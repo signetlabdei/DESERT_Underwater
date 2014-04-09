@@ -1,0 +1,9 @@
+In these two sub-folders you can find several tcl samples to test the various features of DESERT. 
+Each sample has the name of the most representative module tested in that sample 
+However, in each samples a complete stack and a network of at least two nodes is set up.
+If you need help with tcl and the samples, you can refer to the pdf files that you can find 
+within each folder.
+Each pdf file explains in detail one representative tcl file, and is therefore very useful to
+understand the general structure of a tcl file before starting to build your own.
+
+

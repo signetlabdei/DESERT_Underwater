@@ -1,0 +1,10 @@
+Credits: Giovanni Toso
+
+- If you are using an ubuntu like distro open the terminal and: "sudo apt-get install doxygen"
+- Download the script and save it in the folder of your DESERT local copy (or another folder)
+- line 32: add the relative path to the folders containing files with doxygen documentation (the procedure is recursive);
+- line 39: if you want, you can change the output folder (the default one is ./desert_doc);
+- line 288: check that all the extensions (.h, .cc etc) are already included;
+- Compile the script from the terminal by: doxygen doxygen_config_file
+- You can open the docx by cd in ./desert_doc and opening index.html with your browser;
+- Don't worry too much about the warning in the terminal that you could receive.
