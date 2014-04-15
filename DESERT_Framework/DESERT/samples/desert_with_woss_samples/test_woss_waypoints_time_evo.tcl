@@ -16,25 +16,22 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses>/.
-#######################################################################################
-#                                                                                     #
-#                                  README                                             #
-#                                                                                     #
-# This example provide the use of WOSS channel, propagation model and channel         #
-# estimator with complete DESERT stack and Interference computation. In particular,   #
-# this tcl sample require the use of enviromental databases for SSP, bathymetry and   #
-# sediment. You can download the sediment and SSP databases                           #
-# from http://telecom.dei.unipd.it/ns/woss/, meanwhile for the                        #
-# GEBCO bathymetry databases, you have to register yourself and download it from      #
-# http://www.gebco.net/data_and_products/gridded_bathymetry_data/. You can find more  #
-# info on http://telecom.dei.unipd.it/ns/woss/doxygen/installation.html               #
-# After the databases download, please put the correct path in opt(db_path) and       #
-# opt(db_res_path) variables.                                                         #
-# You can also  check out the sample into DESERT_Framework/woss-1.3.5/samples.        #
-# For any question, please refer to the DESERT mailing list                           #
-# <desert-usergroup@dei.unipd.it>                                                     #
-#                                                                                     #
-#######################################################################################
+#####################################################################################"
+#                                  README                                           #"
+#                                                                                   #"
+# This example showcases the use of WOSS at the physical layer, along with DESERT's #"
+# Interference computation capabilities and network protocol stack. In particular,  #"
+# this tcl sample requires the use of enviromental databases for SSP, bathymetry,   #"
+# sediments, as well as for the characteristics of electro-acoustic transducers.    #"
+# You can download the sediment and SSP databases at the following link:            #"
+#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz 			    #"
+# After the download, please set opt(db_path) to the correct path.	        	    #" 
+#	Please note that we cannot redistribute the GEBCO bathymetry database. You can 	#"
+# download the database by registering on the GEBCO web site at:					#"
+#     http://http://www.gebco.net/												    #"
+# For any question, please refer to the DESERT Underwater mailing list              #"
+#     <desert-usergroup@dei.unipd.it>                                               #"
+#####################################################################################"
 
 # Module libraries
 
@@ -120,8 +117,44 @@ set opt(db_path)     "insert_db_path_here"
 set opt(db_res_path)  "."
 
 if { $opt(db_path) == "insert_db_path_here" } {
-  puts "You have to set the database path first."
-  exit
+	puts "#######################################################################################"
+	puts "#                                  README                                             #"
+	puts "#                                                                                     #"
+	puts "# This example showcases the use of WOSS at the physical layer, along with DESERT's   #"
+	puts "# Interference computation capabilities and network protocol stack. In particular,    #"
+	puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
+	puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
+	puts "# You can download the sediment and SSP databases at the following link:              #"
+	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+	puts "# After the download, please set opt(db_path) to the correct path.                    #" 
+	puts "#	Please note that we cannot redistribute the GEBCO bathymetry database.        #"
+	puts "# You can download the database by registering on the GEBCO web site at:              #"
+	puts "#     http://http://www.gebco.net/                                                    #"
+	puts "# For any question, please refer to the DESERT Underwater mailing list                #"
+	puts "#     <desert-usergroup@dei.unipd.it>                                                 #"
+	puts "#######################################################################################"
+  	exit
+}
+set exists_transducers [file exists "$opt(db_path)/transducers/ITC/ITC-ITC-3001-17.5kHz.txt"]
+set exists_ssp [file exists "$opt(db_path)/ssp/2WOA2009_SSP_Annual.nc"]
+if { $exists_ssp == 0 || $exists_transducers == 0 } {
+	puts "#######################################################################################"
+	puts "#                                  README                                             #"
+	puts "#                                                                                     #"
+	puts "# This example showcases the use of WOSS at the physical layer, along with DESERT's   #"
+	puts "# Interference computation capabilities and network protocol stack. In particular,    #"
+	puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
+	puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
+	puts "# You can download the sediment and SSP databases at the following link:              #"
+	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+	puts "# After the download, please set opt(db_path) to the correct path.                    #" 
+	puts "#	Please note that we cannot redistribute the GEBCO bathymetry database.        #"
+	puts "# You can download the database by registering on the GEBCO web site at:              #"
+	puts "#     http://http://www.gebco.net/                                                    #"
+	puts "# For any question, please refer to the DESERT Underwater mailing list                #"
+	puts "#     <desert-usergroup@dei.unipd.it>                                                 #"
+	puts "#######################################################################################"
+	exit
 }
 
 set opt(tracefilename) "/dev/null"

@@ -1,0 +1,6 @@
+2.0.2 - 2014-04-15
+    * Removed .tex files from samples description folders
+    * Added a check for DBs on tcl samples requiring WOSS.
+
+2.0.0 - 2014-04-09
+    * Public release of DESERT Underwater Framework v2
