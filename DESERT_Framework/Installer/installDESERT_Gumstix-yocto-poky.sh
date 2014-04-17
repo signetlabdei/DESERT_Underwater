@@ -881,7 +881,7 @@ build_WOSS() {
                 --build=${HOST}                                                    \
                 --with-ns-allinone=${currentBuildLog}                              \
                 --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION} \
-                --with-netcdf=${currentBuildLog}/netcdf-${NETCDF_VERSION}          \
+                --with-netcdf=${DEST_FOLDER}                                       \
                 --with-pthread                                                     \
                 --prefix=${DEST_FOLDER} i                                          \
                 >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
