@@ -1,5 +1,9 @@
+2.0.4 - 2014-04-20
+    * Fixed the addon list in .addon.list
+
 2.0.3 - 2014-04-17
     * Fixed a bug on WOSS installer configure
+
 2.0.2 - 2014-04-15
     * Removed .tex files from samples description folders
     * Added a check for DBs on tcl samples requiring WOSS.

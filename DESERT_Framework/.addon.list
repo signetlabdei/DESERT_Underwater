@@ -1,11 +1,3 @@
-bpsk_db
-uwmll-with-arp
-uwphysical_variable_bitrate
-uwtp
-uwApplication
-uwmsg
-uwmsun
-packer_uwApplication
 packer_uwcbr
 packer_uwflooding
 packer_uwip
@@ -13,7 +5,6 @@ packer_uwmsun
 packer_uwpolling
 packer_uwudp
 packer_uwufetch
-mfsk_whoi_mm
 wossgmmob3D    (requires WOSS)
 wossgroupmob3D (requires WOSS)
 ALL            (installs all addons)
