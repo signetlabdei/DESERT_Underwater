@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -72,11 +72,11 @@ int UnderwaterGainFromDb::command(int argc, const char*const* argv) {
             path_ = new char[tmp_.length() + 1];
             strcpy(path_, tmp_.c_str());
             if (path_ == NULL) {
-                fprintf(stderr, "Empty string for the trace file name");
+                fprintf(stderr, "Empty string for the path_ file name");
                 return TCL_ERROR;
             }
             return TCL_OK;
-        } 
+        }
     }
     return UnderwaterPhysical::command(argc, argv);
 } /* UnderwaterGainFromDb::command */
@@ -97,14 +97,14 @@ double UnderwaterGainFromDb::getPER(double _snr, int _nbits, Packet* p) {
     double gain_ = pow(10, (this->getGain(NOW, depth_src_, depth_dst_, dist_dst_) / 10));
     gain_ = gain_ * pow(frequency_correction_factor_, - dist_dst_);
     
-    double snr_;
+    double snir_;
     if ((ph->Pn + ph->Pi) != 0) {
-        snr_ = (ph->Pt * gain_) / (ph->Pn + ph->Pi);
+        snir_ = (ph->Pt * gain_) / (ph->Pn + ph->Pi);
     } else {
-        snr_ = - INT_MAX;
+        snir_ = - INT_MAX;
         cerr << "ph->Pn + ph->Pi = 0!" << endl;
     }
-    return UnderwaterPhysical::getPER(snr_, _nbits, p);
+    return UnderwaterPhysical::getPER(snir_, _nbits, p);
 } /* UnderwaterGainFromDb::getPER */
 
 void UnderwaterGainFromDb::setTimeRoughness(const int& _time) {
@@ -130,6 +130,13 @@ void UnderwaterGainFromDb::setTotalTime(const int& _total_time) {
     total_time_ = _total_time;
     return;
 } /* UnderwaterGainFromDb::setTotalTime */
+
+void UnderwaterGainFromDb::setFrequencyCorrectionFactor(const double& _frequency_correction_factor) {
+    assert(_frequency_correction_factor > 0);
+    frequency_correction_factor_ = _frequency_correction_factor;
+    return;
+} /* UnderwaterGainFromDb::setFrequencyCorrectionFactor */
+
 
 double UnderwaterGainFromDb::getGain(const double& _time, const double& _source_depth, const double& _destination_depth, const double& _destination_distance) {
     assert(_time >= 0);

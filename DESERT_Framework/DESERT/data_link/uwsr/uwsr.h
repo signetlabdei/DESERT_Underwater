@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -671,7 +671,7 @@ class MMacUWSR : public MMac {
   /**
   * Erase the packet which is delivered to the destination correctly or other reasons
   */
-  inline void eraseItemFromPktQueue(int mac_addr, int seq_num){ map< usrPair,Packet*> :: iterator it_p; it_p = mapPacket.find(make_pair(mac_addr, seq_num)); mapPacket.erase((*it_p).first); }
+  inline void eraseItemFromPktQueue(int mac_addr, int seq_num){ map< usrPair,Packet*> :: iterator it_p; it_p = mapPacket.find(make_pair(mac_addr, seq_num)); Packet::free((*it_p).second); mapPacket.erase((*it_p).first); }
   
   ///managing ack
   /**

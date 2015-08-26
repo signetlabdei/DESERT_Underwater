@@ -45,11 +45,11 @@
 #include "uw-woss-position.h"
 #include <plugin.h>
 
+#include "uwrandomlib.h"
+
 #define sgn(x) ( ((x)==0.0) ? 0.0 : ((x)/fabs(x)) )
 #define pi (4*atan(1.0))
 #define earth_radius 6371000.0
-
-extern double Gauss(double,double,int); /**< gaussian random variable with average standard deviation */
 
 /**
 * Base class of Group Mobility Model. This is inherited from WossPosition Class.
@@ -268,6 +268,8 @@ class WossGroupMob3D : public WossPosition
 		WossPosition* leader_; /**< Position pointer of the leader */
 		
 		UpdatePositionTimer update_position_timer; /**< An object of UpdateTimerPosition class */
+
+		Uwrandomlib randlib;
 };
 
 #endif		// _WOSS_GROUPMBMODEL_3D_

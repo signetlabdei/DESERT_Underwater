@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,3 +34,4 @@ Module/UW/GAINFROMDB set time_roughness_ 1
 Module/UW/GAINFROMDB set depth_roughness_ 1
 Module/UW/GAINFROMDB set distance_roughness_ 1
 Module/UW/GAINFROMDB set total_time_ 1
+Module/UW/GAINFROMDB set frequency_correction_factor_ 1

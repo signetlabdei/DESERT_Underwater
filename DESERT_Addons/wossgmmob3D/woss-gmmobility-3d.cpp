@@ -228,7 +228,6 @@ double WossGMMob3D::Gaussian()
 	double x1, x2, w, y1;
 	static double y2;
 	static int use_last = 0;
-
 	if (use_last)             
 	{
 		y1 = y2;
@@ -268,7 +267,7 @@ void WossGMMob3D::update()
 		speed_ = (alpha_*speed_) + (((1.0-alpha_))*speedMean_) + (sqrt(1.0-pow(alpha_,2.0))*Gaussian());
 		direction_ = (alpha_*direction_) + (((1.0-alpha_))*directionMean_) + (sqrt(1.0-pow(alpha_,2.0))*Gaussian());
 		
-		pitch_ = Gauss(pitchMean_, sigmaPitch_, 0);
+		pitch_ = randlib.Gauss(pitchMean_, sigmaPitch_, 0);
 		
 		if (wossgm_debug_)
 			printf("WossGMMob3D::Update(%d), new speed %.2f new direction %.2f new pitch %.2f \n", maddr, speed_, direction_, pitch_);

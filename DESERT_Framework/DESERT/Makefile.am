@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ EXTRA_DIST = autogen.sh
 SUBDIRS = m4 \
     application/uwcbr \
     application/uwvbr \
+    application/uwApplication \
     transport/uwudp \
     network/uwstaticrouting \
     network/uwsun \
@@ -51,17 +52,26 @@ SUBDIRS = m4 \
     data_link/uwsr \
     data_link/uw-t-lohi \
     data_link/uwUFetch \
-    data_link/uw-csma-aloha-triggered \
+    data_link/uw-csma-aloha-trigger \
+    data_link/uwtdma \
     physical/uwphysical \
     physical/uwgainfromdb \
     physical/uwphysicaldb\
+    physical/uwphysicalrogersmodel\
+    physical/uwphysicalfromdb\
     physical/uwmphy_modem \
     physical/ms2c_evologics \
     physical/uwmphypatch \
+    physical/uwhermesphy \
+    physical/uwoptical_phy \
     physical/uw-al \
     physical/uw-al/packer_common \
     physical/uw-al/packer_mac \
     mobility/uwdriftposition \
     mobility/uwgmposition \
-    interference/uwinterference
+    mobility/uwrandomlib \
+    mobility/uwsmposition \
+    interference/uwinterference \
+    propagation/uwoptical_propagation \
+    channel/uwoptical_channel
 

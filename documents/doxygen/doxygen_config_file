@@ -22,7 +22,7 @@ PROJECT_NAME           = DESERT
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 2.0.0
+PROJECT_NUMBER         = 2.1.0
 
 # The INPUT tag can be used to specify the files and/or directories that contain
 # documented source files. You may enter file names like "myfile.cpp" or
@@ -31,10 +31,12 @@ PROJECT_NUMBER         = 2.0.0
 
 INPUT       = ../../DESERT_Framework/DESERT/application/uwcbr \
 			../../DESERT_Framework/DESERT/application/uwvbr \
+			../../DESERT_Framework/DESERT/application/uwApplication \
 			../../DESERT_Frameork/DESERT/mobility/uwdriftposition \
 			../../DESERT_Framework/DESERT/mobility/uwgmposition \
 			../../DESERT_Framework/DESERT/network/uwicrp \
 			../../DESERT_Framework/DESERT/network/uwip \
+			../../DESERT_Framework/DESERT/network/uwflooding \
 			../../DESERT_Framework/DESERT/network/uwstaticrouting \
 			../../DESERT_Framework/DESERT/network/uwsun \
 			../../DESERT_Framework/DESERT/transport/uwudp \
@@ -44,11 +46,14 @@ INPUT       = ../../DESERT_Framework/DESERT/application/uwcbr \
 			../../DESERT_Framework/DESERT/data_link/uwaloha \
 			../../DESERT_Framework/DESERT/data_link/uw-t-lohi \
 			../../DESERT_Framework/DESERT/data_link/uwUFetch \
-			../../DESERT_Framework/DESERT/data_link/uw-csma-aloha-triggered \
+			../../DESERT_Framework/DESERT/data_link/uwtdma \
+			../../DESERT_Framework/DESERT/data_link/uw-csma-aloha-trigger \
 			../../DESERT_Framework/DESERT/data_link/uwmll \
 			../../DESERT_Framework/DESERT/data_link/uwsr \
-			../../DESERT_Framework/DESERT/mobility/wossgmmob3D \
-			../../DESERT_Framework/DESERT/mobility/wossgroupmob3D \
+			../..//DESERT_Framework/DESERT/mobility/uwdriftposition \
+			../..//DESERT_Framework/DESERT/mobility/uwgmposition \
+			../..//DESERT_Framework/DESERT/mobility/uwsmposition \
+			../../DESERT_Framework/DESERT/mobility/uwsmposition \
 			../../DESERT_Framework/DESERT/transport/uwtp \
 			../../DESERT_Framework/DESERT/interference/uwinterference \
          	../../DESERT_Framework/DESERT/physical/uwmphy_modem \
@@ -60,6 +65,11 @@ INPUT       = ../../DESERT_Framework/DESERT/application/uwcbr \
          	../../DESERT_Framework/DESERT/physical/uwphysical \
          	../../DESERT_Framework/DESERT/physical/uwgainfromdb \
          	../../DESERT_Framework/DESERT/physical/uwphysicaldb \
+         	../../DESERT_Framework/DESERT/physical/uwphysicalrogersmodel \
+         	../../DESERT_Framework/DESERT/physical/uwhermesphy \
+         	../../DESERT_Framework/DESERT/physical/uwoptical_phy \
+         	../../DESERT_Framework/DESERT/propagation/uwoptical_propagation \
+         	../../DESERT_Framework/DESERT/channel/uwoptical_channel \
             docs/Mainpage.dox
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)

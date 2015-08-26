@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -269,8 +269,8 @@ proc createNode { id } {
     
     $phy($id) setSpectralMask $data_mask
     $phy($id) setInterference $interf_data($id)
-    #$phy($id) setInterferenceModel "CHUNK"
-    $phy($id) setInterferenceModel "MEANPOWER"
+    $phy($id) setInterferenceModel "CHUNK"
+    #$phy($id) setInterferenceModel "MEANPOWER"
     $mac($id) $opt(ack_mode)
     $mac($id) initialize
 }

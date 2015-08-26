@@ -384,7 +384,7 @@ void WossGroupMob3D::update()
 	else {
 		speed_ = (alpha_*speed_) + (((1.0-alpha_))*speedMean_) + (sqrt(1.0-pow(alpha_,2.0))*Gaussian());
 		direction_ = (alpha_*direction_) + (((1.0-alpha_))*directionMean_) + (sqrt(1.0-pow(alpha_,2.0))*Gaussian());
-		pitch_ = Gauss(pitchMean_, sigmaPitch_, 0);
+		pitch_ = randlib.Gauss(pitchMean_, sigmaPitch_, 0);
 		
 		pr_pitch_ = pitch_;
 		
@@ -423,7 +423,7 @@ void WossGroupMob3D::update()
 	  dist = distance(leader_,this);
 	  if((galpha_ < 0) && (dist < 1)) dist = 1.0;
 	  
-	  beta_ = ((1.0 - eta_) * beta_) + (eta_ * Gauss(speedM_,speedS_,0));
+	  beta_ = ((1.0 - eta_) * beta_) + (eta_ * randlib.Gauss(speedM_,speedS_,0));
 	  	  
 	  double rho = updateTime_ * beta_ * charge_ * leaderCharge_ * pow(dist, -galpha_);
 	  

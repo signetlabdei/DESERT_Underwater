@@ -32,9 +32,9 @@ lib_LTLIBRARIES = libwossgroupmobility.la
 
 libwossgroupmobility_la_SOURCES = woss-groupmobility-3d.h woss-groupmobility-3d.cpp initlib.cc
 
-libwossgroupmobility_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  @WOSS_CPPFLAGS@ @DESERT_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@
-libwossgroupmobility_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@   @WOSS_LDFLAGS@  @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@
-libwossgroupmobility_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@    @WOSS_LIBADD@   @DESERT_LIBADD@ @DESERT_ADDON_LIBADD@
+libwossgroupmobility_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  @WOSS_CPPFLAGS@ @DESERT_CPPFLAGS@
+libwossgroupmobility_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@   @WOSS_LDFLAGS@  @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
+libwossgroupmobility_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@    @WOSS_LIBADD@   @DESERT_LIBADD@
 
 
 nodist_libwossgroupmobility_la_SOURCES = embeddedtcl.cc

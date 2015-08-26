@@ -49,7 +49,8 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
 
                 for dir in          \
                     network/uwip    \
-                    transport/uwudp
+                    transport/uwudp \
+                    mobility/uwrandomlib
                 do
                     echo "considering dir \"$dir\""
                     DESERT_CPPFLAGS="$DESERT_CPPFLAGS -I${DESERT_PATH}/${dir}"
@@ -58,7 +59,8 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
 
                 for lib in \
                     uwip   \
-                    uwudp
+                    uwudp  \
+                    uwrandom
                 do
                     DESERT_LIBADD="$DESERT_LIBADD -l${lib}"
                 done
@@ -96,7 +98,8 @@ AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
 
                     for dir in          \
                         network/uwip    \
-                        transport/uwudp
+                        transport/uwudp \
+                        mobility/uwrandomlib
                     do
                         echo "considering dir \"$dir\""
                         DESERT_LDFLAGS_BUILD="$DESERT_LDFLAGS_BUILD -L${DESERT_PATH_BUILD}/${dir}"

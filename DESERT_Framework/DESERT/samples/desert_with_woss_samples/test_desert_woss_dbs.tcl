@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -230,7 +230,7 @@ if { $opt(db_path_gebco) == "insert_db_path_here" } {
     exit
 }
 set exists_ssp [file exists "$opt(db_path)/ssp/2WOA2009_SSP_Annual.nc"]
-set exists_gebco [file exists "$opt(db_path_gebco)/gebco_08.nc"]
+set exists_gebco [file exists "$opt(db_path_gebco)/bathymetry/gebco_08.nc"]
 
 if { $exists_ssp == 0 || $exists_gebco == 0 } {
     puts "#######################################################################################"

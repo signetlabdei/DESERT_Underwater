@@ -1,0 +1,9 @@
+Solar Zenith: 22°
+Location: La Spezia @ noon
+combination   a     b     c
+0.15a         0.15  0     0.15
+0.15b         0     0.15  0.15
+0.15ab        0.075 0.75  0.15
+2.19a         2.19  0     2.19
+2.19b         0     2.19  2.19
+2.19ab        1.1   1.09  2.19

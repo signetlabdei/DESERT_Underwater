@@ -46,7 +46,7 @@ print_desert_logo() {
     echo "| |  | |/ _ \\/ __|/ _ \ '__| __| | |  | | '_ \\ / _\` |/ _ \\ '__\\ \\ /\\ / / _\` | __/ _ \\ '__|"
     echo "| |__| |  __/\\__ \\  __/ |  | |_  | |__| | | | | (_| |  __/ |   \\ V  V / (_| | ||  __/ |   "
     echo "|_____/ \\___||___/\\___|_|   \\__|  \\____/|_| |_|\\__,_|\\___|_|    \\_/\\_/ \\__,_|\\__\\___|_|   "
-    echo "_____\033[0m\033[0;30;49mCopyright (c) 2014 Regents of the SIGNET lab, University of Padova  (ver. 2.0.0)\033[0m_____"
+    echo "_____\033[0m\033[0;30;49mCopyright (c) 2014 Regents of the SIGNET lab, University of Padova  (ver. 2.0)\033[0m_____"
     echo "\n"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "return of print_desert_logo(): ${output}"
@@ -331,10 +331,17 @@ wizard_function_wossRequire() {
     sleep ${SLEEP05}
     echo ""
     wizard__print_L2 "Setting of the WOSS_${WOSS_VERSION} libraries installation."
-    wizard__print_L3 "WARNING: To install the WOSS libraries, you need the gfortran compiler to be."
+    wizard__print_L3 "WARNING: To install the WOSS libraries, you need the gfortran compiler "
     wizard__print_L3 "         to be available on your OS."
     wizard__print_L3 "         If you are using a Debian-based OS, you can try to execute"
     wizard__print_L3 "         this command: sudo apt-get install gfortran"
+    wizard__print_L3 "WARNING: If you want to use enviromental databases for SSP, bathymetry,"
+    wizard__print_L3 "         sediments, as well as for the characteristics of electro-acoustic transducers"
+    wizard__print_L3 "         You can download the sediment and SSP databases at the following link:"
+    wizard__print_L3 "         http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz"
+    wizard__print_L3 "         Please note that we cannot redistribute the GEBCO bathymetry database"
+    wizard__print_L3 "         You can download the database by registering on the GEBCO web site at:"
+    wizard__print_L3 "         http://http://www.gebco.net/"
     echo -n "Do you need the WOSS_${WOSS_VERSION} libraries (N, by default)?"
     woss_require=""
     read_input "woss_require"
@@ -383,25 +390,44 @@ wizard_function_customPar() {
 }
 
 wizard_function_addons(){
+    #TODO replace the case statement with a single call to: wizard__print_L4
     sleep ${SLEEP05}
     echo ""
     wizard__print_L2 "Setting of the ADDONs (OPTIONAL)"
     wizard__print_L3 "list of the available ADDONs:"
-    wizard__print_L4 "$(cat ${ROOT_DESERT}/.addon.list | sed -e 's/\(.\)/*  \1/')"
+    case "${OWNER_PERMISSION}" in
+        "0")
+            wizard__print_L4 "$(cat ${ROOT_DESERT}/${ADDONS_FILE} | sed -e 's/\(.\)/*  \1/')"
+            ;;
+        "1")
+            wizard__print_L4 "$(cat ${ROOT_DESERT}/${ADDONS_FILE} | sed -e 's/\(.\)/*  \1/')"
+            ;;
+    esac
+
     echo -n "Enter all ADDONs to be installed (separate entries with a space)"
     ADDONS=""
     read_input "ADDONS"
     _ADDONS=1
     log_L1 "_ADDONS=${_ADDONS}" install.log
     log_L2 "ADDONS=${ADDONS}" install.log
-    ALL_ADDONS=$(cat ./.addon.list | awk '{print $1}' | grep -v "ALL" | awk '{printf "%s ",$0} END {print ""}')
     case "${ADDONS}" in
         "")
             continue
             ;;
         "ALL")
-            ADDONS=${ALL_ADDONS}
-            echo -n "--addons \"${ALL_ADDONS}\"" >> ${INSTALL_CONF}
+            case "${WITHWOSS}" in
+                "0")
+                    ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | grep -v "wossgmmob3D" | grep -v "wossgroupmob3D" | awk '{printf "%s ",$0} END {print ""}')
+                    ADDONS=${ALL_ADDONS}
+                    echo -n "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                    ;;
+
+                "1")
+                    ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | awk '{printf "%s ",$0} END {print ""}')
+                    ADDONS=${ALL_ADDONS}
+                    echo -n "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                    ;;
+            esac
             ;;
         *)
             echo -n "--addons \"${ADDONS}\" " >> ${INSTALL_CONF}
@@ -909,6 +935,14 @@ debug__print_parameters() {
     debug__print_screen_L1 "BUILD_TARGET (target Destination Folder)    = ${BUILD_TARGET}"
     debug__print_screen_L1 "CUSTOM_PAR   (Custom Parameters)            = ${CUSTOM_PAR}"
     debug__print_screen_L1 "ADDONS       (names of the Addons)          = ${ADDONS}"
+    return 0
+}
+
+delete_recursive_soft_link() {
+    cd ${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-build
+    rm -rf DESERT_ADDON
+    cd ${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-src
+    rm -rf DESERT_Addons
     return 0
 }
 

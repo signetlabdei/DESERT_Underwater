@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ UWMPhy_modem::UWMPhy_modem(std::string pToDevice_) {
     bind("debug_", &debug_);
     bind("log_", &log_);
     bind("SetModemID_", &SetModemID);
+    bind("UseKeepOnline_", &UseKeepOnline);
     t = -1;
     PktRx = NULL;
     pcheckTmr = NULL;
@@ -165,15 +166,26 @@ void UWMPhy_modem::start() {
     } else {
         pmDriver->setModemID(false);
     }
+    if (getKeepOnline() == 1)
+    {
+        pmDriver->setKeepOnlineMode(true);
+    } else {
+        pmDriver->setKeepOnlineMode(false);
+    }
     pmDriver -> start();
     pcheckTmr -> resched(period);
 
 }
 
 void UWMPhy_modem::stop() {
-    pmDriver -> stop();
-    pcheckTmr -> force_cancel();
-
+    if (getKeepOnline()) {
+        pmDriver -> stop();
+        check_modem();
+        pcheckTmr -> force_cancel();
+    } else {
+        pmDriver->stop();
+        pcheckTmr->force_cancel();
+    }
 }
 
 int UWMPhy_modem::check_modem() {
@@ -202,6 +214,11 @@ int UWMPhy_modem::check_modem() {
         endTx(popTxBuff());
         startRx(PktRx);
         endRx(PktRx);
+    } else if (modemStatus == _CFG && modemStatus_old == _CFG) {
+
+        pmDriver->modemSetID();
+        //return modemStatus;
+
     } else if ((modemStatus == modemStatus_old) || ((modemStatus == _TX_RX) && modemStatus_old == _TX_PAUSED) || (modemStatus == _TX_PAUSED && modemStatus_old == _TX)) {
         // Do nothing
         return modemStatus;
@@ -210,10 +227,12 @@ int UWMPhy_modem::check_modem() {
     else if (modemStatus == _IDLE && modemStatus_old == _CFG) {
         if (debug_ >= 0) cout << NOW << "UWMPHY_MODEM(" << ID << ")::CONFIGURATION DONE!!!" << endl;
         pmDriver->emptyModemQueue();
-    } else if (modemStatus == _IDLE && modemStatus_old == _RESET)
+    } else if (modemStatus == _IDLE && modemStatus_old == _RESET) {
         return modemStatus;
-
-    else {
+    } else if (modemStatus == _IDLE && modemStatus_old == _QUIT) {
+        //do nothing
+        if (debug_ >= 0) cout << NOW << "UWMPHY_MODEM(" << ID << ")::QUITTING_INTERFACE_BYE" << endl;
+    } else {
         if (debug_ >= 0) {
             cout << NOW << "UWMPHY_MODEM(" << ID << ")::CHECK_MODEM::ERROR_UNEXPECTED_STATE_TRANSITION_FROM_" << modemStatus_old << "_TO_" << modemStatus << endl;
         }
@@ -234,7 +253,13 @@ void UWMPhy_modem::startTx(Packet* p)
     if (ch->direction() == hdr_cmn::UP) {
          cout << NOW << "UWMPHY_MODEM(" << ID << ")::CHECK_MODEM::ERROR_DIRECTION_SET_UP " << endl;
     } else {
-        pmDriver -> modemTx();
+        if (getKeepOnline())
+        {
+            //TODO: add header reader in order to see which TX mode use: burst, pbm, im
+            pmDriver -> modemTxBurst();
+        } else {
+            pmDriver -> modemTx();
+        }
     }
 }
 

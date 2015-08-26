@@ -1,6 +1,6 @@
 Credits: Giovanni Toso
 
-- If you are using an ubuntu like distro open the terminal and: "sudo apt-get install doxygen"
+- If you are using an ubuntu like distro open the terminal and type: "sudo apt-get install doxygen"
 - Download the script and save it in the folder of your DESERT local copy (or another folder)
 - line 32: add the relative path to the folders containing files with doxygen documentation (the procedure is recursive);
 - line 39: if you want, you can change the output folder (the default one is ./desert_doc);

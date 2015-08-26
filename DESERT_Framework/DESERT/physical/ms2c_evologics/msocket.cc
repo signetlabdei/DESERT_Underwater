@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -60,21 +60,6 @@ static void hexdump(std::string name, std::string str)
     std::cout << std::dec << std::endl;
 }
 
-static std::string bin2hex(std::string bin)
-{
-    size_t len = bin.size();
-    const char *data = bin.c_str();
-    std::stringstream ss(std::stringstream::out);
-
-    for (int i = 0; i < len; i++)
-    {
-        ss.width(2);
-        ss.fill('0');
-        ss << std::hex << (unsigned int)(unsigned char)data[i] << " ";
-    }
-
-    return ss.str();
-}
 
 static std::string hexdumplog(std::string str)
 {
@@ -82,7 +67,6 @@ static std::string hexdumplog(std::string str)
     const char *data = str.c_str();
     
     std::string str_out = "";
-   
     for (int i = 0; i < len; i++)
     {
        if (std::isalnum(data[i]) || std::ispunct(data[i]))
@@ -108,23 +92,23 @@ void Msocket::error(const char *msg)
   
 Msocket::Msocket(UWMdriver* pmDriver_,std::string portno_):UWMconnector(pmDriver_, portno_){
    sockfd = 0;
-   std::string parser(":");
-   size_t p_parser=pathToDevice.find(parser);
+   std::string tokenizer(":");
+   size_t p_tokenizer=pathToDevice.find(tokenizer);
    
-   if (p_parser==string::npos) {
+   if (p_tokenizer==string::npos) {
         
         server_host = "localhost";
         portno = atoi(pathToDevice.c_str());
         
 	if (debug_) {
-	   cout << "port:" << portno << endl;
-           cout << "serverhost:" << server_host << endl;
+	   cout << "MSOCKET::port:" << portno << endl;
+           cout << "MSOCKET::serverhost:" << server_host << endl;
 	}
    
    } else {
         
-        server_host = pathToDevice.substr(0,p_parser);
-        portno = atoi((pathToDevice.substr(p_parser+1)).c_str());
+        server_host = pathToDevice.substr(0,p_tokenizer);
+        portno = atoi((pathToDevice.substr(p_tokenizer+1)).c_str());
         
    }
 }
@@ -135,11 +119,13 @@ Msocket::~Msocket(){
 int Msocket::openConnection(){
       sockfd = socket(AF_INET, SOCK_STREAM, 0);
       if (sockfd < 0){ 
-        perror("ERROR opening socket");
+        perror("MSOCKET::ERROR::OPEN_SOCKET");
       }
       server = gethostbyname(server_host.c_str());
       if (server == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
+        //fprintf(stderr,"ERROR, no such host\n");
+          perror("MSOCKET::ERROR::NO_SUCH_HOST");
+          exit(1);
       }
       bzero((char*) &serv_addr, sizeof(serv_addr));
       serv_addr.sin_family = AF_INET;
@@ -147,7 +133,8 @@ int Msocket::openConnection(){
       serv_addr.sin_port = htons(portno);
       
       if (connect(sockfd,(struct sockaddr*) &serv_addr,sizeof(serv_addr)) < 0){ 
-	perror("ERROR, client connec()");
+	perror("MSOCKET::OPEN_CONNECTION::CONNECT_ERROR");
+        exit(1);
       }
       rc = pthread_create(&thread_id, NULL, read_process_msocket, (void *) this);
       if (rc) {
@@ -199,17 +186,15 @@ void *read_process_msocket(void *pMsocket_me_)
 		tmp_.msg_length = read(pMsocket_me->getSocket(),msg_rx,_MAX_MSG_LENGTH);
 		
 		if( tmp_.msg_length < 0 ) {
-                    perror( "Error reading from socket" );
-		    cout << "File descriptor: " << pMsocket_me->getSocket() << "\n";
+                    perror( "SOCKET::READ::ERROR_READ_FROM_SOCKET" );
                 }
 
-		
 		// Set end of string
 		msg_rx[tmp_.msg_length]='\0';		
 		
 		// Check the queue length
                 if (pMsocket_me->queueMsg.size() > _MAX_QUEUE_LENGTH) {
-                    cerr << "WARNING MSOCKET::*read_process_msocket::READING_BUFFER_FULL. The oldest packet has therefore been dropped" << endl;
+                    cout << "MSOCKET::READ::WARNING::BUFFER_FULL ---> drop the oldest packet" << endl;
 			pMsocket_me->queueMsg.pop();
 		}
                 
@@ -217,13 +202,8 @@ void *read_process_msocket(void *pMsocket_me_)
 		pMsocket_me->queueMsg.push(tmp_);
 		
 		if (pMsocket_me->getDebug() >= 2) {
-		        cout << "[WRITE in queue]: <-- " << hexdumplog(tmp_.msg_rx) << endl;
-			cout << "[# of elements in queue]: " << pMsocket_me->queueMsg.size() << endl;
-		}
-
-		
-		if (pMsocket_me->getDebug() >= 2) {
-		     hexdump(", RX message = ", tmp_.msg_rx);
+                    cout << "MSOCKET::READ::[WRITE in queue]: <-- " << hexdumplog(tmp_.msg_rx) << endl;
+                    cout << "MSOCKET::READ::N_PACKETS_IN_QUEUE " << pMsocket_me->queueMsg.size() << endl;
 		}
 		
 		usleep(1000);

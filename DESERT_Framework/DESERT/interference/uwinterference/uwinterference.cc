@@ -1,4 +1,7 @@
 //
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+// All rights reserved.
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -25,11 +28,11 @@
 //
 
 /**
- * @file   uw-interference-miv-plain.cc
+ * @file   uwinterference.cc
  * @author Federico Favaro
  * @version 1.0.0
  * 
- * \brief Implementation of MinterferenceMIV_plain_Class class.
+ * \brief Implementation of uwinterference class.
  * 
  */
 
@@ -246,87 +249,6 @@ counter uwinterference::getCounters(double starttime, PKT_TYPE type)
 const PowerChunkList& uwinterference::getInterferencePowerChunkList(Packet* p)
 {
     return MInterferenceMIV::getInterferencePowerChunkList(p);
-}
-
-double uwinterference::getInterferencePower(Packet* p)
-{
-    //return MinterferenceMIV_plain::getInterferencePower(p);
-    hdr_MPhy *ph = HDR_MPHY(p);
-    return (this->getInterferencePower(ph->Pr, ph->rxtime, ph->duration));
-}
-
-double uwinterference::getInterferencePower(double power, double starttime, double duration)
-{
-
-  Function::reverse_iterator rit; 
-  
-  double integral = 0;
-  double lasttime = NOW;
-
-  assert(starttime<= NOW);
-  assert(duration > 0);
-  assert(maxinterval_ > duration);
-
-  for (rit = pp.rbegin(); rit != pp.rend(); ++rit )
-    {
-      if (starttime < rit->time)
-	{
-	  integral += rit->value * (lasttime - rit->time);
-          Function::reverse_iterator rit2 = rit;
-          rit2++;
-	  lasttime = rit2->time;	  
-	}
-      else
-	{
-	  integral += rit->value * (lasttime - starttime);
-	  break;
-	}
-    }
-  
-  //assegnazioni nuove
-  
-  initial_interference_time = lasttime;
-  start_rx_time = starttime;
-  end_rx_time = starttime + duration;
-  
-  //cout << "Start Rx Time of packet " << starttime << endl;
-  //cout << "Initial Interference Time " << initial_interference_time << endl;
-  
-  if (starttime > initial_interference_time)
-  {
-      cout << "Interferenza prima dell'inizio sync pacchetto!!" << endl;
-  }
-
-  double interference = (integral/duration) - power;
-
-  // Check for cancellation errors
-  // which can arise when interference is subtracted
-  if (interference < 0)
-    {
-      if (interference < POWER_PRECISION_THRESHOLD)
-	{
-	  // should be a cancellation error, but it exceeds the
-	  // precision threshold, so we print a warning 
-	  if (debug_)
-	    cerr << "MInterferenceMIV::getInterferencePower() WARNING:" 
-		 << " interference=" << interference 
-		 << " POWER_PRECISION_THRESHOLD=" <<  POWER_PRECISION_THRESHOLD
-		 << endl;
-	}
-      interference = 0;
-    }
-
-
-  if (debug_) {
-    dump("Interference::getInterferencePower");
-    std::cout << "transmission from " << starttime 
-	      << " to " << starttime + duration 
-	      << " power " << power
-	      << " gets interference " << interference
-	      << std::endl;
-  }
-
-  return interference;
 }
 
 double uwinterference::getCurrentTotalPower()

@@ -1,4 +1,7 @@
 //
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+// All rights reserved.
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -25,11 +28,11 @@
 //
 
 /**
- * @file   uw-interference-miv-plain.h
+ * @file   uwinterference.h
  * @author Federico Favaro
  * @version 1.0.0
  * 
- * \brief Implementation of MinterferenceMIV_plain class.
+ * \brief Implementation of uwinterference class.
  * 
  */
 
@@ -134,20 +137,6 @@ class uwinterference : public MInterferenceMIV
          * Destructor of the class uwinterference
          */
         virtual ~uwinterference();
-        /**
-         * Returns the power of interference that a certain packet experienced
-         * @param p The Packet for which the calculation of the interference experienced is needed
-         * @return Amount of interference power
-         */
-        virtual double getInterferencePower(Packet* p);
-        /**
-         * Returns the power of interference that a certain packet experienced
-         * @param power Reception power of the desired packet
-         * @param starttime timestamp of the begin of the reception of the desired packet
-         * @param endtime timestamp of the end of the reception of the desired packet
-         * @return Amount of interference power
-         */
-        virtual double getInterferencePower(double power, double starttime, double endtime);
         /**
          * Add a packet to the interference calculation
          * @param p Pointer to the interferer packet

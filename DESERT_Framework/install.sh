@@ -67,7 +67,7 @@ fi
 #------
 
 #Getopt setting --
-shortOpt="abcd:e:f:g:hi:l"
+shortOpt="abcd:e:f:g:hi:lm"
 longOpt="wizard,\
          with-woss,\
          without-woss,\
@@ -77,7 +77,8 @@ longOpt="wizard,\
          custom_par:,\
          help,\
          addons:,\
-         wizard-conf"
+         wizard-conf,\
+         wizard-asOwner"
 ARGS=$(getopt -o $shortOpt   \
               -l "$longOpt"  \
               -n "install.sh" \
@@ -107,11 +108,39 @@ while true; do
     case "$1" in
         -a|--wizard)
             shift;
+            OWNER_PERMISSION=0
+            ADDONS_FILE=".addon.list"
             _WIZARD_OPT=1
             log_L1 "_WIZARD_OPT=${_WIZARD_OPT}" ${INSTALL_LOG}
             if [ -n "$1" ]; then
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_WIZARD_OPT=${_WIZARD_OPT}"
+                    debug__print_screen_L1 "OWNER_PERMISSION=${OWNER_PERMISSION}"
+                    debug__print_screen_L1 "no parameter for --wizard option"
+                fi
+                #shift
+            fi
+            wizard_function
+            break;
+            ;;
+        -m|--wizard-asOwner)
+            shift;
+            if [ -f .addon.priv.list ]; then
+                OWNER_PERMISSION=1
+                ADDONS_FILE=".addon.priv.list"
+            else
+                OWNER_PERMISSION=0
+                ADDONS_FILE=".addon.list"
+                logWARN_L1 "the .addon.priv.list file not found. instal.sh script will start with --wizard option" ${INSTALL_LOG}
+                warn_L1 ".addon.priv.list file not found!"
+                warn_L2 "instal.sh script will start with --wizard option"
+            fi
+            _WIZARD_OPT=1
+            log_L1 "_WIZARD_OPT=${_WIZARD_OPT}" ${INSTALL_LOG}
+            if [ -n "$1" ]; then
+                if [ "${_DEBUG}" = "1" ]; then
+                    debug__print_screen_L1 "_WIZARD_OPT=${_WIZARD_OPT}"
+                    debug__print_screen_L1 "OWNER_PERMISSION=${OWNER_PERMISSION}"
                     debug__print_screen_L1 "no parameter for --wizard option"
                 fi
                 #shift
@@ -283,6 +312,8 @@ if [ $? -ne 0 ]; then
     err_L1 "EXIT FROM install.sh"
     exit
 fi
+
+delete_recursive_soft_link
 
 info_L0 "after_building"
 after_building

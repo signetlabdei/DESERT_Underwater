@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -103,6 +103,11 @@ public:
     std::string build_di() {
         return "AT?DI";
     }
+    /** 
+     * Method to build an AT message to close an acoustic connection
+     * @param  _type_connection_close type of close (1 = brutal, 0 = gentle)
+     */
+    std::string build_ath(int _type_connection_close);
 
     /** 
      * Method to build an AT message to send instant messages. 
@@ -121,6 +126,32 @@ public:
      * @return at_string the requested AT message.
      */    
     std::string build_atzn(int _drop_type);
+    /** 
+     * Method to build an AT message to set the Keep Online Modality
+     * 
+     * @param value of the Keep Online (number of probe message exchanged before close the acoustic connection)
+     * @return at_string the requested AT message.
+     */    
+    std::string build_atko(int value);
+    /** 
+     * Method to build an AT message to send burst messages. 
+     * 
+     * @param _length the length in bytes of the message to send (max is 64 bytes).
+     * @param _dest the ID of the modem that must receive the packet.
+     * @param _payload the payload to send
+     * @return at_string the requested AT message.
+     */
+    std::string build_atsend(int _length, int _dest, std::string _payload);
+
+    /** 
+     * Method to build an AT message to send PIGGYBACK instant messages. 
+     * 
+     * @param _length the length in bytes of the message to send (max is 64 bytes).
+     * @param _dest the ID of the modem that must receive the packet.
+     * @param _payload the payload to send
+     * @return at_string the requested AT message.
+     */
+    std::string build_atsendpbm(int _length, int _dest, std::string _payload);
 
     // METHODS to PARSE MESSAGES
     // NOTE: These methods must know and use the reception variable of the linked UWdriver object and the corresponding methods to update them
@@ -131,6 +162,18 @@ public:
      * @param at_string the received string.
      */
     void parse_recvim(std::string at_string);
+    /**
+     * Method to parse an AT message (reception of a burst message). 
+     * NOTE: this method calls UWMdriver::updateRx(int,int,std::string).
+     * @param at_string the received string.
+     */
+    void parse_recv(std::string at_string);
+    /**
+     * Method to parse an AT message (reception of a burst message). 
+     * NOTE: this method calls UWMdriver::updateRx(int,int,std::string).
+     * @param at_string the received string.
+     */
+    void parse_recvpbm(std::string at_string);
     /** 
      *  Method to get the Integrity value of the last received packet. NOTE: This method is used by McodecS2C_EvoLogics.
      * 

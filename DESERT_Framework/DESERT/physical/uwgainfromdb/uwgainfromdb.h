@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -111,6 +111,13 @@ protected:
     virtual void setTotalTime(const int&);
 
     /**
+     * Sets the frequency_correction_factor_ parameter.
+     * 
+     * @param Frequency correction factor.
+     */
+    virtual void setFrequencyCorrectionFactor(const double&);
+
+    /**
      * Returns the time_roughness_ parameter.
      * 
      * @return time_roughness_
@@ -137,6 +144,13 @@ protected:
      * @return total_time_
      */
     inline const int& getTotalTime() const { return total_time_; }
+
+    /**
+     * Returns the frequency_correction_factor_ parameter.
+     * 
+     * @return frequency_correction_factor_
+     */
+    inline const double& getFrequencyCorrectionFactor() const { return frequency_correction_factor_; }
 
     /**
      * 
@@ -179,6 +193,8 @@ protected:
     inline const bool isZero(const double& value) const { return std::fabs(value) < std::numeric_limits<double>::epsilon(); }
     
     char* path_;                /**< Name of the trace file writter for the current node. */
+    char token_separator_;      /**< Token used to parse the elements in a line of the database. */
+    ostringstream osstream_;    /**< Used to create strings. */
     
 private:
     // Variables
@@ -186,8 +202,6 @@ private:
     int depth_roughness_;       /**< Roughness of the depth samples. */
     int distance_roughness_;    /**< Roughness of the distance samples. */
     int total_time_;            /**< Maximum value of the temporal samples, after this limit the smilulation time will be reset to zero. */
-    char token_separator_;      /**< Token used to parse the elements in a line of the database. */
-    ostringstream osstream_;    /**< Used to create strings. */
     double frequency_correction_factor_; /**< used to shift from a frequency value to another one. */
 };
 

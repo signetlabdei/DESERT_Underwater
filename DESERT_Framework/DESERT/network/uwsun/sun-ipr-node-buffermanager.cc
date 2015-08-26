@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,7 @@ void SunIPRoutingNode::bufferManager() {
                     ch->next_hop()      = sink_associated;
                     iph->daddr()        = sink_associated;
                     _tmp.p_ = p->copy();
+                    Packet::free(((buffer_element) buffer_data.front()).p_); //FF: to fix a mem leak
                     buffer_data.erase(buffer_data.begin());
                     buffer_data.insert(buffer_data.begin(), _tmp);
                     if (iph->saddr() != ipAddr_) {

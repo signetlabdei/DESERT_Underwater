@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -509,7 +509,7 @@ class UWAloha : public MMac {
   * It erases the packet from the container.
   * @param seq_num which is an integer data type.
   */
-  inline void eraseItemFromPktQueue(int seq_num){ map< pktSeqNum,Packet*> :: iterator it_p; it_p = mapPacket.find(seq_num); mapPacket.erase((*it_p).first); }
+  inline void eraseItemFromPktQueue(int seq_num){ map< pktSeqNum,Packet*> :: iterator it_p; it_p = mapPacket.find(seq_num); Packet::free((*it_p).second); mapPacket.erase((*it_p).first); }
   
   /**
   * Put acknowledgement timer in the container.

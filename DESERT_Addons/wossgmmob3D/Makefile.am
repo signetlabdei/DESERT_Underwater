@@ -32,9 +32,9 @@ lib_LTLIBRARIES = libwossgmmobility.la
 
 libwossgmmobility_la_SOURCES = woss-gmmobility-3d.h woss-gmmobility-3d.cpp initlib.cc
 
-libwossgmmobility_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  @WOSS_CPPFLAGS@ @DESERT_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@
-libwossgmmobility_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@   @WOSS_LDFLAGS@  @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@
-libwossgmmobility_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@    @WOSS_LIBADD@   @DESERT_LIBADD@ @DESERT_ADDON_LIBADD@
+libwossgmmobility_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  @WOSS_CPPFLAGS@ @DESERT_CPPFLAGS@
+libwossgmmobility_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@   @WOSS_LDFLAGS@  @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
+libwossgmmobility_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@    @WOSS_LIBADD@   @DESERT_LIBADD@
 
 
 nodist_libwossgmmobility_la_SOURCES = embeddedtcl.cc
@@ -46,4 +46,4 @@ TCL_FILES =  woss-gmmobility-3d-init.tcl
 embeddedtcl.cc: Makefile $(TCL_FILES)
 		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ GmMobilityInitTclCode > embeddedtcl.cc
 
-EXTRA_DIST = $(TCL_FILES) underwater_aloha_bpsk.tcl
+EXTRA_DIST = $(TCL_FILES)

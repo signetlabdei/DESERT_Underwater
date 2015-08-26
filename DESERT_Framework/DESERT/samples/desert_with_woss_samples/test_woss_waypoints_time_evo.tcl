@@ -1,6 +1,6 @@
 # WOSS - World Ocean Simulation System -
 # 
-# Copyright (C) 2014 Regents of Patavina Technologies 
+# Copyright (C) 2015 Regents of Patavina Technologies 
 # 
 # Author: Federico Guerra - federico@guerra-tlc.com
 # 

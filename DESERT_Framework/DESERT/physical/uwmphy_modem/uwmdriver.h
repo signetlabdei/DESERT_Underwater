@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@
 #define _TX_PAUSED 5 /** Status 5 of the driver's general state machine (see UWMdriver::status): modem is buffering the packet to transmit, waiting for the end of an concurring reception. */
 #define _TX_RX 6 /** Status 6 of the driver's general state machine (see UWMdriver::status): modem is transmitting after the reception of a packet. */ 
 #define _RESET 7 /**Reset modem's queue before starting connections */
+#define _QUIT 8
 using namespace std;
 
 // Forward declaration(s)
@@ -85,6 +86,8 @@ public:
 	  */
 	 ~UWMdriver();
 
+	 virtual void modemSetID() = 0;
+
 	 /**
 	  *  Driver starter. This method starts the driver performing all the needed operations 
 	  *  to open an host-modem connection. 
@@ -103,6 +106,16 @@ public:
 	  *  NOTE: when this function is called (by an UWMPhy_modem object), the driver's status must be set to TX_ and the packet must be sent immediately to the modem.
 	  */
 	 virtual void modemTx() = 0;
+	 /**
+	  *  Method to notify to the driver that there is a packet to be sent via modem.
+	  *  NOTE: when this function is called (by an UWMPhy_modem object), the driver's status must be set to TX_ and the packet must be sent immediately to the modem.
+	  */
+	 virtual void modemTxBurst() = 0;
+	 /**
+	  *  Method to notify to the driver that there is a packet to be sent via modem.
+	  *  NOTE: when this function is called (by an UWMPhy_modem object), the driver's status must be set to TX_ and the packet must be sent immediately to the modem.
+	  */
+	 virtual void modemTxPBM() = 0;
 
 	 /** 
 	  *  Method to update modem status. This method has to update the modem status according to the  messages 
@@ -248,6 +261,10 @@ public:
           */
          virtual void emptyModemQueue() = 0;
 
+       	virtual inline bool getKeepOnlineMode() {return KeepOnline;}
+
+       	virtual inline void setKeepOnlineMode(bool ko) {KeepOnline = ko;}
+
          protected:
 
 	 UWMPhy_modem* pmModem; /**< link to the UWMPhy_modem object that contains this driver */
@@ -261,6 +278,8 @@ public:
 	 
 	 int status; /**< Status of the driver's general state machine. Seven possible statuses = \e _IDLE, \e _TX, \e _RX , \e _IDLE_RX,\e _CFG, \e _TX_PAUSED and \e _TX_RX.*/
 
+	 bool KeepOnline;
+
 	 // TX VARIABLES (variables for the next packet to be transmitted)
 	 std::string payload_tx; /**< String where to save the payload of the next packet to send via modem. NOTE: an object of the class UWMcodec must write here after the host-to-modem mapping. */
 	 int dest; /**< Variable where to save the destination ID of the next packet to send via modem. NOTE: an object of the class UWMcodec must write here after the host-to-modem demapping. */
@@ -271,7 +290,7 @@ public:
 	 int src; /**< Variable storing the source ID of the last packet received via modem. NOTE: an object of the class UWMinterpreter must write here after a the parsing of a received data packet; instead, an object of the class UWMcodec reads here before the modem-to-host mapping. */
 	 int dstPktRx;  /**< Variable where to save the destination ID of the last packet received via modem. NOTE: an object of the class UWMinterpreter must write here after a the parsing of a received data packet; instead, an object of the class UWMcodec reads here before the modem-to-host mapping. */
 
-         bool SetModemID; /**< Variable to decide whether the interface has to set the acoustic ID of the modem or not */   
+	 bool SetModemID; /**< Variable to decide whether the interface has to set the acoustic ID of the modem or not */   
 	 int debug_; /**< Flag to enable debug mode (i.e., printing of debug messages) if set to 1 */
 	 std::ofstream outLog; /**< output strem to print into a disk-file log messages. See UWMPhy_modem::logFile.*/
 

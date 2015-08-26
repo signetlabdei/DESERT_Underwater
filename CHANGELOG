@@ -1,3 +1,23 @@
+2.1.0 - ??-??-??
+	* Added uwrandomlib on mobility folder - A tool for use random variables
+	* Added uwsmposition mobility model
+	* Added uwtdma - A TDMA MAC protocol
+	* Improved interface with DESERT and EvoLogics S2C modems
+	* Added uwApplication - an Application Layer protocol to send real payloads on simulation and on real tests
+	* Added the packer of uwApplication to serialize the header and payload of the protocol with real modems
+	* Several bug-fixes on various modules
+	* Several memory leaks resolved
+	* Improvements and refactoring of uw-csma-aloha-triggered MAC protocol
+	* Added an optical channel model
+	* Added an optical PHY layer model
+	* Added an optical propagation model
+	* Added a PHY layer which implements Rogers model
+	* Added A PHY layer which implements Hermes modem model
+	* Added uwmulti_stack_controller to control more than one PHY layers on a node, choosing the best one predetermined metrics
+	* Added uwrov - An application layer protocol to simulate the control of ROVs
+	* Several new samples added
+	* Improved installation script
+
 2.0.5 - 2014-04-21
     * Fixed the addon list in .addon.list (Removed another one)
 

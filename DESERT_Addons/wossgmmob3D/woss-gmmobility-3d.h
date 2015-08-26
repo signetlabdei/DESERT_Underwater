@@ -46,12 +46,14 @@
 #include <string>
 #include <plugin.h>
 #include <uw-woss-position.h>
+#include "uwrandomlib.h"
+
 
 #define sgn(x) ( ((x)==0.0) ? 0.0 : ((x)/fabs(x)) )
 #define pi (4*atan(1.0))
 #define earth_radius 6371000.0
 
-extern double Gauss(double,double,int);         // gaussian random variable with average standard deviation 
+//extern double Gauss(double,double,int);         // gaussian random variable with average standard deviation 
 
 /**
  * This class implements the Gauss Markov mobility model. Movement occurs by 
@@ -218,6 +220,8 @@ class WossGMMob3D : public WossPosition
 		string gm3dTraceFile; /**< Trace file information */
 		
 		UpdateTimerPosition update_timer_position; /**< An object of UpdateTimerPosition class */
+
+		Uwrandomlib randlib;
 };
 
 #endif /*_WOSS_GMMOBMODEL_3D_*/

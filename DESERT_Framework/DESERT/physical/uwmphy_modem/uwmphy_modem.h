@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -179,6 +179,8 @@ public:
          */
          inline unsigned long int getEpoch() {return time(NULL);}
 
+         inline int getKeepOnline() {return UseKeepOnline;}
+
 	 /**
 	  * Method to update the value of the pointer to the last received packet. This method should be used by an object of the class UWMcodec.
 	  * @see UWMcodec
@@ -204,7 +206,8 @@ protected:
 	 int bin_;	 
 	 std::string logFile; /**< Name of the disk-file where to write the interface's log messages.*/	
 	 int log_; /**< Flag to enable, if set different than 0, the printing of log messages in UWMPhy_modem::logFile. */
-         int SetModemID; /**< Flag to indicate if the interface has to force the modem to have the ID indicated in the tcl script */
+     int SetModemID; /**< Flag to indicate if the interface has to force the modem to have the ID indicated in the tcl script */
+     int UseKeepOnline;
 	 
 	 /** 
 	  * Link connector. This method must be used by any derived class D of UWMPhy_modem  to link the members pcheckTmr, pmDriver and pmCodec to the corresponding derived objects contained in D;

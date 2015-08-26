@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ extern packet_t PT_UWVBR;
  * <i>hdr_uwvbr</i> describes <i>UWVBR</i> packets.
  */
 typedef struct hdr_uwvbr {
-    u_int32_t sn_;      /**< Serial number of the packet. */
+    u_int16_t sn_;      /**< Serial number of the packet. */
     float rftt_;        /**< Forward Trip Time of the packet. */
     bool rftt_valid_;   /**< Flag used to set the validity of the fft field. */
 
@@ -85,7 +85,7 @@ typedef struct hdr_uwvbr {
     /**
      * Reference to the sn_ variable.
      */
-    inline u_int32_t& sn() {
+    inline u_int16_t& sn() {
         return sn_;
     }
     

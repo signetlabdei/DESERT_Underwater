@@ -79,7 +79,7 @@ export NS_VERSION=2.34
 export NS_TAR_FILE=${ROOT_DESERT}/ns-${NS_VERSION}.tar.gz
 export NS_DIR=ns-${NS_VERSION}
 
-export NSMIRACLE_VERSION=1.1.0
+export NSMIRACLE_VERSION=1.1.1
 export NSMIRACLE_TAR_FILE=${ROOT_DESERT}/nsmiracle-${NSMIRACLE_VERSION}.tar.gz
 export NSMIRACLE_DIR=nsmiracle-${NSMIRACLE_VERSION}
 
@@ -98,7 +98,7 @@ export WOSS_VERSION=1.3.5
 export WOSS_TAR_FILE=${ROOT_DESERT}/woss-${WOSS_VERSION}.tar.gz
 export WOSS_DIR=woss-${WOSS_VERSION}
 
-export DESERT_VERSION=2.0.0
+export DESERT_VERSION=2.1.0
 export DESERT_DIR=DESERT
 
 export UNPACKED_FOLDER="${ROOT_DESERT}/.unpacked_folder"
@@ -160,6 +160,13 @@ export _ADDONS=-1
 export WITHWOSS=0
 #*
 
+#***
+# OWNER_PERMISSION: 0(default setting. In this case the installer will be set for a public user)
+#                   1(to set this value you must pass the --wizard-asOwner options to install.sh script)
+#
+export OWNER_PERMISSION=0
+#*
+
 export TARGET=""
 export INST_MODE=""
 export DEST_FOLDER=""
@@ -174,6 +181,7 @@ export BUILD_TARGET=""
 
 export CUSTOM_PAR=""
 export ADDONS=""
+export ADDONS_FILE=".addon.list"
 # #
 # ###
 export TMP_INPUT=""

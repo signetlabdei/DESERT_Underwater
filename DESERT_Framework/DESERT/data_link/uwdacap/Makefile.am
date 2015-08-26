@@ -1,10 +1,5 @@
-#-------------------------------------------------------------------------
-# Author: Federico Guerra
-# Date: 24 November 2008
-# Department of Information Engineering (DEI), University of Padova
-#-------------------------------------------------------------------------
 #
-# Copyright (c) 2008 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
