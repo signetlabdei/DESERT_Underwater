@@ -242,7 +242,7 @@ proc createNode {node application id} {
     set ip_addr_value [expr $id + 1]
     $ipif($id) addr $ip_addr_value
     
-    set position($id) [new "Position/SM"]
+    set position($id) [new "Position/UWSM"]
     $node addPosition $position($id)
     #set posdb($id) [new "PlugIn/PositionDB"]
    # $node addPlugin $posdb($id) 20 "PDB"
