@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
@@ -26,31 +27,35 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+#
 # Author: Filippo Campagnaro
-# Author: Roberto Francescon
-# version: 1.0.0
+# Version: 1.0.0
+if [ $# -lt 4 ]
+then
+	echo "1 - ID of the node"
+	echo "2 - IP of the EvoLogics modem"
+	echo "3 - Port of the EvoLogics modem"
+	echo "4 - ID of the experiment"
 
-Module/UW/TDMA set debug_ 		0
-Module/UW/TDMA set HDR_size_ 		0
-Module/UW/TDMA set ACK_size_  		10
-Module/UW/TDMA set max_tx_tries_	5
-Module/UW/TDMA set wait_constant_	0.1
-Module/UW/TDMA set uwTDMA_debug_	0
-Module/UW/TDMA set max_payload_		125
-Module/UW/TDMA set ACK_timeout_		5.0
-Module/UW/TDMA set alpha_		0.8
-Module/UW/TDMA set buffer_pkts_		-1
-Module/UW/TDMA set backoff_tuner_   	1
-Module/UW/TDMA set max_backoff_counter_ 4
-Module/UW/TDMA set MAC_addr_ 		0
+else
 
-Module/UW/TDMA set sea_trial_ 		0
-Module/UW/TDMA set frame_time           0
-Module/UW/TDMA set guard_time           0
-Module/UW/TDMA set tot_slots            0
-Module/UW/TDMA set fair_mode            0
-
-Module/UW/TDMA instproc init {args} {
-    $self next $args
-    $self settag "UW/TDMA"
-}
+	if [ $1 == "--help" ] 
+	then
+		echo "1 - ID of the node"
+		echo "2 - IP of the EvoLogics modem"
+		echo "3 - Port of the EvoLogics modem"
+		echo "4 - ID of the experiment"
+	else
+		nc -w4 -z ${2} ${3} > /dev/null
+		err_check=$?
+		if [ ${err_check} -eq 1 ]
+		then
+			echo "The socket ${1}:${2} is not active! Check the IP and the port associated!"
+		else
+			rm -rf S2C_Evologics_Uwtdma.tr
+			rm -rf MODEM_log_*
+			rm -rf TDMA_node_*_${4}.out
+			ns S2C_uwtdma.tcl $1 5 360000 5 $4 $2 $3
+		fi
+	fi
+fi

@@ -30,9 +30,10 @@
 /**
  * @file   uwtdma.h
  * @author Filippo Campagnaro
+ * @author Roberto Francescon
  * @version 1.0.0
  * 
- * \brief Provides the definition of the class <i>UWTDMA</i>.
+ * @brief Provides the definition of the class <i>UWTDMA</i>.
  * 
  */
 
@@ -41,114 +42,179 @@
 
 #include <mmac.h>
 #include <queue>
+#include <iostream>
+#include <assert.h>
+#include <sstream>
+#include <fstream>
+#include <sys/time.h>
 
-#define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active, whether TDMA modality is on >**/
-#define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active, whether TDMA modality is on >**/
-
-#define UW_CHANNEL_IDLE 1 // status channel idle
-#define UW_CHANNEL_BUSY 2 // status channel busy
-
+#define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active>*/
+#define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/
 
 using namespace std;
+
 
 class UwTDMA;
 
 /**
  * UwTDMATimer class is used to handle the scheduling period of <i>UWTDMA</i> slots.
  */
-class UwTDMATimer : public TimerHandler {
-public:
 
-    /**
-     * Constructor of the UwTDMATimer class
-     * @param UwTDMA *m a pointer to an object of type Uwpolling_AUV
-     */
-    UwTDMATimer(UwTDMA *m) : TimerHandler() {
-        module = m;
-    }
-protected:
-    virtual void expire(Event *e);
-    UwTDMA* module;
+class UwTDMATimer : public TimerHandler
+{
+
+ public:
+  /**
+   * Costructor of the class UwTDMATimer
+   * @param Pointer of a UwTDMA object
+   */
+  UwTDMATimer(UwTDMA* m) : TimerHandler() 
+  {
+    assert(m != NULL);
+    module = m; 
+  } 
+
+ protected:
+  /**
+   * Method call when the timer expire
+   * @param Event*  pointer to an object of type Event
+   */
+  virtual void expire(Event *e);
+  UwTDMA* module;
+
 };
 
+
+/**
+ * Class that represents a TDMA Node
+ */
 class UwTDMA: public MMac {
-public:
-	UwTDMA();
 
-	virtual ~UwTDMA();
+  friend class UwTDMATimer;
 
-	/**
-     * Change TDMA status from 
-     */
-	virtual void change_tdma_status();
- 	
- 	/**
-     * Schedule the beginning of TDMA slots
-     */
-    virtual void start();
+ public:
 
-    /**
-     * TCL command interpreter. It implements the following OTcl methods:
-     * 
-     * @param argc Number of arguments in <i>argv</i>.
-     * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-     * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-     * 
-     **/
-    virtual int command(int argc, const char*const* argv);
+  /**
+   * Constructor of the TDMA class
+   */
+  UwTDMA();
+  
+  /**
+   * Destructor of the TDMA class
+   */
+  virtual ~UwTDMA();
 
-	/**
-     * Transmit a data packet whether is my slot
-     */
-    virtual void txData();
+ protected:
 
-    /**
-     * State status my slot and and start to txData
-     */
-    virtual void stateTxData();
+  /**
+   * Transmit a data packet if in my slot
+   */
+  virtual void txData();
+  /**
+   * Change transceiver status and and start to transmit if in my slot
+   * Used when there's spare time, useful for transmitting other packtes.
+   */
+  virtual void stateTxData();
+  /**
+   * Alternate TDMA status between MY_STATUS and NOT_MY_STATUS
+   */
+  virtual void changeStatus();
+  /**
+   * Schedule the beginning of each TDMA cycle, each one after \p delay
+   * @param delay to await before starting the TDMA
+   */
+  virtual void start(double delay);
+  /**
+   * Terminate a TDMA cycle, essentially cancel the TDMA timer
+   */
+  virtual void stop();
+  /**
+   * Receive the packet from the upper layer (e.g. IP)
+   * @param Packet* pointer to the packet received
+   *
+   */
+  virtual void recvFromUpperLayers(Packet* p);
+  /**
+   * Method called when the Phy Layer finish to receive a Packet 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in reception
+   */
+  virtual void Phy2MacEndRx(Packet* p);
+  /**
+   * Method called when the Phy Layer start to receive a Packet 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in reception
+   */
+  virtual void Phy2MacStartRx(const Packet* p);
+  /**
+   * Method called when the Mac Layer start to transmit a Packet 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in transmission
+   */
+  virtual void Mac2PhyStartTx(Packet* p);
+  /**
+   * Method called when the Mac Layer finish to transmit a Packet 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in transmission
+   */
+  virtual void Phy2MacEndTx(const Packet* p);
+  /**
+   * Method called when the Packet received is determined to be not for me 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in reception
+   */
+  virtual void rxPacketNotForMe(Packet* p);
+  /**
+   * Method called to add the MAC header size 
+   * @param const Packet* Pointer to an Packet object that rapresent the 
+   * Packet in transmission
+   */
+  virtual void initPkt(Packet* p);
+  /**
+   * Calculate the epoch of the event. Used in sea-trial mode
+   * @return the epoch of the system
+   */
+  inline unsigned long int getEpoch()
+  {
+    return time(NULL);
+  }
+
+  /**
+   * TCL command interpreter. It implements the following OTcl methods:
+   * 
+   * @param argc Number of arguments in <i>argv</i>.
+   * @param argv Array of strings which are the command parameters 
+                           (Note that <i>argv[0]</i> is the name of the object).
+   * @return TCL_OK or TCL_ERROR whether the command has been dispatched 
+                                                            successfully or not.
+   */
+  virtual int command(int argc, const char*const* argv);
+  /**
+   * Enumeration class of UWTDMA status.
+   */
+  enum UWTDMA_STATUS {IDLE, TRANSMITTING, RECEIVING};
 
 
-protected:
+  UWTDMA_STATUS transceiver_status; /**<Variable holding the status enum type*/
+  int slot_status;                  /**<Is it my turn to transmit data?*/
+  int debug_;                       /**<Debug variable: 0 for no info,
+                                    >-5 for small info, <-5 for complete info*/
+  int sea_trial_;                   /**<Written log variable*/
+  int fair_mode;                    /**<Fair modality on if 1: then only set 
+                                        tot_slots and common guard_time*/
 
-	int slot_status; /**< Flag about the slot status: it can be either active or not */
-	int channel_status; /**< Flag about the channel status: it can be either busy or idle */
-	int debug_; /**< Flag anabling debug print out */
-	double frame_time; /**< Frame duration */
-	double guard_time; /**< Guard time between slots */
-	double slot_duration; /**< Slot duration */
-	UwTDMATimer tdma_timer; /**< Tdma timer handler */
-	std::queue<Packet*> buffer; /**< Packet buffer*/
+  int tot_slots;    /**<Number of slots in the frame (fair_mode)*/
+  int slot_number;  /**<set the position of the node in the frame (fair_mode) 
+                                         (starting from 0 to tot_slots-1)*/
 
-    /**
-     * Receives the packet from the upper layer (e.g. IP)
-     * @param Packet* pointer to the packet received
-     *
-     */
-	virtual void recvFromUpperLayers(Packet* p);
-
-    /**
-     * Pass the packet to the PHY layer
-     * @param Packet* Pointer to an object of type Packet that rapresent the Packet to transmit
-     */
-    virtual void Mac2PhyStartTx(Packet* p);
-
-    /**
-     * Method called when the PHY layer finish to transmit the packet.
-     * @param Packet* Pointer to an object of type Packet that rapresent the Packet transmitted
-     */  
-    virtual void Phy2MacEndTx(const Packet* p);
-
-    /**
-     * Method called when the Phy Layer start to receive a Packet 
-     * @param const Packet* Pointer to an object of type Packet that rapresent the Packet that is in reception
-     */
-    virtual void Phy2MacStartRx(const Packet* p);
-
-    /**
-     * Method called when the Phy Layer finish to receive a Packet 
-     * @param const Packet* Pointer to an object of type Packet that rapresent the packet received
-     */
-	virtual void Phy2MacEndRx(Packet* p);
+  int HDR_size;                 /**<Size of the HDR if any*/
+  double frame_duration;        /**<Frame duration*/
+  double guard_time;            /**<Guard time between slots*/
+  double slot_duration;         /**<Slot duration*/
+  double start_time;            /**<Time to wait before starting the protocol*/
+  UwTDMATimer tdma_timer;       /**<TDMA timer handler*/
+  std::queue<Packet*> buffer;   /**<Buffer of the MAC node*/
+  std::ofstream out_file_stats; /**<File stream for the log file*/
 
 };
 
