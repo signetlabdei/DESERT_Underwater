@@ -1,4 +1,4 @@
-2.1.0 - ??-??-??
+2.1.0 - 2015-09-01
 	* Added uwrandomlib on mobility folder - A tool for use random variables
 	* Added uwsmposition mobility model
 	* Added uwtdma - A TDMA MAC protocol
@@ -17,6 +17,7 @@
 	* Added uwrov - An application layer protocol to simulate the control of ROVs
 	* Several new samples added
 	* Improved installation script
+    * New version of uwphysical module (Thanks to Randall Plate)
 
 2.0.5 - 2014-04-21
     * Fixed the addon list in .addon.list (Removed another one)

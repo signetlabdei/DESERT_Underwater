@@ -310,45 +310,47 @@ void UnderwaterPhysical::endRx(Packet* p) {
 
     if (PktRx != 0) {
         if (PktRx == p) {
-            double per_ni; // packet error rate due to noise and/or interference
-            double per_n; // packet error rate due to noise only
+            double per_ni;
 
             int nbits = ch->size()*8;
             double x = RNG::defaultrng()->uniform_double();
-            per_n = getPER(ph->Pr / ph->Pn, nbits, p);
-            bool error_n = x <= per_n;
+            bool error_n = 0; //x <= per_n;
             bool error_ni = 0;
-            if (!error_n) {
-                if (interference_) {
-                    if (Interference_Model == "CHUNK") {
-                        const PowerChunkList& power_chunk_list = interference_->getInterferencePowerChunkList(p);
-                        for (PowerChunkList::const_iterator itInterf = power_chunk_list.begin(); itInterf != power_chunk_list.end(); itInterf++) {
-                            if (itInterf->first > (ph->Pn / 2)) {
-                                int nbits2 = itInterf->second * BitRate_;
-                                per_ni = getPER(ph->Pr / (ph->Pn + itInterf->first), nbits2, p);
-                                x = RNG::defaultrng()->uniform_double();
-                                error_ni = x <= per_ni;
-                                if (error_ni) {
-                                    break;
-                                }
-                            }
-                        }
-                    } else if (Interference_Model == "MEANPOWER") {
-                        double interference = interference_->getInterferencePower(p);
-                        per_ni = getPER(ph->Pr / (ph->Pn + interference), nbits, p);
+            double interference_power = 0;
+            if (interference_) {
+                if (Interference_Model == "CHUNK") {
+                    const PowerChunkList& power_chunk_list = interference_->getInterferencePowerChunkList(p);
+                    for (PowerChunkList::const_iterator itInterf = power_chunk_list.begin(); itInterf != power_chunk_list.end(); itInterf++) {
+                        int nbits2 = itInterf->second * BitRate_;
+				        interference_power = itInterf->first;
+                        per_ni = getPER(ph->Pr / (ph->Pn + itInterf->first), nbits2, p);
+                        x = RNG::defaultrng()->uniform_double();
                         error_ni = x <= per_ni;
-                    } else {
-                        std::cerr << "Please choose the right interference model to use: CHUNK or MEANPOWER" << std::endl;
-                        exit(1);
+                        if (error_ni) {
+                            break;
+                        }
                     }
-                    interferent_pkts = interference_->getCounters(p);
-
-                } else {
-                    per_ni = getPER(ph->Pr / (ph->Pn + ph->Pi), nbits, p);
+                } else if (Interference_Model == "MEANPOWER") {
+                    interference_power = interference_->getInterferencePower(p);
+                    per_ni = getPER(ph->Pr / (ph->Pn + interference_power), nbits, p);
                     error_ni = x <= per_ni;
+                } else {
+                    std::cerr << "Please choose the right interference model to use: CHUNK or MEANPOWER" << std::endl;
+                    exit(1);
                 }
-            }
+                interferent_pkts = interference_->getCounters(p);
 
+            } else {
+                interference_power = ph->Pi;
+                per_ni = getPER(ph->Pr / (ph->Pn + ph->Pi), nbits, p);
+                error_ni = x <= per_ni;
+            }
+	    
+	        if (interference_power < (ph->Pn / 10))
+            {
+                error_n = error_ni;
+                error_ni = 0; //error transfered on noise
+            }
             if (time_ready_to_end_rx_ > Scheduler::instance().clock()) {
                 Rx_Time_ = Rx_Time_ + ph->duration - time_ready_to_end_rx_ + Scheduler::instance().clock();
             } else {
@@ -356,16 +358,15 @@ void UnderwaterPhysical::endRx(Packet* p) {
             }
             time_ready_to_end_rx_ = Scheduler::instance().clock() + ph->duration;
             Energy_Rx_ += consumedEnergyRx(ph->duration);
-
-            ch->error() = error_ni || error_n;
-            if (debug_) {
+            ch->error() = error_n || error_ni;
+            if (debug_) 
+            {
                 if (error_ni == 1) {
                     std::cout << NOW << "  UnderwaterPhysical(" << mac_addr << ")::endRx() packet " << ch->uid() << " contains errors due to noise and interference." << std::endl;
                 } else if (error_n == 1) {
                     std::cout << NOW << "  UnderwaterPhysical(" << mac_addr << ")::endRx() packet " << ch->uid() << " contains errors due to noise." << std::endl;
                 }
             }
-
             if (error_n) {
                 incrErrorPktsNoise();
                 if (mach->ftype() != MF_CONTROL) {
@@ -383,9 +384,6 @@ void UnderwaterPhysical::endRx(Packet* p) {
                     } else {
                         if (interferent_pkts.first > 0) {
                             incrCollisionDATAvsCTRL();
-                        } else {
-//                            std::cerr << "Logical error on counting the packet interference!!!" << std::endl;
-                            ;
                         }
                     }
                 }
