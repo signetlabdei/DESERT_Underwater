@@ -17,7 +17,7 @@ environment.
 
 ###Installation
 
-To install DESERT Underwater follow the instructions at the [doxygen documentation](http://telecom.dei.unipd.it/ns/desert/DESERT_HTML_doxygen_doc/INSTALL1.html)
+To install DESERT Underwater follow the instructions at the [doxygen documentation](http://telecom.dei.unipd.it/ns/desert/DESERT2_HTML_doxygen_doc/index.html)
 
 ###Samples
 
