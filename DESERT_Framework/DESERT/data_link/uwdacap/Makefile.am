@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,8 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwdacap.la libuwdacaptracer.la 
 
-libuwdacap_la_SOURCES = uw-mac-DACAP-alter.h uw-mac-DACAP-alter.cpp \
-			   initlib.cc
+libuwdacap_la_SOURCES =  uw-mac-DACAP-alter.cpp \
+			   initlib.cpp
 
 libuwdacap_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  
 libuwdacap_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@   
@@ -41,7 +41,7 @@ libuwdacap_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@
 
 nodist_libuwdacap_la_SOURCES = dacap-embeddedtcl.cc 
 
-libuwdacaptracer_la_SOURCES = uw-mac-DACAP-tracer.cc
+libuwdacaptracer_la_SOURCES = uw-mac-DACAP-tracer.cpp
 
 libuwdacaptracer_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwdacaptracer_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

@@ -79,7 +79,7 @@ main() {
     #     e.g addon_installation_list host/target <addon-list>
 
     ## only for the cross-compilation session
-    export CROSS_ENV_DIR="/opt/gumstix-overo-yocto/"
+    export CROSS_ENV_DIR="/opt/overo-yocto"
     export CROSS_ENV_FILE="${CROSS_ENV_DIR}/environment"
     #*
 

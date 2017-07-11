@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
 AM_CXXFLAGS = -Wall -ggdb3
 
@@ -35,17 +36,11 @@ SUBDIRS =
 
 TESTS = 
 
-libuwicrp_la_SOURCES = initlib.cc\
+libuwicrp_la_SOURCES = initlib.cpp\
     uwicrp-defaults.tcl\
-    uwicrp-hdr-ack.h\
-    uwicrp-hdr-data.h\
-    uwicrp-hdr-status.h\
-    uwicrp-module-node.cc\
-    uwicrp-module-node.h\
-    uwicrp-module-sink.cc\
-    uwicrp-module-sink.h\
-    uwicrp-common.h\
-    uwicrp.cc
+    uwicrp-module-node.cpp\
+    uwicrp-module-sink.cpp\
+    uwicrp.cpp
 
 libuwicrp_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwicrp_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

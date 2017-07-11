@@ -181,7 +181,7 @@ Module/UW/CBR set debug_               0
 
 
 Module/UW/HERMES/PHY  set BitRate_                    $opt(bitrate)
-Module/UW/HERMES/PHY  set AcquisitionThreshold_dB_    15.0 
+Module/UW/HERMES/PHY  set AcquisitionThreshold_dB_    5.0 
 Module/UW/HERMES/PHY  set RxSnrPenalty_dB_            0
 Module/UW/HERMES/PHY  set TxSPLMargin_dB_             0
 Module/UW/HERMES/PHY  set MaxTxSPL_dB_                $opt(txpower)
@@ -265,6 +265,8 @@ proc createNode { id } {
     $phy($id) setSpectralMask $data_mask
     $phy($id) setInterference $interf_data($id)
     $phy($id) setInterferenceModel "MEANPOWER"; # "CHUNK" is not supported
+    # $phy($id) setLUTFileName "dbs/hermes/25June08/mode5.csv"
+    $phy($id) initLUT
     $mac($id) $opt(ack_mode)
     $mac($id) initialize
 }

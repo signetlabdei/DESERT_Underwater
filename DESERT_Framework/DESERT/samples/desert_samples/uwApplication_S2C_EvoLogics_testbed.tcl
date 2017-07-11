@@ -127,7 +127,7 @@ load libpackercommon.so
 load libpackermac.so
 load libpackeruwudp.so
 load libuwmphy_modem.so
-load libmstwoc_evologics.so
+load libevologics_driver.so
 
 #############################
 # NS-Miracle initialization #
@@ -236,12 +236,14 @@ Module/UW/APPLICATION set EXP_ID_ $opt(exp_ID)
 
 # variables for the S2C modem's interface
 #####
-Module/UW/MPhy_modem/S2C set period_ 			        1
-Module/UW/MPhy_modem/S2C set debug_ 			        1
-Module/UW/MPhy_modem/S2C set log_                       0
-Module/UW/MPhy_modem/S2C set SetModemID_	 	        0
-Module/UW/MPhy_modem/S2C set UseKeepOnline_             1
+Module/UW/MPhy_modem/S2C set period_ 		1
+Module/UW/MPhy_modem/S2C set debug_ 		1
+Module/UW/MPhy_modem/S2C set loglevel_          2
+Module/UW/MPhy_modem/S2C set SetModemID_	0
+Module/UW/MPhy_modem/S2C set UseKeepOnline_	1
+Module/UW/MPhy_modem/S2C set DeafTime_ 		2
 #######
+
 
 ################################
 # Procedure(s) to create nodes #

@@ -1,5 +1,5 @@
-PC                       (for any x86 or x64_86 architecture)
-<YOUR_DEVICE>            (please see the user guide for more information on custom installers)
+PC
 Gumstix-yocto-poky
 Raspberry-Pi-yocto-poky
 Udoo
+Pandaboard

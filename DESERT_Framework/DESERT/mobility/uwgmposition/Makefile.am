@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,10 +35,9 @@ SUBDIRS =
 
 TESTS = 
 
-libuwgmposition_la_SOURCES = initlib.cc\
+libuwgmposition_la_SOURCES = initlib.cpp\
     uwgmposition-default.tcl\
-    uwgmposition.h\
-    uwgmposition.cc
+    uwgmposition.cpp
 
 libuwgmposition_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwgmposition_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

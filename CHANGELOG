@@ -1,3 +1,13 @@
+3.0.0 - 2017-07-10
+	* New support of MAC ClMessages through PHY layers
+	* New CSMA-CA protocol
+	* New TDMA MAC protocol with framed slot
+	* Completely rewritten drivers for EvoLogics S2C modems with new features such as multipath and noise probing, clmessage support
+	* Add support to low level firmware of S2C EvoLogics modems
+	* Add a module (uwmulti_traffic_control) which permits to have N upper layers which generate traffic, mux/demuxing correctly the traffic
+	* Various fixes on existent protocols/modules and on installers
+	* Improved guide on doxygen
+
 2.1.0 - 2015-09-01
 	* Added uwrandomlib on mobility folder - A tool for use random variables
 	* Added uwsmposition mobility model

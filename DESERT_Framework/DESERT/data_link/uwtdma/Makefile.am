@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwtdma.la
 
-libuwtdma_la_SOURCES = uwtdma.cpp uwtdma.h initlib.cc
+libuwtdma_la_SOURCES = uwtdma.cpp initlib.cpp
 
 libuwtdma_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwtdma_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

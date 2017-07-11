@@ -106,7 +106,7 @@ set opt(maxinterval_)       10.0
 set opt(freq)              10000000
 set opt(bw)                100000
 set opt(bitrate)           1000000
-set opt(txpower)           0.58
+set opt(txpower)           50
 set opt(opt_acq_db)        10
 set opt(temperatura)       293.15 ; # in Kelvin
 set opt(txArea)            0.000010
@@ -117,7 +117,8 @@ set opt(id)                [expr 1.0e-9]
 set opt(il)                [expr 1.0e-6]
 set opt(shuntRes)          [expr 1.49e9]
 set opt(sensitivity)       0.26
-set opt(LUTpath)           "dbs/optical_noise/LUT.txt"
+set opt(LUTpath)           "dbs/optical_noise/LUT.txt";#"dbs/optical_noise/ALOMEX_optical_E0/E0vsDEP_2015_11_02__13_47_15__036d24.565m_001d40.534m_wl531.50_fileCTD001.txt";
+set opt(atten_LUT)         "dbs/optical_attenuation/lut_532nm/lut_532nm_CTD001.csv"
 
 set rng [new RNG]
 
@@ -172,7 +173,7 @@ Module/UW/OPTICAL/PHY   set TxPower_                    $opt(txpower)
 Module/UW/OPTICAL/PHY   set BitRate_                    $opt(bitrate)
 Module/UW/OPTICAL/PHY   set AcquisitionThreshold_dB_    $opt(opt_acq_db)
 Module/UW/OPTICAL/PHY   set Id_                         $opt(id)
-Module/UW/OPTICAL/PHY   set Il_                         $opt(il)
+# Module/UW/OPTICAL/PHY   set Il_                         $opt(il)
 Module/UW/OPTICAL/PHY   set R_                          $opt(shuntRes)
 Module/UW/OPTICAL/PHY   set S_                          $opt(sensitivity)
 Module/UW/OPTICAL/PHY   set T_                          $opt(temperatura)
@@ -186,6 +187,9 @@ Module/UW/OPTICAL/Propagation set theta_    $opt(theta)
 Module/UW/OPTICAL/Propagation set debug_    0
 set propagation [new Module/UW/OPTICAL/Propagation]
 $propagation setOmnidirectional
+$propagation setLUTFileName $opt(atten_LUT)
+$propagation setLUT
+$propagation setVariableC
 
 set channel [new Module/UW/Optical/Channel]
 
@@ -202,7 +206,7 @@ Module/UW/CSMA_ALOHA set wait_costant_         [expr 1.0e-12]
 proc createNode { id } {
 
     global channel ns cbr position node udp portnum ipr ipif
-    global opt mll mac propagation data_mask
+    global opt mll mac propagation data_mask phy
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -247,6 +251,7 @@ proc createNode { id } {
     $phy($id) setLUTFileName "$opt(LUTpath)"
     $phy($id) setLUTSeparator " "
     $phy($id) useLUT
+    $phy($id) setVariableTemperature
 
     $ipif($id) addr [expr $id +1]
     
@@ -254,9 +259,9 @@ proc createNode { id } {
     $node($id) addPosition $position($id)
     
     #Setup positions
-    $position($id) setX_ [expr $id*10]
-    $position($id) setY_ [expr $id*10]
-    $position($id) setZ_ -15.5
+    $position($id) setX_ [expr $id*0]
+    $position($id) setY_ [expr $id*2]
+    $position($id) setZ_ [expr $id * 5 - 119];#-15.5
     
     $mac($id) $opt(ack_mode)
     $mac($id) initialize
@@ -325,6 +330,12 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 		}
 	}
 }
+
+# TO CHANGE LUT AT A CERTAIN MOMENT
+# $ns at [expr $opt(stoptime)/2] "$phy(0) setLUTFileName dbs/optical_attenuation/lut_532nm/lut_532nm_CTD006.csv"
+# $ns at [expr $opt(stoptime)/2] "$phy(0) useLUT"
+# $ns at [expr $opt(stoptime)/2] "$phy(1) setLUTFileName dbs/optical_attenuation/lut_532nm/lut_532nm_CTD006.csv"
+# $ns at [expr $opt(stoptime)/2] "$phy(1) useLUT"
 
 ###################
 # Final Procedure #

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,12 +34,10 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwapplication.la
 
-libuwapplication_la_SOURCES = initlib.cc \
-			      uwApplication_module.cc \
-			      uwApplication_TCP_socket.cc\
-			      uwApplication_UDP_socket.cc\
-			      uwApplication_module.h\
-			      uwApplication_cmn_header.h
+libuwapplication_la_SOURCES = initlib.cpp \
+			      uwApplication_module.cpp \
+			      uwApplication_TCP_socket.cpp\
+			      uwApplication_UDP_socket.cpp
 			 
 libuwapplication_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwapplication_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

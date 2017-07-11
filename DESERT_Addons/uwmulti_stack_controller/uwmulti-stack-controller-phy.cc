@@ -137,7 +137,9 @@ int UwMultiStackControllerPhy::recvSyncClMsg(ClMessage* m)
     }
     else {
       if (debug_)
-        std::cout << " altro "<< std::endl;
+      {
+        std::cout << " altro, ClMsg type = " << m->type() << std::endl;
+      } 
     }
     
     sendSyncClMsgUp(m);

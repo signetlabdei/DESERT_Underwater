@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,23 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
 # Author: Filippo Campagnaro
 # Author: Roberto Francescon
 # version: 1.0.0
 
 Module/UW/TDMA set debug_ 		0
 Module/UW/TDMA set HDR_size_ 		0
-Module/UW/TDMA set ACK_size_  		10
-Module/UW/TDMA set max_tx_tries_	5
 Module/UW/TDMA set wait_constant_	0.1
-Module/UW/TDMA set uwTDMA_debug_	0
-Module/UW/TDMA set max_payload_		125
-Module/UW/TDMA set ACK_timeout_		5.0
-Module/UW/TDMA set alpha_		0.8
-Module/UW/TDMA set buffer_pkts_		-1
-Module/UW/TDMA set backoff_tuner_   	1
-Module/UW/TDMA set max_backoff_counter_ 4
 Module/UW/TDMA set MAC_addr_ 		0
-
 Module/UW/TDMA set sea_trial_ 		0
 Module/UW/TDMA set frame_time           0
 Module/UW/TDMA set guard_time           0
 Module/UW/TDMA set tot_slots            0
 Module/UW/TDMA set fair_mode            0
+Module/UW/TDMA set max_packet_per_slot  1
+Module/UW/TDMA set queue_size_          10
+Module/UW/TDMA set drop_old_            0
 
 Module/UW/TDMA instproc init {args} {
     $self next $args

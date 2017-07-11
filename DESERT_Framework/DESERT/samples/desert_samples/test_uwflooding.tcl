@@ -176,7 +176,7 @@ Module/UW/CSMA_ALOHA set max_tx_tries_   3
 # BPSK              
 Module/UW/PHYSICAL set debug_                     0
 Module/UW/PHYSICAL set BitRate_                   $opt(bitrate)
-Module/UW/PHYSICAL set AcquisitionThreshold_dB_   10.0 
+Module/UW/PHYSICAL set AcquisitionThreshold_dB_   4.0 
 Module/UW/PHYSICAL set RxSnrPenalty_dB_           $opt(rx_snr_penalty_db)
 Module/UW/PHYSICAL set TxSPLMargin_dB_            $opt(tx_margin_db)
 Module/UW/PHYSICAL set MaxTxSPL_dB_               $opt(txpower)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,11 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwal.la
 
-libuwal_la_SOURCES = uwal.cc uwal.h hdr-uwal.cc hdr-uwal.h packer.cpp packer.h frame-set.cc frame-set.h initlib.cc
+libuwal_la_SOURCES = hdr-uwal.cpp \
+					packer.cpp \
+					frame-set.cpp \
+					uwal.cpp \
+					initlib.cpp 
 
 libuwal_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwal_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

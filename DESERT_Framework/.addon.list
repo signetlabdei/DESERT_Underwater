@@ -1,5 +1,6 @@
 packer_uwApplication
 packer_uwcbr
+packer_uwcsma_ca
 packer_uwflooding
 packer_uwip
 packer_uwpolling
@@ -7,6 +8,7 @@ packer_uwudp
 packer_uwufetch
 uwrov
 uwmulti_stack_controller
+uwmulti_traffic_control
 wossgmmob3D    (requires WOSS)
 wossgroupmob3D (requires WOSS)
 ALL            (installs all addons)

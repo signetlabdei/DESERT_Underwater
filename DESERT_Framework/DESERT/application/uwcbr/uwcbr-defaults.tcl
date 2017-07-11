@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@ Module/UW/CBR set destAddr_           0
 Module/UW/CBR set debug_              0
 Module/UW/CBR set PoissonTraffic_     1
 Module/UW/CBR set drop_out_of_order_  1
+Module/UW/CBR set traffic_type_		  0
 
 Module/UW/CBR instproc init {args} {
     $self next $args

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,21 @@
 #
 
 AM_CXXFLAGS = -Wall -ggdb3
- 
+
 
 lib_LTLIBRARIES = libuwtlohi.la libuwtlohiTracer.la 
 
-libuwtlohi_la_SOURCES = interference-uw-WakeUp.h interference-uw-WakeUp.h \
-                           wake-up-pkt-hdr.h \
-                           uw-phy-WakeUp.h uw-phy-WakeUp.cc \
-			   uw-mac-TLohi.h uw-mac-TLohi.cc \
- 		           initlib.cc 
+libuwtlohi_la_SOURCES = uw-phy-WakeUp.cpp \
+			    uw-mac-TLohi.cpp \
+		           initlib.cpp 
 
 libuwtlohi_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwtlohi_la_LDFLAGS =  @NS_LDFLAGS@  @NSMIRACLE_LDFLAGS@  @DESERT_LDFLAGS@
 libuwtlohi_la_LIBADD =   @NS_LIBADD@   @NSMIRACLE_LIBADD@   @DESERT_LIBADD@
 
-nodist_libuwtlohi_la_SOURCES = TlohiInitTcl.cc 
+nodist_libuwtlohi_la_SOURCES = TlohiInitTcl.cc
 
-libuwtlohiTracer_la_SOURCES = uw-mac-TLohi-tracer.cc
+libuwtlohiTracer_la_SOURCES = uw-mac-TLohi-tracer.cpp
 
 libuwtlohiTracer_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@
 libuwtlohiTracer_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@

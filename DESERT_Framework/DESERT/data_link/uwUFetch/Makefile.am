@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,12 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwufetch.la
 
-libuwufetch_la_SOURCES = initlib.cc \
-			 uwUFetch_AUV_mod_1.cc \
-			 uwUFetch_AUV_mod_2.cc \
-			 uwUFetch_AUV.h \
-			 uwUFetch_NODE_HEADNODE_mod_1.cc \
-			 uwUFetch_NODE_HEADNODE_mod_2.cc \
-			 uwUFetch_NODE_SENSOR.cc \
-   		 	 uwUFetch_NODE.h \
-			 uwUFetch_cmn_hdr.h
+libuwufetch_la_SOURCES = initlib.cpp \
+			 uwUFetch_AUV_mod_1.cpp \
+			 uwUFetch_AUV_mod_2.cpp \
+			 uwUFetch_NODE_HEADNODE_mod_1.cpp \
+			 uwUFetch_NODE_HEADNODE_mod_2.cpp \
+			 uwUFetch_NODE_SENSOR.cpp 
 
 
 libuwufetch_la_CPPFLAGS = @NS_CPPFLAGS@	@NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@

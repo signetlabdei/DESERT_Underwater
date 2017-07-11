@@ -312,8 +312,9 @@ if [ $? -ne 0 ]; then
     err_L1 "EXIT FROM install.sh"
     exit
 fi
-
-delete_recursive_soft_link
+if [ ${_ADDONS} -ne 1 ]; then
+    delete_recursive_soft_link
+fi
 
 info_L0 "after_building"
 after_building

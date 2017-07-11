@@ -250,7 +250,7 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 # Inter-node module connection #
 ################################
 proc connectNodes {id1 des1} {
-    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt 
+    global ipif ipr portnum cbr cbr_sink ipif_sink ipr_sink opt 
 
     $cbr($id1,$des1) set destAddr_ [$ipif($des1) addr]
     $cbr($id1,$des1) set destPort_ $portnum($des1,$id1)

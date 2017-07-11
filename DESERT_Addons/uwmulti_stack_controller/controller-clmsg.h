@@ -1,7 +1,7 @@
 /* -*- Mode:C++ -*- */
 
 /*
- * Copyright (c) 2007 Regents of the SIGNET lab, University of Padova.
+ * Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@
 
 extern ClMessage_t CLMSG_CONTROLLER;
 
-//extern packet_t NOT_CONTROLLED;
+extern packet_t PT_MULTI_ST_SIGNALING;
 //extern packet_t CONTROLLED;
 
 class ClMsgController : public ClMessage

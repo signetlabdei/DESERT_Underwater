@@ -95,6 +95,7 @@ private:
     size_t SN_Bits; /** Bit length of the sn_ field to be put in the header stream of bits. */
     size_t RFTT_Bits; /** Bit length of the rftt_ field to be put in the header stream of bits. */
     size_t RFTT_VALID_Bits; /** Bit length of the rftt_valid_ field to be put in the header stream of bits. */
+    size_t TRAFFIC_TYPE_Bits; /** Bit length of the rftt_valid_ field to be put in the header stream of bits. */
 
 };
 

@@ -45,7 +45,9 @@ SUBDIRS = m4 \
     network/uwip \
     network/uwflooding \
     data_link/uwmll \
+    data_link/uwmmac_clmsgs \
     data_link/uw-csma-aloha \
+    data_link/uw-csma-ca \
     data_link/uwdacap \
     data_link/uwpolling \
     data_link/uwaloha \
@@ -54,6 +56,7 @@ SUBDIRS = m4 \
     data_link/uwUFetch \
     data_link/uw-csma-aloha-trigger \
     data_link/uwtdma \
+    data_link/uwtdma-frame \
     physical/uwphysical \
     physical/uwgainfromdb \
     physical/uwphysicaldb\
@@ -61,12 +64,14 @@ SUBDIRS = m4 \
     physical/uwphysicalfromdb\
     physical/uwmphy_modem \
     physical/ms2c_evologics \
+    physical/ms2c_evologics_lowlev \
     physical/uwmphypatch \
     physical/uwhermesphy \
     physical/uwoptical_phy \
     physical/uw-al \
     physical/uw-al/packer_common \
     physical/uw-al/packer_mac \
+    physical/uwphy_clmsgs \
     mobility/uwdriftposition \
     mobility/uwgmposition \
     mobility/uwrandomlib \

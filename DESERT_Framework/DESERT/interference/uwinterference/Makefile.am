@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
 AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwinterference.la
@@ -35,10 +35,9 @@ SUBDIRS =
 
 TESTS = 
 
-libuwinterference_la_SOURCES = initlib.cc \
-					 uwinterference.h \
-					 uwinterference.cc
-	
+libuwinterference_la_SOURCES = initlib.cpp \
+					 uwinterference.cpp
+
 libuwinterference_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwinterference_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libuwinterference_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@

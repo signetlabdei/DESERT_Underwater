@@ -53,10 +53,12 @@ packerUWCBR::packerUWCBR() : packer(false) {
     SN_Bits = 8 * sizeof (u_int32_t);
     RFTT_Bits = 0;
     RFTT_VALID_Bits = 0;
+    TRAFFIC_TYPE_Bits = 0;
 
     bind("SN_Bits", (int*) &SN_Bits);
     bind("RFTT_Bits", (int*) &RFTT_Bits);
     bind("RFTT_VALID_Bits", (int*) &RFTT_VALID_Bits);
+    bind("TRAFFIC_TYPE_Bits", (int*) &TRAFFIC_TYPE_Bits);
 
     if (debug_)
         cout << "Initialization (from constructor) of n_bits for the UWCBR packer " << endl;
@@ -66,6 +68,7 @@ packerUWCBR::packerUWCBR() : packer(false) {
     n_bits.push_back(SN_Bits);
     n_bits.push_back(RFTT_Bits);
     n_bits.push_back(RFTT_VALID_Bits);
+    n_bits.push_back(TRAFFIC_TYPE_Bits);
 
 }
 
@@ -83,6 +86,7 @@ void packerUWCBR::init() {
     n_bits.push_back(SN_Bits);
     n_bits.push_back(RFTT_Bits);
     n_bits.push_back(RFTT_VALID_Bits);
+    n_bits.push_back(TRAFFIC_TYPE_Bits);
 }
 
 size_t packerUWCBR::packMyHdr(Packet* p, unsigned char* buf, size_t offset) {
@@ -99,6 +103,8 @@ size_t packerUWCBR::packMyHdr(Packet* p, unsigned char* buf, size_t offset) {
         offset += put(buf, offset, &(uch->rftt_), n_bits[field_idx++]);
 
         offset += put(buf, offset, &(uch->rftt_valid_), n_bits[field_idx++]);
+
+        offset += put(buf, offset, &(uch->traffic_type_), n_bits[field_idx++]);
 
         if (debug_) {
             printf("\033[0;46;30m TX CBR packer hdr \033[0m \n");
@@ -127,6 +133,9 @@ size_t packerUWCBR::unpackMyHdr(unsigned char* buf, size_t offset, Packet* p) {
         memset(&(uch->rftt_valid_), 0, sizeof (uch->rftt_valid_));
         offset += get(buf, offset, &(uch->rftt_valid_), n_bits[field_idx++]);
 
+        memset(&(uch->traffic_type_), 0, sizeof (uch->traffic_type_));
+        offset += get(buf, offset, &(uch->traffic_type_), n_bits[field_idx++]);
+
         if (debug_) {
             printf("\033[0;46;30m RX CBR packer hdr \033[0m \n");
             printMyHdrFields(p);
@@ -141,6 +150,7 @@ void packerUWCBR::printMyHdrMap() {
     std::cout << "\033[0;46;30m sn: \033[0m" << SN_Bits << " bits \n";
     std::cout << "\033[0;46;30m rftt: \033[0m" << RFTT_Bits << " bits \n";
     std::cout << "\033[0;46;30m rftt valid: \033[0m" << RFTT_VALID_Bits << " bits" << std::endl;
+    std::cout << "\033[0;46;30m traffic type: \033[0m" << TRAFFIC_TYPE_Bits << " bits" << std::endl;
 }
 
 
@@ -150,4 +160,5 @@ void packerUWCBR::printMyHdrFields(Packet* p) {
     if (n_bits[0] != 0) std::cout << "\033[0;46;30m sn: \033[0m" << uch->sn() << std::endl;
     if (n_bits[1] != 0) std::cout << "\033[0;46;30m rftt: \033[0m" << uch->rftt() << std::endl;
     if (n_bits[2] != 0) std::cout << "\033[0;46;30m rftt_valid: \033[0m" << uch->rftt_valid() << std::endl;
+    if (n_bits[3] != 0) std::cout << "\033[0;46;30m traffic_type: \033[0m" << uch->traffic_type() << std::endl;
 }

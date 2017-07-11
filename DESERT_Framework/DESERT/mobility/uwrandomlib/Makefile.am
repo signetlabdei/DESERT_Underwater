@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,7 @@ AM_CFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwrandom.la
 
-libuwrandom_la_SOURCES = initlib.cc \ 
-						uwrandomlib.h \
-    					uwrandomlib.cc
+libuwrandom_la_SOURCES = initlib.cpp \
+					uwrandomlib.cpp
 
 

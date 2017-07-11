@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,10 @@ SUBDIRS =
 
 TESTS = 
 
-libuwpolling_la_SOURCES = initlib.cc\
+libuwpolling_la_SOURCES = initlib.cpp\
 	uwpolling_default.tcl\
-	uwpolling_cmn_hdr.h\
-	uwpolling_AUV.h\
-	uwpolling_AUV.cc\
-	uwpolling_NODE.h\
-	uwpolling_NODE.cc
+	uwpolling_AUV.cpp\
+	uwpolling_NODE.cpp
 
 libuwpolling_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwpolling_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

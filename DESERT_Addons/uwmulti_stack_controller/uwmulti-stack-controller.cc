@@ -66,12 +66,14 @@ UwMultiStackController::UwMultiStackController()
   debug_(0),
   min_delay_(0),
   switch_mode_(UW_MANUAL_SWITCH),
-  lower_id_active_(0)
+  lower_id_active_(0),
+  signaling_pktSize_(1)
 {
 	bind("debug_", &debug_);
 	bind("min_delay_", &min_delay_);
 	bind("switch_mode_", (int*) &switch_mode_);
 	bind("set_lower_id_active_", &lower_id_active_);
+  bind("signaling_pktSize_", &signaling_pktSize_);
 }
 
 int UwMultiStackController::command(int argc, const char*const* argv) 

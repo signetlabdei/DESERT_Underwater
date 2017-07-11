@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwcsmaaloha.la
 
-libuwcsmaaloha_la_SOURCES = initlib.cc uw-csma-aloha.h uw-csma-aloha.cpp
+libuwcsmaaloha_la_SOURCES = initlib.cpp uw-csma-aloha.cpp
 
 
 libuwcsmaaloha_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@

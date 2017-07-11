@@ -157,7 +157,7 @@ wizard_conf_list() {
 
 wizard_conf_target() {
     echo ""
-    wizard_conf_list ".target.list"
+    wizard_conf_list ".wizard.target.list"
     echo  -n "You can add (a) new targets, remove (r) someone of them or skip (s). "
     tOpt=""
     read_input "tOpt"
@@ -188,12 +188,12 @@ wizard_conf_target_update() {
     case ${1} in
         "a")
             for target in ${2}; do
-                echo "${target}" >> ${ROOT_DESERT}/.target.list
+                echo "${target}" >> ${ROOT_DESERT}/.wizard.target.list
             done
             ;;
         "r")
             for target in ${2}; do
-                eval sed -i -e '/^${target}/d' .target.list
+                eval sed -i -e '/^${target}/d' .wizard.target.list
             done
             ;;
         *)
@@ -260,12 +260,27 @@ wizard_function_target() {
     echo ""
     wizard__print_L2 "Setting of the TARGET:"
     wizard__print_L3 "Available TARGETs:"
-    wizard__print_L4 "$(cat ${ROOT_DESERT}/.target.list | sed -e 's/\(.\)/*  \1/')"
+    wizard__print_L4 "$(cat ${ROOT_DESERT}/.wizard.target.list | sed -e 's/\(.\)/*  \1/')"
     echo -n "TARGET"
     TARGET=""
+    TARGETLIST=""
+    INDEX=0
+    while read line
+    do
+	    TARGETLIST="$TARGETLIST $line"
+    done <".target.list"
     read_input "TARGET"
     if [ -z ${TARGET} ]; then
         err_L1 "invalid target!!"
+        wizard_function_target
+    fi
+    for NAME in ${TARGETLIST}; do
+	    if [ "${NAME}" = "${TARGET}" ]; then
+	        INDEX=`expr $INDEX + 1`
+	    fi
+    done
+    if [ $INDEX -eq 0 ]; then
+	    err_L1 "invalid target!!"
         wizard_function_target
     fi
     _TARGET=1

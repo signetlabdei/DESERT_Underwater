@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,10 @@ SUBDIRS =
 
 TESTS = 
 
-libuwcbr_la_SOURCES = initlib.cc\
-    uwcbr-defaults.tcl\
-    uwcbr-module.cc\
-    uwcbr-module.h
+libuwcbr_la_SOURCES = initlib.cpp\
+    uwcbr-module.cpp\
+    uwcbr-defaults.tcl
+
 
 libuwcbr_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwcbr_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
@@ -47,7 +47,7 @@ libuwcbr_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
 nodist_libuwcbr_la_SOURCES = InitTcl.cc
 
-libuwcbrtracer_la_SOURCES = uwcbr-tracer.cc
+libuwcbrtracer_la_SOURCES = uwcbr-tracer.cpp
 
 libuwcbrtracer_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwcbrtracer_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ -L./

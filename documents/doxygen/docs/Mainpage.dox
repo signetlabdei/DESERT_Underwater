@@ -5,13 +5,13 @@
 \image html http://nautilus.dei.unipd.it/images/DESERT.png
 \image latex ./docs/DESERT.eps
 
-@version 2.1.0
+@version 3.0
 
 @authors <b> Project supervisor: </b> Paolo Casari - casarip@dei.unipd.it
 
-@authors <b> Members: </b> Federico Favaro - favarofe@dei.unipd.it, Federico Guerra - federico@guerra-tlc.com, Filippo Campagnaro - campagn1@dei.unipd.it,  Ivano Calabrese - icalabre@dei.unipd.it
+@authors <b> Members: </b> Federico Favaro - fedefava86@gmail.com, Federico Guerra - federico@guerra-tlc.com, Filippo Campagnaro - campagn1@dei.unipd.it, Roberto Francescon - francescon.roberto@gmail.com
 
-@authors <b> Other contributors and former members: </b> Riccardo Masiero, Saiful Azad, Cristiano Tapparello, Loris Brolo, \link Giovanni Giovanni Toso
+@authors <b> Other contributors and former members: </b> Riccardo Masiero, Saiful Azad, Ivano Calabrese, Cristiano Tapparello, Loris Brolo, \link Giovanni Giovanni Toso
 
 <br>
 
@@ -29,625 +29,30 @@ DESERT has been successfully tested with several underwater modems (e.g., EvoLog
 DESERT has also been successfully tested on low-power embedded systems such as the Gumstix, Pandaboard, IGEPv2 and NetDCU platforms.
 Altogether, the many proof-of-concept implementations and complex tests carried out with DESERT so far make DESERT an effective solution for realizing underwater networking experiments by reusing the same protocol code already written for simulations.
 
-DESERT Underwater has been adopted in several research projects (see also the <A HREF="http://nautilus.dei.unipd.it/desert-underwater/related-work">Related Work</A> and <A HREF="http://nautilus.dei.unipd.it/desert-underwater/acknowledgments">Acknowledgement</A> pages in the <A HREF="http://nautilus.dei.unipd.it/desert-underwater/">DESERT web site</A>). However, for a first-time user, the bulk of the released source code and the many steps required to install ns2, NS-MIRACLE, their dependencies, and DESERT itself, are typically seen as a major obstacle. This prompted us to extend DESERT in order to make it more robust and user-friendly.
+DESERT Underwater has been adopted in several real life <A HREF="http://desert-underwater.dei.unipd.it/index.php/field-experiments/">sea-trials</A>. You can find more on brand new <A HREF="http://desert-underwater.dei.unipd.it">website</A> of the project
 
 
-\subsection NewVer The new version of DESERT
+\subsection NewVer DESERT Release
 
 A considerable amount of work has been done in order to make the installation of the software automatic via a modular installation script, that includes a fully-guided wizard mode.
 At the same time, the installation is organized into separate modules. An experienced users can easily extend the process to accommodate specific requirements, new functionalities, or even to make DESERT part of larger projects.
 As a further help for users wishing to experiment with real hardware using DESERT, we also provide different installer modules, suitable for different compact/embedded hardware platforms, starting from the <A HREF="https://www.gumstix.com/">Gumstix</A> and the <A HREF="http://www.raspberrypi.org/">Raspberry Pi</A>. This set will be extended in the future.
-In order to use DESERT more and more in real environments, an new Application Layer protocol is provided, uwApplication. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication trough a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
-Finally, the functionalities offered by DESERT have been extended with a control framework that provides a set of primitives to remotely control the hardware modems, and thus the network operations. This framework was preliminarily released in September 2013.
-
-This new version of the framework provides some new MAC protocols, including a TDMA MAC and a revised version of already released protocols.
-Furthermore, an optical channel model, an optical propagation model and an optical PHY model are provided, together with a multi-stack controller, which makes it possible to use two different PHY layers on the same node. The controller will decide which PHY layers will be used based on user-defined policies (based on channel quality statistics in its current implementation). For example, this allows a node to exploit the large bandwidth of optical communications when the optical channel conditions are favorable, using instead the acoustic PHY layer for more robust and reliable communications.
-
-The improvements and additional features that we implemented have been packed together into version 2.1.0
-
-
-<br>
-
-\section ContentsThisDoc Contents of the present document
-
-In this document we summarize and briefly describe the modules that are part of DESERT Underwater.
-Our objective is to provide a clear picture of the network protocols currently available in DESERT, 
-in the form of an accessible list of modules, grouped according to the stack layers defined by the TCP/IP standard. 
-The presentation follows a top-down approach, i.e., it starts from the upper layers (Application and Transport layers), 
-and proceeds through the Network and Data Link layers. 
-Finally, the modules implemented for the PHY layer are illustrated: 
-these include the interface between the network simulator and the actual modem hardware. 
-We also illustrate four additional modules implemented to simulate node mobility in underwater networks.
-Since ns2, and therefore NS-Miracle, is a simulator based on two different languages
-(C/C++ for module development and Tcl/OTcl for parameter settings), generally we can refer 
-to a given module by means of three names:
-    1) the name of the module (which corresponds to the name of the folder that contains the C/C++ source files);
-    2) the name of the corresponding dynamic library that must be loaded before using the module itself, and
-    3) the name of the corresponding OTcl object (that we must use in the parameter configuration file to create the module itself).
-Since we need to know all three names in order to use a module, in the following we report them for all the presented modules.
-
-For questions, problems, suggestions, or if you want to get involved in the DESERT Underwater project, you can refer to our DESERT user group mailing list at desert-usergroup@dei.unipd.it <br>
-(You can subscribe to the mailing list at this link https://mail.dei.unipd.it/mailman/listinfo/desert-usergroup).
-
-<br>
- 
-\section application Modules for the Application Layer
-
-Currently, in DESERT there are three modules for the application layer: The <tt> uwApplication </tt>, the <tt> uwcbr </tt> and the <tt> uwvbr </tt> modules, detailed in
-the following. Both <tt> uwcbr </tt> and <tt> uwvbr </tt> modules send dummy packets (i.e., with a random payload) and serve to generate network traffic according to two
-different mechanisms. 
-<tt> uwApplication </tt> instead is an protocol to carry real payload as data packet. In simulation mode, a dummy string of random characters and legth fixed can be generated as payload, meanwhile, in experiment mode, it is possible to send to the module data through an UDP or TCP socket on a specified port. With the latter, real data can ben sent as the payload of a data packet; for example, a simple chat can be easily implemented.
-To work correctly, all the modules of the application layer must be connected to a module of the transport layer
-(for the technical details on how to connected two or more NS-Miracle modules, the reader may refer to the NS-Miracle documentation see http://telecom.dei.unipd.it/pages/read/58/).
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwApplication, </tt> see uwApplicationModule </dd>
-<dt><b> Description: </b></dt>
-<dd> This module allows the user to send a fixed amount of data generated as random characters as payload of packet to do some tests and simulations. Real data can be sent using the DESERT stack if the module is set to expimental mode. It is also possible to implement a simple "acoustic underwater" chat between two end-points. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwapplication.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/APPLICATION </tt> </dd>
-</dl>
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwcbr, </tt> see UwCbrModule </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a Constant Bit Rate (CBR) packet traffic between a sender and a receiver. The data traffic can be generated either by injecting packets in the network with a constant time period or according to a Poisson process with given mean. A single <tt> uwcbr </tt> module represents a data flow between a pair of nodes: if there are two or more nodes transmitting to the same destination, the latter should have an equal number of <tt> uwcbr </tt> modules, one for each flow.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwcbr.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/CBR </tt> </dd>
-</dl>
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwvbr, </tt> see UwVbrModule </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a Variable Bit Rate (VBR) data packet generation pattern between a sender and a receiver. The packet generation process takes place by switching between two different CBR processes, e.g., having different average packet inter-arrival times. 
-The switch between the processes can be configured by the user by providing the switching epochs. Otherwise, the simulator can be instructed to switch at either constant or exponentially distributed intervals. A single <tt> uwvbr </tt> module represents a data flow between a pair of nodes: if there are two or more nodes transmitting to the same node, the latter should have an equal number of <tt> uwvbr </tt> modules, one for each flow.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwvbr.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/VBR </tt> </dd>
-</dl>
-
- <br>
-
- \section transport Modules for the Transport Layer
-
- A simple module called <tt> uwudp </tt> is provided for transport layer.
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwudp, </tt> see UwUdp </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements the flow multiplexing and demultiplexing from and to the upper layers, respectively. It does not support link reliability, error detection or flow control. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwudp.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/UDP </tt> </dd>
-</dl>
-
-
-
-<br>
- 
- \section network Modules for the Network Layer
-
- The Network Layer is in charge of providing tools for the network interfaces (e.g., addresses) and mechanisms for data routing. In DESERT, we developed three algorithms for routing and a simple module to manage network addresses, whose format is compliant with the IP standard. The details of these modules follow.
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwstaticrouting, </tt> see UwStaticRoutingModule </dd>
-<dt><b> Description: </b></dt>
-<dd> This module makes it possible to simulate and test data traffic which has to follow pre-determined routes. For each network node, there is an option to choose a default gateway and/or fill a static routing table (whose maximum size is hard-coded and fixed to 100 entries). This information is then exploited locally at each node to forward the network packets, hop by hop, throughout the pre-determined paths.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwstaticrouting.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/StaticRouting </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwsun, </tt> see SunNodeModuleClass and SunSinkModuleClass </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a dynamic, reactive source routing protocol. The generation of routing paths can be based on different criteria, such as the minimization of the hop-count or the maximization of the minimum link quality, e.g., the Signal to Noise Ratio (SNR), across all links of the path. <tt> uwsun  </tt> is also designed to collect and process different statistics of interest for the routing layer. Currently, this module supports all application modules provided in DESERT (i.e., <tt> uwcbr </tt> and <tt> uwvbr </tt>), and it can be easily extended. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwsun.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/SUNNode </tt> for the nodes; <tt> Module/UW/SUNSink </tt> for the sinks. </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwicrp, </tt> see UwIcrpNodeModuleClass and UwIcrpSinkModuleClass </dd>
-<dt><b> Description: </b></dt>
-<dd> This module, which requires very few configuration parameters, implements a simple flooding-based routing mechanism called Information-Carrying Based Routing protocol, see <b> [9] </b>. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwicrp.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/ICRPNode </tt> for the nodes; <tt> Moudle/UW/ICRPSink </tt> for the sinks. </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwip, </tt> see UWIPModule </dd>
-<dt><b> Description: </b></dt>
-<dd> This module is used to assign an address to the nodes in a given network according to the standard IPv4 addresses; it provides the Time-To-Live (TTL) functionality and <i>does not implement any routing mechanism</i>. It can be configured to provide all the functional and procedural means intended for an Internet Protocol module (e.g., fragmentation, data reassembly and notification of delivery errors).</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwip.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/IP </tt> </dd>
-</dl>
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwflooding, </tt> see UwFlooding </dd>
-<dt><b> Description: </b></dt>
-<dd> This module provide a flooding routing protocol. The packet is reliably delivered to the destination forwarding it in broadcast mode with multiple hops. A system to avoid loops and a TTL system is also implemented.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwflooding.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/FLOODING </tt> </dd>
-</dl>
- 
-
- \section data_link Modules for the Data Link Layer
-
-The core of the data link layer is the Medium Access Control (MAC), that administers the access to the acoustic channel. 
-The DESERT Underwater libraries provide six modules which implement six different MAC techniques: <tt>uwaloha</tt>, <tt>uwsr</tt>, <tt>uw-csma-aloha</tt>, <tt>uwdacap</tt>, <tt>uwpolling</tt> and <tt>uw-t-lohi</tt>, all explained in the following. Additionally, DESERT provides <tt>uwmll</tt>, a module to map IP addresses to their corresponding MAC addresses.
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwmll, </tt> see UWMllModule </dd>
-<dt><b> Description: </b></dt>
-<dd> Since node-to-node communications at the link layer are performed using MAC addresses, whereas the communications at the upper layers employ IP addresses, a method to associate the former to the latter is required.
-<tt>uwmll</tt> makes it possible to set the correspondence between IP and MAC addresses a priori, by filling an ARP table for each network node. Alternatively, ARP tables can be automatically filled using the Address Resolution Protocol (ARP). The <tt>uwmll</tt> module must be placed between one (or more) IP module(s) and one MAC module. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwmll.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/MLL </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwaloha, </tt> see UWAloha </dd>
-<dt><b> Description: </b></dt>
-<dd> ALOHA is a random access scheme, i.e., a protocol that allows nodes to send data packets directly without any preliminary channel reservation process. In its original version <b>[10]</b>, neither channel sensing nor retransmissions are implemented, and each node can transmit whenever it has data packets to send. As a consequence, packet losses can occur. In later adaptations <b>[11]</b>, ALOHA has been enhanced with acknowledgment packets (ALOHA-ACK). The <tt> uwaloha </tt> module implements the functionality of the basic ALOHA protocol as well as its enhanced version using ARQ for error control. The user can set whether to employ basic ALOHA or ALOHA-ACK.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwaloha.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/ALOHA </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name: </b></dt>
-<dd> <tt> uw-csma-aloha, </tt> see CsmaAloha </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a 1-persistent version of the CSMA MAC protocol, which helps reduce the occurrence of collisions with respect to plain ALOHA. <i>Note</i>: this protocol used to be named CSMA-ALOHA in the past: for better backward reference, we prefer to keep this name in the modules. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwcsmaaloha.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/CSMA\_ALOHA </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwdacap, </tt> see DACAPModuleClass </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements DACAP (Distance-Aware Collision Avoidance Protocol) <b>[12]</b>, which provides a collision avoidance mechanism via a handshake phase prior to packet transmission. This phase involves the exchange of signaling packets such as Request-To-Send (RTS) and Clear-To-Send (CTS). The protocol also introduces a short Warning packet in the RTS-CTS mechanism, which helps prevent some packet collision events. DACAP is designed for underwater networks with long propagation delays, and can be operated with and without acknowledgements; <tt> uwdacap </tt> implements both solutions. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwdacap.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/DACAP </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwpolling, </tt> see Uwpolling_AUV and Uwpolling_NODE </dd>
-<dt><b> Description: </b></dt>
-<dd>  This module implements a MAC protocol which is based on a centralized polling scheme. <b>[13]</b> To fix ideas, focus on an Autonomous Underwater Vehicle (AUV) patrolling an area covered by an underwater sensor field; the AUV coordinates the data gathering from the sensors in a centralized fashion using a polling mechanism. This mechanism is based on the exchange of three types of messages: a broadcast TRIGGER message, that the AUV sends to notify the sensor nodes of its presence; a PROBE message, that the sensors use to answer the initial TRIGGER message; and a POLL message, sent again by the AUV and containing the order in which the underwater nodes can access the channel to communicate their data. 
-The polling sequence is determined by the AUV, given the information collected from the PROBE messages which may include, e.g., such metrics as the residual energy of the nodes, the timestamp of the data to be transmitted, or a measure of the data priority. The algorithm implemented by <tt> uwpolling </tt> does not require any routing mechanism on top of it. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwpolling.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/POLLING\_AUV </tt> for the AUV; <tt> Module/UW/POLLING\_NODE </tt> for the sensor nodes. </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uw-t-lohi, </tt> see TLOHIModuleClass </dd>
-<dt><b> Description: </b></dt>
-<dd> Tone-Lohi (T-Lohi) <b>[14]</b> is a MAC protocol that uses tones during contention rounds to reserve the channel. Other nodes competing for channel access are detected during a contention round, by listening to the channel after sending the reservation tone. T-Lohi takes advantage of the long propagation delays present in underwater networks to count the number of contenders reliably, and act accordingly during the contention round. Three versions of T-Lohi are proposed in <b>[11]</b>: 1) synchronized (ST-Lohi); 2) conservative unsynchronized (cUT-Lohi), which enables the counting of all contenders by extending the duration of the contention round to twice the maximum expected propagation delay, and 3) aggressive unsynchronized (aUT-Lohi), which reduces idle times (while increasing the probability of collisions). The <tt> uw-t-lohi </tt> module implements all of three versions of T-Lohi above; the user can freely choose which one to enable. 
-Since the actual transmission of tones depends on the available hardware, this module has not been considered for emulation and testbed implementation. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwtlohi.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/TLOHI </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwsr, </tt> see MMacUWSR </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> uwsr </tt> implements a Selective Repeat ARQ mechanism by setting up a time-division duplex between the transmitter and the receiver. The ARQ window length is set adaptively based on the propagation delay between the sender and the receiver. The window is further adapted in the presence of mobility. In addition, an Additive Increase and Multiplicative Decrease (AIMD) window control technique, similar to TCP's congestion window size adaptation, makes it possible to automatically increase or reduce the window length to reduce the chance of collisions and to stabilize the network throughput in the presence of strong traffic. This protocol has been shown to be effective because the underwater channel propagation delay is sufficiently large to accommodate more than one packet transmission within one round-trip time (RTT) <b>[15]</b>. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwsr.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/USR </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uw-csma-aloha-trigger, </tt> see UwCsmaAloha_Trigger_SINK and UwCsmaAloha_Trigger_NODE </dd>
-<dt><b> Description: </b></dt>
-<dd> Even though the 1-persistent CSMA protocol implemented by the <tt> uw-csma-aloha </tt> module has been shown to achieve good performance in underwater networks, sometimes it is useful to constrain packet transmissions so that they only take place when the sink is actually within the communication range of the nodes. This is particularly important if the sink is a mobile node or AUV. To do so, <tt> uw-csma-aloha-triggered </tt> extends the <tt> uw-csma-aloha </tt> module by allowing a mobile sink to enable communications in its neighborhood via the periodic transmission of a special TRIGGER packet. After receiving the TRIGGER, the nodes will contend for the channel via a simple 1-persistent CSMA mechanism as in the plain <tt> uw-csma-aloha </tt> module, and will revert to silence if no TRIGGER is received for a given amount of time.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwcsmaalohatrigger.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/CSMA_ALOHA/TRIGGER/NODE for sensors, Module/UW/CSMA_ALOHA/TRIGGER/SINK for the SINK</tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwUFetch, </tt> see uwUFetch_NODE and  uwUFetch_AUV </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt>uwUFetch</tt> implements the U-Fetch protocol <b>[16]</b>, which organizes the nodes of an UW network into three roles: the Mobile Sink, which patrols the networks to receive packets; the Sensor nodes, which sense environmental quantities or monitor man-made assets; the Head-Nodes (HNs), special sensors nodes endowed with the responsibility to retrieve the data packets from their neighbors and forward them to the mobile sink as it passes by.<br>
-Every HN sends a BEACON message to inform all neighbors about its presence. Every node that correctly receives the BEACON stores the MAC address of the HN, and answers with a PROBE message after a random backoff period. A node that receives several BEACONs coming from multiple HNs can choose one HN, following a predetermined metric (e.g., the BEACON received with highest SNR) and answers with a PROBE to this HN.<br>
-The transmission of data packets from the sensors to the HN is performed following a polling scheme.<br>
-The mobile sink (i.e., the AUV) also periodically tries to poll for HNs via TRIGGER packets and to establish a contact with them. Whenever HNs are discovered by the AUV, they are also sequentially polled.<br>
-In this version of the protocol, the HNs are fixed and predetermined, and one-hop communications between them and the sensors takes place, since every sensor is within the coverage range of one HN.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwufetch.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/UFETCH/NODE </tt> for the sensor node and the HN, <tt> Module/UW/UFETCH/AUV </tt> for the AUV  </dd>
-</dl>
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwtdma, </tt> see UwTDMA </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a MAC protocol which is based on a Time Division Multiple Access (TDMA) channel access method. 
-The TDMA slots have to be set for each node, in order to allow the user to employ some desired time sharing policy. In this way, the user can assign longer time slot to nodes with a large amount of data to send, and shorter time slots to the other nodes. 
-</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwtdma.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/TDMA </dd>
-</dl>
-
-<br>
-
-
-\section Propagation models
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwoptical_propagation, </tt> see UwOpticalMPropagation </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a propagation model for optical underwater transmissions. It employs the Lambert-Beer law, by taking into account: distance and alignment between transmitter and receiver, channel attenuation coefficient, beam diverge angle, receiving and transmitting area. It can be employed for omni-directional transmitters as well.
-</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwoptical_propagation.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/OPTICAL/Propagation </dd>
-</dl>
-
-<br>
-
-
-\section  PHY Modules for the Physical Layer 
-
-\subsection Modules Modules for simulate PHY layer
-
-DESERT framework provides some modules to simulate PHY layers.
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwphysical, </tt> see UnderwaterPhysical </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> uwphysical </tt> is a module that simulates the behavior of a BPSK or BFSK PHY layer (selectable by the user via a tcl variable). <tt> uwphysical </tt> provides also the possibility to calculate the amount of energy consumed by each node in transmission and reception phases separately, provided that the power consumption of the simulated PHY layer in each phase is specified by the user. <tt> uwphysical </tt> provides also the time (in seconds) that each node used for transmission and reception phases. Moreover, it counts the number of packets collided (i.e., packets discarded due to interference from concurrent transmissions) and also the type of collision (data packet vs control packet, data packet vs data packet, etc.), provided that this module is used together with the interference module <tt>uwinterference</tt> described below.  </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwphysical.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/PHYSICAL </tt> </dd>
-</dl>
-
-
-<br>
-
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwgainfromdb, </tt> see UnderwaterGainFromDb </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> uwgainfromdb </tt> provides the attenuation between two points from a file organized as a matrix. In particular, the SNR of a received signal is calculated by taking into account the position of the transmitter and the receiver and by retrieving the attenuation from a file via a hash table search. After that, as usual, the SNR associated to a given transmission is computed, and the PER is derived from it using the same procedure as in the <tt> uwphysical </tt> module. 
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwgainfromdb.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/GAINFROMDB </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwphysicaldb, </tt> see UnderwaterPhysicaldb </dd>
-<dt><b> Description: </b></dt>
-<dd> Sometimes it is useful to perform offline simulations of a full-fledged transmitter-receiver chain and obtain the performance of such chain in the form of hash tables. <tt> uwphysicaldb </tt> assumes that the performance of a transmission scheme is defined in terms of two hash tables: one that relates the SNR of a received transmission to its PER, and a second one that relates the SINR (including interference) and overlap between concurrent transmission to the PER. An example of how these tables were used in underwater network simulations can be found in <b>[17]</b>.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwphysicaldb.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/PHYSICALDB </tt> </dd>
-</dl>
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Uwoptical PHY, </tt> see UwOpticalPhy </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> This module simulates the behavior of an optical PHY layer. In particular, the SNR of a received signal is calculated by taking into account the position of the transmitter and the receiver, the receiver sensitivity, noise and receiving area. In addition the ambient light noise is included by retrieving the solar irradiance from a file via a lookup table search. After that, the SNR associated to a given transmission is computed. The receiving model is based on a SNR threshold and the interference is assumed to be destructive. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwoptical_phy.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/OPTICAL/PHY </tt> </dd>
-</dl>
-
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Rogers model physical layer, </tt> see UnderwaterPhysicalRogersModel </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> PC:Describe this </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwphysicalrogersmodel.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/PROPAGATIONROGERS </tt> </dd>
-</dl>
-
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Hermes PHY model, </tt> see UwHermesPhy </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> This module simulates the behavior of the Hermes acoustic modem's physical layer. The success probability of a packet reception is obtained from a lookup table of packet error rate vs. distance, by taking into account the position of both the transmitter and the receiver, and the packet size. The PER is assumed to be spread uniformly in all the packet chunks and the interference is destructive.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwhermesphy.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/HERMES/PHY </tt> </dd>
-</dl>
- 
-\subsection real_modem Interfaces with real modems
-
-Currently, DESERT supports three different hardware platforms for emulation and test-bed realization: the S2C hydroacoustic modem, a system developed by Evologics <b>[5]</b> which exploits the Sweep-Spread Carrier (S2C) technology for underwater data telemetry and communications. However, the <tt> uwmphy_modem </tt> module, which implements the general interface between the acoustic modem hardware and NS-Miracle, can be easily extended to support different hardware. In the following, we describe <tt> uwmphy_modem </tt>, along with the DESERT modules specialized for the above hardware (<tt> mfsk_whoi_mm </tt>, <tt> mpsk_whoi_mm </tt> and <tt> ms2c_evologics </tt>), as well as an additional module called <tt> uwmphypatch </tt> that is intended for preparing the OTcl scripts needed to set the parameters of the networking prototypes to test.
-
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwmphypatch, </tt> see UWMPhypatch </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> uwmphypatch </tt> is a dumb module to patch the absence of a physical layer when a MAC module is used. It just receives and forwards a packet, and handles the cross-layer messages required by all the MAC layers of DESERT. The main aim of this module is to observe the behavior of a given network protocol over an ideal channel, before interfacing the network simulation engine with real hardware. It should be used in conjunction with the underwater channel or the dumb wireless channel provided by the NS-Miracle libraries, and mainly to gather insight about the mechanisms of the investigated network protocol (independently of the errors that can be introduced by the channel). Any usage related to protocol or network performance evaluation is not recommended.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwmphypatch.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/MPhypatch </tt> </dd>
-</dl>
-
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uw-al, </tt> see Uwal </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> uw-al </tt>, (Underwater Adaption Layer) is a flexible module that performs the conversion from packet data structures internal to DESERT into bit streams suitable to be transmitted by a modem, and vice-versa. It also manages the fragmentation of packets to match the maximum Physical layer Service Data Unit, when appropriate. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwal.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/AL </tt> </dd>
-</dl>
-
-
-<br>
- 
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Packer common, </tt> see packerCOMMON </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> Packer common </tt>, is a module that converts the common header of ns-miracle into a bit stream suitable to be transmitted by a modem, and vice-versa. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libpackercommon.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> NS2/COMMON/Packer </tt> </dd>
-</dl>
-
-
-<br>
-
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Packer mac, </tt> see packerMAC </dd>
-<dt><b> Description: </b></dt>
-<dd> <tt> Packer mac </tt>, is a module that converts mac header of NS-Miracle into a bit stream, suitable to be transmitted by a modem, and vice-versa. Each mac protocol that implements its own header (other than the standard NS-Miracle mac header) must convert its header using another packer. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libpackermac.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> NS2/MAC/Packer </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwmphy_modem, </tt> see UWMPhy_modem </dd>
-<dt><b> Description: </b></dt>
-<dd> This module defines and implements the general interface between ns2/NS-Miracle and real acoustic modems.<tt> uwmphy_modem </tt> manages all the messages needed by NS-Miracle (e.g., cross layer messages between MAC and PHY layers) and contains all the simulation parameters that can be set by the user, along with the methods to change them. This module is an abstract class that must be used as the base class for any derived class that interfaces NS-Miracle with a hardware modem. Therefore, neither an actual object for this module nor its corresponding shadowed Tcl object can be created, hence there is no "Tcl name" associated to this module.</dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwmphy_modem.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> --- </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> MS2C\_EvoLogics, </tt> see MS2C_EvoLogics </dd>
-<dt><b> Description: </b></dt>
-<dd> Module derived from <tt> uwmphy_modem </tt> to implement the interface between ns2/NS-Miracle and the S2C EvoLogics modem. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libmstwoc_evologics.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/MPhy_modem/S2C </tt> </dd>
-</dl>
-
-
-<br>
- 
-\section interference Interference models
-
-In DESERT we provide two modules to simulate interference among concurrent transmissions in underwater networks. In the MEANPOWER interference model, the Signal-to-Interference-and-Noise Ratio (SINR) of a received packet is averaged over the entire duration of the packet.
-In the CHUNK interference model, the received packet is split into several chunks, where the interference perceived over each chunk is constant over the chunk duration. The SINR is computed for every chunk and the PER for each chunk is derived from its SINR. The packet is finally considered correct only if all chunks are correctly received.
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> Underwater Interference, </tt> see uwinterference </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements the interference model described above. Furthermore, this module provides the possibility to have the number of collisions occurred during the simulation, taking in account also different packets (e.g., the number of control packets collided with data packets and data packets collided with other data packets) </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwinterference.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Module/UW/INTERFERENCE </tt> </dd>
-</dl>
-
-<br>
-
-
-
-\section mobility Additional modules to simulate mobility
-
-The DESERT libraries also include two modules to simulate node mobility. These may be useful in the protocol design phase, in order to simulate the variation of the network topology over time and prove that a protocol is robust to this variation.
-
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwdriftposition, </tt> see UwDriftPosition </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements a mobility model that mimics the drift of a node caused by ocean currents. Given the mean speed and direction of the waves, the initial node's position and its velocity, <tt> uwdriftposition </tt> continuously updates the node's location in order to follow the direction of the current. At each update, the new node position is also affected by a random noise that aims at reproducing the waving movement typical of objects floating in the water. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwdriftposition.so </tt> </dd>
-<dt><b> Tcl name: </b></dt>
-<dd> <tt> Position/UW/DRIFT </tt> </dd>
-</dl>
-
-
-<br>
- 
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwgmposition, </tt> see UwGMPosition </dd>
-<dt><b> Description: </b></dt>
-<dd> This module implements the Gauss-Markov Mobility Model <b>[18]</b> (both in 2D and 3D), a solution designed to produce smooth and realistic traces by appropriately tuning a correlation parameter <i>alpha</i>. When required, <tt> uwgmposition </tt> updates node speed and direction according to a finite state Markov process. Once the desired mean speed is fixed, The parameter <i>alpha</i> controls the correlation between the speed vector and direction over time. </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwgmposition.so </tt> </dd>
-<dt><b> Tcl name:  </b></dt>
-<dd> <tt> Position/UW/GM </tt> </dd>
-</dl>
-
-
-<br>
-
-<dl>
-<dt><b> Name:</b></dt>
-<dd> <tt> uwsmposition, </tt> see UWSMPosition </dd>
-<dt><b> Description: </b></dt>
-<dd> This class implements the a simple movement behaviour: it is possible to define the direction and the speed of the linear movement thanks to a TCL command in which the user has to define the destination point and the movement speed required.
-NOTE: the destination point is only used to define the direction od the node: when it is reached, the node will proceed along the same direction </dd>
-<dt><b> Library name: </b></dt>
-<dd> <tt> libuwsmposition.so </tt> </dd>
-<dt><b> Tcl name:  </b></dt>
-<dd> <tt> Position/UWSM </tt> </dd>
-</dl>
-
+In order to use DESERT more and more in real environments, uwApplication is provided. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication trough a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
+Finally, the functionalities offered by DESERT have been extended with a control framework that provides a set of primitives to remotely control the hardware modems, and thus the network operations.
+All these features are released constantly on our <A HREF="https://github.com/uwsignet/DESERT_Underwater">GitHub</A> repository
 
 <br>
 
 \section refs References
 
 <b>[1]</b> R. Masiero, P. Casari, M. Zorzi, "The NAUTILUS project: Physical Parameters, Architectures and Network Scenarios," <i>Proc. MTS/IEEE OCEANS</i>, Kona, HI, 2011.
- 
+
 <b>[2]</b> The Network Simulator - ns2. http://nsnam.isi.edu/nsnam/index.php/Main_Page
- 
+
 <b>[3]</b> N. Baldo, M. Miozzo, F. Guerra, M. Rossi, and M. Zorzi, "Miracle: the multi-interface cross-layer extension of ns2," EURASIP J. of Wireless Commun. and Networking, 2010. [Online]. Available: http://www.hindawi.com/journals/wcn/aip.761792.html
 
 <b>[4]</b> WOSS - World Ocean Simulation System. http://telecom.dei.unipd.it/ns/woss/
- 
+
 <b>[5]</b> EvoLogics GmbH web site. http://www.evologics.de/
 
 <b>[6]</b> Woods Hole Oceanographic Institution web site. http://www.whoi.edu/
@@ -656,7 +61,7 @@ NOTE: the destination point is only used to define the direction od the node: wh
 
 <b>[8]</b> Develogic Subsea Systems. http://www.develogic.de/
 
-<b>[9]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007. 
+<b>[9]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007.
 
 <b>[10]</b> N. Abramson, "Development of the ALOHANET," <i>IEEE Transactions on Information Theory</i>, vol. 31, num. 2, pp. 119-123, 1985.
 
@@ -671,18 +76,20 @@ NOTE: the destination point is only used to define the direction od the node: wh
 <b>[15]</b> S. Azad, P. Casari, M. Zorzi, The Underwater Selective Repeat Error Control Protocol for Multiuser Acoustic Networks: Design and Parameter Optimization," <i>IEEE Transactions on Wireless Communications</i>, vol. 12, no. 10, pp. 4866-4877, Oct. 2013.
 
 <b>[16]</b> F. Favaro, L. Brolo, G. Toso, P. Casari, M. Zorzi, "A Study on Data Retrieval Strategies in Underwater Acoustic Networks", <i>Proc. MTS/IEEE OCEANS</i>, San Diego, CA, Sep. 2013.
- 
+
 <b>[17]</b> C. Tapparello, P. Casari, G. Toso, I. Calabrese, R. Otnes, P. van Walree, M. Goetz, I. Nissen, M. Zorzi, "Performance Evaluation of Forwarding Protocols for the RACUN Network," Proc. of ACM WUWNet, Kaohsiung, Taiwan, Nov. 2013.
 
 <b>[18]</b> B. Liang and Z. Haas, "Predictive distance-based mobility management for PCS networks," <i>Proc. IEEE INFOCOM</i>, New York, NY, Mar. 1999.
 
- 
- 
+<b>[19]</b> F. Campagnaro, R. Francescon, F. Guerra, F. Favaro, P. Casari, R. Diamant, M. Zorzi, "The DESERT underwater framework v2: Improved capabilities and extension tools," <i>Proc. IEEE UCOMMS</i>, Lerici, Italy, Oct. 2016.
+
+
+
   */
 
 /** \page INSTALL1 Installation Guidelines
 
-\section requirements Installation requirements
+\section requirements Installation requirements: Ubuntu
 
 Before installing the DESERT framework, please check that your host device has the following packages installed:
 
@@ -712,6 +119,35 @@ If you are using a Debian-based Linux distribution, you can type this command in
 </small>
 
 in order to install all dependencies above.
+
+\section fed-requirements Installation requirements: Fedora
+
+DESERT Underwater was successfully installed on Fedora 23 and following releases. Before installing the DESERT framework in Fedora, please check that your host device has the following packages installed:
+
+<SMALL>
+<BLOCKQUOTE>
+- C Development Tools and Libraries
+- gcc-gfortran
+- libXmu-devel
+- libX11-devel
+- patch
+- patchutils
+</BLOCKQUOTE>
+</SMALL>
+
+Please note that main C develoment tools are installed by installing the package group "C Development Tools and Libraries". To install all the software requirements you can run the following commands in a terminal:
+
+<small>
+
+    dnf groupinstall "C Development Tools and Libraries"
+
+</small>
+
+<small>
+
+    dnf install gcc-fortran libXmu-devel libX11-devel patch patchutils
+
+</small>
 
 \section install Installation procedures
 
@@ -983,51 +419,61 @@ As an example, we prepared two installation scripts that cross-compile DESERT Un
 \section gumstix Gumstix Overo
 <b> Gumstix Overo® FireSTORM COM </b><SMALL>[GUM3703f]</SMALL>
 
-See also: https://store.gumstix.com/index.php/products/267/
+See also: https://store.gumstix.com/coms/overo-coms.html
 
 \image html https://d3iwea566ns1n1.cloudfront.net/images/product/GUM3703F.overview.jpg
 
-On our Gumstix, we installed a Yocto® distro. We preferred to use Yocto Project because it makes it possible to create custom Linux distributions for embedded systems, including Gumstix-based systems. It is a collection of git repositories, known as layers, where each layer provides recipes to build software packages, as well as configuration information. For more details on the Yocto Project, we refer the interested user to https://www.yoctoproject.org/
 
-There exists a Yocto Project repository which is ready for installation on the Gumstix embedded boards. The first step in this respect is to point your browsers to this link:
+On the Gumstix Overo board, we installed a Yocto Project® image. We chose to use Yocto because it makes possible to create custom Linux distributions for embedded systems, including Gumstix-based systems. It is a collection of git repositories, known as layers, where each layer provides recipes to build software packages, as well as configuration information. For more details on the Yocto Project, we refer the interested user to https://www.yoctoproject.org/.
 
-https://github.com/gumstix/Gumstix-YoctoProject-Repo
+There exists a Yocto Project repository which is ready for installation on the Gumstix embedded boards at [GitHub](https://github.com/gumstix/Gumstix-YoctoProject-Repo).
+
+We point the user to the following page for an excellent tutorial on how to build a Yocto distribution for the Gumstix Overo:
+
+http://www.hackgnar.com/2015/03/building-yocto-linux-images-for-gumstix.html
 
 and follow the installation steps described therein.
-After the distro has been built, the next step is to prepare the file system to be copied on board the microSD card that will be loaded on the Gumstix. The instructions at the following link are the key to this:
+After the distro has been built, the next step is to prepare the file system to be copied on board the micro SD card that will be loaded on the Gumstix. The last steps in the previous page will guide the user towards this.
 
-http://gumstix.org/getting-started-guide/242-create-a-bootable-microsd-card.html
+Be aware that there are some changes to be made with respect to the page, namely
 
-<BLOCKQUOTE>
-By following the Yocto procedures, you can find all files to be put in the Gumstix's microSD ( <tt>rootfs.tar.bz2</tt>, <tt>uImage</tt>, <tt>u-boot.img</tt>, <tt>MLO</tt>) at the following path:
-<small>
+- The file `uImage` does not exist anymore in the `../yocto/build/tmp/deploy/images/overo` folder and so, it does not need to be copied.
 
-    .../yocto/build/tmp/deploy/images
+- The filesystem of the Yocto image is not in `yocto.tar.bz2` as pointed out by the tutorial bu, instead, is found at `gumstix-console-image-overo.tar.bz2`.
 
-</small>
-</BLOCKQUOTE>
+- Once the user has identified the micro SD device (i.e. `/dev/sdX`) the file system is normally mounted (on a Ubuntu machine) at `/media/<USERNAME>/<DEVICE_FOLDER>`.
 
 After all files have been uploaded to the Gumstix's microSD card and your Gumstix system boots, the final step is to set the toolchain. You can do so as follows: <br>
-- Create an empty directory to hold the toolchain that you will generate:
+- Generate the Yocto toolchain through:
 <small>
 
-    sudo mkdir -p /opt/gumstix-overo-yocto/
-    cd /opt/gumstix-overo-yocto/
+    cd ../yocto/
+    source poky/oe-init-build-env
+    bitbake meta-ide-support
+
+</small>
+
+- Create an empty directory to hold the toolchain that was generated:
+<small>
+
+    sudo mkdir -p /opt/overo-yocto/
+    cd /opt/overo-yocto/
 
 </small>
 - Now create a symbolic link to the gumstix toolchain in the folder above, and write the environment file:
 <small>
 
-    sudo ln -sf .../yocto/build/tmp/sysroots/x86_64-linux /opt/gumstix-overo-yocto/sysroots-x86_64-linux
-    touch environment
+    sudo ln -sf .../yocto/build/tmp/sysroots/x86_64-linux /opt/overo-yocto/sysroots-x86_64-linux
+    sudo touch environment
 
 </small>
-- Open the environment file with a text editor and write the following lines:
+- Open the `environment` file with a text editor and write the following lines:
 <small>
 
-    export PATH=/opt/gumstix-overo-yocto/sysroots-x86_64-linux/usr/bin/armv7a-vfp-neon-poky-linux-gnueabi:$PATH
-    export CC=arm-poky-linux-gnueabi-gcc
-    export CXX=arm-poky-linux-gnueabi-g++
+    export PATH=/opt/overo/sysroots/x86_64-linux/usr/bin/arm-poky-linux-gnueabi:$PATH
+    export SDKTARGETSYSROOT=/opt/overo/sysroots/overo
+    export CC="arm-poky-linux-gnueabi-gcc  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a8 --sysroot=$SDKTARGETSYSROOT"
+    export CXX="arm-poky-linux-gnueabi-g++  -march=armv7-a -mfloat-abi=hard -mfpu=neon -mtune=cortex-a8 --sysroot=$SDKTARGETSYSROOT"
     export STRIP=arm-poky-linux-gnueabi-strip
     export AR=arm-poky-linux-gnueabi-ar
 
@@ -1047,12 +493,15 @@ See also: http://www.raspberrypi.org/
 
 \image html http://nautilus.dei.unipd.it/images/raspberry-pi-model-b.jpg
 
-The Raspberry Pi is an ultra low cost embedded system that support Linux OS that was conceived with the primary goal of teaching computer programming. Its price tag ($25-$35) and the wide availability of pre-compiled software, makes it a perfect embedded system to start with for getting your hands dirty.
-Also for the Raspberry Pi embedded system we used Yocto to create a Linux-based distro with the required toolchain.
+The Raspberry Pi is an ultra low cost embedded system that supports GNU/Linux OSes and was conceived with the primary goal of teaching computer programming. Its price tag ($25-$35), and the wide availability of pre-compiled software, makes it a perfect embedded system to start with for getting your hands dirty. Three main versions have been developed up to now: Raspberry Pi 1, 2 and 3.
 
-The procedure to create an image for the raspberry is easier than the one for the Gumstix:
+Also for the Raspberry Pi embedded system we used Yocto to create a Linux-based distro with the required toolchain. The Yocto project has an official Raspberry Pi image (BSP layer) in the main Yocto repository and the versions 1, 2 and 3 are supported. The first step it to point the user to it:
 
-- create a folder in your system and cd in it
+https://git.yoctoproject.org/cgit/cgit.cgi/meta-raspberrypi/
+
+The procedure to create an image for the Raspberry Pi is easier than the one for the Gumstix. The steps described builds a Raspberry Pi version 1 image but the procedure can be easily adapted to work with version 2 or 3 of the board.
+
+- create a folder, named `yocto`, in your system and cd in it
 <small>
 
     mkdir yocto
@@ -1060,10 +509,10 @@ The procedure to create an image for the raspberry is easier than the one for th
 
 </small>
 
-- clone the dora branch of Yocto
+- clone the Yocto repository (the branch `krogoth`)
 <small>
 
-    git clone -b dora git://git.yoctoproject.org/poky.git
+    git clone -b krogoth git://git.yoctoproject.org/poky.git
 
 </small>
 
@@ -1074,28 +523,59 @@ The procedure to create an image for the raspberry is easier than the one for th
 
 </small>
 
-- clone the meta layer of the brach dora for the Raspberry-Pi
+- clone the meta layer of the brach `krogoth` for the Raspberry Pi
 <small>
 
-    git clone -b dora git://git.yoctoproject.org/meta-raspberrypi
+    git clone -b krogoth git://git.yoctoproject.org/meta-raspberrypi
 
 </small>
 
-- set the terminal to use bitbake
+- set the terminal to use bitbake (you will be in a folder called `build`)
 <small>
 
     source oe-init-build-env
 
 </small>
 
-- start the creation of the image to copy on the sd card
+- there are few configurations to make: first edit `conf/local.conf` to add these lines (changing raspberry to raspberrypi2 or raspberrypi3 if you are building for these devices)
+<small>
+
+    MACHINE = "raspberrypi"
+    GPU_MEM = "16"
+
+    ...
+
+    EXTRA_IMAGE_FEATURES ?= "debug-tweaks tools-sdk"
+
+</small>
+
+- second edit `conf/bblayers.conf` to add the `meta-raspberrypi` bblayer
+<small>
+
+    BBLAYERS ?= "
+    <PATH_TO_YOUR_YOCTO_FOLDER>/yocto/poky/meta \
+    <PATH_TO_YOUR_YOCTO_FOLDER>/yocto/poky/meta-poky \
+    <PATH_TO_YOUR_YOCTO_FOLDER>/yocto/poky/meta-yocto-bsp \
+    <PATH_TO_YOUR_YOCTO_FOLDER>/yocto/poky/meta-raspberrypi \
+    "
+
+</small>
+
+- start the creation of the image to be copied onto the SD card (this will take some time)
 <small>
 
     bitbake -k rpi-basic-image
 
 </small>
 
-- when the compilation will be over, insert an sd card in your card reader and identify the dev name by running dmesg
+- while on this shell, let's build also the toolchain needed to cross-compile DESERT. To do it, run:
+<small>
+
+    bitbake meta-ide-support
+
+</small>
+
+- when the compilation will be over, insert an SD card (at least 4 GB) in your card reader and identify the device name by running `dmesg`
 <small>
 
     dmesg
@@ -1105,38 +585,41 @@ The procedure to create an image for the raspberry is easier than the one for th
 
 </small>
 
-- in order to copy the image in the sd card you have to run
+- in order to copy the image on the SD card, run (specifying the device `sdX`)
 <small>
 
-    cd ../build//tmp/deploy/images/raspberrypi
-    sudo dd if=rpi-basic-image.rpi-sdimg of=/dev/sdX bs=1M
+    cd tmp/deploy/images/raspberrypi
+    sudo dd if=rpi-basic-image-raspberrypi.rpi-sdimg of=/dev/sdX bs=1M
 
 </small>
 
-After dd ended with the copy, you have to expand the root partition on your sd to fit the entire sd card. You can do it by using gparted. A good tutorial can be found here: http://www.howtoforge.com/partitioning_with_gparted
+After `dd` finished with the copy, you have to expand the root partition on your SD to fit the entire sd card. You can do it by using `gparted` which is both powerful and easy to use. A good tutorial can be found here: https://www.ibm.com/developerworks/library/l-resizing-partitions-1/.
 
-After all the files have been copied to the Raspberry-Pi's SD card, the final step is to set the toolchain. You can do so as follows:
+After all the files have been copied to the Raspberry Pi's SD card and your system boots up, the final step is to set the toolchain system variables, needed for the cross-compilation of DESERT. You can do so as follows:
 
-- Create an empty directory to hold the toolchain that you will generate:
+- Create an empty directory to hold the environment file for the toolchain:
 <small>
 
-    sudo mkdir -p /opt/raspberry-yocto/
-    cd /opt/raspberry-yocto/
+    sudo mkdir -p /opt/raspberry/
+    cd /opt/raspberry/
 
 </small>
-- Now create a symbolic link to the raspberry-pi toolchain in the folder above, and write the environment file:
+
+- Now create a symbolic link to the raspberry-pi toolchain, and write the environment file:
 <small>
 
-    sudo ln -sf .../yocto/build/tmp/sysroots/x86_64-linux /opt/raspberry-yocto/sysroots-x86_64-linux
-    touch environment
+    sudo ln -sf <PATH_TO_YOUR_YOCTO_FOLDER>/yocto/poky/build/tmp/sysroots  /opt/raspberry/sysroots
+    sudo touch environment
 
 </small>
-- Open the environment file with a text editor and write the following lines:
+
+- Open the `environment` file with a text editor and write the following lines:
 <small>
 
-    export PATH=/opt/raspberry-yocto/x86_64-linux/usr/bin/armv6-vfp-poky-linux-gnueabi:$PATH
-    export CC=arm-poky-linux-gnueabi-gcc
-    export CXX=arm-poky-linux-gnueabi-g++
+    export PATH=/opt/raspberry/sysroots/x86_64-linux/usr/bin/arm-poky-linux-gnueabi:$PATH
+    export SDKTARGETSYSROOT=/opt/raspberry/sysroots/raspberrypi
+    export CC="arm-poky-linux-gnueabi-gcc  -march=armv6 -mfpu=vfp  -mfloat-abi=hard -mtune=arm1176jzf-s -mfpu=vfp --sysroot=$SDKTARGETSYSROOT"
+    export CXX="arm-poky-linux-gnueabi-g++  -march=armv6 -mfpu=vfp  -mfloat-abi=hard -mtune=arm1176jzf-s -mfpu=vfp --sysroot=$SDKTARGETSYSROOT"
     export STRIP=arm-poky-linux-gnueabi-strip
     export AR=arm-poky-linux-gnueabi-ar
 
@@ -1144,20 +627,20 @@ After all the files have been copied to the Raspberry-Pi's SD card, the final st
 
 At this point it is possible to use the installation script. To do so, go inside <tt>.../DESERT_Underwater/DESERT_Framework/</tt> and launch <tt>./install.sh [OPTIONS]</tt>. See section \ref install for more information about the options.
 
-Please note that the first time that you run the command bitbake, the system will require several hours to fetch all the recipes, path, configure and compile them. Fortunately the next time the procedure will be much faster.
+Please note that the first time that you run the command bitbake, the system will require several hours to fetch all the recipes, paths, configures and compile them. Fortunately the next time the procedure will be much faster.
 
-Yocto is a very good starting point to enter the world of embedded system, but if you do not want or you do not have time to learn Yocto there are other alternatives. There exists linux distributions online ready to be copied directly on the sd card. We list below the most used by the community:
+Yocto is a very good starting point to enter the world of embedded system, but if you do not want or you do not have time to learn Yocto there are other alternatives. There exists linux distributions online ready to be copied directly on the SD card. The most common are:
 
 - Raspbian (based on Debian): http://www.raspbian.org/
-- Pidora (based on Fedora): http://pidora.ca/
-- Arch: http://archlinuxarm.org/platforms/armv6/raspberry-pi/
-- Moebius (minimal based on Raspbian): http://moebiuslinux.sourceforge.net/
+- Fedora ARM: https://fedoraproject.org/wiki/Raspberry_Pi
 
-We tested DESERT successfully with Raspbian and Moebius.
+But a more comprehensive list is available at the Raspberry Pi official website:
 
-In order to cross-compile DESERT you need a toolchain. You can download one from the network (https://github.com/raspberrypi/tools) or you can compile one by using crosstool-ng (http://crosstool-ng.org/)
+https://www.raspberrypi.org/downloads
 
-A good and complete tutorial on how to use the crosstool-ng for the raspberry can be found here: http://elinux.org/RPi_Linaro_GCC_Compilation
+In order to cross-compile DESERT you need a toolchain: you can download one from the network (https://github.com/raspberrypi/tools) or you can compile one by using crosstool-ng (http://crosstool-ng.org/): an alternative is to use the precompiled toolchain that could be already available in your OS repositories.
+
+A good and complete tutorial on how to use the crosstool-ng for the Raspberry Pi can be found here: http://elinux.org/RPi_Linaro_GCC_Compilation.
 
 <br>
 
@@ -1168,15 +651,15 @@ See also: http://www.udoo.org/
 
 \image html http://nautilus.dei.unipd.it/images/udoo-quad.jpg
 
-UDOO is a mini PC that can be used both with Android and Linux OS, with an embedded Arduino-compatible board. It is a powerful prototyping board for software development and design; it is easy to use and enables project  development with minimum hardware knowledge. 
+UDOO is a mini PC that can be used both with Android and Linux OS, with an embedded Arduino-compatible board. It is a powerful prototyping board for software development and design; it is easy to use and enables project  development with minimum hardware knowledge.
 UDOO merges different computing worlds together: each one has its proper strengths and weak points, but all of them are useful for educational purposes as well as Do-It-Yourself (DIY) and quick prototyping. UDOO is an open hardware, low-cost platform equipped with an ARM i.MX6 Freescale processor, and an Arduino Due compatible section based on ATMEL SAM3X8E ARM processor, all this available on the same board.
 
-On the UDOO website, at the <A HREF="http://www.udoo.org/downloads/">download</A> page, you can find images for several operative systems like: Ubuntu, Android and Debian. For our purposes, we tested DESERT with an UDOO quad, where we intalled the Linaro Ubuntu 12.04 LTS.
+On the UDOO website, at the <A HREF="http://download.udoo.org/files/UDOO_Unico/UDOO_QDL_img/UDOObuntu_img/udoobuntu-udoo-qdl-desktop_2.1.2.zip">download</A> page, you can find images for several operative systems like: Ubuntu, Android and Debian. For our purposes, we tested DESERT with an UDOO quad, where we intalled the UDOObuntu 2.1.2 (Ubuntu 14.04 LTS).
 
 - The procedure to follow to download and copy the image on the sd card is the following:
 <small>
 
-     wget http://download.udoo.org/files/UDOO_Unico/Quad_img/Ubuntu_img/udoo_quad_ubuntu1204_v2.1.zip
+     wget http://download.udoo.org/files/UDOO_Unico/UDOO_QDL_img/UDOObuntu_img/udoobuntu-udoo-qdl-desktop_2.1.2.zip
      unzip udoo_quad_ubuntu1204_v2.1.zip
      sudo dd if=udoo_quad_ubuntu1204_v2.1.img of=/dev/sdX bs=1M
 
@@ -1185,71 +668,84 @@ On the UDOO website, at the <A HREF="http://www.udoo.org/downloads/">download</A
 - After you have to download the toolchain and add it to your system:
 <small>
 
-    wget http://download.udoo.org/files/crosscompiler/arm-fsl-linux-gnueabi.tar.gz
-    tar xzf arm-fsl-linux-gnueabi.tar.gz
+    cd $HOME
+    wget https://releases.linaro.org/15.05/components/toolchain/binaries/arm-linux-gnueabihf/gcc-linaro-4.9-2015.05-x86_64_arm-linux-gnueabihf.tar.xz
+    gcc-linaro-4.9-2015.05-x86_64_arm-linux-gnueabihf.tar.xz
     sudo mkdir /opt/udoo
-    sudo mv arm-fsl-linux-gnueabi /opt/udoo
-    sudo touch /opt/udoo/environment
+    sudo ln -s $HOME/gcc-linaro-4.9-2015.05-x86_64_arm-linux-gnueabihf/  /opt/udoo/arm-linux-gnueabihf-linaro
 
 </small>
 
 - Open the environment file with a text editor and write the following lines (remember to edit it as sudo):
 <small>
 
-    export PATH=/opt/udoo/arm-fsl-linux-gnueabi/bin:$PATH
-    export CC=arm-fsl-linux-gnueabi-gcc
-    export CXX=arm-fsl-linux-gnueabi-g++
-    export GDB=arm-fsl-linux-gnueabi-gdb
-    export STRIP=arm-fsl-linux-gnueabi-strip
-    export AR=arm-fsl-linux-gnueabi-ar
+    export PATH=/opt/udoo/arm-linux-gnueabihf-linaro/bin:$PATH
+    export CC=arm-linux-gnueabihf-gcc
+    export CXX=arm-linux-gnueabihf-g++
+    export GDB=arm-linux-gnueabihf-gdb
+    export STRIP=arm-linux-gnueabihf-strip
+    export AR=arm-linux-gnueabihf-a
 
 </small>
 
 At this point it is possible to use the installation script. To do so, go inside <tt>.../DESERT_Underwater/DESERT_Framework/</tt> and launch <tt>./install.sh [OPTION]</tt>. See section \ref install for more information about the options.
 
-*/
 
-/** \page VirtualMachine Virtual Machine
+\section pandaboard Pandaboard
+<b> Pandaboard® </b>
 
-<b> An option to play immediately with the DESERT Underwater libraries </b>
+See also: http://www.pandaboard.org/
 
-If you do not want to install yet another library on your system, we provide the image of a ready-to-run virtual machine. This is an easy solution that will make it possible for you to start working directly with our software, before choosing whether to actually install it or not. The virtual machine is also a very feasible fallback for those users that are stuck with the Windows OS, and cannot install a fresh Linux distro on their host.
+\image html http://www.liquidware.com/system/0000/3727/PandaBoard_Angle.jpg
 
-To install the virtual machine, your system must satisfy these requirements:
+The Pandaboard is a powerful embedded board. It features a dual core Cortex A9 processor running at 1 GHz and a number of ports that outnmubers simpler boards such as the Raspberry or the Udoo. Namely, it comes with a HDMI output port, a DVI output port, 2 USB 2.0 ports, 1 micro USB OTG port, a serial port, a 10/100 Ethernet connector and also a WLAN/Bluetooth module. Of course these specs extend the range of applications it can support, and impact on the price of the board ($100-$200).
 
+The horsepower of the Pandaboard makes it suitable for the installation of a complete OS like Ubuntu: on our Pandaboard we installed an Ubuntu image, cross-compiled for ARM. We point the user to the following link to easily obtain an Ubuntu image for the Pandaboard:
+
+http://www.omappedia.org/wiki/Ubuntu_Pre-built_Binaries_Guide
+
+Once the Pandaboard is set up and working properly (e.g., you can view terminal output or access the Pandaboard OS via ssh) you will have to cross-compile DESERT for the ARM A9 processor. We tested it on an Ubuntu 10.xx installation. To accomplish this, a few dependencies must be solved, namely:
+
+- Open up a terminal and install the following packages:
 <small>
 
-    - Oracle VM Virtual Box installed (see https://www.virtualbox.org/)
-    - 64 bit host
-    - CPU that supports VT-x/AMD-V instructions (aka hardware virtualization)
+     sudo apt-get install gcc-arm-linux-gnueabihf libc6-dev-armhf-cross g++-arm-linux-gnueabihf
+
+</small>
+and then accept all the dependencies required.
+At this point, we need to create a folder in order to hold the files needed by the toolchain:
+
+- As sudo, do the following:
+<small>
+
+    sudo mkdir /opt/pandaboard
+    cd /opt/pandaboard
+
+</small>
+- then create an environment file
+<small>
+
+     touch environment
+
+</small>
+- and finally write the following lines into the newly created environment file:
+<small>
+
+     export CC=arm-linux-gnueabihf-gcc
+     export CXX=arm-linux-gnueabihf-g++
+     export GDB=arm-linux-gnueabihf-gdb
+     export STRIP=arm-linux-gnueabihf-strip
+     export AR=arm-linux-gnueabihf-ar
 
 </small>
 
-If you have a suitable system, go on the DESERT Underwater web site<br>
-http://nautilus.dei.unipd.it/desert-underwater-2/#virtual-machine <br>
-and double-click on the the virtual machine download link. This will trigger Virtual Box, which will prompt for settings.
-Click "Import" to start working with the machine.
-
-Once the virtual machine boots, use the following credentials to log into the Debian system:
-
+At this point, the toolchain needed for cross-compilation is available, and you only need to call the DESERT installer as usual, where of course you need to specifically select the Pandaboard target.
 <small>
 
-    username: desert
-    password: desert
+     ./install.sh --wizard
 
 </small>
-
-In order to start to play with the script:
-
-- click on the terminal icon in the upper left corner and type:
-<small>
-
-    cd_desert_samples
-
-</small>
-
-- follow the instructions on screen.
-
+See section \ref install for more information about the options.
 */
 
 /** \page ack Acknowledgments
@@ -1267,7 +763,7 @@ Grateful thanks also go to the many collaborations that helped develop part of t
 /**
 * \page License License Terms
 //
-// Copyright (c) 2012-2015 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2012-2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1302,7 +798,7 @@ Grateful thanks also go to the many collaborations that helped develop part of t
 
 /** \page Giovanni In memory of Giovanni Toso
 
-DESERT Underwater has been put together, tested, improved, and expanded over time also thanks to the continuous efforts of our beloved colleague and friend Giovanni Toso, who prematurely passed away in a car accident on August 10, 2014. DESERT 2.1.0 is the first major release after Giovanni's death, and is dedicated to his memory.
+DESERT Underwater has been put together, tested, improved, and expanded over time also thanks to the continuous efforts of our beloved colleague and friend Giovanni Toso, who prematurely passed away in a car accident on August 10, 2014. DESERT 3.0 is the first major release after Giovanni's death, and is dedicated to his memory.
 
 \image html http://nautilus.dei.unipd.it/people/people_photos/GiovanniToso.jpg
 

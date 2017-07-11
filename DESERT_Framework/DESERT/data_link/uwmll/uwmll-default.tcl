@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This module has only slightly modification as respect to the mll module contained  in Miracle, 
+
+# This module has only slightly modification as respect to the mll module
+# contained  in Miracle, 
 # released under the same BSD copyright and implemented by 
 # Erik Andersson, Emil Ljungdahl, Lars-Olof Moilanen (Karlstad University)
 

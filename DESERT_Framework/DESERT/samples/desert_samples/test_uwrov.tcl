@@ -189,7 +189,7 @@ Module/UW/ROV/CTR set debug_               0
 
 
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    15.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
 Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
 Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)

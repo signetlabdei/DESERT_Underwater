@@ -84,7 +84,8 @@ load libpackermac.so
 load libpackeruwudp.so
 load libpackeruwcbr.so
 load libuwmphy_modem.so
-load libmstwoc_evologics.so
+load libevologics_driver.so
+load libuwmmac_clmsgs.so
 load libuwtdma.so
 
 #############################

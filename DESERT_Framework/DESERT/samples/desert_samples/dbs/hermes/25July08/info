@@ -1,0 +1,46 @@
+The FAU Hermes acoustic modem can work in 6 modes:
+MODE0:
+	Modulation: BPSK
+	Bandwidth [kHz]: 25
+	Bitrate (coded info) [bps]: 25000
+	Bitrate (effective datarate) [bps]: 16243
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+MODE1:
+	Modulation: BPSK
+	Bandwidth [kHz]: 50
+	Bitrate (coded info) [bps]: 50000
+	Bitrate (effective datarate) [bps]: 31784
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+MODE2:
+	Modulation: BPSK
+	Bandwidth [kHz]: 75
+	Bitrate (coded info) [bps]: 75000
+	Bitrate (effective datarate) [bps]: 46668
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+MODE3:
+	Modulation: QPSK
+	Bandwidth [kHz]: 25
+	Bitrate (coded info) [bps]: 50000
+	Bitrate (effective datarate) [bps]: 31784
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+MODE4:
+	Modulation: QPSK
+	Bandwidth [kHz]: 50
+	Bitrate (coded info) [bps]: 100000
+	Bitrate (effective datarate) [bps]: 60935
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+MODE5:
+	Modulation: QPSK
+	Bandwidth [kHz]: 75
+	Bitrate (coded info) [bps]: 150000
+	Bitrate (effective datarate) [bps]: 87768
+	Carrier Frequency: 300 kHz
+	Info bit/frame: 9120
+
+ref: A Very High Bit Rate Broadband Acoustic Modem For Short-to-Medium Range Data Transmission in Ports and Shallow Water using Spread Spectrum Modulation and Decision Feedback Equalizing
+Pierre-Philippe Beaujean, PhD Florida Atlantic University.

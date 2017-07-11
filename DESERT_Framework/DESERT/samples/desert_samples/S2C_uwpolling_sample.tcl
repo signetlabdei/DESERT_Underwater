@@ -85,8 +85,9 @@ load libpackercommon.so
 load libpackermac.so
 load libpackeruwudp.so
 load libpackeruwcbr.so
+load libuwphy_clmsgs.so
 load libuwmphy_modem.so
-load libmstwoc_evologics.so
+load libevologics_driver.so
 load libuwpolling.so
 load libpackeruwpolling.so
 
@@ -231,11 +232,14 @@ UW/CBR/Packer set debug_ 0
 
 # variables for the S2C modem's interface
 #####
-Module/UW/MPhy_modem/S2C set period_ 			        1
-Module/UW/MPhy_modem/S2C set debug_ 			        1
-Module/UW/MPhy_modem/S2C set log_                 1
-Module/UW/MPhy_modem/S2C set SetModemID_	 	      0
-Module/UW/MPhy_modem/S2C set RemoteControl_       1
+Module/UW/MPhy_modem/S2C set period_		1
+Module/UW/MPhy_modem/S2C set debug_ 		1
+Module/UW/MPhy_modem/S2C set loglevel_       4
+Module/UW/MPhy_modem/S2C set SetModemID_	0
+Module/UW/MPhy_modem/S2C set UseKeepOnline_	0
+Module/UW/MPhy_modem/S2C set DeafTime_ 		2
+Module/UW/MPhy_modem/S2C set NoiseProbeFrequency_   0
+Module/UW/MPhy_modem/S2C set MultipathProbeFrequency_ 0
 #######
 
 ################################
@@ -281,8 +285,7 @@ proc createNode { } {
     set uwal_             [new Module/UW/AL]
 
     # PHY LAYER
-    set modem_ [new "Module/UW/MPhy_modem/S2C" $socket_port]    
-    puts "creo nodo"
+    set modem_ [new "Module/UW/MPhy_modem/S2C" $socket_port]
     # insert the module(s) into the node
     if {$opt(node) != $opt(sink)} {
 	    $node_ addModule 8 $app_ 1 "CBR"
@@ -373,6 +376,7 @@ proc createNode { } {
     }
 
     $mac_ initialize
+    $modem_ setLogSuffix "tec_acoustic"
 }
 
 #################

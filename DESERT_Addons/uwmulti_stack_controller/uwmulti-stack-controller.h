@@ -142,14 +142,13 @@ protected:
   };
 
   int debug_; /**< Flag to activate debug verbosity.*/
-  int min_delay_; 
+  double min_delay_; 
   Mode switch_mode_; /** <Current switch mode (either AUTOMATIC or MANUAL).*/
   int lower_id_active_; /**< Id of the current lower layer active. It is used only in MANUAL MODE.*/
-
   std::map<int, int> id2order; /**< Maps each layer id to its order in the threshold matrix. (layer_id, order).*/
-	ThresMatrix threshold_map; /**< Returns the switch layer theshold given a layer order.*/
+  ThresMatrix threshold_map; /**< Returns the switch layer theshold given a layer order.*/
   std::map<int, int> order2id; /**< Return the layer order given its order in the threshold matrix. (layer_order, layer_id).*/
-
+  int signaling_pktSize_; /** By default the signaling is not employed, if it is needed, here where to set the signaling packet size*/
   /** 
    * Handle a packet coming from upper layers
    * 

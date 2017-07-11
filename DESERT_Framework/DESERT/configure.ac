@@ -64,8 +64,10 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwstaticrouting'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwicrp'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwip'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwflooding'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmmac_clmsgs'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmll'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-ca'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwdacap'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwpolling'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwaloha'
@@ -74,8 +76,10 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-t-lohi'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha-trigger'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwUFetch'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma-frame'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmphy_modem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/ms2c_evologics'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/ms2c_evologics_lowlev'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmphypatch'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysical'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalrogersmodel'
@@ -88,6 +92,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_mac'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalracun'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhermesphy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphy_clmsgs'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwrandomlib'
@@ -96,20 +101,22 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
 
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
+
 #if test x$have_woss != xyes ; then
     #AC_MSG_WARN([---------------------------------------------------------------------])
     #AC_MSG_WARN([Could not find WOSS, is --with-woss set correctly?])
     #AC_MSG_WARN([If the --with-woss parameter has been omitted when you ran the configure script])
     #AC_MSG_WARN([this warning can be ignored.])
     #AC_MSG_WARN([---------------------------------------------------------------------])
-#fi  
+#fi
 
 
 AC_SUBST(DESERT_CPPFLAGS) 
 
 AC_SUBST(DESERT_LDFLAGS) 
 
-AC_SUBST(DESERT_LIBADD) 
+AC_SUBST(DESERT_LIBADD)
 
 AC_DEFINE(CPP_NAMESPACE,std) 
 
@@ -127,8 +134,10 @@ AC_CONFIG_FILES([
     network/uwicrp/Makefile
     network/uwip/Makefile
     network/uwflooding/Makefile
+    data_link/uwmmac_clmsgs/Makefile
     data_link/uwmll/Makefile
     data_link/uw-csma-aloha/Makefile
+    data_link/uw-csma-ca/Makefile
     data_link/uwdacap/Makefile
     data_link/uwpolling/Makefile
     data_link/uwaloha/Makefile
@@ -137,8 +146,10 @@ AC_CONFIG_FILES([
     data_link/uwUFetch/Makefile
     data_link/uw-csma-aloha-trigger/Makefile
     data_link/uwtdma/Makefile
+    data_link/uwtdma-frame/Makefile
     physical/uwmphy_modem/Makefile
     physical/ms2c_evologics/Makefile
+    physical/ms2c_evologics_lowlev/Makefile
     physical/uwmphypatch/Makefile
     physical/uwphysical/Makefile
     physical/uwphysicalrogersmodel/Makefile
@@ -150,6 +161,7 @@ AC_CONFIG_FILES([
     physical/uw-al/packer_mac/Makefile    
     physical/uwhermesphy/Makefile
     physical/uwoptical_phy/Makefile
+    physical/uwphy_clmsgs/Makefile
     mobility/uwdriftposition/Makefile
     mobility/uwgmposition/Makefile
     mobility/uwrandomlib/Makefile

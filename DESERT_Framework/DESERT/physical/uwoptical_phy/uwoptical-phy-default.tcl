@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 
 Module/UW/OPTICAL/PHY set TxPower_  				0.01
 Module/UW/OPTICAL/PHY set AcquisitionThreshold_dB_              1
-Module/UW/OPTICAL/PHY set Id_                                   [expr 1.0e-9]
+Module/UW/OPTICAL/PHY set Id_                                   -1;#[expr 1.0e-9]
 Module/UW/OPTICAL/PHY set Il_                                   [expr 1.0e-6]
 Module/UW/OPTICAL/PHY set R_                                    [expr 1.49e9]
 Module/UW/OPTICAL/PHY set S_                                    0.26

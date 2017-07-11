@@ -41,6 +41,14 @@ if [ "${_DEBUG}" = "1" ]; then
     debug__print_screen_L1 "inside --- $0"
 fi
 
+curr_ver="$(gcc --version | head -n1 | cut -d" " -f3)"
+last_ver="6.2.0"
+if [ "$(printf "$last_ver\n$curr_ver" | sort -V | head -n1)" = "$curr_ver" -a "$curr_ver" != "$last_ver" ]; then
+    export GCC6_FLAG=""
+else
+    export GCC6_FLAG="-std=c++98"
+fi
+
 DIRFOLDER="${ZLIB_DIR}      \
            ${TCL_DIR}       \
            ${OTCL_DIR}      \
@@ -374,6 +382,7 @@ build_NS() {
     patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/ns-${NS_VERSION}-without-x-cross.patch > "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/ns-${NS_VERSION}-compile.patch >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/ns-${NS_VERSION}-fix-gcc-4.7.patch >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
+    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/ns-real-time.patch >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     mv configure.in configure.ac
     # autoreconf || true >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
 
@@ -716,7 +725,7 @@ build_NETCDF() {
     fi
 
     info_L2 "make       [$*]"
-    make check install >> "${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log" 2>&1
+    make install >> "${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the compilation or installation of netcdf-${NETCDF_VERSION}! Exiting ..."
         tail ${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log
@@ -827,12 +836,12 @@ build_BELLHOP() {
     fi
 
     info_L2 "make       [$*]"
-    make install >> "${currentBuildLog}/bellhop-$*.log" 2>&1
+    make >> "${currentBuildLog}/bellhop-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the compilation or installation of Bellhop! Exiting ..."
         exit 1
     fi
-    cp bin/bellhop.exe ${DEST_FOLDER}/bin
+    cp Bellhop/bellhop.exe ${DEST_FOLDER}/bin
     elapsed=`expr $(date +%s) - $start`
     ok_L1 "completed in ${elapsed}s"
 }
@@ -911,6 +920,7 @@ build_WOSS() {
         tail ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
+    info_L2 "make inst  [$*]"
     elapsed=`expr $(date +%s) - $start`
     ok_L1 "completed in ${elapsed}s"
 }

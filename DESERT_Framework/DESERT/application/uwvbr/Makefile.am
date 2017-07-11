@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,9 @@ SUBDIRS =
 
 TESTS = 
 
-libuwvbr_la_SOURCES = initlib.cc\
+libuwvbr_la_SOURCES = initlib.cpp\
     uwvbr-defaults.tcl\
-    uwvbr-module.cc\
-    uwvbr-module.h
+    uwvbr-module.cpp
 
 libuwvbr_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwvbr_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

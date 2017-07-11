@@ -82,6 +82,7 @@ load libuwstaticrouting.so
 load libuwmll.so
 load libuwudp.so
 load libuwrov.so
+load libuwmmac_clmsgs.so
 load libuwtdma.so
 load libuwcbr.so
 load libuwaloha.so
@@ -103,10 +104,10 @@ $ns use-Miracle
 set opt(start_clock) [clock seconds]
 
 set opt(nn)                     2.0 ;# Number of Nodes
-set opt(ROV_pktsize)            [expr 4024];#125  ;# Pkt size in byte
+set opt(ROV_pktsize)            [expr 1024];#125  ;# Pkt size in byte
 set opt(CTR_pktsize)            [expr 1024/8];#125  ;# Pkt size in byte
 
-set opt(ROV_period) 			0.5
+set opt(ROV_period) 			0.8
 
 set opt(starttime)          1
 set opt(stoptime)           3000
@@ -121,7 +122,7 @@ set opt(bw)                 76000.0	;#Bandwidth used in Hz
 set opt(bitrate)            87768.0 ;#150000;#bitrate in bps
 set opt(max_rtt)            [expr 2*$opt(maxinterval_)/$opt(propagation_speed) + $opt(CTR_pktsize)/$opt(bitrate) + $opt(ROV_pktsize)/$opt(bitrate)];
 
-set opt(CTR_timeout)             [expr 6+2*($opt(max_rtt)+$opt(ROV_period))];#time out before retransmission which [] ?
+set opt(CTR_timeout)             [expr 3*6+2*($opt(max_rtt)+$opt(ROV_period))];#time out before retransmission which [] ?
 #if {$opt(ACK_Active)} {
 #    set opt(ack_mode)           "setAckMode"    
 #} else {
@@ -200,18 +201,13 @@ Module/UW/TDMA set sea_trial_           0
 Module/UW/TDMA set fair_mode            1
 # FAIR Modality on
 # Remeber to put silent the SetSlotDuration, SetGuardTime and setStartTime call
-Module/UW/TDMA set guard_time           0.1
+Module/UW/TDMA set guard_time           0.6
 Module/UW/TDMA set tot_slots            2
-
-Module/UW/TDMA set ACK_size_            0
-Module/UW/TDMA set max_tx_tries_        1
-Module/UW/TDMA set wait_constant_       0
-Module/UW/TDMA set max_payload_         10000
-Module/UW/TDMA set ACK_timeout_         10000.0
-
+Module/UW/TDMA set max_packet_per_slot  1000
+Module/UW/TDMA set queue_size_          1000
 
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    15.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
 Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
 Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
@@ -242,11 +238,6 @@ proc createNode {node application id} {
     # set mac($id)  [new Module/UW/CSMA_ALOHA]
     
     set mac($id)  [new Module/UW/TDMA]
-    if {$id == 1} {
-        $mac($id) setMacAddr [expr $id + 1]
-    } else {
-        $mac($id) setMacAddr [expr $id + 1]
-    }
     
     #$mac($id)  setNoAckMode
     set phy($id)    [new Module/UW/PHYSICAL]
@@ -275,6 +266,9 @@ proc createNode {node application id} {
     #Set the IP address of the node
     set ip_addr_value [expr $id + 1]
     $ipif($id) addr $ip_addr_value
+
+    $mac($id) setMacAddr    [expr $id + 1]
+    $mac($id) setSlotNumber [expr $id + 1]
     
     set position($id) [new "Position/UWSM"]
     $node addPosition $position($id)
@@ -295,8 +289,6 @@ proc createNode {node application id} {
     $phy($id) setSpectralMask $data_mask
     $phy($id) setInterference $interf_data($id)
     $phy($id) setInterferenceModel "MEANPOWER"
-    # $mac($id) $opt(ack_mode)
-    # $mac($id) initialize
 }
 
 
@@ -386,10 +378,12 @@ foreach line $data {
 }
 $ns at [expr $opt(starttime)+0.0000000]    "$applicationROV start"
 $ns at [expr $opt(starttime)+0.00000002]    "$applicationCTR start"
-$ns at [expr $opt(starttime)+0.00000001]    "$mac(0) start"
-$ns at [expr $opt(starttime)+0.00000003]    "$mac(1) start"
+$ns at $opt(starttime)    "$mac(0) start"
+$ns at $opt(starttime)    "$mac(1) start"
 $ns at $opt(stoptime)     "$applicationROV stop"
 $ns at $opt(stoptime)     "$applicationCTR stop"
+$ns at $opt(stoptime)    "$mac(0) stop"
+$ns at $opt(stoptime)    "$mac(1) stop"
 
 proc update_and_check {t} {
     global position applicationROV

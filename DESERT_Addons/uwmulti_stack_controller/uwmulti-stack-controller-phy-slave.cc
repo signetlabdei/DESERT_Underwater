@@ -57,15 +57,35 @@ public:
 
 UwMultiStackControllerPhySlave::UwMultiStackControllerPhySlave() 
 : 
-  UwMultiStackControllerPhy()
+  UwMultiStackControllerPhy(),
+  signaling_recv_(0),
+  signaling_active_(0)
 { 
-  
+  bind("signaling_active_", &signaling_active_);
 }
 
 int UwMultiStackControllerPhySlave::command(int argc, const char*const* argv) 
 {
   Tcl& tcl = Tcl::instance();
-  if (argc == 3) 
+  if (argc == 2)
+  {
+    if(strcasecmp(argv[1], "signalingON") == 0)
+    {
+      signaling_active_ = 1;
+      return TCL_OK;
+    }
+    else if(strcasecmp(argv[1], "signalingOFF") == 0)
+    {
+      signaling_active_ = 0;
+      return TCL_OK;
+    }
+    else if(strcasecmp(argv[1], "getSignalsRecv") == 0)
+    {
+      tcl.resultf("%d", signaling_recv_);
+      return TCL_OK;
+    }
+  }
+  else if (argc == 3) 
   {
     if(strcasecmp(argv[1], "setManualLowerlId") == 0)
     {
@@ -80,7 +100,48 @@ int UwMultiStackControllerPhySlave::command(int argc, const char*const* argv)
 void UwMultiStackControllerPhySlave::recv(Packet *p, int idSrc)
 {
   updateSlave(p,idSrc);
-  UwMultiStackControllerPhy::recv(p, idSrc);
+  hdr_cmn* ch = hdr_cmn::access(p);
+  if (ch->ptype() == PT_MULTI_ST_SIGNALING) {
+    signaling_recv_++;
+    //Filippo: signaling con risposta
+    if (signaling_active_) {
+      hdr_mac* mach = HDR_MAC(p);
+      int my_mac_addr = -1;
+      ClMsgPhy2MacAddr msg;
+      sendSyncClMsg(&msg);
+      my_mac_addr = msg.getAddr(); 
+      if (mach->macDA() == my_mac_addr || mach->macDA() == MAC_BROADCAST) {
+        mach->macDA() = mach->macSA();
+        mach->macSA() = my_mac_addr;
+        sendDown(lower_id_active_, p, min_delay_);
+      }
+    }
+    else
+      Packet::free(p);
+    
+    if (debug_)
+    {
+      std::cout << NOW << " ControllerPhySlave::recv(Packet *p, int idSrc) signaling "<< ch->ptype() << " " << PT_MULTI_ST_SIGNALING<< std::endl;
+    }
+  }
+  else
+    UwMultiStackControllerPhy::recv(p, idSrc);
+}
+
+int UwMultiStackControllerPhySlave::recvSyncClMsg(ClMessage* m) {
+  if (m->type() == CLMSG_PHY2MAC_ENDTX)
+  {
+    hdr_cmn* ch = hdr_cmn::access( static_cast<ClMsgPhy2MacEndTx *>(m)->pkt);
+    if (ch->ptype() == PT_MULTI_ST_SIGNALING)
+      return 0;
+  }
+  else if (m->type() == CLMSG_PHY2MAC_STARTRX)
+  {
+    hdr_cmn* ch = hdr_cmn::access( static_cast<ClMsgPhy2MacStartRx *>(m)->pkt);
+    if (ch->ptype() == PT_MULTI_ST_SIGNALING)
+      return 0;
+  }
+  return UwMultiStackControllerPhy::recvSyncClMsg(m);
 }
 
 int UwMultiStackControllerPhySlave::getBestLayer(Packet *p) { 

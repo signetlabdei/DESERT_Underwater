@@ -76,6 +76,7 @@ load libuwip.so
 load libuwstaticrouting.so
 load libmphy.so
 load libmmac.so
+load libuwmmac_clmsgs.so
 load libuwtdma.so
 load libuwmll.so
 load libuwudp.so
@@ -397,25 +398,24 @@ proc finish {} {
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 
-	set mac_sent_pkts        [$mac($i) get_sent_pkts]
-	set mac_recv_pkts        [$mac($i) get_recv_pkts]
+    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
+    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
 
-	for {set j 0} {$j < $opt(nn)} {incr j} {
-	    if {$i != $j} {
-		set cbr_throughput        [$cbr($i,$j) getthr]
-               	set sent_pkts        [$cbr($i,$j) getsentpkts]
+    	for {set j 0} {$j < $opt(nn)} {incr j} {
+    	    if {$i != $j} {
+    		set cbr_throughput        [$cbr($i,$j) getthr]
+                set sent_pkts        [$cbr($i,$j) getsentpkts]
                 set recv_pkts        [$cbr($i,$j) getrecvpkts]
-        }
-   
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
-        set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
-	}
+                set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
+                set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
+                set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
+            }
+    	}
         set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
         set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
         set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
         set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
-   	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
+       	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
     }
 
     set per_cbr1 [$cbr(0,1) getper]
@@ -429,6 +429,7 @@ proc finish {} {
         puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
         puts "MAC sent Packets         : $sum_mac_sent_pkts"
         puts "MAC received Packets     : $sum_mac_recv_pkts"
+        puts "MAC upper_pcks_rx     : $sum_upper_pcks_rx"
         puts "CBR sent Packets         : $sum_sent_pkts"
         puts "CBR received Packets     : $sum_recv_pkts"
         puts "Packets in buffer        : $sum_pcks_in_buffer"

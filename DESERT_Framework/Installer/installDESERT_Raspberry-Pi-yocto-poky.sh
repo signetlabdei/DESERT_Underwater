@@ -79,7 +79,7 @@ main() {
     #     e.g addon_installation_list host/target <addon-list>
 
     ## only for the cross-compilation session
-    export CROSS_ENV_DIR="/opt/raspberry/"
+    export CROSS_ENV_DIR="/opt/raspberry"
     export CROSS_ENV_FILE="${CROSS_ENV_DIR}/environment"
     #*
 
@@ -465,6 +465,7 @@ build_NSMIRACLE() {
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                     \
       CFLAGS="-Wno-write-strings"                     \
+     LDFLAGS=-L${DEST_FOLDER}/lib                     \
     ./configure --target=${ARCH}                      \
                 --host=${ARCH}                        \
                 --build=${HOST}                       \

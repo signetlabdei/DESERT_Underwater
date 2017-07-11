@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,34 +28,29 @@
  
 AM_CXXFLAGS = -Wall -ggdb3
 
-lib_LTLIBRARIES = libmstwoc_evologics.la
+lib_LTLIBRARIES = libevologics_driver.la
 check_PROGRAMS = 
 
 SUBDIRS = 
 
 TESTS = 
 
-libmstwoc_evologics_la_SOURCES = initlib.cc\
-mdriverS2C_EvoLogics.cc\
-mdriverS2C_EvoLogics.h\
-mS2C_EvoLogics.cc\
-mS2C_EvoLogics.h\
-minterpreterAT.cc\
-minterpreterAT.h\
-msocket.cc\
-msocket.h
+libevologics_driver_la_SOURCES = initlib.cpp\
+mdriverS2C_EvoLogics.cpp \
+mS2C_EvoLogics.cpp \
+minterpreterAT.cpp
 
-libmstwoc_evologics_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libmstwoc_evologics_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libmstwoc_evologics_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libevologics_driver_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+libevologics_driver_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+libevologics_driver_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
-nodist_libmstwoc_evologics_la_SOURCES = initTcl.cc
+nodist_libevologics_driver_la_SOURCES = initTcl.cc
 BUILT_SOURCES = initTcl.cc
 CLEANFILES = initTcl.cc
 
 TCL_FILES =  ms2c_evologics-init.tcl
 
 initTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ MSTwoc_evologicsTclCode > initTcl.cc
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ Evologics_driverTclCode > initTcl.cc
 
 EXTRA_DIST = $(TCL_FILES)

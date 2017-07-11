@@ -100,7 +100,7 @@ $ns use-Miracle
 ##################
 set opt(start_clock) [clock seconds]
 
-set opt(nn)                 2.0 ;# Number of Nodes
+set opt(nn)                 3.0 ;# Number of Nodes
 set opt(pktsize)            125  ;# Pkt sike in byte
 set opt(starttime)          1	
 set opt(stoptime)           100000 
@@ -190,7 +190,7 @@ Module/UW/CBR set debug_               0
 Module/MPhy/BPSK  set TxPower_               $opt(txpower)
 
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    5.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
 Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
 Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
@@ -222,8 +222,8 @@ proc createNode { id } {
     }
 
     set cbr($id,$cnt)  [new Module/UW/CBR] 
-		set udp($id,$cnt)  [new Module/UW/UDP]
 	}
+  set udp($id)  [new Module/UW/UDP]
   set ipr($id)  [new Module/UW/StaticRouting]
   set ipif($id) [new Module/UW/IP]
   set mll($id)  [new Module/UW/MLL] 
@@ -245,8 +245,8 @@ proc createNode { id } {
 	
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
 		$node($id) addModule 10 $cbr($id,$cnt)   1  "CBR"
-		$node($id) addModule 9 $udp($id,$cnt)   1  "UDP"
 	}
+  $node($id) addModule 9 $udp($id)   1  "UDP"
   $node($id) addModule 8 $ipr($id)   1  "IPR"
   $node($id) addModule 7 $ipif($id)  1  "IPF"   
   $node($id) addModule 6 $mll($id)   1  "MLL"
@@ -257,10 +257,10 @@ proc createNode { id } {
   $node($id) addModule 1 $phy3($id)   1  "PHY"
 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
-		$node($id) setConnection $cbr($id,$cnt)   $udp($id,$cnt)   0
-		$node($id) setConnection $udp($id,$cnt)   $ipr($id)   0
-		set portnum($id,$cnt) [$udp($id,$cnt) assignPort $cbr($id,$cnt) ]
+		$node($id) setConnection $cbr($id,$cnt)   $udp($id)   0
+		set portnum($id,$cnt) [$udp($id) assignPort $cbr($id,$cnt) ]
 	}
+  $node($id) setConnection $udp($id)   $ipr($id)   0
   $node($id) setConnection $ipr($id)   $ipif($id)  1
   $node($id) setConnection $ipif($id)  $mll($id)   1
   $node($id) setConnection $mll($id)   $mac($id)   1
@@ -435,23 +435,23 @@ proc finish {} {
     set sum_cbr_rcv_pkts       0.0    
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
-		for {set j 0} {$j < $opt(nn)} {incr j} {
-			set cbr_throughput           [$cbr($i,$j) getthr]
-			if {$i != $j} {
-				set cbr_sent_pkts        [$cbr($i,$j) getsentpkts]
-				set cbr_rcv_pkts           [$cbr($i,$j) getrecvpkts]
-			}
-			if ($opt(verbose)) {
-				puts "cbr($i,$j) throughput                    : $cbr_throughput"
-			}
-		}
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
-        set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
+  		for {set j 0} {$j < $opt(nn)} {incr j} {
+  			set cbr_throughput           [$cbr($i,$j) getthr]
+  			if {$i != $j} {
+  				set cbr_sent_pkts        [$cbr($i,$j) getsentpkts]
+  				set cbr_rcv_pkts         [$cbr($i,$j) getrecvpkts]
+          set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
+          set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
+          set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
+  			}
+  			if ($opt(verbose)) {
+  				puts "cbr($i,$j) throughput                    : $cbr_throughput"
+  			}
+  		}
     }
         
     set ipheadersize        [$ipif(1) getipheadersize]
-    set udpheadersize       [$udp(1,0) getudpheadersize]
+    set udpheadersize       [$udp(1) getudpheadersize]
     set cbrheadersize       [$cbr(1,0) getcbrheadersize]
     
     if ($opt(verbose)) {

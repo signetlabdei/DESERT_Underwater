@@ -35,10 +35,14 @@
  */
 
 #include <tclcl.h>
+#include <controller-clmsg.h>
 
 extern EmbeddedTcl UwMultiStackControllerInitTclCode;
 
+packet_t PT_MULTI_ST_SIGNALING;
+
 extern "C" int Uwmulti_stack_controller_Init() {
+  PT_MULTI_ST_SIGNALING = p_info::addPacket("MULTI_ST_SIGNALING");
 	UwMultiStackControllerInitTclCode.load();
 	return 0;
 }

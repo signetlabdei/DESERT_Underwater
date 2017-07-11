@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,25 +35,17 @@ SUBDIRS =
 
 TESTS = 
 
-libsun_la_SOURCES = initlib.cc\
+libsun_la_SOURCES = initlib.cpp\
     sun-defaults.tcl\
-    sun-hdr-ack.h\
-    sun-hdr-data.h\
-    sun-hdr-pathestablishment.h\
-    sun-hdr-probe.h\
-    sun-ipr-common-structures.h\
-    sun-ipr-node-ack.cc\
-    sun-ipr-node-buffermanager.cc\
-    sun-ipr-node-data.cc\
-    sun-ipr-node-loadmetric.cc\
-    sun-ipr-node-pathest-answer.cc\
-    sun-ipr-node-pathest-search.cc\
-    sun-ipr-node.cc\
-    sun-ipr-node.h\
-    sun-ipr-sink.cc\
-    sun-ipr-sink.h\
-    sun-ipr.cc
-	    
+    sun-ipr-node-ack.cpp\
+    sun-ipr-node-buffermanager.cpp\
+    sun-ipr-node-data.cpp\
+    sun-ipr-node-loadmetric.cpp\
+    sun-ipr-node-pathest-answer.cpp\
+    sun-ipr-node-pathest-search.cpp\
+    sun-ipr-node.cpp\
+    sun-ipr-sink.cpp\
+    sun-ipr.cpp
 
 libsun_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libsun_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

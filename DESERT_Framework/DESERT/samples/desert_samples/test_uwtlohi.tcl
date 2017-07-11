@@ -193,7 +193,7 @@ Module/UW/CBR set PoissonTraffic_      1
 #PHY BPSK
 Module/UW/PHYSICAL  set debug_                     0
 Module/UW/PHYSICAL  set BitRate_                   $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_   5.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_   4.0 
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_           $opt(rx_snr_penalty_db)
 Module/UW/PHYSICAL  set TxSPLMargin_dB_            $opt(tx_margin_db)
 Module/UW/PHYSICAL  set MaxTxSPL_dB_               $opt(txpower)

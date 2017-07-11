@@ -44,11 +44,12 @@
  
 #include <limits>
 
+class UwMultiStackControllerPhyMaster;
+
 /**
  * Class used to represents the UwMultiStackControllerPhyMaster layer of a node.
  */
 class UwMultiStackControllerPhyMaster : public UwMultiStackControllerPhy {
-
 
 public:
 
@@ -83,11 +84,28 @@ public:
   virtual void recv(Packet *p, int idSrc);
     
 protected:
-    // Variables
-	int last_layer_used_; /**< ID of the last PHY layer used */
-	double power_statistics_; /**< Average received power from the closest node according to the IIR filter*/
-  int power_stat_node_; /**< Address of the node which the master is collecting the average power*/
-	double alpha_; /**< IIR parameter */
+  // Internal classes
+  class UwMultiStackSignalingTimer : public TimerHandler {
+  public:
+
+      UwMultiStackSignalingTimer(UwMultiStackControllerPhyMaster *m) : TimerHandler() {
+          module = m;
+      }
+
+  protected:
+      virtual void expire(Event *e);
+      UwMultiStackControllerPhyMaster* module;
+  };
+
+  // Variables
+  int signaling_active_; /**If true master is in signaling mode, otherwise not */
+  int last_layer_used_; /**ID of the last PHY layer used */
+  double power_statistics_; /** Average received power from the closest node according to the IIR filter*/
+  int power_stat_node_; /** Address of the node which the master is collecting the average power*/
+  double alpha_; /**< IIR parameter */
+  double signaling_period_; /** Period to check the best layer if no interactions occurs*/
+  int signaling_sent_; /** Number of signaling packets sent*/
+  UwMultiStackSignalingTimer signaling_timer_; /**< UwMultiStack signaling timer handler */
 
   /** 
    * Return the best layer to forward the packet when the system works in AUTOMATIC_MODE.
@@ -97,7 +115,45 @@ protected:
    *
    * @return id of the module representing the best layer
   */
-  virtual int  getBestLayer(Packet *p);
+  virtual int getBestLayer(Packet *p);
+
+  /** 
+   * If signaling is active, check the average power thresholds at each packet received
+   *
+  */
+  virtual void checkAndSignal();
+
+  /** 
+   * If signaling is active and signaling timer expires, check the average power thresholds at each packet received
+   *
+  */
+  virtual void resetCheckAndSignal();
+
+  /** 
+   * Check the average power thresholds
+   *
+  */
+  virtual int checkBestLayer();
+
+  /** 
+   * Signals the best phy
+   *
+  */
+  virtual void signalsBestPhy();
+
+  /**
+  * Cross-Layer messages synchronous interpreter. It has to be properly extended in order to 
+  * interpret custom cross-layer messages used by this particular plug-in.
+  * This type of communication need to be directly answered in the message exchanged in 
+  * order to be synchronous with the source.
+  * 
+  * @param m an instance of <i>ClMessage</i> that represent the message received and used for the answer
+  *
+  * @return zero if successful
+  * 
+  * @see NodeCore, ClMessage, ClSAP, ClTracer, UwMultiStackControllerPhy
+  **/
+  int recvSyncClMsg(ClMessage* m);
 
   /** 
    * It implements the slave choice rule to choose the lower layer when the system works 
@@ -116,7 +172,7 @@ protected:
    * @return id of the next layer in order
   */
   inline int getShorterRangeLayer(int layer_id){ return (getId(getOrder(layer_id) + 1) == UwMultiStackController::layer_not_exist)?
-																												 layer_id : getId(getOrder(layer_id) + 1);
+                                                 layer_id : getId(getOrder(layer_id) + 1);
 	}
   
   /** 
@@ -127,7 +183,7 @@ protected:
    * @return id of the previous layer in order
   */
   inline int getLongerRangeLayer(int layer_id){ return (getId(getOrder(layer_id) - 1) == UwMultiStackController::layer_not_exist)?
-																												layer_id : getId(getOrder(layer_id) - 1);
+                                                layer_id : getId(getOrder(layer_id) - 1);
 	}
 
 private:

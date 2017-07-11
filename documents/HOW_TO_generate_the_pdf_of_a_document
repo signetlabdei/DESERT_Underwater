@@ -1,0 +1,11 @@
+Procedure to follow to create the .pdf files.
+
+1. go in the corresponding repository folder ../DESERT/documents/name_of_the_folder_containing_the_doc (e.g., in ../DESERT/documents/minutes)
+
+2. from the shell call the command 
+    ./go + <name of the tex file (***without the extension .tex***) you want to obtain in pdf> 
+(e.g., type "./go minutes1" to create minutes1.pdf)
+
+3. if you want to clear your folder from the intermediate latex files (*.aux *.bbl *.blg *.dvi *.log *.ps *.backup), from the shell call the command
+    ./go clear
+
