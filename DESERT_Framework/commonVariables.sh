@@ -98,7 +98,7 @@ export WOSS_VERSION=1.5.1
 export WOSS_TAR_FILE=${ROOT_DESERT}/woss-${WOSS_VERSION}.tar.gz
 export WOSS_DIR=woss-${WOSS_VERSION}
 
-export DESERT_VERSION=3.0.2
+export DESERT_VERSION=3.0.3
 export DESERT_DIR=DESERT
 
 export UNPACKED_FOLDER="${ROOT_DESERT}/.unpacked_folder"

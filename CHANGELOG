@@ -1,3 +1,6 @@
+3.0.3 - 2017-07-19
+	* Import new version of Miracle with fix on ClMessage handling
+
 3.0.2 - 2017-07-16
 	* Add support and installer script to EvoLogics sandbox
 	* Imported a new patch for NS for real-time scheduler improvements
