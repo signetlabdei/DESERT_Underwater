@@ -44,6 +44,7 @@ SUBDIRS = m4 \
     network/uwicrp \
     network/uwip \
     network/uwflooding \
+    network/uwPositionBasedRouting \
     data_link/uwmll \
     data_link/uwmmac_clmsgs \
     data_link/uw-csma-aloha \
@@ -67,7 +68,9 @@ SUBDIRS = m4 \
     physical/ms2c_evologics_lowlev \
     physical/uwmphypatch \
     physical/uwhermesphy \
+    physical/uwahoi_phy \
     physical/uwoptical_phy \
+    physical/uwopticalbeampattern \
     physical/uw-al \
     physical/uw-al/packer_common \
     physical/uw-al/packer_mac \

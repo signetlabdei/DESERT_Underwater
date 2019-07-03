@@ -215,8 +215,14 @@ protected:
 					FROMDBPERKYARDTODMPERM;
 	}
 
+#if __cplusplus <= 199711L
 	static const double FROMDBPERKYARDTODMPERM =
 			0.001093613298338; /**< Conversion factor from dB/kyard to dB/m. */
+#else
+	static constexpr double FROMDBPERKYARDTODMPERM =
+			0.001093613298338; /**< Conversion factor from dB/kyard to dB/m. */
+#endif
+
 private:
 	// Variables
 	double bottom_depth; /**< Water depth (m) */

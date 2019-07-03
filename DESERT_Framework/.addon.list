@@ -9,6 +9,7 @@ packer_uwufetch
 uwrov
 uwmulti_stack_controller
 uwmulti_traffic_control
+uwmulti_destination
 wossgmmob3D    (requires WOSS)
 wossgroupmob3D (requires WOSS)
 ALL            (installs all addons)

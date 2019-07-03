@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@
 #include <uwrov-packet.h>
 #include "uwsmposition.h"
 #include <queue>
+#include <fstream>
 #define UWROV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define UWROV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define UWROV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
@@ -60,16 +61,22 @@ class UwROVModule;
 /**
 * UwSendTimer class is used to handle the scheduling period of <i>UWROV</i> packets.
 */
-class UwROVSendTimer : public UwSendTimer {
+class UwROVSendAckTimer : public TimerHandler 
+{
 public:
-	UwROVSendTimer(UwROVModule *m) : UwSendTimer((UwCbrModule*)(m)){
-	};
+	UwROVSendAckTimer(UwROVModule *m) : TimerHandler() { 
+		module = m;
+	}
+protected:
+	virtual void expire(Event *e);
+	UwROVModule *module;
 };
 
 /**
 * UwROVModule class is used to manage <i>UWROV</i> packets and to collect statistics about them.
 */
 class UwROVModule : public UwCbrModule {
+	friend class UwROVSendAckTimer;
 public:
 
 	/**
@@ -149,14 +156,39 @@ public:
 	*/
 	static inline int getROVCTRHeaderSize() { return sizeof(hdr_uwROV_ctr); }
 
+	/**
+	* Sends ACK if ackTimeout expire;
+	*
+	*/
+	virtual void sendAck();
+
 protected:
+
+	enum UWROV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
 	UWSMPosition* posit; /**< ROV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int ack; /**< If not zero, contains the ACK to the last command Packete received.*/
-	int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
+	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
 	std::queue<Packet*> buffer; /**< Packets buffer.*/
-	
+	UWROV_ACK_POLICY ackPolicy; /**< Flag to set the policy for ACK transimission,
+					ACK_PIGGYBACK:   ACK is always sent in piggyback,
+					ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated 
+									 packet after the reception of CTR packet
+					ACK_PGBK_OR_TO:  ACK is sent in piggyback if a ROV packet is generated 
+									 before a ackTimeout otherwise ACK is sent with a 
+									 dedicated packet after the acKTimeout.*/
+	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
+	UwROVSendAckTimer ackTimer_; /**<Timer to schedule ACK transmission.*/
+	int ackPriority; /** < Flag to give higher priority to ACK or not.*/
+	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
+	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
+								lower or equal than last_sn_confirmed.*/
+
+
+	int log_flag; /**< Flag to enable log file writing.*/
+
+	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 };
 
 #endif // UWROV_MODULE_H

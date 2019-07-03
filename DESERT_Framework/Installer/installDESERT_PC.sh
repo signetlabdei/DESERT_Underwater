@@ -41,13 +41,13 @@ if [ "${_DEBUG}" = "1" ]; then
     debug__print_screen_L1 "inside --- $0"
 fi
 
-curr_ver="$(gcc --version | head -n1 | cut -d" " -f3)"
-last_ver="6.2.0"
-if [ "$(printf "$last_ver\n$curr_ver" | sort -V | head -n1)" = "$curr_ver" -a "$curr_ver" != "$last_ver" ]; then
-    export GCC6_FLAG=""
-else
-    export GCC6_FLAG="-std=c++98"
-fi
+# curr_ver="$(gcc --version | head -n1 | cut -d" " -f3)"
+# last_ver="6.2.0"
+# if [ "$(printf "$last_ver\n$curr_ver" | sort -V | head -n1)" = "$curr_ver" -a "$curr_ver" != "$last_ver" ]; then
+#     export GCC6_FLAG=""
+# else
+#     export GCC6_FLAG="-std=c++98"
+# fi
 
 DIRFOLDER="${ZLIB_DIR}      \
            ${TCL_DIR}       \
@@ -538,7 +538,7 @@ build_DESERT() {
     )
 
     info_L2 "configure  [$*]"
-    CXXFLAGS="-Wno-write-strings"                                                                             \
+    CXXFLAGS="-Wno-write-strings -std=c++11"                                                                  \
       CFLAGS="-Wno-write-strings"                                                                             \
     ${ROOT_DESERT}/${DESERT_DIR}/configure --target=${ARCH}                                                   \
                                            --host=${ARCH}                                                     \

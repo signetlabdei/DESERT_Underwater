@@ -86,13 +86,13 @@ load libmphy.so
 load libUwmStd.so
 load libuwcsmaaloha.so
 load libuwmmac_clmsgs.so
-load libuwtdma.so
 load libuwaloha.so
 load libuwip.so
 load libuwstaticrouting.so
 load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
+load libuwtdma.so
 load libuwflooding.so
 load libuwmulti_traffic_control.so
 

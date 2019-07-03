@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,9 @@
 #include "uwrov-packet.h"
 extern EmbeddedTcl UwrovTclCode;
 
+packet_t PT_UWROV;
+packet_t PT_UWROV_CTR;
+
 static class UwROVMonPktClass : public PacketHeaderClass {
 public:
 
@@ -66,6 +69,8 @@ public:
 
 
 extern "C" int Uwrov_Init() {
+    PT_UWROV = p_info::addPacket("UWROV");
+    PT_UWROV_CTR = p_info::addPacket("UWROVCtr");
 	UwrovTclCode.load();
 	return 0;
 }

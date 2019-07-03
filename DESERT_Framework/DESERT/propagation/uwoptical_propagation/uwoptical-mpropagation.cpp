@@ -187,8 +187,8 @@ UwOpticalMPropagation::getWossOrientation(Position *src, Position *dest)
 	return asin(cosBeta);
 }
 
-double
-UwOpticalMPropagation::getGain(Packet *p)
+double 
+UwOpticalMPropagation::getBeta(Packet *p)
 {
 	hdr_MPhy *ph = HDR_MPHY(p);
 	Position *source = ph->srcPosition;
@@ -207,33 +207,106 @@ UwOpticalMPropagation::getGain(Packet *p)
 																destination)
 													  : -source->getRelZenith(
 																destination)));
-	double PCgain;
-	if (!variable_c_ || beta_ == 0) {
-		if (variable_c_)
-			updateC(use_woss_ ? -destination->getAltitude()
-							  : -destination->getZ());
-		double dist = source->getDist(destination);
-		PCgain = getLambertBeerGain(dist, beta_);
-		if (debug_)
-			std::cout << NOW << " UwOpticalMPropagation::getGain()"
-					  << " dist=" << dist << " gain=" << PCgain << std::endl;
-	} else {
+	return beta_;
+}
+
+bool 
+UwOpticalMPropagation::isOmnidirectional()
+{
+	return omnidirectional_;
+}
+
+double 
+UwOpticalMPropagation::getC(Packet *p)
+{
+	if (variable_c_ && p != NULL) {
+		hdr_MPhy *ph = HDR_MPHY(p);
+		Position *source = ph->srcPosition;
+		Position *destination = ph->dstPosition;
 		double destination_depth =
 				use_woss_ ? -destination->getAltitude() : -destination->getZ();
 		double source_depth =
 				use_woss_ ? -source->getAltitude() : -source->getZ();
-		if (debug_)
-			std::cout << NOW
+		double min_depth_ = min(destination_depth,source_depth);
+		double max_depth_ = max(destination_depth,source_depth);
+		if ((lut_c_.empty() == true) ||
+			(min_depth_ < ((lut_c_.begin())->first) ||
+					(max_depth_ > ((lut_c_.rbegin())->first)))) {
+
+			goto done;
+			//return c_;
+		}
+		
+		LUT_c_iter lower = lut_c_.lower_bound(min_depth_);
+		assert(lower != lut_c_.end());
+		if (lower->first > min_depth_) {
+			assert(lower != lut_c_.begin());
+			lower--;
+		}
+		double first_depth = lower->first;
+		double temp_depth = lower->first;
+		double c_temp = lower->second.first;
+		++lower;
+		if (lower->first >= max_depth_) {
+			return c_temp;
+		}
+
+		double average_c = 0;
+		for (; lower->first < max_depth_; ++lower) {
+			average_c = average_c + (c_temp + lower->second.first) * (lower->first-temp_depth)/2;
+			temp_depth = lower->first;
+			c_temp = lower->second.first;
+		}
+		
+		return average_c / (temp_depth - first_depth);
+	}
+
+done:
+	return c_;
+}
+
+double
+UwOpticalMPropagation::getGain(Packet *p)
+{
+	hdr_MPhy *ph = HDR_MPHY(p);
+	Position *source = ph->srcPosition;
+	Position *destination = ph->dstPosition;
+	//assert(source);
+	//assert(destination);
+	
+	double beta_ = getBeta(p);
+	double PCgain;
+	
+	if (source != 0 || destination != 0) {
+		if (!variable_c_ || beta_ == 0) {
+			if (variable_c_)
+				updateC(use_woss_ ? -destination->getAltitude()
+							  : -destination->getZ());
+			double dist = source->getDist(destination);
+			PCgain = getLambertBeerGain(dist, beta_);
+			if (debug_)
+				std::cout << NOW << " UwOpticalMPropagation::getGain()"
+					  << " dist=" << dist << " gain=" << PCgain << std::endl;
+		} else {
+			double destination_depth =
+				use_woss_ ? -destination->getAltitude() : -destination->getZ();
+			double source_depth =
+				use_woss_ ? -source->getAltitude() : -source->getZ();
+			if (debug_)
+				std::cout << NOW
 					  << " UwOpticalMPropagation::getGain() destination_depth "
 					  << destination_depth << " source_depth " << source_depth
 					  << std::endl;
-		PCgain = getLambertBeerGain_variableC(beta_,
+			PCgain = getLambertBeerGain_variableC(beta_,
 				min(destination_depth, source_depth),
 				max(destination_depth, source_depth));
-		if (debug_)
-			std::cout << NOW << " UwOpticalMPropagation::getGain()"
+			if (debug_)
+				std::cout << NOW << " UwOpticalMPropagation::getGain()"
 					  << "c_variable"
 					  << " gain=" << PCgain << std::endl;
+		} 
+	} else {
+		std::cerr << "UwOpticalMPropagation::getGain(), source or destination not found";
 	}
 	return PCgain;
 }

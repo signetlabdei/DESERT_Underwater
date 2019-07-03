@@ -102,6 +102,31 @@ public:
 	 *
 	 */
 	double getTemperature(double depth);
+	
+	/**
+	 * Provide angle between transmitter and receiver.
+	 *
+	 * @param Packet* Pointer to the packet that has to be received.
+	 * @return the angle between transmitter and receiver.
+	 *
+	 */
+	double getBeta(Packet *p);
+
+	/**
+	 * Provide the attenuation coefficient.
+	 *
+	 * @return c.
+	 *
+	 */
+	double getC(Packet *p = NULL);
+
+	/**
+	 * Provide if we are assuming omnidirectional tx and rx or not.
+	 *
+	 * @return if it is omnidirectional or not.
+	 *
+	 */
+	bool isOmnidirectional();
 
 	int debug_;
 

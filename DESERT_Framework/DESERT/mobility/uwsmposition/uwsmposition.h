@@ -86,6 +86,21 @@ public:
 	virtual double getZ();
 
 	/**
+	* Method that return the x cooridnate of the destination point.
+	*/
+	virtual double getXdest();
+
+	/**
+	* Method that return the y cooridnate of the destination point.
+	*/
+	virtual double getYdest();
+
+	/**
+	* Method that return the z cooridnate of the destination point.
+	*/
+	virtual double getZdest();
+
+	/**
 	* TCL command interpreter
 	*  <li><b>setdest &lt;<i>integer value</i>&gt;<i>integer
 	*value</i>&gt;<i>integer value</i>&gt;</b>:

@@ -107,7 +107,7 @@ uwApplicationModule::uwApplicationModule()
 	for (int i = 0; i < USHRT_MAX; i++) {
 		sn_check[i] = false;
 	}
-	// servPort = port_num;
+	servPort = port_num;
 } // end uwApplicationModule() Method
 
 uwApplicationModule::~uwApplicationModule()
@@ -486,7 +486,6 @@ uwApplicationModule::init_Packet()
 	if (logging)
 		out_log << left << "[" << getEpoch() << "]::" << NOW
 				<< "::UWAPPLICATION::INIT_PACKET::SEND_DOWN_PACKET" << endl;
-
 	sendDown(p, delay);
 	chkTimerPeriod.resched(
 			getTimeBeforeNextPkt()); // schedule next transmission

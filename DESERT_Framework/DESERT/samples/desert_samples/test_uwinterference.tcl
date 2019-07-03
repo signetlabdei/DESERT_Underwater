@@ -269,8 +269,7 @@ proc createNode { id } {
     
     $phy($id) setSpectralMask $data_mask
     $phy($id) setInterference $interf_data($id)
-    $phy($id) setInterferenceModel "CHUNK"
-    #$phy($id) setInterferenceModel "MEANPOWER"
+    $phy($id) setInterferenceModel "MEANPOWER"
     $mac($id) $opt(ack_mode)
     $mac($id) initialize
 }

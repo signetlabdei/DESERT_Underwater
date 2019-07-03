@@ -29,124 +29,109 @@
 
 /**
  * @file   uwinterference.h
- * @author Federico Favaro
+ * @author Alberto Signori
  * @version 1.0.0
  *
  * \brief Implementation of uwinterference class.
  *
  */
 
-#ifndef UW_INTERFERENCE__H
-#define UW_INTERFERENCE__H
+#ifndef UW_INTERFERENCE
+#define UW_INTERFERENCE
 
-#include "interference_miv.h"
-
+#include <interference_miv.h>
+#include <list>
 #include <scheduler.h>
+#include <assert.h>
+#include <cmath>
 
 enum PKT_TYPE { CTRL, DATA }; /**< Pkt type: CONTROL or DATA packet */
+// enum RX_STATE { START_RX, END_RX};
 
 typedef std::pair<int, int> counter; /**< counter of collisions */
-/**
- * Class that describes the type of the collision occured
- */
-class CollisionType
+
+class ListNode
 {
 public:
+	double time;
+	double sum_power; /** sum of the rx power in the node at the given time*/
+	int ctrl_cnt; /** control packet counter */
+	int data_cnt; /** data packet counter */
+
 	/**
-	 * Consstructor of the class CollisionType
+	 * Constructor of the class ListNode
 	 */
-	CollisionType()
+	ListNode()
+	{
+		time = 0;
+		sum_power = 0;
+		// n_pkts = 0;
+		ctrl_cnt = 0;
+		data_cnt = 0;
+	}
+
+	/**
+	 * Constructor of the class ListNode
+	 * @param t time
+	 * @param sum_pw sum of the rx power in the node at the given time
+	 * @param ctrl  control packet counter
+	 * @param data data packet counter
+	 */
+	ListNode(double t, double sum_pw, /*double n,*/ int ctrl, int data)
+	{
+		time = t;
+		sum_power = sum_pw;
+		ctrl_cnt = ctrl;
+		data_cnt = data;
+	}
+
+	/**
+	 * Destructor of the class ListNode
+	 */
+	virtual ~ListNode()
 	{
 	}
-	/**
-	 * Contructor of the class CollisionType
-	 * @param ctrl 1 if the packet collided is a control packet
-	 * @param data 1 if the packet collided is a data packet
-	 * @param time_ Time at which the packet collided
-	 */
-	CollisionType(int ctrl, int data, double time_)
-	{
-		CtrlPkts = ctrl;
-		DataPkts = data;
-		time = time_;
-	}
-	/**
-	 * Contructor of the class CollisionType
-	 * @param CollisionType Object of the class CollisionType
-	 */
-	CollisionType(const CollisionType &c)
-	{
-		CtrlPkts = c.CtrlPkts;
-		DataPkts = c.DataPkts;
-		time = c.time;
-	}
-	double time; /**< Time at which the packet collided */
-	int CtrlPkts; /**< 1 if the packet is a CTRL packet */
-	int DataPkts; /**< 1 if the packet is a DATA packet */
 };
 
-typedef std::list<CollisionType>
-		CollisionFunction; /**< List of the collisions over time */
-typedef std::list<CollisionType>::iterator
-		CollisionFunctionIterator; /**< Iterator over the collision function */
-
-/**
- * Class that represent a Collision Event
- */
-class CollisionEvent : public Event
+class EndInterfEvent : public Event
 {
 public:
 	/**
-	 * Constructor of the class CollisionEvent
+	 * Constructor of the class EndInterfEvent
+	 * @param pw Received power of the current packet
+	 * @param type type of the packet (DATA or CTRL)
 	 */
-	CollisionEvent()
+	EndInterfEvent(double pw, PKT_TYPE tp)
 	{
+		power = pw;
+		type = tp;
 	}
+
 	/**
-	 * Constructor of the class CollisionEvent
-	 * @param pkt type of the packet collided
+	 * Destructor of the class EndInterfEvent
 	 */
-	CollisionEvent(PKT_TYPE pkt)
-		: type(pkt)
+	virtual ~EndInterfEvent()
 	{
 	}
-	/**
-	 * Destructor of the class CollisionEvent
-	 */
-	virtual ~CollisionEvent()
-	{
-	}
-	PKT_TYPE type; /**< Type of the packet collided */
+	double power;
+	PKT_TYPE type;
 };
 
 class uwinterference;
-/**
- * Class that represent the duration of a collision event
- */
-class EndCollisionEventTimer : public Handler
+
+class EndInterfTimer : public Handler
 {
 public:
-	/**
-	 *
-	 * @param ptr pointer to an object of type uwinterference
-	 */
-	EndCollisionEventTimer(uwinterference *ptr)
-		: attr(ptr)
+	EndInterfTimer(uwinterference *ptr)
 	{
+		interference = ptr;
 	}
-	/**
-	 * Handle the Event represented by the timer
-	 * @param e Event
-	 */
 	virtual void handle(Event *e);
 
 protected:
-	uwinterference *attr; /**< Pointer to an object of type uwinterference */
+	uwinterference *interference;
 };
 
-/**
- * Class that represent the interference model used in simulation
- */
 class uwinterference : public MInterferenceMIV
 {
 public:
@@ -164,15 +149,48 @@ public:
 	 */
 	virtual void addToInterference(Packet *p);
 	/**
-	 * Add a packet to the counter of collision
+	 * Add a packet to the interference calculation
+	 * @param pw Received power of the current packet
 	 * @param type type of the packet (DATA or CTRL)
-	 * @param starttime timestamp of the begin of the reception of the
-	 * interferer packet
-	 * @param incr_value Increment value (+1 if the node is receiving the
-	 * packet, -1 if reception of the packet is terminated)
 	 */
-	virtual void addToCollisionCounters(
-			PKT_TYPE type, double starttime, int incr_value);
+	virtual void addToInterference(double pw, PKT_TYPE tp);
+	/**
+	 * Remove a packet to the interference calculation
+	 * @param pw Received power of the current packet
+	 * @param type type of the packet (DATA or CTRL)
+	 */
+	virtual void removeFromInterference(double pw, PKT_TYPE tp);
+	/**
+	 * Compute the average interference power for the given packet
+	 * @param p Pointer to the interferer packet
+	 * @return average interference power
+	 */
+	virtual double getInterferencePower(Packet *p);
+	/**
+	 * Compute the average interference power for the given packet
+	 * @param pw Received power of the current packet
+	 * @param starttime timestamp of the start of reception phase
+	 * @param duration duration of the reception phase
+	 * @return average interference power
+	 */
+	virtual double getInterferencePower(
+			double power, double starttime, double duration);
+	virtual double getCurrentTotalPower();
+	/**
+	 * Returns the percentage of overlap between current packet and interference
+	 * packets
+	 * @param p Pointer of the packet for which the overlap is needed
+	 * @return percantage of overlap
+	 */
+	virtual double getTimeOverlap(Packet *p);
+	/**
+	 * Returns the percentage of overlap between current packet and interference
+	 * packets
+	 * @param starttime timestamp of the start of reception phase
+	 * @param duration duration of the reception phase
+	 * @return percantage of overlap
+	 */
+	virtual double getTimeOverlap(double starttime, double duration);
 	/**
 	 * Returns the counters of collisions
 	 * @param p Pointer of the packet for which the counters are needed
@@ -182,16 +200,11 @@ public:
 	/**
 	 * Returns the counters of collisions
 	 * @param starttime timestamp of the start of reception phase
+	 * @param duration duration of the reception phase
 	 * @param type type of the packet (DATA or CTRL)
 	 * @return counter variable that represent the counters of the interference
 	 */
-	virtual counter getCounters(double starttime, PKT_TYPE type);
-	/**
-	 * return a list of Chunks (part in which a packet is divided )
-	 * @param p Pointer to the packet for the the chunk list is needed
-	 * @return list of the chunks with relative interference power experienced
-	 */
-	virtual const PowerChunkList &getInterferencePowerChunkList(Packet *p);
+	virtual counter getCounters(double starttime, double duration, PKT_TYPE tp);
 	/**
 	 * Get the timestamp of the start of reception phase
 	 * @return timestamp of the start of reception phase
@@ -221,23 +234,17 @@ public:
 	{
 		return initial_interference_time;
 	}
-	/**
-	 * Get the total power of interference at this moment
-	 * @return amount of the interference power at this moment
-	 */
-	virtual double getCurrentTotalPower();
 
 protected:
+	std::list<ListNode> power_list; /**<List with power and counters*/
+	EndInterfTimer end_timer; /**< Timer for schedules end of interference
+									 for a transmission */
+	double use_maxinterval_; /**< set to 1 to use maxinterval_. */
+
 	double initial_interference_time; /**< timestamp of the begin of reception
 										 of the first interferer packet */
 	double start_rx_time; /**< timestamp of the start of reception phase */
 	double end_rx_time; /**< timetamp of the end of reception phase */
-
-	CollisionFunction cp; /**< Object of a type CollisionFunction */
-
-	EndCollisionEventTimer end_collision_timer; /**< Timer for the event of
-												   finsh of collision between
-												   two concurrent packets */
 };
 
-#endif /* UW_INTERFERENCE_COLLISION_COUNTER_H */
+#endif /*UW_INTERFERENCE*/

@@ -36,7 +36,7 @@ SUBDIRS =
 TESTS = 
 
 libuwinterference_la_SOURCES = initlib.cpp \
-					 uwinterference.cpp
+                     uwinterference.cpp
 
 libuwinterference_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwinterference_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

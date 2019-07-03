@@ -38,6 +38,9 @@
  * particular the header structure.
  */
 
+
+extern packet_t PT_UWROV;
+extern packet_t PT_UWROV_CTR;
 /**
  * <i>hdr_uwROV_ctr</i> describes <i>UWROV_ctr</i> packets for controlling the ROV.
  */

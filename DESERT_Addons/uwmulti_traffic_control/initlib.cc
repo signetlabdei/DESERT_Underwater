@@ -39,17 +39,35 @@
 
 extern EmbeddedTcl UwMultiTrafficControlInitTclCode;
 
+int hdr_uwm_tr::offset_;
+
 packet_t PT_MULTI_TR_PROBE;
 packet_t PT_MULTI_TR_PROBE_ACK;
 
-extern "C" int Uwmulti_traffic_control_Init() {
-	PT_MULTI_TR_PROBE = p_info::addPacket("MULTI_TR_PROBE");
-	PT_MULTI_TR_PROBE_ACK = p_info::addPacket("MULTI_TR_PROBE_ACK");
-	UwMultiTrafficControlInitTclCode.load();
-	return 0;
+static class MultiTrHeaderClass : public PacketHeaderClass
+{
+public:
+    /**
+     * Constructor of the class
+     */
+    MultiTrHeaderClass()
+    : PacketHeaderClass("PacketHeader/MULTI_TR", sizeof(hdr_uwm_tr))
+    {
+        this->bind();
+        bind_offset(&hdr_uwm_tr::offset_);
+    }
+} class_hdr_MULTI_TR;
+
+extern "C" int Uwmulti_traffic_control_Init() 
+{
+  	PT_MULTI_TR_PROBE = p_info::addPacket("MULTI_TR_PROBE");
+  	PT_MULTI_TR_PROBE_ACK = p_info::addPacket("MULTI_TR_PROBE_ACK");
+  	UwMultiTrafficControlInitTclCode.load();
+  	return 0;
 }
 
-extern "C" int Cygmulti_traffic_control_Init() {
+extern "C" int Cygmulti_traffic_control_Init() 
+{
     Uwmulti_traffic_control_Init();
     return 0;
 }

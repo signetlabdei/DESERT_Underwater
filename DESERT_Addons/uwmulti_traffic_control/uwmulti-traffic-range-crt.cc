@@ -39,11 +39,6 @@
 #include "uwip-clmsg.h"
 #include <iostream>
 
-extern packet_t PT_MULTI_TR_PROBE;
-extern packet_t PT_MULTI_TR_PROBE_ACK;
-
-int hdr_uwm_tr::offset_;
-
 void UwMultiTrafficRangeCtr::UwCheckRangeTimer::expire(Event *e) 
 { 
   UwCheckRangeTimer::num_expires++; 
@@ -75,9 +70,9 @@ public:
 UwMultiTrafficRangeCtr::UwMultiTrafficRangeCtr() 
 : 
   UwMultiTrafficControl(),
+  status(),
   check_to_period(0),
   signaling_pktSize(1),
-  status(),
   timers()
 { 
   bind("check_to_period_", &check_to_period);

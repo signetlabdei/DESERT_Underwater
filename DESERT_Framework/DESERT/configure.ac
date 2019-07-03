@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-AC_INIT(DESERT,2.1.0)
+AC_INIT(DESERT,3.1.0)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -64,6 +64,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwstaticrouting'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwicrp'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwip'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwflooding'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwPositionBasedRouting'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmmac_clmsgs'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmll'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha'
@@ -91,7 +92,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_common
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_mac'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalracun'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhermesphy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphy_clmsgs'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
@@ -134,6 +137,7 @@ AC_CONFIG_FILES([
     network/uwicrp/Makefile
     network/uwip/Makefile
     network/uwflooding/Makefile
+    network/uwPositionBasedRouting/Makefile
     data_link/uwmmac_clmsgs/Makefile
     data_link/uwmll/Makefile
     data_link/uw-csma-aloha/Makefile
@@ -160,7 +164,9 @@ AC_CONFIG_FILES([
     physical/uw-al/packer_common/Makefile
     physical/uw-al/packer_mac/Makefile    
     physical/uwhermesphy/Makefile
+    physical/uwahoi_phy/Makefile
     physical/uwoptical_phy/Makefile
+    physical/uwopticalbeampattern/Makefile
     physical/uwphy_clmsgs/Makefile
     mobility/uwdriftposition/Makefile
     mobility/uwgmposition/Makefile

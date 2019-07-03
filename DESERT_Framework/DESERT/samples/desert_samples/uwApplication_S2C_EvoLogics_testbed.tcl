@@ -120,12 +120,13 @@ load libuwstaticrouting.so
 load libuwudp.so
 load libuwapplication.so
 load libpackeruwapplication.so
-load libuwcsmaaloha.so
+load libuwaloha.so
 load libuwal.so
 load libpackeruwip.so
 load libpackercommon.so
 load libpackermac.so
 load libpackeruwudp.so
+load libuwphy_clmsgs.so
 load libuwmphy_modem.so
 load libevologics_driver.so
 
@@ -221,7 +222,6 @@ UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
 UW/APP/uwApplication/Packer set debug_ 1
 
 
-Module/UW/APPLICATION set debug_ -1              
 Module/UW/APPLICATION set period_ $opt(traffic)
 Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
@@ -233,16 +233,14 @@ Module/UW/APPLICATION set drop_out_of_order_ 1
 Module/UW/APPLICATION set pattern_sequence_ 0     
 Module/UW/APPLICATION set EXP_ID_ $opt(exp_ID)
 
-
-# variables for the S2C modem's interface
-#####
-Module/UW/MPhy_modem/S2C set period_ 		1
+Module/UW/MPhy_modem/S2C set period_		1
 Module/UW/MPhy_modem/S2C set debug_ 		1
-Module/UW/MPhy_modem/S2C set loglevel_          2
+Module/UW/MPhy_modem/S2C set loglevel_       3
 Module/UW/MPhy_modem/S2C set SetModemID_	0
-Module/UW/MPhy_modem/S2C set UseKeepOnline_	1
+Module/UW/MPhy_modem/S2C set UseKeepOnline_	0
 Module/UW/MPhy_modem/S2C set DeafTime_ 		2
-#######
+Module/UW/MPhy_modem/S2C set NoiseProbeFrequency_   0
+Module/UW/MPhy_modem/S2C set MultipathProbeFrequency_ 0
 
 
 ################################
@@ -268,35 +266,33 @@ proc createNode { } {
 	
     # IP interface
     set ipif_ [new Module/UW/IP]
-	
     # DATA LINK LAYER - MEDIA LINK LAYER
     set mll_ [new Module/UW/MLL]
-    
     # DATA LINK LAYER - MAC LAYER
-    set mac_ [new Module/UW/CSMA_ALOHA]
+    set mac_ [new Module/UW/ALOHA]
 
-    set uwal_             [new Module/UW/AL]
+    set uwal_ [new Module/UW/AL]
 
     # PHY LAYER
-    set modem_ [new "Module/UW/MPhy_modem/S2C" $socket_port]    
+    set modem_ [new "Module/UW/MPhy_modem/S2C" $socket_port]
     puts "creo nodo"
     # insert the module(s) into the node
-	$node_ addModule 8 $app_ 1 "UWA"
-	$node_ addModule 7 $transport_ 1 "UDP"
-	$node_ addModule 6 $routing_ 1 "IPR"
-	$node_ addModule 5 $ipif_ 1 "IPIF"
-	$node_ addModule 4 $mll_ 1 "ARP"  
-	$node_ addModule 3 $mac_ 1 "ALOHA"
-	$node_ addModule 2 $uwal_ 1 "UWAL"
-	$node_ addModule 1 $modem_ 1 "S2C" 
+	  $node_ addModule 8 $app_ 1 "UWA"
+	  $node_ addModule 7 $transport_ 1 "UDP"
+	  $node_ addModule 6 $routing_ 1 "IPR"
+	  $node_ addModule 5 $ipif_ 1 "IPIF"
+	  $node_ addModule 4 $mll_ 1 "ARP"  
+	  $node_ addModule 3 $mac_ 1 "ALOHA"
+	  $node_ addModule 2 $uwal_ 1 "UWAL"
+    $node_ addModule 1 $modem_ 1 "S2C"  
 
-	$node_ setConnection $app_ $transport_ trace
-    $node_ setConnection $transport_ $routing_ trace
-    $node_ setConnection $routing_ $ipif_ trace
-    $node_ setConnection $ipif_ $mll_ trace
-    $node_ setConnection $mll_ $mac_ trace
-    $node_ setConnection $mac_ $uwal_ trace
-    $node_ setConnection $uwal_ $modem_ trace
+	  $node_ setConnection $app_ $transport_ 1
+    $node_ setConnection $transport_ $routing_ 1
+    $node_ setConnection $routing_ $ipif_ 1
+    $node_ setConnection $ipif_ $mll_ 1
+    $node_ setConnection $mll_ $mac_ 1
+    $node_ setConnection $mac_ $uwal_ 1
+    $node_ setConnection $uwal_ $modem_ 1
 
     # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
@@ -325,6 +321,7 @@ proc createNode { } {
     $packer_ addPacker $packer_payload4
     if {$opt(AppSocket) == 1} {
       $app_ setSocketProtocol $opt(protocol)
+      $app_ set Socket_Port_ $opt(app_port)
     } else {
       $app_ setSocketProtocol "NONE"
     }

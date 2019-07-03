@@ -268,3 +268,18 @@ UWSMPosition::getZ()
 		update(now);
 	return (z_);
 }
+
+double UWSMPosition::getXdest()
+{
+	return Xdest_;
+}
+
+double UWSMPosition::getYdest()
+{
+	return Ydest_;
+}
+
+double UWSMPosition::getZdest()
+{
+	return Zdest_;
+}

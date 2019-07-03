@@ -42,6 +42,7 @@
 
 #include <mmac.h>
 #include <queue>
+#include <deque>
 #include <iostream>
 #include <assert.h>
 #include <sstream>
@@ -223,7 +224,7 @@ protected:
 	double slot_duration; /**<Slot duration*/
 	double start_time; /**<Time to wait before starting the protocol*/
 	UwTDMATimer tdma_timer; /**<TDMA timer handler*/
-	std::queue<Packet *> buffer; /**<Buffer of the MAC node*/
+	std::deque<Packet *> buffer; /**<Buffer of the MAC node*/
 	std::ofstream out_file_stats; /**<File stream for the log file*/
 	bool enable;
 
@@ -234,6 +235,8 @@ protected:
 	int drop_old_; /**<flag to set the drop packet policy in case of buffer overflow: 
 					if 0 (default) drops the new packet, if 1 the oldest*/
 	std::string name_label_; /**<label added in the log file, empty string by default*/
+	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with priority,
+						set to 0 otherwise. Priority can be used only with UWCBR module */
 };
 
 #endif

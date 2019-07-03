@@ -42,6 +42,9 @@
 #include <uwip-module.h>
 #include <set>
 
+
+extern packet_t PT_MULTI_TR_PROBE;
+extern packet_t PT_MULTI_TR_PROBE_ACK;
 #define HDR_UWMTR(P)      (hdr_uwm_tr::access(P))
 // DEFINE BEHAVIORS
 enum CONTROL_RANGE_BEHAVIORS {
@@ -181,8 +184,8 @@ private:
     UwCheckRangeTimer(UwMultiTrafficRangeCtr *m, int traff) : 
     TimerHandler(), 
     traffic(traff),
-    max_increment(10),
-    num_expires(0)
+    num_expires(0),
+    max_increment(10)
     {
         module = m;
     }

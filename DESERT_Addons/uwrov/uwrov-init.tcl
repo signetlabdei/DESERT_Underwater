@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 # @version 1.1.0
 
 PacketHeaderManager set tab_(PacketHeader/UWROV) 1
+PacketHeaderManager set tab_(PacketHeader/UWROVCtr) 1
 
 Module/UW/ROV set packetSize_         500
 Module/UW/ROV set period_             60
@@ -39,7 +40,10 @@ Module/UW/ROV set destAddr_           0
 Module/UW/ROV set debug_              0
 Module/UW/ROV set PoissonTraffic_     1
 Module/UW/ROV set drop_out_of_order_  0
-Module/UW/ROV set send_ack_immediately 0
+Module/UW/ROV set ackTimeout_		  10
+Module/UW/ROV set ackPriority_ 		  0
+Module/UW/ROV set drop_old_waypoints_ 0
+Module/UW/ROV set log_flag_ 		  0
 
 Module/UW/ROV instproc init {args} {
     $self next $args
@@ -53,6 +57,7 @@ Module/UW/ROV/CTR set destAddr_           0
 Module/UW/ROV/CTR set debug_              0
 Module/UW/ROV/CTR set PoissonTraffic_     1
 Module/UW/ROV/CTR set drop_out_of_order_  0
+Module/UW/ROV/CTR set adaptiveRTO_     	  0
 
 Module/UW/ROV/CTR instproc init {args} {
     $self next $args

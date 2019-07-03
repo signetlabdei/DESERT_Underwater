@@ -42,6 +42,7 @@
 #include <stdint.h>
 #include <mac.h>
 #include <uwmmac-clmsg.h>
+#include <uwcbr-module.h>
 
 /**
  * Class that represent the binding of the protocol with tcl
@@ -92,6 +93,7 @@ UwTDMA::UwTDMA()
 	, drop_old_(0)
 	, enable(true)
 	, name_label_("")
+	, checkPriority(0)
 {
 	bind("queue_size_", (int *) &max_queue_size);
 	bind("frame_duration", (double *) &frame_duration);
@@ -101,6 +103,8 @@ UwTDMA::UwTDMA()
 	bind("HDR_size_", (int *) &HDR_size);
 	bind("max_packet_per_slot", (int *) &max_packet_per_slot);
 	bind("drop_old_", (int *) &drop_old_);
+	bind("checkPriority_", (int *) &checkPriority);
+	bind("mac2phy_delay_", (double *) &mac2phy_delay_);
 	if (fair_mode == 1) {
 		bind("guard_time", (double *) &guard_time);
 		bind("tot_slots", (int *) &tot_slots);
@@ -121,6 +125,16 @@ UwTDMA::UwTDMA()
 			 << std::endl;
 		max_packet_per_slot = 1;
 	}
+	if (drop_old_ == 1 && checkPriority == 1) {
+		cerr << NOW << " UwTDMA() drop_old_ and checkPriority cannot be set both to 1!! "
+			 << "checkPriority set to 0 by default " << std::endl;
+		checkPriority = 0; 
+	}
+	if (mac2phy_delay_ <= 0) {
+		cerr << NOW << " UwTDMA() not valid mac2phy_delay_ < 0!! set to 1e-9 by default "
+			 << std::endl; 
+		mac2phy_delay_ = 1e-9;
+	}
 }
 
 UwTDMA::~UwTDMA()
@@ -133,7 +147,23 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 	incrUpperDataRx();
 	if (buffer.size() < max_queue_size) {
 		initPkt(p);
- 		buffer.push(p);
+		if (checkPriority == 0) {
+			buffer.push_back(p);
+		} else {
+			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+			if (uwcbrh->priority() == 0) {
+					buffer.push_back(p);
+				if (debug_)
+					std::cout << NOW << " TDMA(" << addr 
+					<< ")::insert packet with standard priority in the queue" << std::endl;
+			} else {
+				buffer.push_front(p);
+				if (debug_)
+					std::cout << NOW << " TDMA(" << addr 
+					<< ")::insert packet with high priority in the queue" << std::endl;
+			}
+		}
+ 		
  	} else {
 	if (debug_)
 			cout << NOW << " TDMA(" << addr
@@ -141,10 +171,19 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 				 << std::endl;
 		if (drop_old_) {
 			Packet *p_old = buffer.front();
-			buffer.pop();
+			buffer.pop_front();
 			Packet::free(p_old);
 			initPkt(p);
-			buffer.push(p);
+			buffer.push_back(p);
+		}else if (checkPriority == 1) {
+			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+			if (uwcbrh->priority() == 1) {
+				Packet *p_old = buffer.back();
+				buffer.pop_back();
+				Packet::free(p_old);
+				initPkt(p);
+				buffer.push_front(p);
+			}
 		}
 		else
 			Packet::free(p);
@@ -167,7 +206,7 @@ UwTDMA::txData()
 		if (slot_status == UW_TDMA_STATUS_MY_SLOT && transceiver_status == IDLE) {
 			if (buffer.size() > 0) {
 				Packet *p = buffer.front();
-				buffer.pop();
+				buffer.pop_front();
 				Mac2PhyStartTx(p);
 				incrDataPktsTx();
 			}

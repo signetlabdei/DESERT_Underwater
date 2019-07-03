@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,8 @@
 #include <rng.h>
 #include <stdint.h>
 extern packet_t PT_UWCBR;
+extern packet_t PT_UWROV;
+extern packet_t PT_UWROV_CTR;
 
 /**
 * Adds the module for UwROVModuleClass in ns2.
@@ -67,15 +69,49 @@ public:
 	}
 } class_module_uwROV_ctr;
 
-UwROVCtrModule::UwROVCtrModule(Position p) : UwCbrModule(), sn(0) {
+UwROVCtrModule::UwROVCtrModule(Position p) 
+	: UwCbrModule()
+	, sn(0)
+	, adaptiveRTO(0)
+	, adaptiveRTO_parameter(0.5)
+	//, sumrttAck(0)
+	//, rttAcksamples(0)
+{
 	posit=p;
 	speed=1;
+	bind("adaptiveRTO_", (int *) &adaptiveRTO);
+	if (adaptiveRTO == 1) {
+		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);
+	}
+	if (adaptiveRTO_parameter < 0) {
+		cerr << NOW << "Invalid adaptive RTO parameter < 0, set to 0.5 " 
+			<< "by default " << std::endl;
+		adaptiveRTO_parameter = 0.5;
+	}
 }
 
-UwROVCtrModule::UwROVCtrModule() : UwCbrModule(), sn(0) {
+UwROVCtrModule::UwROVCtrModule() 
+	: UwCbrModule()
+	, sn(0) 
+	, adaptiveRTO(0)
+	, adaptiveRTO_parameter(0.5)
+	//, sumrttAck(0)
+	//, rttAcksamples(0)
+{
 	p = NULL;
 	posit = Position();
 	speed = 1;
+	bind("adaptiveRTO_", (int *) &adaptiveRTO);
+	if (adaptiveRTO == 1) {
+		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);	
+	}
+	if (adaptiveRTO_parameter < 0) {
+		cerr << NOW << "Invalide adaptive RTO parameter < 0, set to 0.5 "
+			<< "by default " << std::endl;
+		adaptiveRTO_parameter = 0.5;
+
+	}
+	
 }
 
 UwROVCtrModule::~UwROVCtrModule() {}
@@ -112,6 +148,9 @@ int UwROVCtrModule::command(int argc, const char*const* argv) {
 		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
 			speed = atof(argv[2]);
 			return TCL_OK;
+		} else if (strcasecmp(argv[1], "setAdaptiveRTOparameter") == 0) {
+			adaptiveRTO_parameter = atof(argv[2]);
+			return TCL_OK;
 		}
 	}
 	else if(argc == 5){
@@ -141,6 +180,15 @@ int UwROVCtrModule::command(int argc, const char*const* argv) {
 
 void UwROVCtrModule::transmit() {
 	sendPkt();
+
+	if (adaptiveRTO == 1 && rttsamples > 0) {
+		period_ =  sumrtt/rttsamples + adaptiveRTO_parameter* sumrtt/rttsamples;
+		if (debug_) {
+			std::cout << NOW << " UwROVCtrModule::RTO set to " << period_ 
+				<< std::endl;
+		}
+	}
+	
 	sendTmr_.resched(period_);
 }
 
@@ -168,13 +216,23 @@ void UwROVCtrModule::initPkt(Packet* p) {
 		uwROVh->speed() = speed;
 		uwROVh->sn() = sn;
 		if (debug_) { 
-			std::cout << NOW << " UwROVCtrModule::initPkt(Packet *p)  Retransmitting"<< std::endl;
+			std::cout << NOW << " UwROVCtrModule::initPkt(Packet *p) " 
+				<< "Retransmitting"<< std::endl;
 		}
 	}
+
+	if (debug_) { 
+		if (rttsamples > 0) {
+			std::cout << NOW << " RTT UwROVCtr: " << sumrtt/rttsamples 
+				<< " s" << std::endl;
+		}
+	}
+
 	UwCbrModule::initPkt(p);
 	if (debug_) {
 		hdr_uwROV_ctr* uwROVh = HDR_UWROV_CTR(p);
-		std::cout << NOW << " UwROVCtrModule::initPkt(Packet *p)  setting new ROV way-point: X = "<< uwROVh->x() <<", Y = " 
+		std::cout << NOW << " UwROVCtrModule::initPkt(Packet *p)  setting new" 
+			<< " ROV way-point: X = "<< uwROVh->x() <<", Y = " 
 			<< uwROVh->y() << ", Z = " << uwROVh->z()<< std::endl;
 	}
 }
@@ -189,16 +247,25 @@ void UwROVCtrModule::recv(Packet* p) {
 	y_rov = monitoring->y();
 	z_rov = monitoring->z();
 
-	if(monitoring->ack()>0) {
+	
+	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+	hdr_cmn *ch = hdr_cmn::access(p);
+	if(monitoring->ack() == sn + 1) {
 		sendTmr_.force_cancel();
 		this->p = NULL;
-		if (debug_)
-			std::cout << NOW << " UwROVCtrModule::recv(Packet *p) control ACK received"<< std::endl;
 	}
+
+	if(monitoring->ack() > 0 && debug_) 
+		std::cout << NOW << " UwROVCtrModule::recv(Packet *p) control ACK "
+			<< "received " << monitoring->ack()<< std::endl;
 	else if((monitoring->ack())<0 && debug_)
-		std::cout << NOW << " UwROVCtrModule::recv(Packet *p) control error received"<< std::endl;
+		std::cout << NOW << " UwROVCtrModule::recv(Packet *p) control error " 
+			<<"received"<< std::endl;
 	if (debug_ > 10)
-		std::cout << NOW << " UwROVCtrModule::recv(Packet *p) ROV monitoring position: X = " << x_rov << ", Y = " 
-			<< y_rov << ", Z = " << z_rov << std::endl;
+		std::cout << NOW << " UwROVCtrModule::recv(Packet *p) ROV monitoring "
+			<< "position: X = " << x_rov << ", Y = " << y_rov 
+			<< ", Z = " << z_rov << std::endl;
+
 	UwCbrModule::recv(p);
+
 }

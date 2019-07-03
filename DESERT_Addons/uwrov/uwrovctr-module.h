@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -196,7 +196,10 @@ protected:
 	float speed; /**< Moving speed sent to the ROV.*/
 	int sn; /**Sequence number of the last control packet sent.*/
 	Packet* p;
-	
+	int adaptiveRTO; /**< 1 if an adaptive RTO is used, 0 if a
+						constant RTO is used.*/
+	double adaptiveRTO_parameter; /**< Parameter for the adaptive RTO.*/		
+
 };
 
 #endif // UWROVCtr_MODULE_H

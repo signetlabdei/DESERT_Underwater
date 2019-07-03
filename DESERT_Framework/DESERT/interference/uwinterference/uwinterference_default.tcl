@@ -28,6 +28,6 @@
 #
 
 
-
+Module/UW/INTERFERENCE set use_maxinterval_ 1 
 Module/UW/INTERFERENCE set maxinterval_ 50 
 Module/UW/INTERFERENCE set debug_ 0
