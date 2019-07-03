@@ -1,3 +1,9 @@
+3.1.0 - 2019-07-03
+	* Fixed and improved samples
+	* Import new version of WOSS (1.7.0)
+	* New MAC protocol to support multiple PHYs
+	* New "position-based" routing protocol
+	* Support and simulation of Optical PHYs (Bluecomm)
 3.0.3 - 2017-07-19
 	* Import new version of Miracle with fix on ClMessage handling
 
