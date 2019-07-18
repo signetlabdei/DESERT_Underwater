@@ -113,6 +113,7 @@ protected:
 	virtual void initializeLUT();
 
 	double getVarTemperature(Packet *p);
+	bool use_woss_; /**< Flag to set whether woss is employed*/
 
 	// Variables
 private:
@@ -128,7 +129,6 @@ private:
 	char lut_token_separator_; //
 	DepthMap
 			lut_map; /**< Lookup table map of the solar noise versus the depth*/
-	bool use_woss_; /**< Flag to set whether woss is employed*/
 	bool variable_temperature_; /**< Flag to set whether the temperature is
 								   costant or varialbe with the depth*/
 };
