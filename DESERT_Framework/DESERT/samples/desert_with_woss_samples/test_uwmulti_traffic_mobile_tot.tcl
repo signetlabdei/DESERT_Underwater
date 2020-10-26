@@ -86,7 +86,6 @@ load libUwmStd.so
 load libWOSSPhy.so
 load libuwcsmaaloha.so
 load libuwmmac_clmsgs.so
-load libuwtdma.so
 load libuwaloha.so
 load libuwip.so
 load libuwstaticrouting.so
@@ -95,11 +94,13 @@ load libuwudp.so
 load libuwcbr.so
 load libuwflooding.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwoptical_propagation.so
 load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwmulti_traffic_control.so
+load libuwtdma.so
 
 #############################
 # NS-Miracle initialization #

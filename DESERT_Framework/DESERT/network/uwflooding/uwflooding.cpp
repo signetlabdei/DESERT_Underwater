@@ -83,6 +83,7 @@ UwFlooding::UwFlooding()
 	, packets_forwarded_(0)
 	, trace_path_(false)
 	, trace_file_path_name_((char *) "trace")
+	, ttl_traffic_map()
 { // Binding to TCL variables.
 	bind("ttl_", &ttl_);
 	bind("maximum_cache_time_", &maximum_cache_time_);
@@ -120,10 +121,8 @@ UwFlooding::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "addr") == 0) {
-			// ipAddr_ = str2addr((char *) argv[2]);
 			ipAddr_ = static_cast<uint8_t>(atoi(argv[2]));
 			if (ipAddr_ == 0) {
-				// fprintf(stderr, "0.0.0.0 is not a valid IP address");
 				fprintf(stderr, "0 is not a valid IP address");
 				return TCL_ERROR;
 			}
@@ -140,6 +139,12 @@ UwFlooding::command(int argc, const char *const *argv)
 			remove(trace_file_path_name_);
 			trace_file_path_.open(trace_file_path_name_);
 			trace_file_path_.close();
+			return TCL_OK;
+		}
+	} else if (argc == 4) {
+		if (strcasecmp(argv[1], "addTtlPerTraffic") == 0) {
+			ttl_traffic_map[static_cast<uint16_t>(atoi(argv[2]))] = 
+				static_cast<uint8_t>(atoi(argv[3]));
 			return TCL_OK;
 		}
 	}
@@ -349,7 +354,7 @@ UwFlooding::recv(Packet *p)
 				ch->prev_hop_ = ipAddr_;
 				ch->next_hop() = UWIP_BROADCAST;
 				ch->size() += sizeof(hdr_uwflooding);
-				flh->ttl() = ttl_;
+				flh->ttl() = getTTL(p);
 				if (trace_path_)
 					this->writePathInTrace(p, "FRWD_DTA");
 				sendDown(p);
@@ -369,6 +374,16 @@ UwFlooding::recv(Packet *p)
 		return;
 	}
 } /* UwFlooding::recv */
+
+uint8_t UwFlooding::getTTL(Packet* p) const
+{
+	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+	auto it = ttl_traffic_map.find(uwcbrh->traffic_type());
+	if(it != ttl_traffic_map.end()) {
+		return it->second;
+	}
+	return ttl_;
+}
 
 void
 UwFlooding::writePathInTrace(const Packet *p, const string &_info)

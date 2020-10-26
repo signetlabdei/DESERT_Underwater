@@ -299,7 +299,7 @@ MinterpreterTEL::parse_TELEGRAM(std::string telegram)
 	std::string _rcv_time, _sync_detected_time, _nshift, _speed;
 	std::string _sync_delta_phase, _symbol_phase_std, _symbol_mean_phase, _mps;
 
-	istringstream iastr(telegram);
+	std::istringstream iastr(telegram);
 	getline(iastr, _TEL, ',');
 	getline(iastr, _len, ',');
 	getline(iastr, _data, ',');

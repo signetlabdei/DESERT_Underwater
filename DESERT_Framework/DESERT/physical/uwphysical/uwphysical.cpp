@@ -37,6 +37,7 @@
  */
 
 #include "uwphysical.h"
+#include "uwphy-clmsg.h"
 
 static class UwPhysicalClass : public TclClass
 {
@@ -62,6 +63,15 @@ UnderwaterPhysical::UnderwaterPhysical()
 	, tx_power_(3.3)
 	, rx_power_(0.620)
 	, Interference_Model("CHUNK")
+	, tot_ctrl_pkts_lost(0)
+	, tot_pkts_lost(0)
+	, Transmitted_bytes_(0)
+	, errorCtrlPktsInterf(0)
+	, collisionDataCTRL(0)
+	, collisionCTRL(0)
+	, collisionDATA(0)
+
+	// int collisionDATA;
 {
 	bind("rx_power_consumption_", &rx_power_);
 	bind("tx_power_consumption_", &tx_power_);
@@ -323,8 +333,7 @@ UnderwaterPhysical::startRx(Packet *p)
 } /* UnderwaterPhysical::startRx */
 
 void
-UnderwaterPhysical::endRx(Packet *p)
-{
+UnderwaterPhysical::endRx(Packet *p){
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_mac *mach = HDR_MAC(p);
@@ -472,3 +481,16 @@ UnderwaterPhysical::getPER(double _snr, int _nbits, Packet *_p)
 	// PER calculation
 	return 1 - pow(1 - ber_, _nbits);
 } /* UnderwaterPhysical::getPER */
+
+
+int UnderwaterPhysical::recvSyncClMsg(ClMessage* m)
+{
+	if (m->type() == CLMSG_UWPHY_LOSTPKT)
+	{	
+		int lost_packet = ((ClMsgUwPhyGetLostPkts*)m)->isControl() ?
+			getTot_CtrlPkts_lost() : getTot_pkts_lost();
+		((ClMsgUwPhyGetLostPkts*)m)->setLostPkts(lost_packet);
+		return 0;
+	}
+	return UnderwaterMPhyBpsk::recvSyncClMsg(m);
+}

@@ -269,17 +269,22 @@ UWSMPosition::getZ()
 	return (z_);
 }
 
-double UWSMPosition::getXdest()
+double UWSMPosition::getXdest() const
 {
 	return Xdest_;
 }
 
-double UWSMPosition::getYdest()
+double UWSMPosition::getYdest() const
 {
 	return Ydest_;
 }
 
-double UWSMPosition::getZdest()
+double UWSMPosition::getZdest() const
 {
 	return Zdest_;
+}
+
+double UWSMPosition::getSpeed() const
+{
+	return speed_;
 }

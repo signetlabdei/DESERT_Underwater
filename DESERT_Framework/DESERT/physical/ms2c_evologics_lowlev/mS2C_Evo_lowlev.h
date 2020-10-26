@@ -43,7 +43,7 @@
 #include <uwmphy_modem.h>
 #include "mdriverS2C_Evo_lowlev.h"
 
-using namespace std;
+
 
 /**
  *  Class that implements the interface between ns2/NS-Miracle and the S2C

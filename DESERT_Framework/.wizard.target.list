@@ -1,4 +1,4 @@
-PC                       (for any x86 or x64_86 architecture)
+LOCAL                    (install on this machine)
 <YOUR_DEVICE>            (please see the user guide for more information on custom installers)
 Gumstix-yocto-poky
 Raspberry-Pi-yocto-poky

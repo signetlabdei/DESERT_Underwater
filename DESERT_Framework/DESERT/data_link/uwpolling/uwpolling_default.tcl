@@ -32,9 +32,12 @@
 PacketHeaderManager set tab_(PacketHeader/POLL) 1
 PacketHeaderManager set tab_(PacketHeader/TRIGGER) 1
 PacketHeaderManager set tab_(PacketHeader/PROBE) 1
+PacketHeaderManager set tab_(PacketHeader/AUV_MULE) 1
+PacketHeaderManager set tab_(PacketHeader/ACK_SINK) 1
+PacketHeaderManager set tab_(PacketHeader/PROBE_SINK) 1
 
 
-Module/UW/POLLING/NODE set T_poll_              50
+Module/UW/POLLING/NODE set T_poll_guard_        50
 Module/UW/POLLING/NODE set backoff_tuner_       1
 Module/UW/POLLING/NODE set max_payload_         125
 Module/UW/POLLING/NODE set buffer_data_pkts_    50
@@ -43,10 +46,11 @@ Module/UW/POLLING/NODE set sea_trial_            0
 Module/UW/POLLING/NODE set print_stats_          0
 Module/UW/POLLING/NODE set modem_data_bit_rate_ 1000
 Module/UW/POLLING/NODE set n_run                0
-Module/UW/POLLING/NODE set intra_data_guard_time_ 7
+Module/UW/POLLING/NODE set intra_data_guard_time_ 0.001
+Module/UW/POLLING/NODE set useAdaptiveTpoll_    0
 
 Module/UW/POLLING/AUV set max_payload_          125
-Module/UW/POLLING/AUV set T_probe_              10
+Module/UW/POLLING/AUV set T_probe_guard_        2
 Module/UW/POLLING/AUV set T_min_                0.5
 Module/UW/POLLING/AUV set T_max_                5
 Module/UW/POLLING/AUV set T_guard_              20
@@ -56,3 +60,19 @@ Module/UW/POLLING/AUV set print_stats_          0
 Module/UW/POLLING/AUV set modem_data_bit_rate_  1000
 Module/UW/POLLING/AUV set n_run                 0
 Module/UW/POLLING/AUV set Data_Poll_guard_time_ 3
+Module/UW/POLLING/AUV set max_buffer_size_	 	30
+Module/UW/POLLING/AUV set max_tx_pkts_ 			20
+Module/UW/POLLING/AUV set full_knowledge_       0
+Module/UW/POLLING/AUV set use_woss_             0
+
+Module/UW/POLLING/SINK set T_data_gurad 		10
+Module/UW/POLLING/SINK set backoff_tuner_		1
+Module/UW/POLLING/SINK set sink_id_				1
+Module/UW/POLLING/SINK set sea_trial_            0
+Module/UW/POLLING/SINK set print_stats_          0
+Module/UW/POLLING/SINK set n_run                 0
+Module/UW/POLLING/SINK set useAdaptiveTdata_    0
+Module/UW/POLLING/SINK set max_n_ack_           100
+Module/UW/POLLING/SINK set T_guard_              1
+Module/UW/POLLING/SINK set max_payload_          125
+Module/UW/POLLING/SINK set modem_data_bit_rate_ 1000

@@ -78,7 +78,7 @@ typedef enum LOG_LEVEL log_level_t;
 
 typedef enum MODEM_STATES modem_state_t;
 
-using namespace std;
+
 
 // Forward declaration(s)
 class UWMPhy_modem;
@@ -329,7 +329,7 @@ public:
 	 */
 	std::string getLogFile();
 
-	void printOnLog(log_level_t log_level, string module, string message);
+	void printOnLog(log_level_t log_level, std::string module, std::string message);
 
 protected:
 	UWMPhy_modem *pmModem; /**< link to the UWMPhy_modem object that contains

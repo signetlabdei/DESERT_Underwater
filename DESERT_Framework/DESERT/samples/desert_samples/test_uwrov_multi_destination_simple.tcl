@@ -93,6 +93,7 @@ load libuwcsmaaloha.so
 load libuwinterference.so
 load libUwmStd.so
 load libUwmStdPhyBpskTracer.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwhermesphy.so
 load libuwmulti_destination.so
@@ -516,8 +517,6 @@ proc createRelay {id} {
     $ctr_relay($id) setManualLowerlId [$mll_relay($id) Id_]
     $ctr_relay($id) setAutomaticSwitch
 
-    $ctr_relay($id) addLayer [$mll_relay($id) Id_] 1
-    $ctr_relay($id) addLayer [$mll_relay_2($id) Id_] 2
 }
 
 
@@ -556,7 +555,8 @@ for {set id 0} {$id < $opt(rn)} {incr id} {
     $position_relay($id) setZ_ -1000
 
     # add the ROV IP to the relay multidestination module
-    $ctr_relay($id) setIProv [$ipif(1) addr]
+	$ctr_relay($id) setDefaultLowerId [$mll_relay_2($id) Id_]
+	$ctr_relay($id) addLayer [$ipif(1) addr] [$mll_relay($id) Id_]
 }
 
 

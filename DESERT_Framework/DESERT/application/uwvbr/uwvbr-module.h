@@ -62,7 +62,7 @@
 
 #define HDR_UWVBR(P) (hdr_uwvbr::access(P))
 
-using namespace std;
+
 
 extern packet_t PT_UWVBR;
 

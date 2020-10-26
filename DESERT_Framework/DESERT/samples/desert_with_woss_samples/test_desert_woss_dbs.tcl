@@ -39,7 +39,7 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.      #"
 # You can download the sediment and SSP databases at the following link:              #"
-#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
 # After the download, please set opt(db_path) to the correct path.                    #" 
 # Please note that we cannot redistribute the GEBCO bathymetry database.        #"
 # You can download the database by registering on the GEBCO web site at:              #"
@@ -87,6 +87,7 @@ load libUwmStd.so
 load libWOSS.so
 load libWOSSPhy.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwip.so
 load libuwstaticrouting.so
@@ -199,7 +200,7 @@ if { $opt(db_path) == "insert_db_path_here" } {
     puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
     puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #" 
     puts "# Please note that we cannot redistribute the GEBCO bathymetry database.              #"
     puts "# You can download the database by registering on the GEBCO web site at:              #"
@@ -219,7 +220,7 @@ if { $opt(db_path_gebco) == "insert_db_path_here" } {
     puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
     puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #" 
     puts "# Please note that we cannot redistribute the GEBCO bathymetry database.              #"
     puts "# You can download the database by registering on the GEBCO web site at:              #"
@@ -241,7 +242,7 @@ if { $exists_ssp == 0 || $exists_gebco == 0 } {
     puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
     puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz                #"
+    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #" 
     puts "# Please note that we cannot redistribute the GEBCO bathymetry database.              #"
     puts "# You can download the database by registering on the GEBCO web site at:              #"

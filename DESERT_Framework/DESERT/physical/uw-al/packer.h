@@ -40,14 +40,14 @@
 
 #include "hdr-uwal.h"
 
-#include <packet.h>
 #include <math.h>
+#include <packet.h>
 
-#include <vector>
-#include <string>
-#include <sstream>
-#include <cstring>
 #include <bitset>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <vector>
 
 /**
  * Class exploited by the Uwal module to map an NS-Miracle packet into a bit
@@ -291,9 +291,8 @@ private:
 						   header stream of bits. */
 	size_t FRAME_OFFSET_Bits; /** Bit length of the frameID_ field to be put in
 								 the header stream of bits. */
-	size_t
-			M_BIT_Bits; /** Bit length of the Mbit_ field to be put in the
-						   header stream of bits. */
+	size_t M_BIT_Bits; /** Bit length of the Mbit_ field to be put in the
+						  header stream of bits. */
 	size_t DUMMY_CONTENT_Bits; /** Bit length of the dummy content to be put in
 								  the header stream of bits. */
 };

@@ -61,23 +61,16 @@ public:
 
 UwPosBasedRtROV::UwPosBasedRtROV()
 	: ipAddr(0)
-	, ROV_speed(1)
 	, maxTxRange(3000)
 	, ROV_pos()
 	, list_posIP()
 {
 	bind("debug_", &debug_);
 	bind("maxTxRange_",(double *) &maxTxRange);
-	bind("ROV_speed_", (double *) &ROV_speed);
 	if (maxTxRange <= 0) {
 		std::cout << " UwPosBasedRtROV::maxTxRange value not valid, value set "
 			<< " by default to 3000 m" << std::endl;
 		maxTxRange = 3000;
-	}
-	if (ROV_speed <= 0) {
-		std::cout << " UwPosBasedRtROV::ROV_speed value not valid, value set "
-			<< "by defaul to 1 m/s" << std::endl;
-		ROV_speed = 1;
 	}
 }
 
@@ -211,7 +204,7 @@ void UwPosBasedRtROV::initPkt(Packet* p)
 	pbrh->y_waypoint() = ROV_pos->getYdest();
 	pbrh->z_waypoint() = ROV_pos->getZdest();
 	pbrh->timestamp() = NOW;
-	pbrh->ROV_speed() = ROV_speed;
+	pbrh->ROV_speed() = ROV_pos->getSpeed();
 	pbrh->IP_ROV() = ipAddr;
 
 	if (debug_) {

@@ -149,7 +149,15 @@ UwStaticRoutingModule::recv(Packet *p)
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *uwiph = HDR_UWIP(p);
 
+	if (debug_) {
+		std::cout << NOW << "::UWSTATICROUTING::RECV"
+				  << "::NEXT_HOP::" << ch->next_hop()
+				  << "::DESTINATION_IP::" << (uint)uwiph->daddr()
+				  << std::endl;
+	}
+
 	if (ch->direction() == hdr_cmn::UP) {
+
 		if (uwiph->daddr() == ch->next_hop() ||
 				uwiph->daddr() ==
 						UWIP_BROADCAST) { /* Packet is arrived at its

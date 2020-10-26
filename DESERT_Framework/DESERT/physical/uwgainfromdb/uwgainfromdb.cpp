@@ -39,7 +39,7 @@
 #include "uwgainfromdb.h"
 #include "uwip-module.h"
 
-using namespace std;
+
 
 static class UnderwaterGainFromDbClass : public TclClass
 {

@@ -283,10 +283,10 @@ UwHermesPhy::matchPS(double distance, int size)
 	PdrLut::iterator it = range2pdr_.lower_bound(distance);
 	if (it == range2pdr_.end())
 		return chunckInterpolator((--it)->second, size);
-	int l_sup = it->first;
+	double l_sup = it->first;
 	double p_sup = it->second;
 	it--;
-	int l_inf = it->first;
+	double l_inf = it->first;
 	double p_inf = it->second;
 	if (debug_) {
 		std::cout << " Distance between " << l_inf << " and " << l_sup;

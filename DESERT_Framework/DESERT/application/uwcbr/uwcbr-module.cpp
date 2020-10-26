@@ -42,6 +42,7 @@
 #include <iostream>
 #include <rng.h>
 #include <stdint.h>
+#include <fstream>
 
 extern packet_t PT_UWCBR;
 
@@ -114,12 +115,15 @@ UwCbrModule::UwCbrModule()
 	, sumrtt(0)
 	, sumrtt2(0)
 	, rttsamples(0)
+	, log_suffix("")
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
 	, sumbytes(0)
 	, sumdt(0)
 	, esn(0)
+	, tracefile_enabler_(0)
+	, cnt(0)
 { // binding to TCL variables
 	bind("period_", &period_);
 	bind("destPort_", (int *) &dstPort_);
@@ -129,14 +133,17 @@ UwCbrModule::UwCbrModule()
 	bind("debug_", &debug_);
 	bind("drop_out_of_order_", &drop_out_of_order_);
 	bind("traffic_type_", (uint *) &traffic_type_);
+	bind("tracefile_enabler_", (int *) &tracefile_enabler_);
 	sn_check = new bool[USHRT_MAX];
 	for (int i = 0; i < USHRT_MAX; i++) {
 		sn_check[i] = false;
 	}
 }
 
+
 UwCbrModule::~UwCbrModule()
 {
+	cout << "sdpaosdisaopdisp" << endl;
 }
 
 int
@@ -206,7 +213,31 @@ UwCbrModule::command(int argc, const char *const *argv)
 			this->printIdsPkts();
 			return TCL_OK;
 		}
+	} else if (argc == 3) {
+		if (strcasecmp(argv[1], "setLogSuffix") == 0){
+			string tmp_ = (char *) argv[2];
+			log_suffix = std::string(tmp_);
+			tracefilename = "tracefile" + log_suffix + ".txt";
+			if (tracefile_enabler_) {
+				tracefile.open(tracefilename , std::ios::out | std::ios::app);
+			}
+		return TCL_OK;	
+		}
+	} else if (argc == 4) {
+		if (strcasecmp(argv[1], "setLogSuffix") == 0){
+			string tmp_ = (char *) argv[2];
+			int precision = std::atoi(argv[3]);
+			log_suffix = std::string(tmp_);
+			tracefilename = "tracefile" + log_suffix + ".txt";
+			if (tracefile_enabler_) {
+				tracefile.open(tracefilename , std::ios::out | std::ios::app);
+				tracefile.precision(precision);
+			}
+
+		return TCL_OK;	
+		}
 	}
+	
 	return Module::command(argc, argv);
 }
 
@@ -327,6 +358,8 @@ void
 UwCbrModule::recv(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
+	hdr_uwip *uwiph = hdr_uwip::access(p);
+
 	if (debug_ > 10)
 		printf("CbrModule(%d)::recv(Packet*p,Handler*) pktId %d\n",
 				getId(),
@@ -339,7 +372,6 @@ UwCbrModule::recv(Packet *p)
 	}
 
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
-
 	esn = hrsn + 1; // expected sn
 
 	if (!drop_out_of_order_) {
@@ -374,6 +406,12 @@ UwCbrModule::recv(Packet *p)
 	if (uwcbrh->rftt_valid()) {
 		double rtt = rftt + uwcbrh->rftt();
 		updateRTT(rtt);
+	}
+
+	if (tracefile_enabler_) {
+		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " " 
+				<< (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " " << ch->size() <<"\n";
+		tracefile.flush();
 	}
 
 	updateFTT(rftt);

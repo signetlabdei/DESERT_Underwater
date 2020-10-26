@@ -88,17 +88,22 @@ public:
 	/**
 	* Method that return the x cooridnate of the destination point.
 	*/
-	virtual double getXdest();
+	virtual double getXdest() const;
 
 	/**
 	* Method that return the y cooridnate of the destination point.
 	*/
-	virtual double getYdest();
+	virtual double getYdest() const;
 
 	/**
 	* Method that return the z cooridnate of the destination point.
 	*/
-	virtual double getZdest();
+	virtual double getZdest() const;
+
+	/**
+	* Method that return the actual speed.
+	*/
+	double getSpeed() const;
 
 	/**
 	* TCL command interpreter

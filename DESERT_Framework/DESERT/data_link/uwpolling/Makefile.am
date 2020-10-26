@@ -38,7 +38,8 @@ TESTS =
 libuwpolling_la_SOURCES = initlib.cpp\
 	uwpolling_default.tcl\
 	uwpolling_AUV.cpp\
-	uwpolling_NODE.cpp
+	uwpolling_NODE.cpp\
+	uwpolling_SINK.cpp
 
 libuwpolling_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwpolling_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@

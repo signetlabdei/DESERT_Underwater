@@ -87,7 +87,7 @@ enum log_level { CSMA_CA_ERROR = 0, CSMA_CA_WARN, CSMA_CA_INFO, CSMA_CA_DEBUG };
 
 typedef enum log_level csma_ca_log_level_t;
 
-using namespace std;
+
 
 string log_level_string[] = {"ERROR", "WARNING", "INFO", "DEBUG"};
 /**

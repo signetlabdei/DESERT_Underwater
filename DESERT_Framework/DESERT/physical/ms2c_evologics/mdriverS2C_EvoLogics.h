@@ -95,11 +95,11 @@ class MdriverS2C_EvoLogics : public UWMdriver
 														MdriverS2C_EvoLogics::updateStatus()
 							method. */
 
-	queue<std::string>
+	std::queue<std::string>
 			queue_tx; /**< Queue used to buffer incoming strings for tx
 						 messages.*/
 
-	queue<std::string>
+	std::queue<std::string>
 			queue_rx; /**< Queue used to buffer incoming strings for rx
 						 messages.*/
 
@@ -224,6 +224,6 @@ protected:
 	bool KeepOnline;
 
 private:
-	bool is_number(const string s);
+	bool is_number(const std::string s);
 };
 #endif /* UWMDRIVERS2CEVOLOGICS_H */

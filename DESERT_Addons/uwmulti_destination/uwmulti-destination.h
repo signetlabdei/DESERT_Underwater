@@ -42,12 +42,60 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <list>
 #include <module.h>
 #include <packet.h>
 #include <rng.h>
 #include <string.h>
 #include <tclcl.h>
 #include <uwip-module.h>
+
+typedef struct IP_range
+{
+	int min_IP; /**< Minimum IP address of the range */
+	int max_IP; /**< Maximum IP address of the range */
+
+	IP_range(int min, int max)
+	:
+	min_IP(min),
+	max_IP(max)
+	{
+	}
+
+	/**
+	 * Return true if the 2 ranges are not overlapped
+	 * @param range IP range to check
+	 * @return true if the ranges are not overlapped
+	 */
+	bool overlappingRange(IP_range range)
+	{
+		return overlappingRange(range.min_IP, range.max_IP);
+	}
+
+	/**
+	 * Return true if the 2 ranges are overlapped
+	 * @param min minimum IP address of the range
+	 * @param max masimum IP address of the range
+	 * @return true if the ranges are overlapped
+	 */
+	bool overlappingRange(int min, int max)
+	{
+		return !(min_IP > max || max_IP < min);
+	}
+
+	/**
+	 * Check if the given IP addr is in the range
+	 * @param addr IP address
+	 * @return true if the IP address is in the range, false otherwise
+	 */
+	bool isInRange(int addr)
+	{
+		return (addr >= min_IP && addr <= max_IP);
+	}
+} range_IP;
+
+typedef std::pair<int, IP_range> layer_IPrange;
+
 
 /**
  * Class used to represents the UwMultiDestination layer of a node.
@@ -86,12 +134,14 @@ public:
 	virtual int command(int, const char *const *);
 
 	/**
-	 * Add a layer in the layer map
+	 * Add a layer in the layer map if the IP range is valide, i.e., 
+	 * if the range doesn't overlap with an existing one
 	 *
-	 * @param id unique identifier of the module
-	 * @param order of the layer
+	 * @param range IP range
+	 * @param id identifier of the lower layer
+	 * return false if the range overlaps with an existing one, true otherwise
 	 */
-	virtual void addLayer(int id, int order);
+	virtual bool addLayer(IP_range range, int id);
 
 	/**
 	 * recv method. It is called when a packet is received from the other layers
@@ -111,15 +161,13 @@ protected:
 	int debug_; /**< Flag to activate debug verbosity.*/
 	double min_delay_;
 	Mode switch_mode_; /**< Current switch mode (either AUTOMATIC or MANUAL).*/
-	int
-			lower_id_active_; /**< Id of the current lower layer active. It is
+	int lower_id_active_; /**< Id of the current lower layer active. It is
 								 used only in MANUAL MODE.*/
-	int IP_rov_; /**< IP address of the ROV. It is used to determine the lower
-					layer to use. */
-	std::map<int, int> id2order; /**< Maps each layer id into its logic order
-									(layer_id, order).*/
-	std::map<int, int>
-			order2id; /**< Return the layer id given its logic order. */
+
+	std::list<layer_IPrange> layer_list;/**Maps a layer id into an IP_range. */
+
+	int default_lower_id; /**Default lower id to use if dest adress is not found
+							in the considered IP ranges. */
 
 	/**
 	 * Handle a packet coming from upper layers
@@ -138,43 +186,15 @@ protected:
 	*/
 
 	virtual int getDestinationLayer(Packet *p);
-
+	
 	/**
-	 * return the logic order of the layer given its layer_id
+	 * return true if there is not overlap between the new range and the 
+	 * previous rnage in the list
 	 *
-	 * @param id to select the layer
-	 *
-	 * @return the order of the layer
+	 * @param range that has to be inserted in the list
+	 * @return true if there is not overlap, false otherwise 
 	 */
-	int inline getOrder(int layer_id)
-	{
-		return id2order.find(layer_id) == id2order.end()
-				? UwMultiDestination::layer_not_exist
-				: id2order.find(layer_id)->second;
-	}
-
-	/**
-	 * return the layer id given its logic order
-	 *
-	 * @param order of the layer
-	 *
-	 * @return the layer id
-	 */
-	int inline getId(int layer_order)
-	{
-		return order2id.find(layer_order) == order2id.end()
-				? UwMultiDestination::layer_not_exist
-				: order2id.find(layer_order)->second;
-	}
-
-	/**
-	 * return if the specified layer, identified by id, is available
-	 *
-	 * @param id unique identifier of the module
-	 *
-	 * @return if the specified layer is available
-	 */
-	virtual bool isLayerAvailable(int id);
+	virtual bool checkNotOverlap(IP_range range);
 
 private:
 	// Variables

@@ -64,11 +64,16 @@ SUBDIRS = m4 \
     physical/uwphysicalrogersmodel\
     physical/uwphysicalfromdb\
     physical/uwmphy_modem \
+	physical/uwmodem \
+    physical/uwmodemcsa \
+	physical/uwconnector \
     physical/ms2c_evologics \
     physical/ms2c_evologics_lowlev \
+	physical/uwevologicss2cmodem \
     physical/uwmphypatch \
     physical/uwhermesphy \
     physical/uwahoi_phy \
+    physical/uwahoimodem \
     physical/uwoptical_phy \
     physical/uwopticalbeampattern \
     physical/uw-al \

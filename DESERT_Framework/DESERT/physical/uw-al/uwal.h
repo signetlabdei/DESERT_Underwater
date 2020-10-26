@@ -38,37 +38,37 @@
 #ifndef UWAL_H
 #define UWAL_H
 
+#include "frame-set.h"
 #include "hdr-uwal.h"
 #include "packer.h"
-#include "frame-set.h"
 
-#include <mphy.h>
 #include <mac.h>
+#include <mphy.h>
 
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <string.h>
-#include <errno.h>
-#include <cstring>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <cmath>
+#include <cstring>
+#include <errno.h>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <queue>
-#include <time.h>
 #include <rng.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
+#include <unistd.h>
 
 typedef struct PERListElement {
 	int node_ID;
 	double per;
 } pl_element;
 
-using namespace std;
+
 
 class Uwal;
 
@@ -80,11 +80,11 @@ class TxFrameTimer : public TimerHandler
 {
 public:
 	/**
- * Class constructor.
- *
- * @param pUwal pointer to the Uwal object to be linked with this TxFrameTimer
- * object.
- */
+	 * Class constructor.
+	 *
+	 * @param pUwal pointer to the Uwal object to be linked with this
+	 * TxFrameTimer object.
+	 */
 	TxFrameTimer(Uwal *pUwal)
 		: TimerHandler()
 	{
@@ -93,10 +93,10 @@ public:
 
 protected:
 	/**
-* Method to handle the expiration of a given event.
-*
-* @param e event to be handled.
-*/
+	 * Method to handle the expiration of a given event.
+	 *
+	 * @param e event to be handled.
+	 */
 	virtual void expire(Event *e);
 
 	Uwal *pUwal_; /**< Pointer to an Uwal object. It is used to call
@@ -111,40 +111,48 @@ protected:
 class Uwal : public MPhy
 {
 	/**
-		 * Friend class used to implement the timer handler.
-		 *
-		 * @see TxFrameTimer
-		 */
+	 * Friend class used to implement the timer handler.
+	 *
+	 * @see TxFrameTimer
+	 */
 	friend class TxFrameTimer;
 
 public:
 	/**
-	* Class constructor.
-	*/
+	 * Class constructor.
+	 */
 	Uwal();
 
 	/**
-	* Class destructor.
-	*/
+	 * Class destructor.
+	 */
 	~Uwal();
 
 	/**
-	* Method to handle the reception of packets arriving from the upper layers
-	* of the network simulator.
-	*
-	* @param p pointer to the packet that has been received from the simulator's
-	* upper layers.
-	*/
+	 * Method to handle the reception of a synchronous crosslayer message
+	 *
+	 * @param m pointer to the crosslayer message.
+	 * @return 0 if seccess
+	 */
+	virtual int recvSyncClMsg(ClMessage *m);
+
+	/**
+	 * Method to handle the reception of packets arriving from the upper layers
+	 * of the network simulator.
+	 *
+	 * @param p pointer to the packet that has been received from the
+	 * simulator's upper layers.
+	 */
 	virtual void recv(Packet *);
 
 	/**
-	* Method to map tcl commands into c++ methods.
-	*
-	* @param argc number of arguments in <em> argv </em>
-	* @param argv array of arguments where <em> argv[3] </em> is the tcl command
-	* name and <em> argv[4, 5, ...] </em> are the parameters for the
-	* corresponding c++ method.
-	*/
+	 * Method to map tcl commands into c++ methods.
+	 *
+	 * @param argc number of arguments in <em> argv </em>
+	 * @param argv array of arguments where <em> argv[3] </em> is the tcl
+	 * command name and <em> argv[4, 5, ...] </em> are the parameters for the
+	 * corresponding c++ method.
+	 */
 	virtual int command(int, const char *const *);
 
 	size_t
@@ -168,33 +176,32 @@ protected:
 			sendDownFrames; /**< queue of the frames to send down */
 	std::queue<Packet *> sendUpFrames; /**< queue of the frames to send up to
 										  the upper protocols */
-	std::queue<Packet *>
-			sendUpPkts; /**< queue of the packets to send up to the upper
-						   protocols */
+	std::queue<Packet *> sendUpPkts; /**< queue of the packets to send up to the
+										upper protocols */
 	list<PERListElement> PERList; /**< PER list (couple of ID of the node and
 									 Packet Error Rate associated ) */
 	std::map<RxFrameSetKey, RxFrameSet>
 			sendUpFrameSet; /**< map of the frames to send up */
 	/**
-		 * Method responsible to manage the queueing system of Adaptation Layer
-		 */
+	 * Method responsible to manage the queueing system of Adaptation Layer
+	 */
 	void ALqueueManager();
 	/**
-		 * Method responsible to initialize the headers of the packet
-		 * @param Pointer to the packet
-		 * @param ID of the packet
-		 */
+	 * Method responsible to initialize the headers of the packet
+	 * @param Pointer to the packet
+	 * @param ID of the packet
+	 */
 	void initializeHdr(Packet *, unsigned int);
 	/**
-		 * Method responsible to fragment the packet
-		 * @param Pointer to the packet that are going to be fragmented
-		 */
+	 * Method responsible to fragment the packet
+	 * @param Pointer to the packet that are going to be fragmented
+	 */
 	void fragmentPkt(Packet *);
 	/**
-		 * Method responsible to reassemble the various fragments in a unique
+	 * Method responsible to reassemble the various fragments in a unique
 	 * packets
-		 * @param pointer to the original Packet
-		 */
+	 * @param pointer to the original Packet
+	 */
 	void reassembleFrames(Packet *);
 	/**
 	 * Method responsible to check for errors the received frames
@@ -205,7 +212,7 @@ protected:
 	 *  Method to start the packet transmission.
 	 *
 	 *  @param p pointer to the packet to be transmitted.
-	*/
+	 */
 	virtual void startTx(Packet *);
 
 	/**
@@ -271,6 +278,7 @@ private:
 	double frame_set_validity; /**< Time of validity of a frame set */
 	int frame_padding; /**< Flag to determine if perfoming bit padding up to
 						  PSDU size. */
+	int force_endTx_; /**< 0 not force, otherwise force endTx*/
 
 }; /* class Uwal */
 

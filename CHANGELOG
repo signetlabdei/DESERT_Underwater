@@ -1,5 +1,12 @@
-3.1.1 - 2019-07-18
-	* Fix minor issue on uwoptical_phy simulator
+3.2.0 - 2020-26-10
+	* Various fixes on uwApplication
+	* Improvements and new features on uwpolling
+	* Completely rewritten drivers for EvoLogics S2c modems
+	* New drivers and support for Uwahoi modems
+	* Various fixes and improvements on installer Framework
+	* Latest version of WOSS support
+	* New module for geographic and position based routing
+
 3.1.0 - 2019-07-03
 	* Fixed and improved samples
 	* Import new version of WOSS (1.7.0)

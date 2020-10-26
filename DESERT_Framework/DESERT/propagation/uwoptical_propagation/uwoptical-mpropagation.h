@@ -157,11 +157,14 @@ protected:
 	double getWossOrientation(Position *src, Position *dest);
 
 	/**
-	 * Calculate the inclination angle between the transmitter and the receiver
+	 * Calculate the linear interpolation between two 2-D points
 	 *
-	 * @param src pointer to the transmitter position.
-	 * @param dest pointer to the receiver position.
-	 *
+	 * @param x x-coordinate of which we need to finde the value.
+	 * @param x1 x-coordinate of the first point
+ 	 * @param x2 x-coordinate of the second point
+	 * @param y1 y-coordinate of the first point
+	 * @param y2 y-coordinate of the second point
+	 * @return the value assumed by y obtained by linear interpolation
 	 */
 	double linearInterpolator(
 			double x, double x1, double x2, double y1, double y2);

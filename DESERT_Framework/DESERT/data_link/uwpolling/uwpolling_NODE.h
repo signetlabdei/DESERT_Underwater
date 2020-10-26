@@ -49,6 +49,7 @@
 #include <set>
 #include <queue>
 #include <fstream>
+#include <chrono>
 
 #define UWPOLLING_NODE_DROP_REASON_BUFFER_FULL \
 	"DBF" /**< Buffer of the node is full */
@@ -536,6 +537,15 @@ protected:
 		n_poll_dropped++;
 	}
 
+	inline void
+	getDataQueueLog()
+	{
+		std::cout << getEpoch() << "::"  << NOW
+				  << "::Uwpolling_NODE(" << addr
+				  << ")::DATA_QUEUE_SIZE--> " << Q_data.size()
+				  << std::endl;
+	}
+
 	/**
 	 * Returns the number of PROBE packets sent during the simulation
 	 * @return int n_probe_sent the number of PROBE packets sent
@@ -664,13 +674,17 @@ protected:
 	inline unsigned long int
 	getEpoch()
 	{
-		return time(NULL);
+	  unsigned long int timestamp =
+		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
+			  std::chrono::system_clock::now().time_since_epoch()).count() );
+	  return timestamp;
 	}
 
 	/*************************
 	 * input values from TCL *
 	 *************************/
 	double T_poll; /**< Duration of RxPOLLTimer */
+	double T_poll_guard; /**< Guard time for initial POLL timer*/
 	double backoff_tuner; /**< Multiplying value to the backoff value */
 	int max_payload; /**< Payload of Application Layer in bytes */
 	int buffer_data_pkts; /**< Length of buffer of DATA pkts in number of pkts
@@ -683,7 +697,7 @@ protected:
 					  be tested at the sea */
 	int print_stats; /**< Print protocol's statistics of the protocol */
 	int n_run; /*< ID of the experiments (used during sea trial) */
-	int Intra_data_Guard_Time; /**< Guard Time between one data packet and the
+	double Intra_data_Guard_Time; /**< Guard Time between one data packet and the
 								  following */
 
 	std::queue<Packet *> Q_data; /**< Queue of DATA in number of packets */
@@ -714,7 +728,7 @@ protected:
 	int AUV_mac_addr; /**< MAC address of the AUV */
 	int N_data_pkt_2_TX; /**< Number of DATA packets to transmit to the AUV */
 	int packet_index; /**< Index of the packet just sent to the AUV */
-	int n_probe_sent; /**< Number of PROBE packets sent to the AUV */
+	uint n_probe_sent; /**< Number of PROBE packets sent to the AUV */
 	int n_times_polled; /**< Number of times that the node has been polled by
 						   the AUV */
 	int n_trigger_received; /**< Number of TRIGGER packets received */
@@ -748,5 +762,7 @@ protected:
 
 	int n_trigger_dropped; /**< Number of TRIGGER packet dropped */
 	int n_poll_dropped; /**< Number of POLL packet dropped */
+
+	int useAdaptiveTpoll; /**< True if an adaptive T_poll is used*/
 };
 #endif

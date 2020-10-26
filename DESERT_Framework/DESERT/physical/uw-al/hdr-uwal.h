@@ -77,15 +77,14 @@ typedef struct hdr_uwal {
 
 	// Fields to handle only locally (actually, this is the information to be
 	// sent over and retrieved from the channel ad modem payload...)
-	char
-			binPkt_[MAX_BIN_PKT_ARRAY_LENGTH]; /**< array to store binary data
-												  as encoded from or to be
-												  decoded to this NS-Miracle
-												  packet header (NOTE: this
-												  CANNOT be fragmented) and the
-												  active packers linked to
-												  packer. @see classes packer
-												  and uwmphy_modem */
+	char binPkt_[MAX_BIN_PKT_ARRAY_LENGTH]; /**< array to store binary data
+											   as encoded from or to be
+											   decoded to this NS-Miracle
+											   packet header (NOTE: this
+											   CANNOT be fragmented) and the
+											   active packers linked to
+											   packer. @see classes packer
+											   and uwmphy_modem */
 	uint32_t binPktLength_; /**< number of chars in binPkt_ to consider. */
 	uint32_t binHdrLength_; /**< number of chars in binPkt_ to consider as
 							   header. */

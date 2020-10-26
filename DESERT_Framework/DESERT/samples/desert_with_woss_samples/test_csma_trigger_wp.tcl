@@ -88,6 +88,7 @@ load libuwudp.so
 load libuwcbr.so
 load libuwcsmaalohatrigger.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 
 set ns [new Simulator]

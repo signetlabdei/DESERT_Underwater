@@ -84,9 +84,9 @@ class MdriverS2C_Evo_lowlev : public UWMdriver
 	ll_tx_state_t m_state_tx; /**< TX state to manage transmission methods*/
 	ll_rx_state_t m_state_rx; /**< RX state to manage reception methods*/
 
-	queue<std::string> queue_tx; /**< Queue used to buffer incoming strings
+	std::queue<std::string> queue_tx; /**< Queue used to buffer incoming strings
 															  for tx messages.*/
-	queue<std::string>
+	std::queue<std::string>
 			queue_rx; /**< Queue used to buffer incoming strings for
 														 rx messages.*/
 	int _gain; /**< Variable holding the Gain level of the low level driver*/

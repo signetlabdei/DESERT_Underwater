@@ -84,6 +84,7 @@ load libuwtdma.so
 load libuwinterference.so
 load libUwmStd.so
 load libUwmStdPhyBpskTracer.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 
 #############################

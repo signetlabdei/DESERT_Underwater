@@ -46,3 +46,4 @@ UW/AL/Packer set FRAME_OFFSET_Bits 16
 UW/AL/Packer set M_BIT_Bits 1
 UW/AL/Packer set DUMMY_CONTENT_Bits 256
 UW/AL/Packer set debug_ 0
+UW/AL/Packer set force_endTx 0

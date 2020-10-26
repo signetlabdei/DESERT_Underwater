@@ -44,7 +44,7 @@
 #define MIN_NOISE_PROBE_FREQ 3
 #define MIN_MULTIPATH_PROBE_FREQ 2
 
-using namespace std;
+
 
 /**
  *  Class that implements the interface between ns2/NS-Miracle and the S2C

@@ -109,10 +109,10 @@ UWMconnector::readFromModem()
 		msgModem tmp_ = queueMsg.front();
 		return_str = tmp_.msg_rx;
 		queueMsg.pop();
-		if (return_str.find("-") == string::npos &&
-				return_str.find("OK") == string::npos &&
-				return_str.find("INITATION NOISE") == string::npos &&
-				return_str.find("INITATION LISTEN") == string::npos) {
+		if (return_str.find("-") == std::string::npos &&
+				return_str.find("OK") == std::string::npos &&
+				return_str.find("INITATION NOISE") == std::string::npos &&
+				return_str.find("INITATION LISTEN") == std::string::npos) {
 			pmDriver->printOnLog(LOG_LEVEL_ERROR, "UWMCONNECTOR", return_str);
 		}
 	} else {

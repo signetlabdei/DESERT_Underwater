@@ -44,7 +44,7 @@
 #include <iostream>
 #include <map>
 
-using namespace std;
+
 
 typedef ::std::map<double, double> PdrLut;
 typedef PdrLut::iterator PdrLutIt;

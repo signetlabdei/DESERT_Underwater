@@ -86,6 +86,7 @@ load libuwstaticrouting.so
 load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
+load libuwphy_clmsgs.so
 load libuwpolling.so
 load libuwinterference.so
 load libuwphysical.so
@@ -127,7 +128,7 @@ if {$opt(bash_parameters)} {
 } else {
   set opt(rep_num)    1
   $rng seed [lindex $argv 0]
-  set opt(cbr_period) 100
+  set opt(cbr_period) 1
 }
 
 set opt(cbrpr) [expr int($opt(cbr_period))]
@@ -228,18 +229,25 @@ WOSS/Position/WayPoint set maxVerticalOrientation_    40.0
 
 
 
-Module/UW/POLLING/NODE set T_poll_            40
+Module/UW/POLLING/NODE set T_poll_guard_	  5 
 Module/UW/POLLING/NODE set backoff_tuner_     1
 Module/UW/POLLING/NODE set max_payload_       125
 Module/UW/POLLING/NODE set buffer_data_pkts_  50
 Module/UW/POLLING/NODE set Max_DATA_Pkts_TX_  50
+Module/UW/POLLING/NODE set useAdaptiveTpoll_   1
+Module/UW/POLLING/NODE set n_run                $opt(rep_num);#used for c++ rng
+Module/UW/POLLING/NODE set debug_			1
+
 
 Module/UW/POLLING/AUV set max_payload_        125
-Module/UW/POLLING/AUV set T_probe_            10
+Module/UW/POLLING/AUV set T_probe_guard_      2
 Module/UW/POLLING/AUV set T_min_              0.5
-Module/UW/POLLING/AUV set T_max_              5
+Module/UW/POLLING/AUV set T_max_              20
 Module/UW/POLLING/AUV set T_guard_            5
 Module/UW/POLLING/AUV set max_polled_node_    20
+Module/UW/POLLING/AUV set n_run                $opt(rep_num);#used for c++ rng
+Module/UW/POLLING/AUV set debug_			1
+
 
 
 ################################

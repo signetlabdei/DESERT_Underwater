@@ -41,6 +41,8 @@
 #include "uwApplication_cmn_header.h"
 #include "uwApplication_module.h"
 
+uint uwApplicationModule::MAX_READ_LEN = 64;
+
 static class uwApplicationModuleClass : public TclClass
 {
 public:
@@ -65,7 +67,29 @@ public:
 } class_module_uwapplicationmodule;
 
 uwApplicationModule::uwApplicationModule()
-	: chkTimerPeriod(this)
+	: servSockDescr(0)
+	, clnSockDescr(0)
+	, servAddr()
+	, clnAddr()
+	, servPort(0)
+	, queuePckReadTCP()
+	, queuePckReadUDP()
+	, out_log()
+	, logging(false)
+	, node_id(0)
+	, exp_id(0)
+	, debug_(0)
+	, PERIOD(5)
+	, poisson_traffic(0)
+	, payloadsize(16)
+	, port_num(55550)
+	, drop_out_of_order(0)
+	, dst_addr(0)
+	, chkTimerPeriod(this)
+	, socket_active(false)
+	, socket_protocol("")
+	, tcp_udp(-1)
+	, sn_check()
 	, uidcnt(0)
 	, txsn(1)
 	, rftt(0)
@@ -85,15 +109,9 @@ uwApplicationModule::uwApplicationModule()
 	, sumbytes(0)
 	, sumdt(0)
 	, hrsn(0)
-	, servSockDescr(0)
-	, servPort(0)
-	, tcp_udp(-1)
-	, logging(false)
-	, node_id(0)
-	, exp_id(0)
 {
 	bind("debug_", (int *) &debug_);
-	bind("period_", (int *) &PERIOD);
+	bind("period_", (double *) &PERIOD);
 	bind("node_ID_", (int *) &node_id);
 	bind("EXP_ID_", (int *) &exp_id);
 	bind("PoissonTraffic_", (int *) &poisson_traffic);
@@ -102,6 +120,7 @@ uwApplicationModule::uwApplicationModule()
 	bind("destPort_", (int *) &port_num);
 	bind("Socket_Port_", (int *) &servPort);
 	bind("drop_out_of_order_", (int *) &drop_out_of_order);
+	bind("max_read_length", (uint *) &uwApplicationModule::MAX_READ_LEN);
 
 	sn_check = new bool[USHRT_MAX];
 	for (int i = 0; i < USHRT_MAX; i++) {
@@ -269,7 +288,7 @@ uwApplicationModule::statistics(Packet *p)
 	esn = hrsn + 1; // Increase the expected sequence number
 
 	// Verify if the data packet is already processed.
-	if (!useDropOutOfOrder()) {
+	if (useDropOutOfOrder()) {
 		if (sn_check[uwApph->sn_ &
 					0x00ffffff]) { // Packet already processed: drop it
 			if (debug_ >= 0)
@@ -349,7 +368,7 @@ uwApplicationModule::statistics(Packet *p)
 	if (debug_ >= 0 && socket_active) {
 		std::cout << "[" << getEpoch() << "]::" << NOW
 				  << "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
-		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
+		for (int i = 0; i < uwApph->payload_size(); i++) {
 			cout << uwApph->payload_msg[i];
 		}
 	}
@@ -373,10 +392,18 @@ uwApplicationModule::statistics(Packet *p)
 	if (logging)
 		out_log << left << "[" << getEpoch() << "]::" << NOW
 				<< "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_ << endl;
-	if (logging && !withoutSocket())
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::PAYLOAD_RECEIVED_" << uwApph->payload_msg
-				<< endl;
+
+	if (logging && !withoutSocket()) {
+		out_log << left << "::" << NOW
+				<< "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
+		for (int i = 0; i < uwApph->payload_size(); i++) {
+			out_log << uwApph->payload_msg[i];
+		}
+		out_log << std::endl;
+	}
+	if (clnSockDescr) {
+		write(clnSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size());
+	}
 	Packet::free(p);
 } // end statistics method
 

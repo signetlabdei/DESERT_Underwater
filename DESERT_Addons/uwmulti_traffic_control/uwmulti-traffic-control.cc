@@ -66,32 +66,55 @@ UwMultiTrafficControl::UwMultiTrafficControl()
   debug_(0),
   up_map(),
   down_map(),
-  down_buffer()
+  down_buffer(),
+  buffer_feature_map()
 {
   bind("debug_", &debug_);
 }
 
 int UwMultiTrafficControl::command(int argc, const char*const* argv) 
 {
-  if (argc == 4) 
+  Tcl &tcl = Tcl::instance();
+  if (argc == 3)
+  {
+    if(strcasecmp(argv[1], "getDiscardedPacket") == 0)
+    {
+      tcl.resultf("%d", getDiscardedPacket(atoi(argv[2])));
+      return TCL_OK;
+    }
+  }
+  else if (argc == 4) 
   {
     if(strcasecmp(argv[1], "addUpLayer") == 0)
     {
       addUpLayerFromTag(atoi(argv[2]),argv[3]);
       return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "addLowLayer") == 0)
+    }
+    else if(strcasecmp(argv[1], "addLowLayer") == 0)
     {
       addLowLayerFromTag(atoi(argv[2]),argv[3],DEFAULT);
       return TCL_OK;
     }
-	}
+  }
   else if (argc == 5) 
   {
     if(strcasecmp(argv[1], "addLowLayer") == 0)
     {
       addLowLayerFromTag(atoi(argv[2]),argv[3],atoi(argv[4]));
       return TCL_OK;
+    } 
+    else if (strcasecmp(argv[1], "setBufferFeatures") == 0)
+    {
+      setBufferFeature(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]));
+      return TCL_OK;    
+    }
+  }
+  else if (argc == 6)
+  {
+    if (strcasecmp(argv[1], "setBufferFeatures") == 0)
+    {
+      setBufferFeature(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atof(argv[5]));
+      return TCL_OK;    
     }
   }
 
@@ -166,26 +189,63 @@ void UwMultiTrafficControl::recvFromUpperLayers(Packet *p)
 
 void UwMultiTrafficControl::insertInBuffer(Packet *p, int traffic) 
 {
+  BufferTrafficFeature::iterator it_feat = buffer_feature_map.find(traffic);
+  if (it_feat == buffer_feature_map.end()) {
+    std::cout << "UwMultiTrafficControl::insertInBuffer. ERROR. Buffer not "
+              << "configured. Traffic " << traffic << std::endl;
+    Packet::free(p);
+    return;
+  }
+
   DownTrafficBuffer::iterator it = down_buffer.find(traffic);
   if (it != down_buffer.end()) {
-    it->second->push(p);
-    if(debug_)
-      std::cout << NOW <<" UwMultiTrafficControl::insertInBuffer, traffic = "<< traffic << ", buffer size =" << it->second->size() << std::endl;
+    uint n_elem = it->second->size();
+    if (n_elem < it_feat->second.max_size) {
+      it->second->push(p);
+      if(debug_)
+        std::cout << NOW <<" UwMultiTrafficControl::insertInBuffer, traffic = "
+                  << traffic << ", buffer size =" << it->second->size() 
+                  << std::endl;
+    } else { 
+      incrPktLoss(traffic);
+      if (it_feat->second.behavior_buff == BufferType::CIRCULAR) { //circular buffer
+        if (debug_)
+          std::cout << NOW << "UwMultiTrafficControl::insertInBuffer, traffic = "
+                    << traffic << ", circular buffer full. Discard first element"
+                    << std::endl;
+        it->second->pop();
+        it->second->push(p);
+      } else {
+        if (debug_)
+          std::cout << NOW << "UwMultiTrafficControl::insertInBuffer, traffic = "
+                    << traffic << ", buffer full. Discard incoming packet "
+                    << std::endl;
+        Packet::free(p);          
+      }
+    }    
   }
   else {
     std::queue<Packet*> *q = new std::queue<Packet*>;
     q->push(p);
     down_buffer[traffic] = q;
     if(debug_)
-      std::cout << NOW <<" UwMultiTrafficControl::insertInBuffer, traffic = "<< traffic << ", buffer size =" << 1 << std::endl;
+      std::cout << NOW <<" UwMultiTrafficControl::insertInBuffer, traffic = "
+                << traffic << ", buffer size =" << 1 << std::endl;
   }
 }
 
 void UwMultiTrafficControl::manageBuffer(int traffic)
 {
+  BufferTrafficFeature::iterator it_feat = buffer_feature_map.find(traffic);
+  if (it_feat == buffer_feature_map.end()) {
+    std::cout << "UwMultiTrafficControl::insertInBuffer. ERROR. Buffer not "
+              << "configured. Traffic " << traffic << std::endl;
+    return;
+  }
   DownTrafficBuffer::iterator it = down_buffer.find(traffic);
   if (it != down_buffer.end()) {
-    sendDown(getBestLowerLayer(traffic),removeFromBuffer(traffic));
+    sendDown(getBestLowerLayer(traffic),removeFromBuffer(traffic),
+        it_feat->second.getUpdatedDelay(NOW));
     if(debug_)
       std::cout << NOW << "UwMultiTrafficControl::manageBuffer(" << traffic << ")" << std::endl;
   }
@@ -277,5 +337,43 @@ void UwMultiTrafficControl::eraseTraffic2Up(int traffic)
   UpTrafficMap::iterator it = up_map.find(traffic); 
   if (it != up_map.end()) {
     up_map.erase(traffic);
+  }
+}
+
+void UwMultiTrafficControl::setBufferFeature(int traffic_id, int max_size, 
+    bool is_circular, double send_down_delay) 
+{
+  BufferType::BufferBehavior behav = is_circular ? BufferType::CIRCULAR :
+      BufferType::DISCARD_INCOMING;
+	BufferType buff_type = BufferType(max_size, behav, send_down_delay);
+  buffer_feature_map.insert(std::make_pair(traffic_id, buff_type));
+  
+  if (debug_)
+    std::cout << "Inserted buffer features for traffic " << traffic_id 
+              << " with max size " << max_size << " Is circular " 
+              << is_circular << std::endl;
+}
+
+void UwMultiTrafficControl::incrPktLoss(int traffic_id)
+{
+  BufferTrafficFeature::iterator it = buffer_feature_map.find(traffic_id);
+  if (it != buffer_feature_map.end()) {
+    it->second.pkts_lost++;
+  } else {
+    std::cout << "UwMultiTrafficControl::incrPktLoss. ERROR. Buffer not "
+              << "configured. Traffic " << traffic_id << std::endl;
+    return;
+  }
+}
+
+uint UwMultiTrafficControl::getDiscardedPacket(int traffic_id) const
+{
+	BufferTrafficFeature::const_iterator it = buffer_feature_map.find(traffic_id);
+  if (it == buffer_feature_map.end()) {
+    std::cout << "UwMultiTrafficControl::incrPktLoss. ERROR. Buffer not "
+              << "configured. Traffic " << traffic_id << std::endl;
+    return 0;
+  }	else {
+    return it->second.pkts_lost;
   }
 }

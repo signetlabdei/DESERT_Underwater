@@ -39,15 +39,15 @@ print_desert_logo() {
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "fuction_name is: print_desert_logo()"
     fi
-    echo "__________________________________________________________________________________________"
-    echo " _____                      _     _    _           _                         _            "
-    echo "|  __ \                    | |   | |  | |         | |                       | |           "
-    echo "| |  | | ___  ___  ___ _ __| |_  | |  | |_ __   __| | ___ _ ____      ____ _| |_ ___ _ __ "
-    echo "| |  | |/ _ \\/ __|/ _ \ '__| __| | |  | | '_ \\ / _\` |/ _ \\ '__\\ \\ /\\ / / _\` | __/ _ \\ '__|"
-    echo "| |__| |  __/\\__ \\  __/ |  | |_  | |__| | | | | (_| |  __/ |   \\ V  V / (_| | ||  __/ |   "
-    echo "|_____/ \\___||___/\\___|_|   \\__|  \\____/|_| |_|\\__,_|\\___|_|    \\_/\\_/ \\__,_|\\__\\___|_|   "
-    echo "_____\033[0m\033[0;30;49mCopyright (c) 2014 Regents of the SIGNET lab, University of Padova  (ver. 2.0)\033[0m_____"
-    echo "\n"
+    printf "__________________________________________________________________________________________\n"
+    printf " _____                      _     _    _           _                         _            \n"
+    printf "|  __ \                    | |   | |  | |         | |                       | |           \n"
+    printf "| |  | | ___  ___  ___ _ __| |_  | |  | |_ __   __| | ___ _ ____      ____ _| |_ ___ _ __ \n"
+    printf "| |  | |/ _ \\/ __|/ _ \ '__| __| | |  | | '_ \\ / _\` |/ _ \\ '__\\ \\ /\\ / / _\` | __/ _ \\ '__|\n"
+    printf "| |__| |  __/\\__ \\  __/ |  | |_  | |__| | | | | (_| |  __/ |   \\ V  V / (_| | ||  __/ |   \n"
+    printf "|_____/ \\___||___/\\___|_|   \\__|  \\____/|_| |_|\\__,_|\\___|_|    \\_/\\_/ \\__,_|\\__\\___|_|   \n"
+    printf "_____Copyright (c) 2014 Regents of the SIGNET lab, University of Padova  (ver. 2.0)_____\n"
+    printf "\n"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "return of print_desert_logo(): ${output}"
         debug__print_screen_L1 "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"
@@ -67,86 +67,86 @@ read_input() {
         debug__print_screen_L1 "${1} = ${output}"
         debug__print_screen_L1 "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"
     fi
-    #echo ${output}
+    #printf '%s\n' "${output}"
     return 0
 }
 # #
 # ###
 info_L0() {
-    echo "\033[0m\033[1;34;40m$*\033[0m"
+    printf "\033[0m\033[1;34;40m$*\033[0m\n"
     return 0
 }
 
 info_L1() {
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[1;34m* $*\033[0m"
+    printf "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[1;34m* $*\033[0m\n"
     return 0
 }
 
 info_L2() {
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[0;35m** $*\033[0m"
+    printf "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[0;35m** $*\033[0m\n"
     return 0
 }
 
 ok_L1() {
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[0;32m** $*\033[0m"
+    printf "[$(date +"%Y-%m-%d %H:%M:%S")] \033[0m\033[0;32m** $*\033[0m\n"
     return 0
 }
 
 err_L1() {
-    echo "\033[0m\033[1;31mERROR: $*\033[0m"
+    printf "\033[0m\033[1;31mERROR: $*\033[0m\n"
     return 0
 }
 
 warn_L1() {
-    echo "\033[0m\033[1;33;49mWARNING: $*\033[0m"
+    printf "\033[0m\033[1;33;49mWARNING: $*\033[0m\n"
     return 0
 }
 
 warn_L2() {
-    echo "\033[0m\033[0;33;49mWARNING: $*\033[0m"
+    printf "\033[0m\033[0;33;49mWARNING: $*\033[0m\n"
     return 0
 }
 # #
 # ###
 log_L1() {
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")] ${1}" >> ${2}
+    printf '%s\n' "[$(date +"%Y-%m-%d %H:%M:%S")] $1\n" >> ${2}
     return 0
 }
 
 log_L2() {
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")]     ${1}" >> ${2}
+    printf '%s\n' "[$(date +"%Y-%m-%d %H:%M:%S")]     $1\n" >> ${2}
     return 0
 }
 
 logERR() {
-    echo "                     ----------------------" >> ${2}
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")]>>> ERROR: ${1}" >> ${2}
-    echo "                     ----------------------" >> ${2}
+    printf '%s\n' "                     ----------------------" >> ${2}
+    printf '%s\n' "[$(date +"%Y-%m-%d %H:%M:%S")]>>> ERROR: $1\n" >> ${2}
+    printf '%s\n' "                     ----------------------" >> ${2}
     return 0
 }
 
 logWARN_L1() {
-    echo "                     ------------------------" >> ${2}
-    echo "[$(date +"%Y-%m-%d %H:%M:%S")]>>> WARNING: ${1}" >> ${2}
-    echo "                     ------------------------" >> ${2}
+    printf '%s\n' "                     ------------------------" >> ${2}
+    printf '%s\n' "[$(date +"%Y-%m-%d %H:%M:%S")]>>> WARNING: $1\n" >> ${2}
+    printf '%s\n' "                     ------------------------" >> ${2}
     return 0
 }
 # #
 
 wizard__print_L1() {
-    echo "\033[0m\033[0;34;50m$*\033[0m"
+    printf "\033[0m\033[0;34;50m$*\033[0m\n"
 }
 
 wizard__print_L2() {
-    echo "\033[0m\033[0;35;49m- $*\033[0m"
+    printf "\033[0m\033[0;35;49m- $*\033[0m\n"
 }
 
 wizard__print_L3() {
-    echo "\033[0m\033[0;33;49m* $*\033[0m"
+    printf "\033[0m\033[0;33;49m* $*\033[0m\n"
 }
 
 wizard__print_L4() {
-    echo "\033[0m\033[0;33;49m$*\033[0m"
+    printf "\033[0m\033[0;33;49m$*\033[0m\n"
 }
 
 wizard_conf_list() {
@@ -156,19 +156,19 @@ wizard_conf_list() {
 }
 
 wizard_conf_target() {
-    echo ""
+    printf '\n' 
     wizard_conf_list ".wizard.target.list"
-    echo  -n "You can add (a) new targets, remove (r) someone of them or skip (s). "
+    printf '%s' "You can add (a) new targets, remove (r) someone of them or skip (s). "
     tOpt=""
     read_input "tOpt"
     if [ ${tOpt} = "s" ]; then
         return 0
     fi
-    echo "Enter all TARGETs to be updated (separate entries with a space)"
+    printf '%s\n' "Enter all TARGETs to be updated (separate entries with a space)"
     tList=""
     read_input "tList"
     wizard_conf_target_update ${tOpt} "${tList}"
-    echo -n "Is the wizard configuration concluded? (y/n)"
+    printf '%s' "Is the wizard configuration concluded? (y/n)"
     tOpt2=""
     read_input "tOpt2"
     case "${tOpt2}" in
@@ -188,7 +188,7 @@ wizard_conf_target_update() {
     case ${1} in
         "a")
             for target in ${2}; do
-                echo "${target}" >> ${ROOT_DESERT}/.wizard.target.list
+                printf '%s\n' "${target}" >> ${ROOT_DESERT}/.wizard.target.list
             done
             ;;
         "r")
@@ -202,19 +202,19 @@ wizard_conf_target_update() {
 }
 
 wizard_conf_addon() {
-    echo ""
+    printf "\n"
     wizard_conf_list ".addon.list"
-    echo -n  "You can add (a) new addons, remove (r) someone of them or skip (s). "
+    printf '%s\n' "You can add (a) new addons, remove (r) someone of them or skip (s). "
     aOpt=""
     read_input "aOpt"
     if [ ${aOpt} = "s" ]; then
         return 0
     fi
-    echo "Enter all ADDONs to be updated (separate entries with a space)"
+    printf '%s\n' "Enter all ADDONs to be updated (separate entries with a space)"
     aList=""
     read_input "aList"
     wizard_conf_addon_update ${aOpt} "${aList}"
-    echo -n "Is the wizard configuration concluded? (y/n)"
+    printf '%s\n' "Is the wizard configuration concluded? (y/n)"
     aOpt2=""
     read_input "aOpt2"
     case "${aOpt2}" in
@@ -235,7 +235,7 @@ wizard_conf_addon_update() {
     case ${1} in
         "a")
             for addon in ${2}; do
-                echo "${addon}" >> ${ROOT_DESERT}/.addon.list
+                printf '%s\n' "${addon}" >> ${ROOT_DESERT}/.addon.list
             done
             ;;
         "r")
@@ -257,11 +257,11 @@ wizard_conf() {
 
 wizard_function_target() {
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     wizard__print_L2 "Setting of the TARGET:"
     wizard__print_L3 "Available TARGETs:"
     wizard__print_L4 "$(cat ${ROOT_DESERT}/.wizard.target.list | sed -e 's/\(.\)/*  \1/')"
-    echo -n "TARGET"
+    printf "TARGET"
     TARGET=""
     TARGETLIST=""
     INDEX=0
@@ -286,17 +286,17 @@ wizard_function_target() {
     _TARGET=1
     log_L1 "_TARGET=${_TARGET}" install.log
     log_L2 "TARGET=${TARGET}" install.log
-    echo -n "--target ${TARGET} " >> ${INSTALL_CONF}
+    printf '%s\n' "--target ${TARGET} " >> ${INSTALL_CONF}
 }
 
 wizard_function_instMode() {
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     wizard__print_L2 "Setting of the INSTALLATION MODE:"
     wizard__print_L3 "Available INSTALLATION MODEs:"
     wizard__print_L3 " development   (development mode)"
     wizard__print_L3 " release       (standard mode - keeps only the bin/ and lib/ folders)"
-    echo -n "Installation Mode"
+    printf "Installation Mode"
     INST_MODE=""
     read_input "INST_MODE"
     if [ ! "${INST_MODE}" = "development" ] && [ ! "${INST_MODE}" = "release" ]; then
@@ -306,17 +306,17 @@ wizard_function_instMode() {
     _INST_MODE=1
     log_L1 "_INST_MODE=${_INST_MODE}" install.log
     log_L2 "INST_MODE=${INST_MODE}" install.log
-    echo -n "--inst_mode ${INST_MODE} " >> ${INSTALL_CONF}
+    printf '%s\n' "--inst_mode ${INST_MODE} " >> ${INSTALL_CONF}
 }
 
 wizard_function_destFolder() {
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     DESERT_DEF_PATH=$(cd $(pwd)/../ && pwd)/DESERT_buildCopy_${TARGET}
     wizard__print_L2 "Setting of the DESTINATION FOLDER"
     wizard__print_L3 " the default path is:"
     wizard__print_L3 " ${DESERT_DEF_PATH}"
-    echo -n "Use this path as the destination folder for this installation? [Y/n] (Y, by default)"
+    printf '%s\n' "Use this path as the destination folder for this installation? [Y/n] (Y, by default)"
     dest_folder_requist=""
     read_input "dest_folder_requist"
     case "${dest_folder_requist}" in
@@ -324,7 +324,7 @@ wizard_function_destFolder() {
             DEST_FOLDER=${DESERT_DEF_PATH}
             ;;
         [Nn]|[Nn]o)
-            echo -n "please enter your desired installation path"
+            printf '%s\n' "please enter your desired installation path"
             DEST_FOLDER=""
             read_input "DEST_FOLDER"
             ;;
@@ -339,12 +339,12 @@ wizard_function_destFolder() {
     _DEST_FOLDER=1
     log_L1 "_DEST_FOLDER=${_DEST_FOLDER}" install.log
     log_L2 "DEST_FOLDER=${DEST_FOLDER}" install.log
-    echo -n "--dest_folder ${DEST_FOLDER} " >> ${INSTALL_CONF}
+    printf '%s\n' "--dest_folder ${DEST_FOLDER} " >> ${INSTALL_CONF}
 }
 
 wizard_function_wossRequire() {
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     wizard__print_L2 "Setting of the WOSS_${WOSS_VERSION} libraries installation."
     wizard__print_L3 "WARNING: To install the WOSS libraries, you need the gfortran compiler "
     wizard__print_L3 "         to be available on your OS."
@@ -353,17 +353,17 @@ wizard_function_wossRequire() {
     wizard__print_L3 "WARNING: If you want to use enviromental databases for SSP, bathymetry,"
     wizard__print_L3 "         sediments, as well as for the characteristics of electro-acoustic transducers"
     wizard__print_L3 "         You can download the sediment and SSP databases at the following link:"
-    wizard__print_L3 "         http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.2.0.tar.gz"
+    wizard__print_L3 "         http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz"
     wizard__print_L3 "         Please note that we cannot redistribute the GEBCO bathymetry database"
     wizard__print_L3 "         You can download the database by registering on the GEBCO web site at:"
     wizard__print_L3 "         http://http://www.gebco.net/"
-    echo -n "Do you need the WOSS_${WOSS_VERSION} libraries (N, by default)?"
+    printf "Do you need the WOSS_${WOSS_VERSION} libraries (N, by default)?"
     woss_require=""
     read_input "woss_require"
     case "${woss_require}" in
         [Yy]|[Yy]es)
             WITHWOSS=1
-            echo -n "--with-woss " >> ${INSTALL_CONF}
+            printf '%s\n' "--with-woss " >> ${INSTALL_CONF}
             ;;
         [Nn]|[Nn]o)
             WITHWOSS=0
@@ -384,11 +384,11 @@ wizard_function_wossRequire() {
 
 wizard_function_customPar() {
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     wizard__print_L2 "Setting of the ${TARGET} CUSTOM PARAMETERs (OPTIONAL)"
     wizard__print_L3 " if you are using a custom TARGET_installer which needs additional parameters,"
     wizard__print_L3 " you can enter these parameters here."
-    echo -n "Write your additional parameters"
+    printf "Write your additional parameters"
     CUSTOM_PAR=""
     read_input "CUSTOM_PAR"
     _CUSTOM_PAR=1
@@ -399,7 +399,7 @@ wizard_function_customPar() {
             return 0
             ;;
         *)
-            echo -n "--custom_par \"${CUSTOM_PAR}\" " >> ${INSTALL_CONF}
+            printf '%s\n' "--custom_par \"${CUSTOM_PAR}\" " >> ${INSTALL_CONF}
             ;;
     esac
 }
@@ -407,7 +407,7 @@ wizard_function_customPar() {
 wizard_function_addons(){
     #TODO replace the case statement with a single call to: wizard__print_L4
     sleep ${SLEEP05}
-    echo ""
+    printf "\n"
     wizard__print_L2 "Setting of the ADDONs (OPTIONAL)"
     wizard__print_L3 "list of the available ADDONs:"
     case "${OWNER_PERMISSION}" in
@@ -419,7 +419,7 @@ wizard_function_addons(){
             ;;
     esac
 
-    echo -n "Enter all ADDONs to be installed (separate entries with a space)"
+    printf "Enter all ADDONs to be installed (separate entries with a space)"
     ADDONS=""
     read_input "ADDONS"
     _ADDONS=1
@@ -434,18 +434,18 @@ wizard_function_addons(){
                 "0")
                     ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | grep -v "wossgmmob3D" | grep -v "wossgroupmob3D" | awk '{printf "%s ",$0} END {print ""}')
                     ADDONS=${ALL_ADDONS}
-                    echo -n "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                    printf '%s\n' "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
                     ;;
 
                 "1")
                     ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | awk '{printf "%s ",$0} END {print ""}')
                     ADDONS=${ALL_ADDONS}
-                    echo -n "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                    printf '%s\n' "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
                     ;;
             esac
             ;;
         *)
-            echo -n "--addons \"${ADDONS}\" " >> ${INSTALL_CONF}
+            printf '%s\n' "--addons \"${ADDONS}\" " >> ${INSTALL_CONF}
             ;;
     esac
 }
@@ -466,46 +466,46 @@ install__print_help() {
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "fuction_name is: install__print_help()"
     fi
-    echo "\033[1mNAME\033[0m"
-    echo "       install.sh - installs the Desert Underwater framework"
-    echo ""
-    echo "\033[1mSYNOPSIS\033[0m"
-    echo "       \033[1m./install.sh\033[0m [OPTION]"
-    echo ""
-    echo "\033[1mDESCRIPTION\033[0m"
-    echo "       \033[1m-h, --help\033[0m"
-    echo "              display this help and exit"
-    echo ""
-    echo "       \033[1m--wizard\033[0m"
-    echo "              install the Desert Framework using a step by step \"wizard\" mode" 
-    echo ""
-    echo "       \033[1m--with-woss\033[0m"
-    echo "              install also the WOSS framework when installing Desert"
-    echo ""
-    echo "       \033[1m--without-woss\033[0m"
-    echo "              install the Desert Framework without the WOSS framework"
-    echo ""
-    echo "       \033[1m--target <YOUR_TARGET>\033[0m"
-    echo "              install Desert for YOUR_TARGET"
-    echo ""
-    echo "       \033[1m--inst_mode <development|release> \033[0m"
-    echo "              install Desert in development or release mode"
-    echo ""
-    echo "       \033[1m--dest_folder <YOUR_PATH>\033[0m"
-    echo "              set YOUR_PATH as the installation path"
-    echo ""
-    echo "       \033[1m--custom_par <YOUR_PARAMETERS>\033[0m"
-    echo "              enters additional parameters for a custom installer (use \"...\" to group multiple parameters)"
-    echo ""
-    echo "       \033[1m--addons <ADDON_LIST>\033[0m"
-    echo "              specify THE LISt of ADDONs to be installed (use \"...\" to group multiple ADDONs)"
-    echo ""
-    echo "\033[1mSEE ALSO\033[0m"
-    echo "            home-page: http://nautilus.dei.unipd.it/desert-underwater"
-    echo "         mailing-list: desert-usergroup@dei.unipd.it"
-    echo "                  git:"
-    echo "   desert-doxygen-doc: http://telecom.dei.unipd.it/ns/desert/DESERT_HTML_doxygen_doc/"
-    echo ""
+    printf '%s\n'  "\033[1mNAME\033[0m"
+    printf '%s\n'  "       install.sh - installs the Desert Underwater framework"
+    printf "\n"
+    printf '%s\n'  "\033[1mSYNOPSIS\033[0m"
+    printf '%s\n'  "       \033[1m./install.sh\033[0m [OPTION]"
+    printf "\n"
+    printf '%s\n'  "\033[1mDESCRIPTION\033[0m"
+    printf '%s\n'  "       \033[1m-h, --help\033[0m"
+    printf '%s\n'  "              display this help and exit"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--wizard\033[0m"
+    printf '%s\n'  "              install the Desert Framework using a step by step \"wizard\" mode" 
+    printf "\n"
+    printf '%s\n'  "       \033[1m--with-woss\033[0m"
+    printf '%s\n'  "              install also the WOSS framework when installing Desert"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--without-woss\033[0m"
+    printf '%s\n'  "              install the Desert Framework without the WOSS framework"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--target <YOUR_TARGET>\033[0m"
+    printf '%s\n'  "              install Desert for YOUR_TARGET"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--inst_mode <development|release> \033[0m"
+    printf '%s\n'  "              install Desert in development or release mode"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--dest_folder <YOUR_PATH>\033[0m"
+    printf '%s\n'  "              set YOUR_PATH as the installation path"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--custom_par <YOUR_PARAMETERS>\033[0m"
+    printf '%s\n'  "              enters additional parameters for a custom installer (use \"...\" to group multiple parameters)"
+    printf '%s\n'  ""
+    printf '%s\n'  "       \033[1m--addons <ADDON_LIST>\033[0m"
+    printf '%s\n'  "              specify THE LISt of ADDONs to be installed (use \"...\" to group multiple ADDONs)"
+    printf "\n"
+    printf '%s\n'  "\033[1mSEE ALSO\033[0m"
+    printf '%s\n'  "            home-page: http://nautilus.dei.unipd.it/desert-underwater"
+    printf '%s\n'  "         mailing-list: desert-usergroup@dei.unipd.it"
+    printf '%s\n'  "                  git:"
+    printf '%s\n'  "   desert-doxygen-doc: http://telecom.dei.unipd.it/ns/desert/DESERT_HTML_doxygen_doc/"
+    printf "\n"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "return of install__print_help(): ${output}"
         debug__print_screen_L1 "¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯"
@@ -532,6 +532,7 @@ unpack_desertframework() {
                  ${TCLCL_TAR_FILE}     \
                  ${NS_TAR_FILE}        \
                  ${NSMIRACLE_TAR_FILE} \
+                 ${HDF5_TAR_FILE}      \
                  ${BELLHOP_TAR_FILE}   \
                  ${NETCDF_TAR_FILE}    \
                  ${NETCDFCXX_TAR_FILE} \
@@ -649,15 +650,15 @@ check_pktInstallation () {
                 rm -rf .installed.check
                 ;;
             [Nn]|[Nn]o)
-                continue
+                return 1
                 ;;
             "")
-                continue
+                return 1
                 ;;
             *)
                 warn_L2 "Input ${TMP_checkPKT} not valid."
                 warn_L2 "THE CURRENT PACKAGE WILL NOT BE REINSTALLED."
-                continue
+                return 1
                 ;;
         esac
     fi
@@ -696,11 +697,13 @@ handle_package() {
                 cd ${BUILD_HOST}/${package_DIR}
                 check_pktInstallation ${package_DIR}
                 # exec the following commands in a subshell
-                (
-                    currentBuildLog=${BUILD_HOST}
-                    ARCH=$HOST
-                    build_$2 host
-                )
+                if [ "$?" -ne "1" ]; then
+                    (
+                        currentBuildLog=${BUILD_HOST}
+                        ARCH=$HOST
+                        build_$2 host
+                    )
+                fi
                 if [ $? -ne 0 ]; then
                     err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
                     exit 1
@@ -721,11 +724,13 @@ handle_package() {
                 cd ${BUILD_TARGET}/${package_DIR}
                 check_pktInstallation ${package_DIR}
                 # exec the following commands in a subshell
-                (
-                    currentBuildLog=${BUILD_TARGET}
-                    . $CROSS_ENV_FILE
-                    build_$2 target
-                )
+                if [ "$?" -ne "1" ]; then
+                    (
+                        currentBuildLog=${BUILD_TARGET}
+                        . $CROSS_ENV_FILE
+                        build_$2 target
+                    )
+                fi
                 if [ $? -ne 0 ]; then
                     err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
                     exit 1
@@ -761,11 +766,13 @@ handle_desert_ADDON() {
                 cd ${BUILD_HOST}/DESERT_ADDON/${2}
                 check_pktInstallation ${2}
                 # exec the following commands in a subshell
-                (
-                    currentBuildLog=${BUILD_HOST}
-                    ARCH=$HOST
-                    build_DESERT_addon $2 host
-                )
+                if [ "$?" -ne "1" ]; then
+                    (
+                        currentBuildLog=${BUILD_HOST}
+                        ARCH=$HOST
+                        build_DESERT_addon $2 host
+                    )
+                fi
                 if [ $? -ne 0 ]; then
                     err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
                     exit 1
@@ -785,11 +792,13 @@ handle_desert_ADDON() {
                 cd ${BUILD_TARGET}/DESERT_ADDON/${2}
                 check_pktInstallation ${2}
                 # exec the following commands in a subshell
-                (
-                    currentBuildLog=${BUILD_TARGET}
-                    . $CROSS_ENV_FILE
-                    build_DESERT_addon $2 target
-                )
+                if [ "$?" -ne "1" ]; then
+                    (
+                        currentBuildLog=${BUILD_TARGET}
+                        . $CROSS_ENV_FILE
+                        build_DESERT_addon $2 target
+                    )
+                fi
                 if [ $? -ne 0 ]; then
                     err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
                     exit 1
@@ -821,8 +830,8 @@ after_building() {
             (
                 cd ${DEST_FOLDER}
                 touch environment
-                echo "export PATH=${DEST_FOLDER}/bin:\${PATH}" > environment
-                echo "export LD_LIBRARY_PATH=${DEST_FOLDER}/lib:\${LD_LIBRARY_PATH}" >> environment
+                printf "export PATH=${DEST_FOLDER}/bin:\${PATH}\n" > environment
+                printf "export LD_LIBRARY_PATH=${DEST_FOLDER}/lib:\${LD_LIBRARY_PATH}\n" >> environment
             )
             log_L2 "[after_building]: the environment file has been created" ${INSTALL_LOG}
             continue
@@ -833,40 +842,40 @@ after_building() {
                 MAKE_ENV="make_environment.sh"
                 touch ${MAKE_ENV}
                 chmod +x ${MAKE_ENV}
-                echo "#!/bin/sh" > make_environment.sh
-                echo "#" >> make_environment.sh
-                echo "# Generated by ${DESERT_DIR} ${DESERT_VERSION} installation tool" >> make_environment.sh
-                echo "#" >> make_environment.sh
-                echo "# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova." >> make_environment.sh
-                echo "# All rights reserved." >> make_environment.sh
-                echo "#" >> make_environment.sh
-                echo "# Redistribution and use in source and binary forms, with or without" >> make_environment.sh
-                echo "# modification, are permitted provided that the following conditions" >> make_environment.sh
-                echo "# are met:" >> make_environment.sh
-                echo "# 1. Redistributions of source code must retain the above copyright" >> make_environment.sh
-                echo "#    notice, this list of conditions and the following disclaimer." >> make_environment.sh
-                echo "# 2. Redistributions in binary form must reproduce the above copyright" >> make_environment.sh
-                echo "#    notice, this list of conditions and the following disclaimer in the" >> make_environment.sh
-                echo "#    documentation and/or other materials provided with the distribution." >> make_environment.sh
-                echo "# 3. Neither the name of the University of Padova (SIGNET lab) nor the" >> make_environment.sh
-                echo "#    names of its contributors may be used to endorse or promote products" >> make_environment.sh
-                echo "#    derived from this software without specific prior written permission." >> make_environment.sh
-                echo "#" >> make_environment.sh
-                echo "# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS" >> make_environment.sh
-                echo "# 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED" >> make_environment.sh
-                echo "# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR" >> make_environment.sh
-                echo "# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR" >> make_environment.sh
-                echo "# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL," >> make_environment.sh
-                echo "# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO," >> make_environment.sh
-                echo "# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;" >> make_environment.sh
-                echo "# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY," >> make_environment.sh
-                echo "# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR" >> make_environment.sh
-                echo "# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF" >> make_environment.sh
-                echo "# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." >> make_environment.sh
-                echo "" >> make_environment.sh
-                echo "touch environment" >> make_environment.sh
-                echo 'echo "export PATH=$(pwd)/bin:\${PATH}" > environment' >> make_environment.sh
-                echo 'echo "export LD_LIBRARY_PATH=$(pwd)/lib:\${LD_LIBRARY_PATH}" >> environment' >> make_environment.sh
+                printf "#!/bin/sh\n" > make_environment.sh
+                printf "#\n" >> make_environment.sh
+                printf "# Generated by ${DESERT_DIR} ${DESERT_VERSION} installation tool\n" >> make_environment.sh
+                printf "#\n" >> make_environment.sh
+                printf "# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.\n" >> make_environment.sh
+                printf "# All rights reserved.\n" >> make_environment.sh
+                printf "#\n" >> make_environment.sh
+                printf "# Redistribution and use in source and binary forms, with or without\n" >> make_environment.sh
+                printf "# modification, are permitted provided that the following conditions\n" >> make_environment.sh
+                printf "# are met:\n" >> make_environment.sh
+                printf "# 1. Redistributions of source code must retain the above copyright\n" >> make_environment.sh
+                printf "#    notice, this list of conditions and the following disclaimer.\n" >> make_environment.sh
+                printf "# 2. Redistributions in binary form must reproduce the above copyright\n" >> make_environment.sh
+                printf "#    notice, this list of conditions and the following disclaimer in the\n" >> make_environment.sh
+                printf "#    documentation and/or other materials provided with the distribution.\n" >> make_environment.sh
+                printf "# 3. Neither the name of the University of Padova (SIGNET lab) nor the\n" >> make_environment.sh
+                printf "#    names of its contributors may be used to endorse or promote products\n" >> make_environment.sh
+                printf "#    derived from this software without specific prior written permission.\n" >> make_environment.sh
+                printf "#\n" >> make_environment.sh
+                printf "# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n" >> make_environment.sh
+                printf "# 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED\n" >> make_environment.sh
+                printf "# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n" >> make_environment.sh
+                printf "# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR\n" >> make_environment.sh
+                printf "# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n" >> make_environment.sh
+                printf "# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n" >> make_environment.sh
+                printf "# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;\n" >> make_environment.sh
+                printf "# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,\n" >> make_environment.sh
+                printf "# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR\n" >> make_environment.sh
+                printf "# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF\n" >> make_environment.sh
+                printf "# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n" >> make_environment.sh
+                printf "\n" >> make_environment.sh
+                printf "touch environment\n" >> make_environment.sh
+                printf 'printf "export PATH=$(pwd)/bin:\${PATH}\n" > environment' >> make_environment.sh
+                printf 'printf "export LD_LIBRARY_PATH=$(pwd)/lib:\${LD_LIBRARY_PATH}\n" >> environment' >> make_environment.sh
             )
             log_L2 "[after_building]: release mode: removing the BUILD FOLDER" ${INSTALL_LOG}
             rm_build_folder
@@ -880,33 +889,33 @@ after_building() {
 
     log_L1 "THE INSTALLATION PROCEDURE HAS BEEN COMPLETED" ${INSTALL_LOG}
     info_L1 "THE INSTALLATION PROCEDURE HAS BEEN COMPLETED"
-    echo ""
-    echo "------------------------------------------------------------------------------"
-    echo " THE DESTINATION FOLDER IS:"
-    echo "\n  ${DEST_FOLDER}\n"
-    echo " WARNING: to use Desert and its dependencies (ns, ns-miracle, etc.) you must"
-    echo "          update your environment variables."
-    echo "          To do so, go to the folder above and run the following command"
-    echo "          BEFORE STARTING ANY TCL SCRIPTS:" 
+    printf "\n"
+    printf '%s\n'  "------------------------------------------------------------------------------\n"
+    printf '%s\n'  " THE DESTINATION FOLDER IS:\n"
+    printf '%s\n'  "\n  ${DEST_FOLDER}\n"
+    printf '%s\n'  " WARNING: to use Desert and its dependencies (ns, ns-miracle, etc.) you must\n"
+    printf '%s\n'  "          update your environment variables.\n"
+    printf '%s\n'  "          To do so, go to the folder above and run the following command\n"
+    printf '%s\n'  "          BEFORE STARTING ANY TCL SCRIPTS:\n" 
     case "${INST_MODE}" in
         "development")
-            echo "\n          $ source environment"
+            printf '%s\n'  "\n          $ source ${DEST_FOLDER}/environment\n"
             ;;
         "release")
-            echo "\n          $ ./make_environment.sh"
-            echo "\n          then"
-            echo "\n          $ source environment"
+            printf '%s\n'  "\n          $ ${DEST_FOLDER}/make_environment.sh\n"
+            printf '%s\n'  "\n          then"
+            printf '%s\n'  "\n          $ source ${DEST_FOLDER}/environment\n"
             ;;
         *)
             err_L1 "FATAL ERROR during the installation procedure. INST_MODE = ${INST_MODE} is NOT CORRECT!!!"
             exit 1
             ;;
     esac
-    echo ""
-    echo "   desert-doxygen-doc: http://telecom.dei.unipd.it/ns/desert/DESERT_HTML_doxygen_doc/"
-    echo ""
-    echo " THANK YOU FOR INSTALLING DESERT UNDERWATER."
-    echo "------------------------------------------------------------------------------"
+    printf "\n"
+    printf "   desert-doxygen-doc: http://telecom.dei.unipd.it/ns/desert/DESERT_HTML_doxygen_doc/\n"
+    printf "\n"
+    printf " THANK YOU FOR INSTALLING DESERT UNDERWATER.\n"
+    printf '%s\n'  "------------------------------------------------------------------------------\n"
 }
 
 rm_build_folder(){
@@ -929,7 +938,7 @@ rm_build_folder(){
 
 #-DEBUG FUNCTION---------------------------------------------------------------
 debug__print_screen_L1() {
-    echo "\033[40m\033[37m[DEBUG] $* \033[0m"
+    printf "\033[40m\033[37m[DEBUG] $* \033[0m\n"
     return 0
 }
 

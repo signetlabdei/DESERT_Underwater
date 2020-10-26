@@ -51,7 +51,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-using namespace std;
+
 
 /**
  * Class used to manage host/modem string exchange via TCP/IP connection (this

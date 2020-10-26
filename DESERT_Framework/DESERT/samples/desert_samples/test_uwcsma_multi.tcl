@@ -85,6 +85,7 @@ load libuwcbr.so
 load libuwcsmaaloha.so
 load libuwaloha.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwhermesphy.so
 load libuwoptical_propagation.so

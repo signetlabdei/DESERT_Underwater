@@ -89,6 +89,7 @@ load libuwcsmaaloha.so
 load libuwinterference.so
 load libUwmStd.so
 load libUwmStdPhyBpskTracer.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwposbasedrt.so
 load libuwflooding.so

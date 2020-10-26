@@ -40,6 +40,7 @@ Module/UW/CBR set debug_              0
 Module/UW/CBR set PoissonTraffic_     1
 Module/UW/CBR set drop_out_of_order_  1
 Module/UW/CBR set traffic_type_		  0
+Module/UW/CBR set tracefile_enabler_  0
 
 Module/UW/CBR instproc init {args} {
     $self next $args

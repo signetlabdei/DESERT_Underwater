@@ -54,7 +54,7 @@ Msocket::Msocket(UWMdriver *pmDriver_, std::string portno_)
 	std::string tokenizer(":");
 	size_t p_tokenizer = pathToDevice.find(tokenizer);
 
-	if (p_tokenizer == string::npos) {
+	if (p_tokenizer == std::string::npos) {
 
 		server_host = "localhost";
 		portno = atoi(pathToDevice.c_str());
@@ -161,9 +161,9 @@ read_process_msocket(void *pMsocket_me_)
 		// Check the queue length
 		if (pMsocket_me->queueMsg.size() >
 				pMsocket_me->getDriverQueueLength()) {
-			cout << "MSOCKET::READ::ERROR::BUFFER_FULL ---> drop the oldest "
+			std::cout << "MSOCKET::READ::ERROR::BUFFER_FULL ---> drop the oldest "
 					"packet"
-				 << endl;
+				 << std::endl;
 			pMsocket_me->queueMsg.pop();
 		}
 

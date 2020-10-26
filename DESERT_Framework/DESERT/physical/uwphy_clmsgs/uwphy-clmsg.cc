@@ -176,3 +176,39 @@ void ClMsgUwPhyThresh::setThresh(double thresh)
 {
 	threshold = thresh;
 }
+
+ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(bool control)
+: ClMsgUwPhy(CLMSG_UWPHY_LOSTPKT)
+, lost_packets(0)
+, is_control(control)
+{
+
+}
+ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(int stack_id, int dest_module_id, bool control)
+: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_UWPHY_LOSTPKT)
+, lost_packets(0)
+{
+
+}
+
+ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(const ClMsgUwPhyGetLostPkts& msg)
+: ClMsgUwPhy(msg),
+  lost_packets(0)
+{
+
+}
+
+ClMsgUwPhyGetLostPkts::~ClMsgUwPhyGetLostPkts()
+{
+
+}
+
+uint ClMsgUwPhyGetLostPkts::getLostPkts() 
+{
+  return lost_packets;
+}
+
+void ClMsgUwPhyGetLostPkts::setLostPkts(uint lost_pkt)
+{
+  lost_packets = lost_pkt;
+}

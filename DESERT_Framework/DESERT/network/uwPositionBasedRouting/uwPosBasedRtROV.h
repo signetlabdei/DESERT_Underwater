@@ -123,7 +123,6 @@ private:
 
 	uint8_t ipAddr;
 
-	double ROV_speed; /**<Last known ROV speed. */
 	double maxTxRange; /**<Maximum transmission range, 
 						in meters, for this node. */
 

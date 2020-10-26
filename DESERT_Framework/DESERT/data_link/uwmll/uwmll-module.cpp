@@ -161,6 +161,13 @@ UWMllModule::sendDown(Packet *p)
 	mh->hdr_type() = ETHERTYPE_IP;
 	int tx = 0;
 
+	if (debug_) {
+		std::cout << NOW << "::UWMLL::SENDDOWN::SOURCE_MAC::" << mh->macSA()
+				  << "::NEXT_HOP::" << ch->next_hop()
+				  << "::DESTINATION::" << (uint)ih->daddr()
+				  << std::endl;
+	}
+
 	switch (ch->addr_type()) {
 
 		case NS_AF_ILINK:

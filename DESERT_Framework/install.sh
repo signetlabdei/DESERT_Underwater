@@ -49,7 +49,7 @@ print_desert_logo
 log_L1 "_________________________" ${INSTALL_LOG}
 log_L1 "- install.sh is STARTED -" ${INSTALL_LOG}
 
-echo -n "$0 " > ${INSTALL_CONF}
+printf '%s\n' "$0 " > ${INSTALL_CONF}
 
 check_sh
 #PRIVATE_VARIABLEs
@@ -153,7 +153,7 @@ while true; do
             _WITHWOSS=1
             WITHWOSS=1
             log_L1 "_WITHWOSS=${_WITHWOSS}" ${INSTALL_LOG}
-            echo -n "--with-woss " >> ${INSTALL_CONF}
+            printf '%s' "--with-woss " >> ${INSTALL_CONF}
             if [ -n "$1" ]; then
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_WITHWOSS=${_WITHWOSS}"
@@ -181,7 +181,7 @@ while true; do
             log_L1 "_TARGET=${_TARGET}" ${INSTALL_LOG}
             if [ -n "${1}" ]; then
                 TARGET="${1}"
-                echo -n "--target ${1} " >> ${INSTALL_CONF}
+                printf '%s' "--target ${1} " >> ${INSTALL_CONF}
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_TARGET=${_TARGET}"
                     debug__print_screen_L1 "parameter for --target option is: ${1}"
@@ -195,7 +195,7 @@ while true; do
             log_L1 "_INST_MODE=${_INST_MODE}" ${INSTALL_LOG}
             if [ -n "${1}" ]; then
                 INST_MODE=${1}
-                echo -n "--inst_mode ${1} " >> ${INSTALL_CONF}
+                printf '%s' "--inst_mode ${1} " >> ${INSTALL_CONF}
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_INST_MODE=${_INST_MODE}"
                     debug__print_screen_L1 "parameter for --inst_mode option is: ${1}"
@@ -209,7 +209,7 @@ while true; do
             log_L1 "_DEST_FOLDER=${_DEST_FOLDER}" ${INSTALL_LOG}
             if [ -n "${1}" ]; then
                 DEST_FOLDER="${1}"
-                echo -n "--dest_folder ${1} " >> ${INSTALL_CONF}
+                printf '%s' "--dest_folder ${1} " >> ${INSTALL_CONF}
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_DEST_FOLDER=${_DEST_FOLDER}"
                     debug__print_screen_L1 "parameter for --dest_folder option is: ${1}"
@@ -223,7 +223,7 @@ while true; do
             log_L1 "_CUSTOM_PAR=${_CUSTOM_PAR}" ${INSTALL_LOG}
             if [ -n "${1}" ]; then
                 CUSTOM_PAR=${1}
-                echo -n "--custom_par \"${1}\" " >> ${INSTALL_CONF}
+                printf '%s' "--custom_par \"${1}\" " >> ${INSTALL_CONF}
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_CUSTOM_PAR=${_CUSTOM_PAR}"
                     debug__print_screen_L1 "parameter for --custom_par option is: ${1}"
@@ -250,7 +250,7 @@ while true; do
             log_L1 "_ADDONS=${_ADDONS}" ${INSTALL_LOG}
             if [ -n "${1}" ]; then
                 ADDONS=${1}
-                echo -n "--addons \"${1}\" " >> ${INSTALL_CONF}
+                printf '%s' "--addons \"${1}\" " >> ${INSTALL_CONF}
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_ADDONS=${_ADDONS}"
                     debug__print_screen_L1 "parameter for --addons option is: ${1}"

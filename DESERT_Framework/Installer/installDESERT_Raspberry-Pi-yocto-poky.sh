@@ -37,6 +37,11 @@
 #. ./commonVariables.sh
 . ${ROOT_DESERT}/commonFunctions.sh
 
+# Raspberry should have an ARM processor
+# ARCH will set in the --host (and --target) option of the GCC
+# export ARCH="arm-linux-gnueabihf"
+export ARCH="arm-linux-gnu"
+
 if [ "${_DEBUG}" = "1" ]; then
     debug__print_screen_L1 "inside --- $0"
 fi
@@ -117,7 +122,7 @@ main() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_ZLIB() {
     info_L1 "zlib-${ZLIB_VERSION}"
@@ -131,7 +136,7 @@ build_ZLIB() {
         ./configure >> "${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log" 2>&1
         if [ $? -ne 0 ] ; then
             err_L1 "Error during the configuration of zlib-${ZLIB_VERSION}! Exiting ..."
-            tail ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
+            tail -n 50 ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
             exit 1
         fi
     else
@@ -143,7 +148,7 @@ build_ZLIB() {
         ./configure >> "${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log"  2>&1
         if [ $? -ne 0 ] ; then
             err_L1 "Error during the configuration of zlib-${ZLIB_VERSION}! Exiting ..."
-            tail ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
+            tail -n 50 ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
             exit 1
         fi
     fi
@@ -151,7 +156,7 @@ build_ZLIB() {
     make -j $MAKE_JOBS >> "${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of zlib-${ZLIB_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/zlib-${ZLIB_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -170,7 +175,7 @@ build_ZLIB() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_TCL() {
     info_L1 "tcl-${TCL_VERSION}"
@@ -193,7 +198,7 @@ build_TCL() {
 
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of tcl-${TCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
         exit 1
     fi
     echo > ../compat/fixstrtod.c
@@ -202,7 +207,7 @@ build_TCL() {
     make -j ${MAKE_JOBS} >> "${currentBuildLog}/tcl-${TCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of tcl-${TCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
         exit 1
     fi
 
@@ -214,7 +219,7 @@ build_TCL() {
     make install-strip >> "${currentBuildLog}/tcl-${TCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of tcl-${TCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/tcl-${TCL_VERSION}-$*.log
         exit 1
     fi
 
@@ -244,7 +249,7 @@ build_TCL() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_OTCL() {
     info_L1 "otcl-${OTCL_VERSION}"
@@ -271,7 +276,7 @@ build_OTCL() {
                 >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of otcl-${OTCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log
         exit 1
     fi
 
@@ -279,7 +284,7 @@ build_OTCL() {
     make >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of otcl-${OTCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -298,7 +303,7 @@ build_OTCL() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_TCLCL() {
     info_L1 "tclcl-${TCLCL_VERSION}"
@@ -332,7 +337,7 @@ build_TCLCL() {
                 >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of tclcl-${TCLCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log
         exit 1
     fi
 
@@ -340,7 +345,7 @@ build_TCLCL() {
     make >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of tclcl-${TCLCL_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -359,7 +364,7 @@ build_TCLCL() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NS() {
     info_L1 "ns-${NS_VERSION}"
@@ -397,7 +402,7 @@ build_NS() {
                 >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of ns-${NS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/ns-${NS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/ns-${NS_VERSION}-$*.log
         exit 1
     fi
     #FIXME
@@ -409,7 +414,7 @@ build_NS() {
     make -j ${MAKE_JOBS} >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of ns-${NS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/ns-${NS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/ns-${NS_VERSION}-$*.log
         exit 1
     fi
 
@@ -417,7 +422,7 @@ build_NS() {
     make install-ns >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of ns-${NS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/ns-${NS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/ns-${NS_VERSION}-$*.log
         exit 1
     fi
 
@@ -445,7 +450,7 @@ build_NS() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NSMIRACLE() {
     info_L1 "nsmiracle-${NSMIRACLE_VERSION}"
@@ -474,7 +479,7 @@ build_NSMIRACLE() {
                 >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
         exit 1
     fi
 
@@ -482,14 +487,14 @@ build_NSMIRACLE() {
     make >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
         exit 1
     fi
 
     make install-strip >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -508,7 +513,7 @@ build_NSMIRACLE() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_DESERT() {
     info_L1 "desert-${DESERT_VERSION}"
@@ -519,7 +524,7 @@ build_DESERT() {
         info_L2 "make-clean [$*]"
         if [ $? -ne 0 ] ; then
             err_L1 "Error during the make distclean of DESERT! Exiting ..."
-            tail ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
+            tail -n 50 ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
             exit 1
         fi
     fi
@@ -543,7 +548,7 @@ build_DESERT() {
                                            >> "${currentBuildLog}/desert-${DESERT_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the configuration of DESERT! Exiting ..."
-        tail ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
         exit 1
     fi
     info_L2 "patch      [$*]"
@@ -555,7 +560,7 @@ build_DESERT() {
     make >> "${currentBuildLog}/desert-${DESERT_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the compilation of DESERT! Exiting ..."
-        tail ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
         exit 1
     fi
 
@@ -563,7 +568,7 @@ build_DESERT() {
     make install-strip >> "${currentBuildLog}/desert-${DESERT_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of DESERT! Exiting ..."
-        tail ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/desert-${DESERT_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -582,7 +587,7 @@ build_DESERT() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_DESERT_addon() {
     info_L2 "INSTALLATION of ${1} as ADD-ON"
@@ -598,7 +603,7 @@ build_DESERT_addon() {
             make distclean >> "${currentBuildLog}/DESERT_ADDON/${1}-${2}.log"  2>&1
             if [ $? -ne 0 ] ; then
                 err_L1 "Error during the make distclean of ${1}! Exiting ..."
-                tail ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
+                tail -n 50 ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
                 exit 1
             fi
         fi
@@ -643,7 +648,7 @@ build_DESERT_addon() {
         esac
         if [ $? -ne 0 ]; then
             err_L1 "Error during the configuration of ${1}! Exiting ..."
-            tail ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
+            tail -n 50 ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
             exit 1
         fi
         info_L2 "patch      [${2}]"
@@ -655,7 +660,7 @@ build_DESERT_addon() {
         make >> "${currentBuildLog}/DESERT_ADDON/${1}-${2}.log"  2>&1
         if [ $? -ne 0 ]; then
             err_L1 "Error during the compilation of ${1}! Exiting ..."
-            tail ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
+            tail -n 50 ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
             exit 1
         fi
 
@@ -663,7 +668,7 @@ build_DESERT_addon() {
         make install >> "${currentBuildLog}/DESERT_ADDON/${1}-${2}.log"  2>&1
         if [ $? -ne 0 ]; then
             err_L1 "Error during the installation of ${1}! Exiting ..."
-            tail ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
+            tail -n 50 ${currentBuildLog}/DESERT_ADDON/${1}-${2}.log
             exit 1
         fi
     else
@@ -690,7 +695,7 @@ build_DESERT_addon() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NETCDF() {
     info_L1 "netcdf-${NETCDF_VERSION}"
@@ -712,7 +717,7 @@ build_NETCDF() {
                 >> "${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the configuration of netcdf-${NETCDF_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log
         exit 1
     fi
 
@@ -720,7 +725,7 @@ build_NETCDF() {
     make check install >> "${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the compilation or installation of netcdf-${NETCDF_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -739,7 +744,7 @@ build_NETCDF() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NETCDFCXX() {
     info_L1 "netcdf-cxx-${NETCDFCXX_VERSION}"
@@ -761,7 +766,7 @@ build_NETCDFCXX() {
                 >> "${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the configuration of netcdf-cxx-${NETCDFCXX_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log
         exit 1
     fi
 
@@ -769,7 +774,7 @@ build_NETCDFCXX() {
     make check install >> "${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the compilation or installation of netcdf-cxx-${NETCDFCXX_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log
         exit 1
     fi
 
@@ -790,7 +795,7 @@ build_NETCDFCXX() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_BELLHOP() {
     info_L1 "bellhop"
@@ -849,7 +854,7 @@ build_BELLHOP() {
 #    ${ARCH} != ${HOST} -> cross-compile
 
 #TODO:
-# (v) add the "return check" after each compile command. Moreover add "tail" command when a error compile happen.
+# (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_WOSS() {
     info_L1 "woss-$WOSS_VERSION"
@@ -870,7 +875,7 @@ build_WOSS() {
     ./autogen.sh >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error with autogen.sh! Exiting ..."
-        tail ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
     info_L2 "configure  [$*]"
@@ -890,7 +895,7 @@ build_WOSS() {
 
     if [ $? -ne 0 ]; then
         err_L1 "Error during the configuration of woss-${WOSS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
 
@@ -901,14 +906,14 @@ build_WOSS() {
     make >>  "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the compilation of woss-${WOSS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
 
     make install >>  "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the installation of woss-${WOSS_VERSION}! Exiting ..."
-        tail ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
+        tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`

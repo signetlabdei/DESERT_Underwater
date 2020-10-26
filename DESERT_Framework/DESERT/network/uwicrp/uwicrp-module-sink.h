@@ -57,7 +57,7 @@
 #include <tclcl.h>
 #include <vector>
 
-using namespace std;
+
 
 /**
  * UwIcrpSink class is used to represent the routing layer of a node.

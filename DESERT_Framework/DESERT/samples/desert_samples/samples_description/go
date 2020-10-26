@@ -1,0 +1,17 @@
+if [ $1 = clear ]
+then
+     rm -f *.aux *.bbl *.blg *.dvi *.log *.ps *.backup *~
+     echo "Folder cleaned!"
+else
+     latex $1
+     latex $1
+#     bibtex $1
+#     bibtex $1
+     latex $1
+     latex $1
+
+     dvips -D 600 -j0 -Ppdf -G0 -t letter -o $1.ps $1.dvi
+
+     ps2pdf -dPDFSETTINGS=/printer -dCompatibilityLevel=1.5 -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -sPAPERSIZE=letter $1.ps
+
+fi

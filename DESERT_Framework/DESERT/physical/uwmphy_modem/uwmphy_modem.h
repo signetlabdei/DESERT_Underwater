@@ -67,7 +67,7 @@
 #define MIN_MODEM_QUEUE_LENGTH 2
 #define MAX_MODEM_QUEUE_LENGTH 30
 
-using namespace std;
+
 
 // Forward declaration
 class DropTimer;

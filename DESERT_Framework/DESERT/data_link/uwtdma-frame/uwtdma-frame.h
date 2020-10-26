@@ -49,7 +49,7 @@
 #include <vector>
 #include <map>
 
-using namespace std;
+
 
 typedef std::map<int, int> Slot;
 typedef std::map<int, Slot> SlotTopology;

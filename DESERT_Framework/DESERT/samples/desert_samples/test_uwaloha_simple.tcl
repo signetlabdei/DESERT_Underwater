@@ -149,6 +149,8 @@ Module/UW/CBR set packetSize_          $opt(pktsize)
 Module/UW/CBR set period_              $opt(cbr_period)
 Module/UW/CBR set PoissonTraffic_      1
 Module/UW/CBR set debug_               0
+Module/UW/CBR set tracefile_enabler_   1
+Module/UW/CBR setLogSuffix         "ciao"
 
 
 set channel [new Module/DumbWirelessCh]
@@ -165,7 +167,8 @@ proc createNode { id } {
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
-		set cbr($id,$cnt)  [new Module/UW/CBR] 
+		set cbr($id,$cnt)  [new Module/UW/CBR]
+        $cbr($id,$cnt) setLogSuffix "ciao"
 	}
     set udp($id)  [new Module/UW/UDP]
     set ipr($id)  [new Module/UW/StaticRouting]

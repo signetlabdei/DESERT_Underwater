@@ -75,6 +75,7 @@ load libmmac.so
 load libMiracleBasicMovement.so
 load libUwmStd.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwip.so
 load libuwstaticrouting.so

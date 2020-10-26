@@ -48,9 +48,41 @@
 #include <string.h>
 #include <cmath>
 #include <climits>
+#include <algorithm>
 
 // DEFINE BEHAVIORS
 #define DEFAULT 1
+
+struct BufferType {
+  enum BufferBehavior {
+    DISCARD_INCOMING = 0, // Discard incoming packets
+    CIRCULAR  // Discard old packets (first packets in the queue)
+  };
+  uint max_size; /**< Maximum buffer size*/
+  BufferBehavior behavior_buff; /**< Buffer behavior */
+  double send_delay; /**< Send down delay */
+  uint pkts_lost; /**< Packet lost for buffer overflow */
+  double last_sched_tx; /**< Last scheduled transmission time */
+
+  BufferType(uint size, BufferBehavior behav, double del) 
+  :
+    max_size(size),
+    behavior_buff(behav),
+    send_delay(del),
+    pkts_lost(0)
+  {
+  }
+
+  double getUpdatedDelay(double time_instant) {
+    if ((time_instant - last_sched_tx) >= send_delay) {
+      last_sched_tx = time_instant;
+      return 0; //last_sched_tx - time_instant
+    } else {
+      last_sched_tx = last_sched_tx + send_delay;
+      return std::max(last_sched_tx - time_instant, 0.0); //max to avoid problem with double precision
+    }
+  }
+};
 
 // DEFINE STATES
 
@@ -60,6 +92,8 @@ typedef std::map <int, BehaviorItem> BehaviorMap; /**< stack_id, behavior>*/
 typedef std::map <int, BehaviorMap> DownTrafficMap; /**< app_type, BehaviorMap*/
 typedef std::queue<Packet*> Buffer;
 typedef std::map <int, Buffer*> DownTrafficBuffer; /**< app_type, PacketQueue*/
+/**traffic, buffer type*/    
+typedef std::map <int,BufferType> BufferTrafficFeature; 
 
 /**
  * Class used to represents the UwMultiTrafficControl layer of a node.
@@ -103,6 +137,7 @@ protected:
   UpTrafficMap up_map; /**< Map of upper layers.*/
   DownTrafficMap down_map; /**< Map of lower layers.*/
   DownTrafficBuffer down_buffer; /**< Map of buffer per traffic types*/
+  BufferTrafficFeature buffer_feature_map; /**< Map with features of each buffer*/
   
   /** 
    * Handle a packet coming from upper layers
@@ -227,6 +262,31 @@ protected:
    */
   virtual void addLowLayerFromTag(int traffic_id, std::string tag, int behavior);
 
+  /**
+   * set buffer features for the given traffic type 
+   * @param traffic_id: application traffic id
+   * @param max_size: maximum buffer size
+   * @param is_circular: true if buffer is circular, false otherwise (discard new)
+   * buffer) 
+   * @param send_down_delay: delay used to send down packets
+   */
+  void setBufferFeature(int traffic_id, int max_size, bool is_circular,
+    double send_down_delay=0);
+
+  /**
+   * Increment by 1 the number of lost packets for the given traffic
+   * @param traffic_id: application traffic id
+   */
+  virtual void incrPktLoss(int traffic_id);  
+
+  /**
+   * get discarded packets
+   * @param traffic_id: application traffic id
+   * @return number of discarded packets for the given traffic id
+   * buffer) 
+   */
+  virtual uint getDiscardedPacket(int traffic_id) const;  
+  
 private:
   //Variables
 };

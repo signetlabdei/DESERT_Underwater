@@ -66,7 +66,7 @@
 #include <map>
 #include <list>
 
-using namespace std;
+
 
 /**
  * UwFlooding class is used to represent the routing layer of a node.
@@ -180,6 +180,8 @@ private:
 	map_forwarded_packets
 			my_forwarded_packets_; /**< Map of the packet forwarded. */
 
+	std::map<uint16_t,uint8_t> ttl_traffic_map; /**< Map with ttl per traffic. */
+
 	/**
 	 * Copy constructor declared as private. It is not possible to create a new
 	 * UwFlooding object passing to its constructor another UwFlooding object.
@@ -187,6 +189,15 @@ private:
 	 * @param UwFlooding& UwFlooding object.
 	 */
 	UwFlooding(const UwFlooding &);
+
+	/**
+	 * Get the value of the TTL
+	 *
+	 * @param p pointer to the packet for which the ttl has to be computed.
+	 *
+	 * @return the ttl for that packet
+	 */
+	uint8_t getTTL(Packet* p) const;
 };
 
 #endif // UWFLOODING_H

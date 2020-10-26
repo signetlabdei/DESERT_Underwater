@@ -94,6 +94,7 @@ load libuwcbr.so
 load libuwtdma.so
 load libuwflooding.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwoptical_propagation.so
 load libuwoptical_channel.so

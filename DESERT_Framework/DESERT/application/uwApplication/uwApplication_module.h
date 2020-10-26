@@ -75,6 +75,7 @@
 #include <rng.h>
 #include <fstream>
 #include <ostream>
+#include <chrono>
 
 #define UWAPPLICATION_DROP_REASON_UNKNOWN_TYPE \
 	"DPUT" /**< Drop the packet. Packet received is an unknown type*/
@@ -83,7 +84,7 @@
 #define UWAPPLICATION_DROP_REASON_OUT_OF_SEQUENCE \
 	"DOOS" /**< Drop the packet. Packet received is out of sequence. */
 
-using namespace std;
+
 extern packet_t
 		PT_DATA_APPLICATION; /**< Trigger packet type for UFetch protocol */
 
@@ -147,7 +148,10 @@ public:
 	inline unsigned long int
 	getEpoch()
 	{
-		return time(NULL);
+	  unsigned long int timestamp =
+		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
+			  std::chrono::system_clock::now().time_since_epoch()).count() );
+	  return timestamp;
 	}
 
 	int servSockDescr; /**< socket descriptor for server */
@@ -168,6 +172,9 @@ public:
 	bool logging;
 	int node_id;
 	int exp_id;
+
+	/** Maximum size (bytes) of a single read of the socket */
+	static uint MAX_READ_LEN;
 
 protected:
 	/**< uwSenderTimer class that manage the timer */
@@ -479,7 +486,6 @@ protected:
 	 */
 	virtual double GetFTT() const;
 	/**
-	/**
 	 * Return the standard deviation of the Forward Trip Time calculated
 	 *
 	 * @return the standard deviation of the Forward Trip Time calculated
@@ -516,7 +522,7 @@ protected:
 	// TCL VARIABLES
 	int debug_; /**< Used for debug purposes <i>1</i> debug activated <i>0</i>
 				   debug not activated*/
-	int PERIOD; /**< Interval time between two successive generation data
+	double PERIOD; /**< Interval time between two successive generation data
 				   packets */
 	// int SOCKET_CMN; /**< Enable or not the communication with socket <i>1</i>
 	// enabled <i>0</i> not enabled*/

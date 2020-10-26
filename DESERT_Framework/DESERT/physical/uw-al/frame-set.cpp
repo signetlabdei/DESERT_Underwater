@@ -115,8 +115,9 @@ RxFrameSet::displaySet()
 	std::stringstream sstr;
 
 	sstr << "binPayload_:" << packer::hexdump_nice(binPayload(false))
-		 << "binPayloadCheck_:" << packer::bindump(binPayloadCheck_,
-										   MAX_BIN_PAYLOAD_CHECK_ARRAY_LENGTH)
+		 << "binPayloadCheck_:"
+		 << packer::bindump(
+					binPayloadCheck_, MAX_BIN_PAYLOAD_CHECK_ARRAY_LENGTH)
 		 << ",tot_length_:" << tot_length() << ",curr_length_:" << curr_length()
 		 << ",t_last_rx_frame_:" << t_last_rx_frame();
 

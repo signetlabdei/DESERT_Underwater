@@ -64,7 +64,7 @@
 #include <rng.h>
 #include <fstream>
 
-using namespace std;
+
 
 /**
  * SunIPRoutingSink class is used to represent the routing layer of a sink.

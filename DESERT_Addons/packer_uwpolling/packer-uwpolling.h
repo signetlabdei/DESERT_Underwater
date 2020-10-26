@@ -104,6 +104,17 @@ private:
         UID_PROBE,
         ID_NODE,
         UID_POLL,
+        POLL_TIME,
+        UID_SINK,
+        UID_PROBE_SINK,
+        UID_ACK,
+        UID_PACKET,
+        UID_LAST_PACKET,
+        UID_ACKS,
+        ACK_ARRAY_SIZE,
+        ACK_ELEM_BITS,
+
+		LAST_ELEM
     };
 
     size_t t_in_Bits;           /**< number of Bits used for t_in field on TRIGGER header */
@@ -116,7 +127,18 @@ private:
     size_t uid_probe_Bits;      /**< number of Bits used for uid field on PROBE header */
     size_t id_node_Bits;        /**< number of Bits used for id_node field on PROBE header */
     size_t uid_poll_Bits;       /**< number of Bits used for uid field on POLL header */
+    size_t poll_time_Bits;		/**< number of Bits used for POLL_time field on POLL header */
+    size_t uid_sink_Bits;		/**< number of Bits used for id_sink_ field on PROBE_SINK header */
+    size_t uid_probe_sink_Bits; /**< number of Bits used for PROBE_uid_ field on PROBE_SINK header */
+    size_t uid_ack_Bits;		/**< number of Bits used for id_ack_ field on PROBE_SINK header */
+    size_t uid_packet_Bits; 	/**< number of Bits used for pkt_uid_ field on AUV_MULE header */
+    size_t uid_last_packet_Bits;/**< number of Bits used for last_pkt_uid_ field on AUV_MULE header */
+    size_t uid_acks_Bits;
+    size_t ack_array_size_Bits; /**< number of Bits used for number of ACKs on ACK_SINK header */
+    size_t ack_array_el_Bits;	/**< number of Bits used for each ACK on ACK_SINK header */
+    size_t ack_array_size;		/**< Maximum number of elements for the ACK vector */
 
-};
+    int sink_mac; /**< Mac addres of the destination that need AUV_MULE hdr */
+};	
 
 #endif

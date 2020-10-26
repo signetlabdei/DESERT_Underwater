@@ -72,6 +72,7 @@ load libMiracleBasicMovement.so
 load libmphy.so
 load libUwmStd.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwcsmaaloha.so
 load libuwip.so

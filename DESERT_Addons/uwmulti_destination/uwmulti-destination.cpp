@@ -68,6 +68,8 @@ UwMultiDestination::UwMultiDestination()
 	, min_delay_(0)
 	, switch_mode_(UW_MANUAL_SWITCH)
 	, lower_id_active_(0)
+	, layer_list()
+	, default_lower_id(0)
 {
 	bind("debug_", &debug_);
 	bind("min_delay_", &min_delay_);
@@ -90,32 +92,70 @@ UwMultiDestination::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "setManualLowerlId") == 0) {
 			lower_id_active_ = atoi(argv[2]);
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "setIProv") == 0) {
-			IP_rov_ = atoi(argv[2]);
+		} else if (strcasecmp(argv[1], "setDefaultLowerId") == 0) {
+			default_lower_id = atoi(argv[2]);
 			return TCL_OK;
 		}
 	} else if (argc == 4) {
-		/**
-		 * parameters: layer_id, layer_order, a positive and
-		 * unique integer to order the set if physical ids
-		*/
+		
+		//parameters: IP_val, layer_id
 		if (strcasecmp(argv[1], "addLayer") == 0) {
-			addLayer(atoi(argv[2]), atoi(argv[3]));
-			return TCL_OK;
+			if (atoi(argv[2]) < 0) {
+				std::cerr << "UwMultiDestination::command. " 
+					<<"Error, negative IP address" << std::endl;
+				return TCL_ERROR;
+			} else {
+				IP_range range(atoi(argv[2]), atoi(argv[2]));
+				if (!addLayer(range, atoi(argv[3]))) {
+					std::cerr << "UwMultiDestination::command. " 
+						<<"Error, overlapping IP ranges" << std::endl;
+					return TCL_ERROR;
+				} 
+				
+				return TCL_OK;
+			}
+			
+		}
+		
+	} else if (argc == 5) {
+		//parameters: IP_val_min, IP_val_max, layer_id
+		if (strcasecmp(argv[1], "addLayer") == 0) {
+			if (atoi(argv[2]) < 0 || atoi(argv[3]) < atoi(argv[2])) {
+				std::cerr << "UwMultiDestination::command. " 
+					<<"Wrong IP address range" << std::endl;
+				return TCL_ERROR;
+			} else {
+				IP_range range(atoi(argv[2]),atoi(argv[3]));
+				if (!addLayer(range, atoi(argv[4]))) {
+					std::cerr << "UwMultiDestination::command. " 
+						<<"Error, overlapping IP ranges" << std::endl;
+					return TCL_ERROR;
+				}
+				return TCL_OK;
+			}
+			
 		}
 	}
 
 	return Module::command(argc, argv);
 } /* UwMultiDestination::command */
 
-void
-UwMultiDestination::addLayer(int id, int order)
+bool
+UwMultiDestination::addLayer(IP_range range, int id)
 {
-	assert(order > 0);
-	id2order.erase(id);
-	id2order.insert((std::pair<int, int>(id, order)));
-	order2id.erase(order);
-	order2id.insert((std::pair<int, int>(order, id)));
+
+	if (layer_list.empty()) {
+		layer_IPrange item = std::make_pair(id,range);
+		layer_list.push_back(item);
+		return true;
+	} else {
+		if (checkNotOverlap(range)) {
+			layer_IPrange item = std::make_pair(id,range);
+			layer_list.push_back(item);
+			return true;
+		}
+	}
+	return false;
 }
 
 void
@@ -146,16 +186,25 @@ UwMultiDestination::getDestinationLayer(Packet *p)
 {
 	hdr_uwip *ih = HDR_UWIP(p);
 
-	// control the IP address and choose the corrispondent layer
-	if (ih->daddr() == IP_rov_) {
-		return getId(1);
-	} else {
-		return getId(2);
+
+	int dest_addr = ih->daddr();
+	auto it = layer_list.begin();
+	for (; it != layer_list.end(); it++) {
+		if (it->second.isInRange(dest_addr)) {
+			return it->first;
+		}
 	}
+	return default_lower_id;
 }
 
 bool
-UwMultiDestination::isLayerAvailable(int id)
+UwMultiDestination::checkNotOverlap(IP_range range)
 {
-	return id2order.find(id) != id2order.end();
+	auto it = layer_list.begin();
+	for (; it != layer_list.end(); it++) {
+		if (it->second.overlappingRange(range)) {
+			return false;
+		}
+	}
+	return true;
 }

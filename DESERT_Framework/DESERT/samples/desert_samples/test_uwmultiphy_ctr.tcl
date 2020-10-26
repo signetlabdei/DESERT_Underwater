@@ -10,27 +10,27 @@
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 3. Neither the name of the University of Padova (SIGNET lab) nor the 
-#    names of its contributors may be used to endorse or promote products 
+# 3. Neither the name of the University of Padova (SIGNET lab) nor the
+#    names of its contributors may be used to endorse or promote products
 #    derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
-# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
-# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # This script is used to test MULTI_STACK_CONTROLLER_PHY MASTER and SLAVE module
-# There are 2 nodes that can transmit each other packets with a CBR (Constant 
+# There are 2 nodes that can transmit each other packets with a CBR (Constant
 # Bit Rate) Application Module
 # The MASTER controls the switch between three UW/PHYSICAL layers with different
-# frequency and bandwidth, according with the received power metrics. The slave 
+# frequency and bandwidth, according with the received power metrics. The slave
 # switches according to the MASTER behavior. UnderwaterChannel is used as channel.
 #
 # Author: Filippo Campagnaro <campagn1@dei.unipd.it>
@@ -39,7 +39,7 @@
 # NOTE: tcl sample tested on Ubuntu 11.10, 64 bits OS
 #
 # Stack of the nodes
-#                   MASTER                                         SLAVE 
+#                   MASTER                                         SLAVE
 #   +------------------------------------------+   +------------------------------------------+
 #   |  10. UW/CBR                              |   |  10. UW/CBR                              |
 #   +------------------------------------------+   +------------------------------------------+
@@ -49,18 +49,18 @@
 #   +------------------------------------------+   +------------------------------------------+
 #   |  7. UW/IP                                |   |  7. UW/IP                                |
 #   +------------------------------------------+   +------------------------------------------+
-#   |  6. UW/MLL                               |   |  6. UW/MLL                               | 
+#   |  6. UW/MLL                               |   |  6. UW/MLL                               |
 #   +------------------------------------------+   +------------------------------------------+
 #   |  5. UW/CSMA_ALOHA                        |   |  5. UW/CSMA_ALOHA                        |
 #   +------------------------------------------+   +------------------------------------------+
 #   |  4. UW/MULTI_STACK_CONTROLLER_PHY_MASTER |   |  4. UW/MULTI_STACK_CONTROLLER_PHY_SLAVE  |
 #   +--------------+-------------+-------------+   +--------------+-------------+-------------+
 #   | 3.UW/PHYSICAL|2.UW/PHYSICAL|1.UW/PHYSICAL|   | 3.UW/PHYSICAL|2.UW/PHYSICAL|1.UW/PHYSICAL|
-#   +--------------+-------------+-------------+   +--------------+-------------+-------------+ 
-#           |             |              |                  |             |            |     
+#   +--------------+-------------+-------------+   +--------------+-------------+-------------+
+#           |             |              |                  |             |            |
 #   +-----------------------------------------------------------------------------------------+
-#   |                                     UnderwaterChannel                                   |   
-#   +-----------------------------------------------------------------------------------------+   
+#   |                                     UnderwaterChannel                                   |
+#   +-----------------------------------------------------------------------------------------+
 
 ######################################
 # Flags to enable or disable options #
@@ -85,6 +85,7 @@ load libuwcbr.so
 load libuwcsmaaloha.so
 load libuwaloha.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwmulti_stack_controller.so
 
@@ -102,8 +103,8 @@ set opt(start_clock) [clock seconds]
 
 set opt(nn)                 3.0 ;# Number of Nodes
 set opt(pktsize)            125  ;# Pkt sike in byte
-set opt(starttime)          1	
-set opt(stoptime)           100000 
+set opt(starttime)          1
+set opt(stoptime)           100000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)] ;# Duration of the simulation
 
 set opt(txpower)            180.0  ;#Power transmitted in dB re uPa
@@ -190,13 +191,13 @@ Module/UW/CBR set debug_               0
 Module/MPhy/BPSK  set TxPower_               $opt(txpower)
 
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
 Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
 Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
 Module/UW/PHYSICAL  set MinTxSPL_dB_                10
 Module/UW/PHYSICAL  set MaxTxRange_                 50000
-Module/UW/PHYSICAL  set PER_target_                 0    
+Module/UW/PHYSICAL  set PER_target_                 0
 Module/UW/PHYSICAL  set CentralFreqOptimization_    0
 Module/UW/PHYSICAL  set BandwidthOptimization_      0
 Module/UW/PHYSICAL  set SPLOptimization_            0
@@ -212,8 +213,8 @@ proc createNode { id } {
   global channel propagation data_mask data_mask2 data_mask3 ns cbr position node udp portnum ipr ipif channel_estimator
   global phy posdb opt rvposx rvposy rvposz mhrouting mll mac woss_utilities woss_creator db_manager
   global node_coordinates
-  
-  set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
+
+  set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
     if {$id == 0} {
         Module/UW/CBR set period_              [expr $opt(cbr_period)*10]
@@ -221,34 +222,34 @@ proc createNode { id } {
         Module/UW/CBR set period_              $opt(cbr_period)
     }
 
-    set cbr($id,$cnt)  [new Module/UW/CBR] 
+    set cbr($id,$cnt)  [new Module/UW/CBR]
 	}
   set udp($id)  [new Module/UW/UDP]
   set ipr($id)  [new Module/UW/StaticRouting]
   set ipif($id) [new Module/UW/IP]
-  set mll($id)  [new Module/UW/MLL] 
-  set mac($id)  [new Module/UW/CSMA_ALOHA] 
-  # set mac($id)  [new Module/UW/ALOHA] 
+  set mll($id)  [new Module/UW/MLL]
+  set mac($id)  [new Module/UW/CSMA_ALOHA]
+  # set mac($id)  [new Module/UW/ALOHA]
   if {$id > 0} {
       set ctr($id)  [new Module/UW/MULTI_STACK_CONTROLLER_PHY_SLAVE]
   } else {
       set ctr($id)  [new Module/UW/MULTI_STACK_CONTROLLER_PHY_MASTER]
-  }    
-  # set phy($id)  [new Module/MPhy/BPSK]  
-  # set phy2($id)  [new Module/MPhy/BPSK] 
+  }
+  # set phy($id)  [new Module/MPhy/BPSK]
+  # set phy2($id)  [new Module/MPhy/BPSK]
   Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-  set phy($id)  [new Module/UW/PHYSICAL] 
+  set phy($id)  [new Module/UW/PHYSICAL]
   Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate2)
-  set phy2($id)  [new Module/UW/PHYSICAL]  
+  set phy2($id)  [new Module/UW/PHYSICAL]
   Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate3)
-  set phy3($id)  [new Module/UW/PHYSICAL]  
-	
+  set phy3($id)  [new Module/UW/PHYSICAL]
+
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
 		$node($id) addModule 10 $cbr($id,$cnt)   1  "CBR"
 	}
   $node($id) addModule 9 $udp($id)   1  "UDP"
   $node($id) addModule 8 $ipr($id)   1  "IPR"
-  $node($id) addModule 7 $ipif($id)  1  "IPF"   
+  $node($id) addModule 7 $ipif($id)  1  "IPF"
   $node($id) addModule 6 $mll($id)   1  "MLL"
   $node($id) addModule 5 $mac($id)   1  "MAC"
   $node($id) addModule 4 $ctr($id)   1  "CTR"
@@ -279,23 +280,23 @@ proc createNode { id } {
   #Set the IP address of the node
   set ip_value [expr $id + 1]
   $ipif($id) addr $ip_value
-  
+
   set position($id) [new "Position/BM"]
   $node($id) addPosition $position($id)
   set posdb($id) [new "PlugIn/PositionDB"]
   $node($id) addPlugin $posdb($id) 20 "PDB"
   $posdb($id) addpos [$ipif($id) addr] $position($id)
-  
+
   #Setup positions
   $position($id) setX_ [expr $id*200]
   $position($id) setY_ [expr $id*200]
   $position($id) setZ_ -100
-  
+
   #Interference model
   set interf_data($id) [new "Module/UW/INTERFERENCE"]
   $interf_data($id) set maxinterval_ $opt(maxinterval_)
   $interf_data($id) set debug_       0
-  
+
   set interf_data2($id) [new "Module/UW/INTERFERENCE"]
   $interf_data2($id) set maxinterval_ $opt(maxinterval_)
   $interf_data2($id) set debug_       0
@@ -345,13 +346,13 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 # Inter-node module connection #
 ################################
 proc connectNodes {id1 des1} {
-    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt 
+    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt
 
     $cbr($id1,$des1) set destAddr_ [$ipif($des1) addr]
     $cbr($id1,$des1) set destPort_ $portnum($des1,$id1)
 
     $cbr($des1,$id1) set destAddr_ [$ipif($id1) addr]
-    $cbr($des1,$id1) set destPort_ $portnum($id1,$des1) 
+    $cbr($des1,$id1) set destPort_ $portnum($id1,$des1)
 
 }
 
@@ -397,7 +398,7 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 # Start/Stop Timers #
 #####################
 # Set here the timers to start and/or stop modules (optional)
-# e.g., 
+# e.g.,
 for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 	$ns at $opt(starttime)    "$cbr($id1,0) start"
 	$ns at $opt(stoptime)     "$cbr($id1,0) stop"
@@ -432,7 +433,7 @@ proc finish {} {
     set sum_cbr_throughput     0
     set sum_per                0
     set sum_cbr_sent_pkts      0.0
-    set sum_cbr_rcv_pkts       0.0    
+    set sum_cbr_rcv_pkts       0.0
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
   		for {set j 0} {$j < $opt(nn)} {incr j} {
@@ -449,11 +450,11 @@ proc finish {} {
   			}
   		}
     }
-        
+
     set ipheadersize        [$ipif(1) getipheadersize]
     set udpheadersize       [$udp(1) getudpheadersize]
     set cbrheadersize       [$cbr(1,0) getcbrheadersize]
-    
+
     if ($opt(verbose)) {
         puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
         puts "Sent Packets             : $sum_cbr_sent_pkts"
@@ -464,7 +465,7 @@ proc finish {} {
         puts "CBR Header Size          : $cbrheadersize"
         puts "done!"
     }
-    
+
     $ns flush-trace
     close $opt(tracefile)
 }
@@ -479,6 +480,6 @@ if ($opt(verbose)) {
 }
 
 
-$ns at [expr $opt(stoptime) + 250.0]  "finish; $ns halt" 
+$ns at [expr $opt(stoptime) + 250.0]  "finish; $ns halt"
 
 $ns run

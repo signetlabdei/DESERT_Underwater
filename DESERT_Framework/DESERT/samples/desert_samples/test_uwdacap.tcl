@@ -82,6 +82,7 @@ load libuwudp.so
 load libuwcbr.so
 load libuwdacap.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 
 

@@ -57,7 +57,7 @@
 
 #define HDR_UWIP(P) (hdr_uwip::access(P))
 
-using namespace std;
+
 
 static const uint8_t UWIP_BROADCAST = static_cast<uint8_t>(
 		0x000000ff); /**< Variable used to represent a broadcast UWIP. */

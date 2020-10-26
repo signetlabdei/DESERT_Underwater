@@ -83,6 +83,7 @@ load libpackercommon.so
 load libpackermac.so
 load libpackeruwudp.so
 load libpackeruwcbr.so
+load libuwphy_clmsgs.so
 load libuwmphy_modem.so
 load libevologics_driver.so
 load libuwmmac_clmsgs.so

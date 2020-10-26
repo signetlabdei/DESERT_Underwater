@@ -49,6 +49,7 @@
 
 #include <module.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <climits>
@@ -62,7 +63,7 @@
 
 #define HDR_UWCBR(p) (hdr_uwcbr::access(p))
 
-using namespace std;
+
 
 extern packet_t PT_UWCBR;
 
@@ -268,8 +269,11 @@ public:
 protected:
 	static int uidcnt_; /**< Unique id of the packet generated. */
 	uint16_t dstPort_; /**< Destination port. */
+	std::string log_suffix; /**< Possibility to insert a log suffix */
 	nsaddr_t dstAddr_; /**< IP of the destination. */
 	char priority_; /**< Priority of the data packets. */
+	std::ofstream tracefile;
+	std::string tracefilename;
 
 	bool *sn_check; /**< Used to keep track of the packets already received. */
 
@@ -295,6 +299,7 @@ protected:
 	int pkts_last_reset; /**< Used for error checking after stats are reset. Set
 							to pkts_lost+pkts_recv each time resetStats is
 							called. */
+	int cnt;  	/**< Used for check if is the first time that tracefile<ip of sink> is opened. */					
 
 	double rftt; /**< Forward Trip Time seen for last received packet. */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP. */
@@ -318,6 +323,8 @@ protected:
 	double sumdt; /**< Sum of the delays. */
 
 	uint32_t esn; /**< Expected serial number. */
+
+	int tracefile_enabler_; /**< True if enable tracefile of received packets, default disabled. */
 
 	/**
 	 * Initializes a data packet passed as argument with the default values.

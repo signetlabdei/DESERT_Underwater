@@ -38,5 +38,4 @@ Module/UW/PosBasedRt set maxTxRange_	3000
 
 
 Module/UW/PosBasedRt/ROV set debug_		0
-Module/UW/PosBasedRt/ROV set ROV_speed_ 1
 Module/UW/PosBasedRt/ROV set maxTxRange_	3000

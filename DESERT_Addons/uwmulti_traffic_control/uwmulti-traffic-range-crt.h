@@ -65,6 +65,8 @@ struct check_status {
 };
 typedef std::map <int, check_status> StatusMap; /** traffic, status */
 
+typedef std::map <int, uint> CounterMap; /** traffic, counter */ 
+
 typedef struct hdr_uwm_tr {
   int tr_id_;    /**< Id of the traffic app layer. */
   static int offset_; /**< Required by the PacketHeaderManager. */
@@ -119,16 +121,39 @@ public:
    */
   virtual int command(int, const char*const*);
 
+  /** 
+   * Handle a packet coming from upper layers
+   * 
+   * @param p pointer to the packet
+  */
   virtual void recv(Packet* p, int idSrc);
 
-  virtual void sendDown(Packet* p) { if(p != NULL ) { Module::sendDown(p); } }
+  /**
+  * Send a packet to the module(s) of the bottom layers 
+	* 
+	* @param p pointer of the packet which has to be sent
+	* @param delay (optional) delay introduced before transmission [sec.]
+  */
+  virtual void sendDown(Packet* p, double delay=0) { if(p != NULL ) { Module::sendDown(p, delay); } }
 
-  virtual void sendDown(int moduleId, Packet* p) { if(p != NULL ) { Module::sendDown(moduleId, p); } }
+  /**
+	* Send a packet to the requested module of the bottom layer
+	* 
+	* @param moduleId ID of the down module at which you would send the packet
+	* @param p pointer of the packet which has to be sent
+	* @param delay (optional) delay introduced before transmission [sec.] 
+	**/
+  virtual void sendDown(int moduleId, Packet* p, double delay=0) { if(p != NULL ) { Module::sendDown(moduleId, p, delay); } }
 
 protected:
   StatusMap status; /**< Map of status per traffic types*/
   double check_to_period; /**< Time-Out period*/
   int signaling_pktSize; /**< Signaling packet size*/
+  CounterMap tx_probe_cnt; /**< Number of probe pkts sent for each traffic*/
+  CounterMap rx_probe_cnt; /**< Number of probe pkts recv for each traffic*/
+  CounterMap tx_probe_ack_cnt; /**< Number of probe ACK pkts sent for each traffic*/
+  CounterMap rx_probe_ack_cnt; /**< Number of probe ACK pkts recv for each traffic*/
+
   /** 
    * manage to tx a packet of traffic type
    *
@@ -173,6 +198,22 @@ protected:
    * @param traffic application traffic id
    */
   virtual void timerExpired(int traffic);
+
+  /**
+   * Incement number of signaling pkts sent for the given traffic
+   * @param traffic application traffic id
+   * @param map_cnt map with counter for each traffic
+   */
+  void incrSignalingCounter(int traffic, CounterMap& map_cnt);
+
+  /**
+   * Return the number of signaling pkts sent for the given traffic
+   * @param traffic application traffic id
+   * @param map_cnt map with counter for each traffic
+   * @return number of signaling packets sent for the given traffic and 0 if
+   * traffic not found
+   */
+  uint getSignalingCounter(int traffic, const CounterMap& map_cnt) const;
 
 private:
   /**

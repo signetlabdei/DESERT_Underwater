@@ -45,8 +45,14 @@ export _DEBUG=0
 #*
 
 # System_set
-export ARCH="arm-linux"
-export HOST=$(uname -m)-linux-gnu
+ARCH_COMPLETE=$(uname -m)
+if printf "$ARCH_COMPLETE" | grep -q "arm"; then
+	export HOST="arm-linux-gnu"
+	export ARCH="arm-linux-gnu"
+else
+	export HOST=$(uname -m)-linux-gnu
+	export ARCH=$(uname -m)-linux-gnu
+fi
 export CPU_NUM=$(grep -c '^processor' /proc/cpuinfo)
 
 # Paths
@@ -86,19 +92,23 @@ export NSMIRACLE_DIR=nsmiracle-${NSMIRACLE_VERSION}
 export BELLHOP_TAR_FILE=${ROOT_DESERT}/at.tar.gz
 export BELLHOP_DIR=at
 
-export NETCDF_VERSION=4.2.1.1
+export NETCDF_VERSION=4.7.3
 export NETCDF_TAR_FILE=${ROOT_DESERT}/netcdf-${NETCDF_VERSION}.tar.gz
-export NETCDF_DIR=netcdf-${NETCDF_VERSION}
+export NETCDF_DIR=netcdf-c-${NETCDF_VERSION}
 
-export NETCDFCXX_VERSION=4.2
-export NETCDFCXX_TAR_FILE=${ROOT_DESERT}/netcdf-cxx-${NETCDFCXX_VERSION}.tar.gz
-export NETCDFCXX_DIR=netcdf-cxx-${NETCDFCXX_VERSION}
+export NETCDFCXX_VERSION=4.3.1
+export NETCDFCXX_TAR_FILE=${ROOT_DESERT}/netcdf-cxx4-${NETCDFCXX_VERSION}.tar.gz
+export NETCDFCXX_DIR=netcdf-cxx4-${NETCDFCXX_VERSION}
 
-export WOSS_VERSION=1.7.0
+export HDF5_VERSION=1.8.13
+export HDF5_TAR_FILE=${ROOT_DESERT}/hdf5-${HDF5_VERSION}.tar.gz
+export HDF5_DIR=hdf5-${HDF5_VERSION}
+
+export WOSS_VERSION=1.11.0
 export WOSS_TAR_FILE=${ROOT_DESERT}/woss-${WOSS_VERSION}.tar.gz
 export WOSS_DIR=woss-${WOSS_VERSION}
 
-export DESERT_VERSION=3.1.0
+export DESERT_VERSION=3.2.0
 export DESERT_DIR=DESERT
 
 export UNPACKED_FOLDER="${ROOT_DESERT}/.unpacked_folder"

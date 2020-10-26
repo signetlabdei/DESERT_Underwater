@@ -92,6 +92,14 @@ public:
 	 */
 	virtual void recv(Packet *);
 
+	/**
+	 * recv syncronous cross layer messages to require an operation from another module
+	 *
+	 * @param m Pointer cross layer message
+	 *
+	 */
+	int recvSyncClMsg(ClMessage* m);
+
 protected:
 	/**
 	 * Handles the end of a packet transmission
@@ -363,7 +371,7 @@ protected:
 	}
 
 	// Variables
-	string modulation_name_; /**< Modulation scheme name. */
+	std::string modulation_name_; /**< Modulation scheme name. */
 	double time_ready_to_end_rx_; /**< Used to keep track of the arrival time.
 									 */
 
@@ -397,7 +405,7 @@ protected:
 
 	int collisionDATA; /**< Total number of DATA pkts lost due to collision */
 
-	string Interference_Model; /**< Interference calcuation mode chosen: CHUNK
+	std::string Interference_Model; /**< Interference calcuation mode chosen: CHUNK
 								  model or MEANPOWER model */
 
 	uwinterference

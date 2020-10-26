@@ -52,6 +52,7 @@
 extern ClMessage_t CLMSG_UWPHY_TX_POWER;
 extern ClMessage_t CLMSG_UWPHY_B_RATE;
 extern ClMessage_t CLMSG_UWPHY_THRESH;
+extern ClMessage_t CLMSG_UWPHY_LOSTPKT;
 
 /**
 * ClMsgUwPhy should be extended and used to ask to set or get a parameter of a specific phy.
@@ -154,7 +155,7 @@ public:
   /**
     * Destructor of the ClMsgUwPhyTxPwr class
   **/
-  ~ClMsgUwPhyTxPwr();
+  virtual ~ClMsgUwPhyTxPwr();
 
   /**
   * method to return the transmitting power
@@ -208,7 +209,7 @@ public:
   /**
     * Destructor of the ClMsgUwPhyTxPwr class
   **/
-  ~ClMsgUwPhyBRate();
+  virtual ~ClMsgUwPhyBRate();
 
   /**
   * method to return the transmitting rate
@@ -262,7 +263,7 @@ public:
   /**
     * Destructor of the ClMsgUwPhyThresh class
   **/
-  ~ClMsgUwPhyThresh();
+  virtual ~ClMsgUwPhyThresh();
 
   /**
   * method to return the rx threshold
@@ -280,6 +281,66 @@ public:
 private:
 
   double threshold; /* < Receiving threshold. Can be either the rx_power or the SNR.*/
+    
+};
+
+/**
+* ClMsgUwPhyGetLostPkts should be used by a layer to ask the phy how many packets it discarded 
+* from the beginning of the simulation.
+* In addition, ClMsgUwPhyThresh is used from the phy to reply such a request.
+**/
+class ClMsgUwPhyGetLostPkts : public ClMsgUwPhy
+{
+public:
+
+  /**
+   * Broadcast constructor of the ClMsgUwPhyBRate class
+   * @param control set to true if it refers to the control packets, 
+   * false (default) for data packets
+   * 
+  */
+  ClMsgUwPhyGetLostPkts(bool control = false);
+
+  /**
+   * Unicast constructor of the ClMsgUwPhyGetLostPkts class
+   * @param int stack_id: id of the stack
+   * @param dest_mod_id: id of the destination module
+   * @param control set to true if it refers to the control packets, 
+   * false (default) for data packets
+   */
+  ClMsgUwPhyGetLostPkts(int stack_id, int dest_module_id, bool control = false);
+
+  /**
+  * Copy constructor
+  * @param const ClMsgUwPhyGetLostPkts& msg: ClMsgUwPhyGetLostPkts that has to be copied
+  */
+  ClMsgUwPhyGetLostPkts(const ClMsgUwPhyGetLostPkts& msg);
+
+
+  /**
+    * Destructor of the ClMsgUwPhyGetLostPkts class
+  **/
+  ~ClMsgUwPhyGetLostPkts();
+
+  /**
+  * method to return the number of packets lost by the phy.
+  * @return the number of packets lost by the phy.
+  */
+  uint getLostPkts();
+
+  /**
+  * method to set the number of packets lost by the phy.
+  * @param lost_pkt: number of packets lost by the phy.
+  */
+  void setLostPkts(uint lost_pkt);
+
+  inline bool isControl() {return is_control;}
+
+
+private:
+
+  uint lost_packets; /* < Number of packets lost by the phy.*/
+  bool is_control;
     
 };
 

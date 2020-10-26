@@ -64,6 +64,14 @@ uwApplicationModule::openConnectionUDP()
 					<< endl;
 		exit(1);
 	}
+
+	if (setsockopt(servSockDescr, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int)) == -1) {
+		if(debug_ >=0)
+			std::cout << "[" << getEpoch() << "]::" << NOW 
+					  << "UWAPPLICATION::ERROR::REUSABLE_FAIL"
+					  << std::endl;
+	}
+
 	if (debug_ >= 2)
 		std::cout << "[" << getEpoch() << "]::" << NOW
 				  << "::UWAPPLICATION::OPEN_CONNECTION_UDP::SOCKET_CREATED"

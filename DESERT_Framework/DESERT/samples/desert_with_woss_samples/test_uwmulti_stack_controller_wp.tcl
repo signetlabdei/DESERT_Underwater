@@ -101,6 +101,7 @@ load libuwudp.so
 load libuwcbr.so
 load libuwcsmaalohatrigger.so
 load libuwinterference.so
+load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwmulti_stack_controller.so
 load libuwoptical_channel.so

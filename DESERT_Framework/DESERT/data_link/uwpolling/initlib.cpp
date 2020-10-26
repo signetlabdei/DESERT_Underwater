@@ -38,6 +38,7 @@
 #include <tclcl.h>
 #include "uwpolling_AUV.h"
 #include "uwpolling_NODE.h"
+#include "uwpolling_SINK.h"
 #include "uwpolling_cmn_hdr.h"
 #include "sap.h"
 #include "packet.h"
@@ -45,10 +46,16 @@
 int hdr_PROBE::offset_ = 0;
 int hdr_TRIGGER::offset_ = 0;
 int hdr_POLL::offset_ = 0;
+int hdr_AUV_MULE::offset_ = 0;
+int hdr_ACK_SINK::offset_ = 0;
+int hdr_PROBE_SINK::offset_ = 0;
 
 packet_t PT_TRIGGER;
 packet_t PT_PROBE;
+packet_t PT_PROBE_SINK;
 packet_t PT_POLL;
+packet_t PT_AUV_MULE;
+packet_t PT_ACK_SINK;
 
 /**
  * Class that describe the Header of PROBE Packet
@@ -101,6 +108,57 @@ public:
 	}
 } class_hdr_POLL;
 
+/**
+ * Class that describe the Header of AUV_MULEt
+ */
+static class AuvMuleHeaderClass : public PacketHeaderClass
+{
+public:
+	/**
+	 * Constructor of the class
+	 */
+	AuvMuleHeaderClass()
+		: PacketHeaderClass("PacketHeader/AUV_MULE", sizeof(hdr_AUV_MULE))
+	{
+		this->bind();
+		bind_offset(&hdr_AUV_MULE::offset_);
+	}
+} class_hdr_AUV_MULE;
+
+/**
+ * Class that describe the Header of ACK sent by the sink
+ */
+static class AckSinkHeaderClass : public PacketHeaderClass
+{
+public:
+	/**
+	 * Constructor of the class
+	 */
+	AckSinkHeaderClass()
+		: PacketHeaderClass("PacketHeader/ACK_SINK", sizeof(hdr_ACK_SINK))
+	{
+		this->bind();
+		bind_offset(&hdr_ACK_SINK::offset_);
+	}
+} class_hdr_ACK_SINK;
+
+/**
+ * Class that describe the Header of PROBE_SINK Packet
+ */
+static class ProbeSinkHeaderClass : public PacketHeaderClass
+{
+public:
+	/**
+	 * Constructor of the class
+	 */
+	ProbeSinkHeaderClass()
+		: PacketHeaderClass("PacketHeader/PROBE_SINK", sizeof(hdr_PROBE_SINK))
+	{
+		this->bind();
+		bind_offset(&hdr_PROBE_SINK::offset_);
+	}
+} class_hdr_PROBE_SINK;
+
 extern EmbeddedTcl uwpolling_default;
 
 extern "C" int
@@ -109,6 +167,9 @@ Uwpolling_Init()
 	PT_PROBE = p_info::addPacket("UWPOLLING/PROBE");
 	PT_TRIGGER = p_info::addPacket("UWPOLLING/TRIGGER");
 	PT_POLL = p_info::addPacket("UWPOLLING/POLL");
+	PT_AUV_MULE = p_info::addPacket("UWPOLLING/AUV_MULE");
+	PT_ACK_SINK =p_info::addPacket("UWPOLLING/ACK_SINK");
+	PT_PROBE_SINK = p_info::addPacket("UWPOLLING/PROBE_SINK");
 	uwpolling_default.load();
 	return 0;
 }

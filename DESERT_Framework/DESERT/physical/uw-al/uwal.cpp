@@ -36,6 +36,7 @@
  */
 
 #include "uwal.h"
+#include <phymac-clmsg.h>
 
 /**
  * The size, in bytes, of the default Physical Service Data Unit (i.e., the
@@ -44,7 +45,7 @@
  */
 #define DEFAULT_PSDU 32
 
-using namespace std;
+
 
 /**
  * Class to create the Otcl shadow object for an object of the class Uwal.
@@ -64,20 +65,25 @@ public:
 } class_module_uwal;
 
 Uwal::Uwal()
-	: InterframeTmr(this)
+	: nodeID(0)
+	, pkt_counter(0)
+	, pPacker(NULL)
+	, PSDU(DEFAULT_PSDU)
+	, dummyStr("")
+	, debug_(0)
+	, sendDownPkts()
+	, sendDownFrames()
+	, sendUpFrameSet()
+	, InterframeTmr(this)
+	, interframe_period(0)
+	, frame_set_validity(0)
+	, frame_padding(0)
+	, force_endTx_(0)
 {
-	nodeID = 0;
-	pkt_counter = 0;
-	pPacker = NULL;
-	PSDU = DEFAULT_PSDU;
-	dummyStr = "";
 	while (dummyStr.size() < PSDU) {
 		dummyStr += " DEFAULT DUMMY STRING ";
 	}
-	debug_ = 0;
-	interframe_period = 0;
-	frame_set_validity = 0;
-	frame_padding = 0;
+	dummyStr.resize(PSDU);
 
 	bind("nodeID", (int *) &nodeID);
 	bind("PSDU", (int *) &PSDU);
@@ -86,6 +92,7 @@ Uwal::Uwal()
 	bind("interframe_period", &interframe_period);
 	bind("frame_set_validity", &frame_set_validity);
 	bind("frame_padding", &frame_padding);
+	bind("force_endTx", &force_endTx_);
 }
 
 Uwal::~Uwal()
@@ -343,8 +350,8 @@ Uwal::fragmentPkt(Packet *p)
 						  << lastFramePayloadLength << std::endl;
 			}
 
-			for (int i = 0; i < frameNumber; i++) {
-				f_tmp = Packet::alloc();
+			for (uint i = 0; i < frameNumber; i++) {
+				f_tmp =  p->copy();
 				initializeHdr(f_tmp, hal->pktID());
 
 				hal_tmp = HDR_UWAL(f_tmp);
@@ -390,7 +397,7 @@ Uwal::fragmentPkt(Packet *p)
 
 			if (lastFramePayloadLength > 0) {
 
-				f_tmp = Packet::alloc();
+				f_tmp = p->copy();
 				initializeHdr(f_tmp, hal->pktID());
 
 				hal_tmp = HDR_UWAL(f_tmp);
@@ -471,9 +478,9 @@ Uwal::reassembleFrames(Packet *p)
 		if (it != sendUpFrameSet.end()) {
 			if (hal->Mbit()) { // not the last pkt frame
 				//(it->second).UpdateRxFrameSet(hal->binPkt() +
-				//hal->binHdrLength(), hal->framePayloadOffset(),
-				//hal->binPktLength() - hal->binHdrLength(), -1,
-				//Scheduler::instance().clock());
+				// hal->binHdrLength(), hal->framePayloadOffset(),
+				// hal->binPktLength() - hal->binHdrLength(), -1,
+				// Scheduler::instance().clock());
 				(it->second)
 						.UpdateRxFrameSet(hal->binPkt() + hal->binHdrLength(),
 								framePayloadOffset,
@@ -482,16 +489,16 @@ Uwal::reassembleFrames(Packet *p)
 								Scheduler::instance().clock());
 			} else {
 				//(it->second).UpdateRxFrameSet(hal->binPkt() +
-				//hal->binHdrLength(), hal->framePayloadOffset(),
-				//hal->binPktLength() - hal->binHdrLength(),
+				// hal->binHdrLength(), hal->framePayloadOffset(),
+				// hal->binPktLength() - hal->binHdrLength(),
 				//(hal->framePayloadOffset() + hal->binPktLength() -
-				//hal->binHdrLength()), Scheduler::instance().clock());
+				// hal->binHdrLength()), Scheduler::instance().clock());
 				(it->second)
 						.UpdateRxFrameSet(hal->binPkt() + hal->binHdrLength(),
 								framePayloadOffset,
 								hal->binPktLength() - hal->binHdrLength(),
 								(framePayloadOffset + hal->binPktLength() -
-												  hal->binHdrLength()),
+										hal->binHdrLength()),
 								Scheduler::instance().clock());
 			}
 
@@ -525,7 +532,7 @@ Uwal::reassembleFrames(Packet *p)
 						framePayloadOffset,
 						hal->binPktLength() - hal->binHdrLength(),
 						(hal->framePayloadOffset() + hal->binPktLength() -
-												hal->binHdrLength()),
+								hal->binHdrLength()),
 						Scheduler::instance().clock());
 			}
 
@@ -560,6 +567,19 @@ Uwal::reassembleFrames(Packet *p)
 			}
 		}
 	}
+}
+
+int
+Uwal::recvSyncClMsg(ClMessage *m)
+{
+	if (m->type() == CLMSG_PHY2MAC_ENDTX && !force_endTx_) {
+		hdr_uwal *hal = HDR_UWAL(((ClMsgPhy2MacEndTx *) m)->pkt);
+		if (!hal->Mbit()) {
+			Phy2MacEndTx(((ClMsgPhy2MacEndTx *) m)->pkt);
+		}
+		return 0;
+	} else
+		return Module::recvSyncClMsg(m);
 }
 
 void
@@ -662,7 +682,7 @@ Uwal::startTx(Packet *p)
 											  // interframe_period );
 	hdr_uwal *hal = HDR_UWAL(p);
 
-	if (!hal->Mbit()) {
+	if (!hal->Mbit() && force_endTx_) {
 		endTx(p);
 	}
 	sendDown(p);

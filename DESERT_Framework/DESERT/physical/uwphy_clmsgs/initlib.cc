@@ -40,8 +40,10 @@
 ClMessage_t CLMSG_UWPHY_TX_POWER;
 ClMessage_t CLMSG_UWPHY_B_RATE;
 ClMessage_t CLMSG_UWPHY_THRESH;
+ClMessage_t CLMSG_UWPHY_LOSTPKT;
 ClMessage_t CLMSG_S2C_TX_MODE;
 ClMessage_t CLMSG_S2C_POWER_LEVEL;
+ClMessage_t CLMSG_S2C_RX_FAILED;
 
 extern EmbeddedTcl UwPhyClMsgsInitTclCode;
 
@@ -49,8 +51,10 @@ extern "C" int Uwphy_clmsgs_Init() {
 	CLMSG_UWPHY_TX_POWER = ClMessage::addClMessage();
 	CLMSG_UWPHY_B_RATE = ClMessage::addClMessage();
 	CLMSG_UWPHY_THRESH = ClMessage::addClMessage();
+	CLMSG_UWPHY_LOSTPKT = ClMessage::addClMessage();
 	CLMSG_S2C_TX_MODE = ClMessage::addClMessage();
 	CLMSG_S2C_POWER_LEVEL = ClMessage::addClMessage();
+	CLMSG_S2C_RX_FAILED = ClMessage::addClMessage();
 	UwPhyClMsgsInitTclCode.load();
 	return 0;
 }

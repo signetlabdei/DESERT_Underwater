@@ -135,7 +135,8 @@ UwAhoiPhy::initializeLUT()
 			std::getline(line_stream, token, pdr_token_separator_);
 			double p = stod(token);
 			range2pdr_[d] = p;
-			std::cout << d << " " << p << endl;
+			if (debug_)
+				std::cout << d << " " << p << endl;
 		}
 	} else {
 		cerr << "Impossible to open file " << pdr_file_name_ << endl;
@@ -158,7 +159,8 @@ UwAhoiPhy::initializeLUT()
 			std::getline(line_stream, token, pdr_token_separator_);
 			double p = stod(token);
 			sir2pdr_[sir] = p;
-			std::cout << sir << " " << p << endl;
+			if (debug_)
+				std::cout << sir << " " << p << endl;
 		}
 	} else {
 		cerr << "Impossible to open file " << sir_file_name_ << endl;
@@ -187,6 +189,7 @@ UwAhoiPhy::endRx(Packet *p)
 			double x = RNG::defaultrng()->uniform_double();
 			per_n = getPER(ph->Pr / ph->Pn, p);
 			bool error_n = x <= per_n;
+			error_n = 0;
 			bool error_ni = 0;
 			double interference = interference_ ? 
 				interference_->getInterferencePower(p):0;

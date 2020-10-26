@@ -219,7 +219,7 @@ MdriverS2C_EvoLogics::change_power_level()
 }
 
 bool
-MdriverS2C_EvoLogics::is_number(const string s)
+MdriverS2C_EvoLogics::is_number(const std::string s)
 {
 	std::string::const_iterator it = s.begin();
 	while (it != s.end() && std::isdigit(*it))

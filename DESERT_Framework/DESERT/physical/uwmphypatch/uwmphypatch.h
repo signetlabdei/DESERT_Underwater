@@ -51,7 +51,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-using namespace std;
+
 
 /**
  * Class to patch the absence of a PHY layer's module when we want to use a

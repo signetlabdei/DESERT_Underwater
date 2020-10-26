@@ -171,10 +171,11 @@ UwOpticalBeamPattern::startRx(Packet *p)
 	Position *destination = ph->dstPosition;
 	double dist = source->getDist(destination);
 
+
 	if ((PktRx == 0) && (txPending == false)) {
 		double max_tx_range = getMaxTxRange(p);
 		if (debug_)
-			cout << "UwOpticalBeamPattern::startRx max_tx_range LUT = " << max_tx_range 
+			cout << NOW << " UwOpticalBeamPattern::startRx max_tx_range LUT = " << max_tx_range 
 					 << " distance = " << dist << endl;
 		if (max_tx_range > dist) {
 			if (ph->modulationType == MPhy_Bpsk::modid) {
@@ -183,19 +184,19 @@ UwOpticalBeamPattern::startRx(Packet *p)
 				return;
 			} else {
 				if (debug_)
-					cout << "UwOpticalBeamPattern::Drop Packet::Wrong modulation"
+					cout << NOW << " UwOpticalBeamPattern::Drop Packet::Wrong modulation"
 						 << endl;
 			}
 		} else {
 			if (debug_)
-				cout << "UwOpticalBeamPattern::Drop Packet::Distance = "
+				cout << NOW << " UwOpticalBeamPattern::Drop Packet::Distance = "
 					 << dist
 					 << ", Above Max Range = " << max_tx_range
 					 << endl;
 		}
 	} else {
 		if (debug_)
-			cout << "UwOpticalBeamPattern::Drop Packet::Synced onto another packet "
+			cout << NOW << " UwOpticalBeamPattern::Drop Packet::Synced onto another packet "
 					"PktRx = "
 				 << PktRx << ", pending = " << txPending << endl;
 	}
@@ -231,7 +232,7 @@ UwOpticalBeamPattern::getMaxTxRange(Packet *p)
 	}
 	double max_distance = getLutMaxDist(c,na);	
 	if (debug_)
-		cout << "UwOpticalBeamPattern::getMaxTxRange max_distance LUT = " 
+		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange max_distance LUT = " 
 			<< max_distance << endl;
 	/*if(beta == 0) {
 		return max_distance;
@@ -239,12 +240,12 @@ UwOpticalBeamPattern::getMaxTxRange(Packet *p)
 	double norm_beam_factor_rx = getLutBeamFactor(beam_lut_rx_, beta);
 	double norm_beam_factor_tx = getLutBeamFactor(beam_lut_tx_, beta_tx);	
 	if (debug_)
-		cout << "UwOpticalBeamPattern::getMaxTxRange norm_beam_factor = " 
+		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor = " 
 			<< norm_beam_factor_rx << ", beta = " << beta << endl;
 	double norm_beam_factor_xy_rx = getLutBeamFactor(beam_lut_rx_, beta_xy);
 	double norm_beam_factor_xy_tx = getLutBeamFactor(beam_lut_tx_, beta_xy_tx);		
 	if (debug_)
-		cout << "UwOpticalBeamPattern::getMaxTxRange norm_beam_factor_xy = " 
+		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor_xy = " 
 			<< norm_beam_factor_xy_rx << ", beta_xy = " << beta_xy << endl;
 	return max_distance * norm_beam_factor_rx * norm_beam_factor_xy_rx 
 			* norm_beam_factor_tx * norm_beam_factor_xy_tx;

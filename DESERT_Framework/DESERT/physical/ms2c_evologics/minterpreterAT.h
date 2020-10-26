@@ -52,7 +52,7 @@
 #include <unistd.h>
 #include <cmath>
 
-using namespace std;
+
 
 /* @author: Riccardo Masiero
  * @date:   06/02/2012

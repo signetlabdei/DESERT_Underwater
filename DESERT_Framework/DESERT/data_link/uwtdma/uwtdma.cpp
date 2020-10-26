@@ -194,8 +194,8 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 void
 UwTDMA::stateTxData()
 {
-	if (transceiver_status == TRANSMITTING)
-		transceiver_status = IDLE;
+	//if (transceiver_status == TRANSMITTING)
+	//	transceiver_status = IDLE;
 	txData();
 }
 
@@ -235,11 +235,15 @@ UwTDMA::txData()
 void
 UwTDMA::Mac2PhyStartTx(Packet *p)
 {
-	if (sea_trial_ != 1)
+	if (!sea_trial_)
 		assert(transceiver_status == IDLE);
 
 	transceiver_status = TRANSMITTING;
-	MMac::Mac2PhyStartTx(p);
+	if(sea_trial_) {
+		sendDown(p, 0.01);
+	} else {
+		MMac::Mac2PhyStartTx(p);
+	}
 
 	if (debug_ < -5)
 		std::cout << NOW << " ID " << addr << ": Sending packet" << std::endl;
@@ -259,6 +263,7 @@ UwTDMA::Phy2MacEndTx(const Packet *p)
 		out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 					   << "::TDMA_node(" << addr << ")::Phy2MacEndTx(p)"
 					   << std::endl;
+
 	txData();
 }
 
@@ -317,7 +322,9 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 			txData();
 
 	} else {
-		Packet::free(p);
+		if(!sea_trial_) {
+			Packet::free(p);
+		}
 		if (debug_)
 			std::cout << NOW << " ID " << addr
 					  << ": Received packet while transmitting " << std::endl;
@@ -325,6 +332,8 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::RCVD_PCK_WHILE_TX"
 						   << std::endl;
+			sendUp(p);
+			incrDataPktsRx();
 	}
 }
 

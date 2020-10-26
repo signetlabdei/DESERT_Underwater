@@ -61,13 +61,13 @@
 #define _MAX_QUEUE_LENGTH \
 	20 /**< Maximum length of queue containing the messages from modem */
 
-using namespace std;
+
 
 // Forward declaration to avoid dependence from UWMdriver.h
 class UWMdriver;
 
 struct msgModem {
-	string msg_rx; /**< Message from the modem.*/
+	std::string msg_rx; /**< Message from the modem.*/
 	int msg_length; /**< Length of the message (bytes).*/
 };
 
@@ -80,7 +80,7 @@ struct msgModem {
 class UWMconnector
 {
 public:
-	queue<msgModem> queueMsg; /**< Queue used to buffer incoming strings from
+	std::queue<msgModem> queueMsg; /**< Queue used to buffer incoming strings from
 								 the modem.*/
 
 	/**

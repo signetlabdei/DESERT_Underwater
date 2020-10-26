@@ -38,12 +38,12 @@
 #ifndef FRAMESET_H
 #define FRAMESET_H
 
+#include <cstring>
+#include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 #include <string.h>
-#include <cstring>
-#include <sstream>
 
 #include "stdint.h"
 
@@ -52,7 +52,7 @@
 #define MAX_BIN_PAYLOAD_CHECK_ARRAY_LENGTH \
 	((MAX_BIN_PAYLOAD_ARRAY_LENGTH + sizeof(char) - 1) / sizeof(char))
 
-using namespace std;
+
 
 class RxFrameSetKey
 {
@@ -91,10 +91,9 @@ public:
 class RxFrameSet
 {
 
-	char
-			binPayload_[MAX_BIN_PAYLOAD_ARRAY_LENGTH]; /**< array to store
-														  binary data received
-														  as frames. */
+	char binPayload_[MAX_BIN_PAYLOAD_ARRAY_LENGTH]; /**< array to store
+													   binary data received
+													   as frames. */
 	char binPayloadCheck_
 			[MAX_BIN_PAYLOAD_CHECK_ARRAY_LENGTH]; /**< array to count already
 													 received frames. */

@@ -53,7 +53,7 @@
 #include <cmath>
 #include <climits>
 
-using namespace std;
+
 
 /** Class used to build and parse TELEGRAMS (this class derives UWMinterpreter);
  * currently, this class implements methods to build/parse:
