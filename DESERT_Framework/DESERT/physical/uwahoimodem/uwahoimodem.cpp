@@ -431,6 +431,9 @@ UwAhoiModem::receivingData()
 			if ((pck = p_interpreter->parseResponse(cmd_b, cmd_e)) != nullptr) {
 
 				updateStatus(pck);
+				printOnLog(LogLevel::DEBUG,
+						   "AHOIMODEM",
+						   "receivingData::RX_MSG=" + std::string(cmd_b, cmd_e));
 			}
 
 			offset = std::distance(cmd_e, end_it);
