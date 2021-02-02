@@ -1,3 +1,9 @@
+3.2.2 - 2021-02-02
+	* Update zlib to Latest
+	* Fix hd5 to use local zlib
+	* Fix tclcl installation of zlib
+	* Fixes on doxygen and minor improvements
+
 3.2.0 - 2020-26-10
 	* Various fixes on uwApplication
 	* Improvements and new features on uwpolling

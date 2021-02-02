@@ -336,7 +336,7 @@ build_TCLCL() {
                 --build=${HOST}                     \
                 --with-tcl=../tcl-${TCL_VERSION}/   \
                 --with-tcl-ver=8.4                  \
-                --with-zlib=../zlib-${ZLIB_VERSION} \
+                --with-zlib=${DEST_FOLDER} \
                 --exec-prefix=${DEST_FOLDER}        \
                 >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
@@ -724,6 +724,7 @@ build_HDF5() {
                 --host=${ARCH}          \
                 --build=${HOST}         \
                 --enable-shared         \
+                --with-zlib=${DEST_FOLDER} \
                 --prefix=${DEST_FOLDER} \
                 >> "${currentBuildLog}/hdf5-${HDF5_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then

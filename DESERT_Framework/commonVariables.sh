@@ -65,7 +65,7 @@ export LOG_DIR_BUILD=""
 export PATCHES_TAR_FILE=${ROOT_DESERT}/patches.tar.gz
 export PATCHES_DIR=patches
 
-export ZLIB_VERSION=1.2.7
+export ZLIB_VERSION=1.2.11
 export ZLIB_TAR_FILE=${ROOT_DESERT}/zlib-${ZLIB_VERSION}.tar.gz
 export ZLIB_DIR=zlib-${ZLIB_VERSION}
 
