@@ -14,11 +14,13 @@ importance to realize a communication and networking architecture that
 allows heterogeneous nodes to communicate reliably in the underwater 
 environment.
 
+### Documentation
 
+See our [github.io webpage](https://signetlabdei.github.io/DESERT_Underwater_doc/)
 
-### Installation
+### Website
 
-To install DESERT Underwater follow the instructions at the [doxygen documentation](http://telecom.dei.unipd.it/ns/desert/DESERT3_HTML_doxygen_doc/)
+Checkout our [website](http://desert-underwater.dei.unipd.it/)
 
 ### Samples
 
@@ -35,9 +37,14 @@ The basic structure of DESERT adheres to the
 A set of **packers** allows DESERT to also be connected to real devices, thus using the same 
 code in both simulation and a real sea experiment.
 
+### Code style
+
+Please take a look at the [code style](coding_rules.md)
+
 ### Contributing to the project
 
 Contributions from the community are welcome and appreciated. 
 To maintain consinstency and provide ease of integration and readability, the project has a set of rules for 
 coding and submitting changes. Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) 
 if you want to contribute.
+Before committing your changes, please give a read at this [set of rules](commit_rules.md)

@@ -1,3 +1,6 @@
+3.2.3 - 2021-03-14
+	* Improved doxygen documentation and project README
+	* Now doxygen is hosted on github pages
 3.2.2 - 2021-02-02
 	* Update zlib to Latest
 	* Fix hd5 to use local zlib
