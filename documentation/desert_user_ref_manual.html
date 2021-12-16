@@ -1,0 +1,4594 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2021-12-17 Fri 00:55 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DESERT Underwater</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Roberto Francescon &lt;roberto.francescon@wirelessandmore.it&gt;" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">DESERT Underwater
+<br />
+<span class="subtitle">User Reference Manual</span>
+</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgfc518cf">1. Introduction</a></li>
+<li><a href="#org47c6913">2. physical layer</a>
+<ul>
+<li><a href="#orgae57cc5">2.1. <code>Module/UW/MPhypatch</code> (<i>UWMPhypatch</i>) : <i>MPhy</i></a>
+<ul>
+<li><a href="#orge27c79f">2.1.1. Bound variables</a></li>
+<li><a href="#org541aaf8">2.1.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org945606c">2.2. <code>Module/UW/UwModem/AHOI</code> (<i>UwAhoiModem</i>) : <i>UwModem</i></a>
+<ul>
+<li><a href="#org6fb6404">2.2.1. Bound variables</a></li>
+<li><a href="#orgaf1b7cd">2.2.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org71d34cc">2.3. <code>Module/UW/GAINFROMDB</code> (<i>UnderwaterGainFromDb</i>) : <i>UnderwaterPhysical</i></a>
+<ul>
+<li><a href="#orgdcfb464">2.3.1. Bound variables</a></li>
+<li><a href="#orgef97571">2.3.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org89f0735">2.4. <code>Module/UW/MPhy_modem/S2CLowLevel</code> (<i>MS2C_Evo_lowlev</i>) : <i>UWMPhy_modem</i></a>
+<ul>
+<li><a href="#org52639a7">2.4.1. Bound variables</a></li>
+<li><a href="#orgde9e92d">2.4.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orge42feef">2.5. <code>Module/UW/PROPAGATIONROGERS</code> (<i>UnderwaterPhysicalRogersModel</i>) : <i>UnderwaterMPropagation</i></a>
+<ul>
+<li><a href="#org3ca03af">2.5.1. Bound variables</a></li>
+<li><a href="#orgb2ec0b5">2.5.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org5d2b2de">2.6. <code>Module/UW/AHOI/PHY</code> (<i>UwAhoiPhy</i>) : //</a>
+<ul>
+<li><a href="#org10df4f5">2.6.1. Bound variables</a></li>
+<li><a href="#org45b5dea">2.6.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org7e9594a">2.7. <code>Module/UW/UWOPTICALBEAMPATTERN</code> (<i>UwOpticalBeamPattern</i>) : <i>UwOpticalPhy</i></a>
+<ul>
+<li><a href="#org1902cd5">2.7.1. Bound variables</a></li>
+<li><a href="#org2eb0659">2.7.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org139ca9e">2.8. <code>Module/UW/PHYSICAL</code> (<i>UnderwaterPhysical</i>) : <i>UnderwaterMPhyBpsk</i></a>
+<ul>
+<li><a href="#orgd654c1d">2.8.1. Bound variables</a></li>
+<li><a href="#orgf4e717a">2.8.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgfa2fa7a">2.9. <code>Module/UW/HERMES/PHY</code> (<i>UwHermesPhy</i>) : <i>UnderwaterPhysical</i></a>
+<ul>
+<li><a href="#org253cf98">2.9.1. Bound variables</a></li>
+<li><a href="#org39dad9c">2.9.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orga441fe3">2.10. <code>Module/UW/UwModem/EvoLogicsS2C</code> (<i>UwEvoLogicsS2CModem</i>) : <i>UwModem</i></a>
+<ul>
+<li><a href="#org88d08a1">2.10.1. Bound variables</a></li>
+<li><a href="#org91af830">2.10.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org12ccd8b">2.11. <code>Module/UW/PHYSICALFROMDB</code> (<i>UnderwaterPhysicalfromdb</i>) : <i>UnderwaterGainFromDb</i></a>
+<ul>
+<li><a href="#org96a769d">2.11.1. Bound variables</a></li>
+<li><a href="#orgc18d6eb">2.11.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgfed986c">2.12. <code>Module/UW/MPhy_modem/S2C</code> (<i>MS2C_EvoLogics</i>) : <i>UWMPhy_modem</i></a>
+<ul>
+<li><a href="#org966acd2">2.12.1. Bound variables</a></li>
+<li><a href="#org63b60e5">2.12.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org332bcd1">2.13. <code>UW/AL/Packer</code> (<i>packer</i>) : <i>TclObject</i></a>
+<ul>
+<li><a href="#org24ba165">2.13.1. Bound variables</a></li>
+<li><a href="#org7d22ec9">2.13.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgec0e08c">2.14. <code>Module/UW/AL</code> (<i>Uwal</i>) : <i>MPhy</i></a>
+<ul>
+<li><a href="#org1bf2609">2.14.1. Bound variables</a></li>
+<li><a href="#orgf70cd34">2.14.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org632386c">2.15. <code>Module/UW/HMMPHYSICAL</code> (<i>UnderwaterHMMPhysical</i>) : <i>UnderwaterPhysical</i></a>
+<ul>
+<li><a href="#orgd56deb2">2.15.1. Bound variables</a></li>
+<li><a href="#org254cd61">2.15.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org887d0ab">2.16. <code>Module/UW/HMMPHYSICAL/MCLINK</code> (<i>MCLink</i>) : <i>TclObject</i></a>
+<ul>
+<li><a href="#orgcfbe116">2.16.1. Bound variables</a></li>
+<li><a href="#org6e91fa9">2.16.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org2a19c45">2.17. <code>Module/UW/UwModem/ModemCSA</code> (<i>UwModemCSA</i>) : <i>UwModem {</i></a>
+<ul>
+<li><a href="#org817f1af">2.17.1. Bound variables</a></li>
+<li><a href="#orgda9a697">2.17.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org7f0b60c">2.18. <code>Module/UW/OPTICAL/PHY</code> (<i>UwOpticalPhy</i>) : <i>MPhy_Bpsk</i></a>
+<ul>
+<li><a href="#org0d2151a">2.18.1. Bound variables</a></li>
+<li><a href="#org8d487b2">2.18.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgbb499a3">2.19. <code>Module/UW/PHYSICALDB</code> (<i>UnderwaterPhysicaldb</i>) : //</a>
+<ul>
+<li><a href="#orgfe50b06">2.19.1. Bound variables</a></li>
+<li><a href="#org39ac4b3">2.19.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org937c117">3. data_link layer</a>
+<ul>
+<li><a href="#orgcd05fea">3.1. <code>Module/UW/TLOHI</code> (<i>MMacTLOHI</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgc4c5d1b">3.1.1. Bound variables</a></li>
+<li><a href="#org6cc9ff7">3.1.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orge4b104e">3.2. <code>MInterference/MIV/WKUP</code> (<i>MInterfMivUwWakeUp</i>) : //</a>
+<ul>
+<li><a href="#orgd97d7b1">3.2.1. Bound variables</a></li>
+<li><a href="#org69835ab">3.2.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgd3c9667">3.3. <code>Module/MPhy/Underwater/WKUP</code> (<i>MPhy_WakeUp</i>) : <i>MPhy</i></a>
+<ul>
+<li><a href="#org5f1afc0">3.3.1. Bound variables</a></li>
+<li><a href="#org4096f29">3.3.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org45ecafc">3.4. <code>Module/UW/ALOHA</code> (<i>UWAloha</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgcaf609d">3.4.1. Bound variables</a></li>
+<li><a href="#orgd4548d5">3.4.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgba7d3fa">3.5. <code>Module/UW/CSMA_ALOHA/TRIGGER/NODE</code> (<i>UwCsmaAloha_Trigger_NODE</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org8bc6d45">3.5.1. Bound variables</a></li>
+<li><a href="#orgb1ced0a">3.5.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgb4ef474">3.6. <code>Module/UW/CSMA_ALOHA/TRIGGER/SINK</code> (<i>UwCsmaAloha_Trigger_SINK</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org3e04666">3.6.1. Bound variables</a></li>
+<li><a href="#org1db9713">3.6.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org1b7da64">3.7. <code>Module/UW/TDMA</code> (<i>UwTDMA</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org5515f09">3.7.1. Bound variables</a></li>
+<li><a href="#orga3b32c8">3.7.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgd6a55a5">3.8. <code>Module/UW/TDMA_FRAME</code> (<i>UwTDMA_frame</i>) : <i>UwTDMA</i></a>
+<ul>
+<li><a href="#orge264010">3.8.1. Bound variables</a></li>
+<li><a href="#orgf1d0daf">3.8.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org7a15ee2">3.9. <code>Module/UW/DACAP</code> (<i>MMacDACAP</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org214cf01">3.9.1. Bound variables</a></li>
+<li><a href="#org5da8eba">3.9.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org8f8d6a1">3.10. <code>Module/UW/UFETCH/AUV</code> (<i>uwUFetch_AUV</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgfd1f5af">3.10.1. Bound variables</a></li>
+<li><a href="#org4ac80ec">3.10.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org7c0454c">3.11. <code>Module/UW/UFETCH/NODE</code> (<i>uwUFetch_NODE</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgb071a89">3.11.1. Bound variables</a></li>
+<li><a href="#org7bfc167">3.11.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org6281868">3.12. <code>Module/UW/UFETCH/AUV</code> (<i>uwUFetch_AUV</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org0315cf6">3.12.1. Bound variables</a></li>
+<li><a href="#org11e2222">3.12.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org5d773bc">3.13. <code>Module/UW/CSMA_ALOHA</code> (<i>CsmaAloha</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org2c7a3af">3.13.1. Bound variables</a></li>
+<li><a href="#org4b73bcc">3.13.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org425f496">3.14. <code>Module/UW/MLL</code> (<i>UWMllModule</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org640272b">3.14.1. Bound variables</a></li>
+<li><a href="#org7785508">3.14.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgc2443eb">3.15. <code>Module/UW/POLLING/NODE</code> (<i>Uwpolling_NODE</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgceb0fb4">3.15.1. Bound variables</a></li>
+<li><a href="#orgf375ca4">3.15.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org9c46cf7">3.16. <code>Module/UW/POLLING/AUV</code> (<i>Uwpolling_AUV</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org39dfccd">3.16.1. Bound variables</a></li>
+<li><a href="#org9d42c80">3.16.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orga418fc7">3.17. <code>Module/UW/POLLING/SINK</code> (<i>Uwpolling_SINK</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org951d4cf">3.17.1. Bound variables</a></li>
+<li><a href="#org53898a8">3.17.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org3c07a32">3.18. <code>Module/UW/CSMA_CA</code> (<i>CsmaCa</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#orgc108184">3.18.1. Bound variables</a></li>
+<li><a href="#org30eb9d4">3.18.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org49d70ba">3.19. <code>Module/UW/USR</code> (<i>MMacUWSR</i>) : <i>MMac</i></a>
+<ul>
+<li><a href="#org56b93e5">3.19.1. Bound variables</a></li>
+<li><a href="#orgea6f7ed">3.19.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org32e307c">4. network layer</a>
+<ul>
+<li><a href="#orgfe74b63">4.1. <code>Module/UW/SUNNode</code> (<i>SunIPRoutingNode</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org83bc75b">4.1.1. Bound variables</a></li>
+<li><a href="#org9dd24f1">4.1.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org92ae943">4.2. <code>Module/UW/SUNSink</code> (<i>SunIPRoutingSink</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orge31ed29">4.2.1. Bound variables</a></li>
+<li><a href="#org20e944b">4.2.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgf957075">4.3. <code>Module/UW/PosBasedRt</code> (<i>UwPosBasedRt</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orgf1ade81">4.3.1. Bound variables</a></li>
+<li><a href="#org1ffaada">4.3.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgdad711d">4.4. <code>Module/UW/PosBasedRt/ROV</code> (<i>UwPosBasedRtROV</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orge5e5036">4.4.1. Bound variables</a></li>
+<li><a href="#org1effb72">4.4.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgbbc0baa">4.5. <code>Module/UW/IP</code> (<i>UWIPModule</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org0b063c2">4.5.1. Bound variables</a></li>
+<li><a href="#org9d15a48">4.5.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orga3b778b">4.6. <code>Module/UW/FLOODING</code> (<i>UwFlooding</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org8d476eb">4.6.1. Bound variables</a></li>
+<li><a href="#org42ba8bc">4.6.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgf013347">4.7. <code>Module/UW/ICRPNode</code> (<i>UwIcrpNode</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orge5cc94f">4.7.1. Bound variables</a></li>
+<li><a href="#orga29e8ca">4.7.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org91b1ce2">4.8. <code>Module/UW/ICRPSink</code> (<i>UwIcrpSink</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org0fa6482">4.8.1. Bound variables</a></li>
+<li><a href="#orgdce593a">4.8.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org59c9198">4.9. <code>Module/UW/StaticRouting</code> (<i>UwStaticRoutingModule</i>) : //</a>
+<ul>
+<li><a href="#org203317f">4.9.1. Bound variables</a></li>
+<li><a href="#orgac11704">4.9.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org127b9b6">5. transport layer</a>
+<ul>
+<li><a href="#org00b613e">5.1. <code>Module/UW/UDP</code> (<i>UwUdp</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#org6add93a">5.1.1. Bound variables</a></li>
+<li><a href="#org7a648af">5.1.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgd3bb934">6. application layer</a>
+<ul>
+<li><a href="#org5175991">6.1. <code>Module/UW/APPLICATION</code> (<i>uwApplicationModule</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orgef45a91">6.1.1. Bound variables</a></li>
+<li><a href="#org8c624f5">6.1.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orgefc1f8e">6.2. <code>Module/UW/CBR</code> (<i>UwCbrModule</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orgccf3859">6.2.1. Bound variables</a></li>
+<li><a href="#org6925fb1">6.2.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orged36a4d">6.3. <code>Module/UW/VBR</code> (<i>UwVbrModule</i>) : <i>Module</i></a>
+<ul>
+<li><a href="#orgb3cfa17">6.3.1. Bound variables</a></li>
+<li><a href="#orgfda6ec3">6.3.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org2a665da">7. mobility layer</a>
+<ul>
+<li><a href="#orgcd473f3">7.1. <code>Position/UWSM</code> (<i>UWSMPosition</i>) : <i>Position</i></a>
+<ul>
+<li><a href="#org351bde5">7.1.1. Bound variables</a></li>
+<li><a href="#org9cc9526">7.1.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#org58e9857">7.2. <code>Position/UWGM</code> (<i>UwGMPosition</i>) : <i>Position</i></a>
+<ul>
+<li><a href="#org7ad7fdc">7.2.1. Bound variables</a></li>
+<li><a href="#orgc0fd1c1">7.2.2. Commands</a></li>
+</ul>
+</li>
+<li><a href="#orga9903ce">7.3. <code>Position/UWDRIFT</code> (<i>UwDriftPosition</i>) : <i>Position</i></a>
+<ul>
+<li><a href="#org15c2546">7.3.1. Bound variables</a></li>
+<li><a href="#orgd163caa">7.3.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org846823c">8. propagation layer</a>
+<ul>
+<li><a href="#org967431e">8.1. <code>Module/UW/OPTICAL/Propagation</code> (<i>UwOpticalMPropagation</i>) : <i>MPropagation</i></a>
+<ul>
+<li><a href="#orgfe35077">8.1.1. Bound variables</a></li>
+<li><a href="#orgbbaf699">8.1.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgeceb2de">9. channel layer</a>
+<ul>
+<li><a href="#orgf273678">9.1. <code>Module/UW/Optical/Channel</code> (<i>UwOpticalChannel</i>) : <i>ChannelModule</i></a>
+<ul>
+<li><a href="#org9fb00a1">9.1.1. Bound variables</a></li>
+<li><a href="#org4c108a5">9.1.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org7beb3ea">10. interference layer</a>
+<ul>
+<li><a href="#orgd91d85c">10.1. <code>Module/UW/INTERFERENCE</code> (<i>uwinterference</i>) : <i>MInterferenceMIV</i></a>
+<ul>
+<li><a href="#org19d211d">10.1.1. Bound variables</a></li>
+<li><a href="#org4921c10">10.1.2. Commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgfc518cf" class="outline-2">
+<h2 id="orgfc518cf"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This document is not a user manual, this document aims at being a complete reference for all the available settings that can be used in a Tcl script of a DESERT simulation.These settings can be divided into two categories: bound variables and commands: please see one of the simulation examples for their usage. The structure of each heading is the following: the first name, in monospace, is the name of the Tcl module that can be deployed in a simulation, then, in parentheses and in italic, is the C++ class that is mapped by this module and then after the comma, still in italic, is the father class of this C++ class. In general, everything in monospace refers to Tcl elements and everything in italic refers to C++ elements. For what concern the bound variables, their Tcl name is presented first, in monospace, then in parentheses and in italic, their bound C++ class member is found.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org47c6913" class="outline-2">
+<h2 id="org47c6913"><span class="section-number-2">2</span> physical layer</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgae57cc5" class="outline-3">
+<h3 id="orgae57cc5"><span class="section-number-3">2.1</span> <code>Module/UW/MPhypatch</code> (<i>UWMPhypatch</i>) : <i>MPhy</i></h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-orge27c79f" class="outline-4">
+<h4 id="orge27c79f"><span class="section-number-4">2.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org8b1e72f"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-2-1-1-1">
+<p>
+<i>Flag to enable debug mode (i.e., printing of debug    messages) if set to 1.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org541aaf8" class="outline-4">
+<h4 id="org541aaf8"><span class="section-number-4">2.1.2</span> Commands</h4>
+</div>
+</div>
+<div id="outline-container-org945606c" class="outline-3">
+<h3 id="org945606c"><span class="section-number-3">2.2</span> <code>Module/UW/UwModem/AHOI</code> (<i>UwAhoiModem</i>) : <i>UwModem</i></h3>
+<div class="outline-text-3" id="text-2-2">
+</div>
+<div id="outline-container-org6fb6404" class="outline-4">
+<h4 id="org6fb6404"><span class="section-number-4">2.2.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgeea7d9e"></a><code>buffer_size</code> (<i>DATA_BUFFER_LEN</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-1">
+<p>
+<i>Size of the buffer that holds data</i> 
+</p>
+</div>
+</li>
+<li><a id="org2b6b311"></a><code>max_read_size</code> (<i>MAX_READ_BYTES</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-2">
+<p>
+<i>Maximum number of bytes to be read by a single dump of data</i> 
+</p>
+</div>
+</li>
+<li><a id="org9eb7283"></a><code>parity_bit</code> (<i>parity_bit</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-3">
+<p>
+<i>flag for parity bit</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc5695d5"></a><code>stop_bit</code> (<i>stop_bit</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-4">
+<p>
+<i>flag for stop bit</i> 
+</p>
+</div>
+</li>
+<li><a id="org4408825"></a><code>flow_control</code> (<i>flow_control</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-5">
+<p>
+<i>flag for flow control</i> 
+</p>
+</div>
+</li>
+<li><a id="org1414125"></a><code>baud_rate</code> (<i>baud_rate</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-6">
+<p>
+<i>Integer for port baud rate</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc1b212f"></a><code>modem_id</code> (<i>id</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-7">
+<p>
+<i>Id of a parallel thread.</i> 
+</p>
+</div>
+</li>
+<li><a id="org296011f"></a><code>max_n_retx</code> (<i>MAX_RETX</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-8">
+<p>
+<i>Maximum number of retransmissions for the same packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org7ddb4f0"></a><code>wait_delivery</code> (<i>WAIT_DELIVERY_INT</i>)<br />
+<div class="outline-text-5" id="text-2-2-1-9">
+<p>
+<i>Time interval matching the WAIT_DELIVERY variable: version of type int to match the chrono one, needed because TclObject::bind does not support binding std::chrono variable [milliseconds]</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgaf1b7cd" class="outline-4">
+<h4 id="orgaf1b7cd"><span class="section-number-4">2.2.2</span> Commands</h4>
+</div>
+</div>
+<div id="outline-container-org71d34cc" class="outline-3">
+<h3 id="org71d34cc"><span class="section-number-3">2.3</span> <code>Module/UW/GAINFROMDB</code> (<i>UnderwaterGainFromDb</i>) : <i>UnderwaterPhysical</i></h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-orgdcfb464" class="outline-4">
+<h4 id="orgdcfb464"><span class="section-number-4">2.3.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-3-1">
+</div>
+<ol class="org-ol">
+<li><a id="org74b3564"></a><code>time_roughness_</code> (<i>time_roughness_</i>)<br />
+<div class="outline-text-5" id="text-2-3-1-1">
+<p>
+<i>Roughness of the temporal samples.</i> 
+</p>
+</div>
+</li>
+<li><a id="org91d6182"></a><code>depth_roughness_</code> (<i>depth_roughness_</i>)<br />
+<div class="outline-text-5" id="text-2-3-1-2">
+<p>
+<i>Roughness of the depth samples.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgcb91491"></a><code>distance_roughness_</code> (<i>distance_roughness_</i>)<br />
+<div class="outline-text-5" id="text-2-3-1-3">
+<p>
+<i>Roughness of the distance samples.</i> 
+</p>
+</div>
+</li>
+<li><a id="org20f6e8f"></a><code>total_time_</code> (<i>total_time_</i>)<br />
+<div class="outline-text-5" id="text-2-3-1-4">
+<p>
+<i>Maximum value of the temporal samples, after this limit the smilulation time will be reset to zero.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgad2bbaa"></a><code>frequency_correction_factor_</code> (<i>frequency_correction_factor_</i>)<br />
+<div class="outline-text-5" id="text-2-3-1-5">
+<p>
+<i>used to shift from a frequency value to another one.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgef97571" class="outline-4">
+<h4 id="orgef97571"><span class="section-number-4">2.3.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgcc6b0c4"></a><code>path</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org89f0735" class="outline-3">
+<h3 id="org89f0735"><span class="section-number-3">2.4</span> <code>Module/UW/MPhy_modem/S2CLowLevel</code> (<i>MS2C_Evo_lowlev</i>) : <i>UWMPhy_modem</i></h3>
+<div class="outline-text-3" id="text-2-4">
+</div>
+<div id="outline-container-org52639a7" class="outline-4">
+<h4 id="org52639a7"><span class="section-number-4">2.4.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-4-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgafd7ee2"></a><code>bitrate_index</code> (<i>bitrate_i</i>)<br />
+<div class="outline-text-5" id="text-2-4-1-1">
+<p>
+<i>Variable holding the bitrate index of the low level  firmware</i> 
+</p>
+</div>
+</li>
+<li><a id="org86e8dcc"></a><code>SL</code> (<i>SL</i>)<br />
+<div class="outline-text-5" id="text-2-4-1-2">
+<p>
+<i>Variable holding the Source Level of the low level driver</i> 
+</p>
+</div>
+</li>
+<li><a id="org418e66c"></a><code>msg_bitlength</code> (<i>msg_bitlen</i>)<br />
+<div class="outline-text-5" id="text-2-4-1-3">
+<p>
+<i>Very very temporary parameter to let the receiver not    screw up and read only the, known, number of bytes</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgde9e92d" class="outline-4">
+<h4 id="orgde9e92d"><span class="section-number-4">2.4.2</span> Commands</h4>
+</div>
+</div>
+<div id="outline-container-orge42feef" class="outline-3">
+<h3 id="orge42feef"><span class="section-number-3">2.5</span> <code>Module/UW/PROPAGATIONROGERS</code> (<i>UnderwaterPhysicalRogersModel</i>) : <i>UnderwaterMPropagation</i></h3>
+<div class="outline-text-3" id="text-2-5">
+</div>
+<div id="outline-container-org3ca03af" class="outline-4">
+<h4 id="org3ca03af"><span class="section-number-4">2.5.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-5-1">
+</div>
+<ol class="org-ol">
+<li><a id="org274be2b"></a><code>bottom_depth_</code> (<i>bottom_depth</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-1">
+<p>
+<i>Water depth (m)</i> 
+</p>
+</div>
+</li>
+<li><a id="orgecced4f"></a><code>sound_speed_water_bottom_</code> (<i>sound_speed_water_bottom</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-2">
+<p>
+<i>Speed of sound in water at the sea bottom level (m/s).</i> 
+</p>
+</div>
+</li>
+<li><a id="org2b0c715"></a><code>sound_speed_water_surface_</code> (<i>sound_speed_water_surface</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-3">
+<p>
+<i>Speed of sound in water at the sea  surface level (m/s).</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf29d2a3"></a><code>sound_speed_sediment_</code> (<i>sound_speed_sediment</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-4">
+<p>
+<i>Speed of sound in the sediment (m/s).</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc73906b"></a><code>density_sediment_</code> (<i>density_sediment</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-5">
+<p>
+<i>Sediment density (g/cm^3).</i> 
+</p>
+</div>
+</li>
+<li><a id="org401291b"></a><code>density_water_</code> (<i>density_water</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-6">
+<p>
+<i>Water density (g/cm^3).</i> 
+</p>
+</div>
+</li>
+<li><a id="org4e7d62c"></a><code>attenuation_coeff_sediment_</code> (<i>attenuation_coeff_sediment</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-7">
+<p>
+<i>Attenuation coefficient of the   sediment (dB/(m*kHz)).</i> 
+</p>
+</div>
+</li>
+<li><a id="org378c490"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-2-5-1-8">
+<p>
+<i>Flag to enable debug mode (i.e., printing of debug    messages) if set to 1.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgb2ec0b5" class="outline-4">
+<h4 id="orgb2ec0b5"><span class="section-number-4">2.5.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-5-2">
+</div>
+<ol class="org-ol">
+<li><a id="org85e7d1b"></a><code>getBottomDepth</code><br /></li>
+<li><a id="orgbd64a22"></a><code>getSoundSpeedWaterBottom</code><br /></li>
+<li><a id="org4dfab6a"></a><code>getSoundSpeedWaterSurface</code><br /></li>
+<li><a id="org565af71"></a><code>getSoundSpeedSediment</code><br /></li>
+<li><a id="orga17bbb2"></a><code>getDensitySediment</code><br /></li>
+<li><a id="orgc67cea8"></a><code>getDensityWater</code><br /></li>
+<li><a id="org65104a2"></a><code>getAttenuationCoeffSediment</code><br /></li>
+<li><a id="org8a275bf"></a><code>setBottomDepth</code><br /></li>
+<li><a id="orga0e9923"></a><code>setSoundSpeedWaterBottom</code><br /></li>
+<li><a id="orga37f962"></a><code>setSoundSpeedWaterSurface</code><br /></li>
+<li><a id="org51e0145"></a><code>setSoundSpeedSediment</code><br /></li>
+<li><a id="org79f779c"></a><code>setDensitySediment</code><br /></li>
+<li><a id="orgf1e7dd9"></a><code>setDensityWater</code><br /></li>
+<li><a id="orgbd62093"></a><code>setAttenuationCoeffSediment</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org5d2b2de" class="outline-3">
+<h3 id="org5d2b2de"><span class="section-number-3">2.6</span> <code>Module/UW/AHOI/PHY</code> (<i>UwAhoiPhy</i>) : //</h3>
+<div class="outline-text-3" id="text-2-6">
+</div>
+<div id="outline-container-org10df4f5" class="outline-4">
+<h4 id="org10df4f5"><span class="section-number-4">2.6.1</span> Bound variables</h4>
+</div>
+<div id="outline-container-org45b5dea" class="outline-4">
+<h4 id="org45b5dea"><span class="section-number-4">2.6.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-6-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgedaf7be"></a><code>initLUT</code><br /></li>
+<li><a id="org16b2dbb"></a><code>setRangePDRFileName</code><br /></li>
+<li><a id="org5649846"></a><code>setSIRFileName</code><br /></li>
+<li><a id="orgc5dbec4"></a><code>setLUTSeparator</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org7e9594a" class="outline-3">
+<h3 id="org7e9594a"><span class="section-number-3">2.7</span> <code>Module/UW/UWOPTICALBEAMPATTERN</code> (<i>UwOpticalBeamPattern</i>) : <i>UwOpticalPhy</i></h3>
+<div class="outline-text-3" id="text-2-7">
+</div>
+<div id="outline-container-org1902cd5" class="outline-4">
+<h4 id="org1902cd5"><span class="section-number-4">2.7.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-7-1">
+</div>
+<ol class="org-ol">
+<li><a id="orge1d3fcf"></a><code>noise_threshold</code> (<i>back_noise_threshold_</i>)<br /></li>
+<li><a id="orgf6ec1d4"></a><code>inclination_angle_</code> (<i>inclination_angle_</i>)<br />
+<div class="outline-text-5" id="text-2-7-1-2">
+<p>
+<i>Angle of inclination from the 0 Zenith</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org2eb0659" class="outline-4">
+<h4 id="org2eb0659"><span class="section-number-4">2.7.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-7-2">
+</div>
+<ol class="org-ol">
+<li><a id="org7ee59d7"></a><code>useSameBeamPattern</code><br /></li>
+<li><a id="orgd763a3c"></a><code>useDifferentBeamPattern</code><br /></li>
+<li><a id="org8e10be8"></a><code>setBeamPatternPath</code><br /></li>
+<li><a id="orgbaf7350"></a><code>setMaxRangePath</code><br /></li>
+<li><a id="orgdc49aab"></a><code>setBeamSeparator</code><br /></li>
+<li><a id="org69b479d"></a><code>setMaxRangeSeparator</code><br /></li>
+<li><a id="orgf300655"></a><code>setInclinationAngle</code><br /></li>
+<li><a id="org2349bd2"></a><code>setBeamPatternPath</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org139ca9e" class="outline-3">
+<h3 id="org139ca9e"><span class="section-number-3">2.8</span> <code>Module/UW/PHYSICAL</code> (<i>UnderwaterPhysical</i>) : <i>UnderwaterMPhyBpsk</i></h3>
+<div class="outline-text-3" id="text-2-8">
+</div>
+<div id="outline-container-orgd654c1d" class="outline-4">
+<h4 id="orgd654c1d"><span class="section-number-4">2.8.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-8-1">
+</div>
+<ol class="org-ol">
+<li><a id="org09399cd"></a><code>rx_power_consumption_</code> (<i>rx_power_</i>)<br />
+<div class="outline-text-5" id="text-2-8-1-1">
+<p>
+<i>Power required in reception.</i> 
+</p>
+</div>
+</li>
+<li><a id="org9f7d20c"></a><code>tx_power_consumption_</code> (<i>tx_power_</i>)<br />
+<div class="outline-text-5" id="text-2-8-1-2">
+<p>
+<i>Power required in transmission.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgf4e717a" class="outline-4">
+<h4 id="orgf4e717a"><span class="section-number-4">2.8.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-8-2">
+</div>
+<ol class="org-ol">
+<li><a id="org32d3e7a"></a><code>getTxTime</code><br /></li>
+<li><a id="org985a950"></a><code>getRxTime</code><br /></li>
+<li><a id="org425d0cb"></a><code>getConsumedEnergyTx</code><br /></li>
+<li><a id="orgf849f4c"></a><code>getConsumedEnergyRx</code><br /></li>
+<li><a id="org9fe0c3d"></a><code>getTransmittedBytes</code><br /></li>
+<li><a id="orgd04ce90"></a><code>getTotPktsLost</code><br /></li>
+<li><a id="org6644970"></a><code>getCollisionsDATAvsCTRL</code><br /></li>
+<li><a id="orgec5e465"></a><code>getCollisionsCTRL</code><br /></li>
+<li><a id="orgf91af52"></a><code>getCollisionsDATA</code><br /></li>
+<li><a id="org4d5e274"></a><code>getTotCtrlPktsLost</code><br /></li>
+<li><a id="orge86d712"></a><code>getErrorCtrlPktsInterf</code><br /></li>
+<li><a id="orgc3670b7"></a><code>modulation</code><br /></li>
+<li><a id="orgcccc44c"></a><code>setInterferenceModel</code><br /></li>
+<li><a id="org5a3076c"></a><code>setInterference</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgfa2fa7a" class="outline-3">
+<h3 id="orgfa2fa7a"><span class="section-number-3">2.9</span> <code>Module/UW/HERMES/PHY</code> (<i>UwHermesPhy</i>) : <i>UnderwaterPhysical</i></h3>
+<div class="outline-text-3" id="text-2-9">
+</div>
+<div id="outline-container-org253cf98" class="outline-4">
+<h4 id="org253cf98"><span class="section-number-4">2.9.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-9-1">
+</div>
+<ol class="org-ol">
+<li><a id="orged46248"></a><code>BCH_N</code> (<i>BCH_T</i>)<br /></li>
+<li><a id="org96cbb90"></a><code>FRAME_BIT</code> (<i>FRAME_BIT</i>)<br /></li>
+</ol>
+</div>
+<div id="outline-container-org39dad9c" class="outline-4">
+<h4 id="org39dad9c"><span class="section-number-4">2.9.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-9-2">
+</div>
+<ol class="org-ol">
+<li><a id="org3e8e9d3"></a><code>initLUT</code><br /></li>
+<li><a id="org87eb8e1"></a><code>setLUTFileName</code><br /></li>
+<li><a id="orga0fa564"></a><code>setLUTSeparator</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga441fe3" class="outline-3">
+<h3 id="orga441fe3"><span class="section-number-3">2.10</span> <code>Module/UW/UwModem/EvoLogicsS2C</code> (<i>UwEvoLogicsS2CModem</i>) : <i>UwModem</i></h3>
+<div class="outline-text-3" id="text-2-10">
+</div>
+<div id="outline-container-org88d08a1" class="outline-4">
+<h4 id="org88d08a1"><span class="section-number-4">2.10.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-10-1">
+</div>
+<ol class="org-ol">
+<li><a id="org8d3db9a"></a><code>buffer_size</code> (<i>DATA_BUFFER_LEN</i>)<br />
+<div class="outline-text-5" id="text-2-10-1-1">
+<p>
+<i>Size of the buffer that holds data</i> 
+</p>
+</div>
+</li>
+<li><a id="org85f2122"></a><code>max_read_size</code> (<i>MAX_READ_BYTES</i>)<br />
+<div class="outline-text-5" id="text-2-10-1-2">
+<p>
+<i>Maximum number of bytes to be read by a single dump of data</i> 
+</p>
+</div>
+</li>
+<li><a id="org1303dff"></a><code>max_n_status_queries</code> (<i>MAX_N_STATUS_QUERIES</i>)<br />
+<div class="outline-text-5" id="text-2-10-1-3">
+<p>
+<i>Maximum number of time to query the modem transmission status before to  * discard the transmitted packet</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org91af830" class="outline-4">
+<h4 id="org91af830"><span class="section-number-4">2.10.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-10-2">
+</div>
+<ol class="org-ol">
+<li><a id="org066398f"></a><code>start</code><br /></li>
+<li><a id="org05c212e"></a><code>stop</code><br /></li>
+<li><a id="orgff66e37"></a><code>setBurstMode</code><br /></li>
+<li><a id="org23cef60"></a><code>setIMMode</code><br /></li>
+<li><a id="orgd6ac53e"></a><code>enableIMAck</code><br /></li>
+<li><a id="org47b7a74"></a><code>disableIMAck</code><br /></li>
+<li><a id="org958287c"></a><code>setSourceLevel</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org12ccd8b" class="outline-3">
+<h3 id="org12ccd8b"><span class="section-number-3">2.11</span> <code>Module/UW/PHYSICALFROMDB</code> (<i>UnderwaterPhysicalfromdb</i>) : <i>UnderwaterGainFromDb</i></h3>
+<div class="outline-text-3" id="text-2-11">
+</div>
+<div id="outline-container-org96a769d" class="outline-4">
+<h4 id="org96a769d"><span class="section-number-4">2.11.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-11-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgcd9d222"></a><code>tau_index_</code> (<i>tau_index</i>)<br />
+<div class="outline-text-5" id="text-2-11-1-1">
+<p>
+<i>Tau index to load in the file.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgc18d6eb" class="outline-4">
+<h4 id="orgc18d6eb"><span class="section-number-4">2.11.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-11-2">
+</div>
+<ol class="org-ol">
+<li><a id="org48493dc"></a><code>setPathGainmaps</code><br /></li>
+<li><a id="org5218c08"></a><code>setPathSelfInterference</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgfed986c" class="outline-3">
+<h3 id="orgfed986c"><span class="section-number-3">2.12</span> <code>Module/UW/MPhy_modem/S2C</code> (<i>MS2C_EvoLogics</i>) : <i>UWMPhy_modem</i></h3>
+<div class="outline-text-3" id="text-2-12">
+</div>
+<div id="outline-container-org966acd2" class="outline-4">
+<h4 id="org966acd2"><span class="section-number-4">2.12.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-12-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgf452728"></a><code>UseKeepOnline_</code> (<i>UseKeepOnline</i>)<br /></li>
+<li><a id="orga8dfac0"></a><code>NoiseProbeFrequency_</code> (<i>NoiseProbeFrequency</i>)<br /></li>
+<li><a id="org935e7ec"></a><code>MultipathProbeFrequency_</code> (<i>MultipathProbeFrequency</i>)<br /></li>
+<li><a id="orgc3cbd96"></a><code>DeafTime_</code> (<i>DeafTime</i>)<br /></li>
+</ol>
+</div>
+<div id="outline-container-org63b60e5" class="outline-4">
+<h4 id="org63b60e5"><span class="section-number-4">2.12.2</span> Commands</h4>
+</div>
+</div>
+<div id="outline-container-org332bcd1" class="outline-3">
+<h3 id="org332bcd1"><span class="section-number-3">2.13</span> <code>UW/AL/Packer</code> (<i>packer</i>) : <i>TclObject</i></h3>
+<div class="outline-text-3" id="text-2-13">
+</div>
+<div id="outline-container-org24ba165" class="outline-4">
+<h4 id="org24ba165"><span class="section-number-4">2.13.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-13-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgf996e4f"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-2-13-1-1">
+<p>
+<i>Flag to enable debug mode (i.e., printing of debug    messages) if set to 1.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc6a88ed"></a><code>SRC_ID_Bits</code> (<i>SRC_ID_Bits</i>)<br /></li>
+<li><a id="org8ebfc50"></a><code>PKT_ID_Bits</code> (<i>PKT_ID_Bits</i>)<br />
+<div class="outline-text-5" id="text-2-13-1-3">
+<p>
+<i>Bit length of the srcID_ field to be put in the    header stream of bits.</i> 
+</p>
+</div>
+</li>
+<li><a id="org086fff4"></a><code>FRAME_OFFSET_Bits</code> (<i>FRAME_OFFSET_Bits</i>)<br />
+<div class="outline-text-5" id="text-2-13-1-4">
+<p>
+<i>Bit length of the pktID_ field to be put in the    header stream of bits.</i> 
+</p>
+</div>
+</li>
+<li><a id="org7be1238"></a><code>M_BIT_Bits</code> (<i>M_BIT_Bits</i>)<br />
+<div class="outline-text-5" id="text-2-13-1-5">
+<p>
+<i>Bit length of the frameID_ field to be put in  the header stream of bits.</i> 
+</p>
+</div>
+</li>
+<li><a id="org2eccaae"></a><code>DUMMY_CONTENT_Bits</code> (<i>DUMMY_CONTENT_Bits</i>)<br />
+<div class="outline-text-5" id="text-2-13-1-6">
+<p>
+<i>Bit length of the Mbit_ field to be put in the   header stream of bits.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org7d22ec9" class="outline-4">
+<h4 id="org7d22ec9"><span class="section-number-4">2.13.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-13-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgcc102d3"></a><code>packerInit</code><br /></li>
+<li><a id="org2c9b43c"></a><code>printMap</code><br /></li>
+<li><a id="org55800da"></a><code>printAllFields</code><br /></li>
+<li><a id="org23fa1ab"></a><code>addPacker</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgec0e08c" class="outline-3">
+<h3 id="orgec0e08c"><span class="section-number-3">2.14</span> <code>Module/UW/AL</code> (<i>Uwal</i>) : <i>MPhy</i></h3>
+<div class="outline-text-3" id="text-2-14">
+</div>
+<div id="outline-container-org1bf2609" class="outline-4">
+<h4 id="org1bf2609"><span class="section-number-4">2.14.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-14-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgb5473b0"></a><code>nodeID</code> (<i>nodeID</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-1">
+<p>
+<i>Node ID</i> 
+</p>
+</div>
+</li>
+<li><a id="org08e57e9"></a><code>PSDU</code> (<i>PSDU</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-2">
+<p>
+<i>size of the PSDU</i> 
+</p>
+</div>
+</li>
+<li><a id="org44baddc"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-3">
+<p>
+<i>Flag to enable debug mode (i.e., printing of debug    messages) if set to 1.</i> 
+</p>
+</div>
+</li>
+<li><a id="org8498ad8"></a><code>interframe_period</code> (<i>interframe_period</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-4">
+<p>
+<i>Time period [s] between two successive frame  to be sent down.</i> 
+</p>
+</div>
+</li>
+<li><a id="org4618497"></a><code>frame_set_validity</code> (<i>frame_set_validity</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-5">
+<p>
+<i>Time of validity of a frame set</i> 
+</p>
+</div>
+</li>
+<li><a id="org0244623"></a><code>frame_padding</code> (<i>frame_padding</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-6">
+<p>
+<i>Flag to determine if perfoming bit padding up to   PSDU size.</i> 
+</p>
+</div>
+</li>
+<li><a id="org0cab89d"></a><code>force_endTx</code> (<i>force_endTx_</i>)<br />
+<div class="outline-text-5" id="text-2-14-1-7">
+<p>
+<i>0 not force, otherwise force endTx</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgf70cd34" class="outline-4">
+<h4 id="orgf70cd34"><span class="section-number-4">2.14.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-14-2">
+</div>
+<ol class="org-ol">
+<li><a id="org1e06eaa"></a><code>Reset_PER_List</code><br /></li>
+<li><a id="org28f80ed"></a><code>linkPacker</code><br /></li>
+<li><a id="orgbd6e7cb"></a><code>setDummyStr</code><br /></li>
+<li><a id="org77d1ccc"></a><code>Set_PER_List</code><br /></li>
+<li><a id="orgd91a65f"></a><code>Clear_PER_List</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org632386c" class="outline-3">
+<h3 id="org632386c"><span class="section-number-3">2.15</span> <code>Module/UW/HMMPHYSICAL</code> (<i>UnderwaterHMMPhysical</i>) : <i>UnderwaterPhysical</i></h3>
+<div class="outline-text-3" id="text-2-15">
+</div>
+<div id="outline-container-orgd56deb2" class="outline-4">
+<h4 id="orgd56deb2"><span class="section-number-4">2.15.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-15-1">
+</div>
+<ol class="org-ol">
+<li><a id="org853402f"></a><code>step_duration</code> (<i>step_duration</i>)<br />
+<div class="outline-text-5" id="text-2-15-1-1">
+<p>
+<i>sampling period for channel transitions</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org254cd61" class="outline-4">
+<h4 id="org254cd61"><span class="section-number-4">2.15.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-15-2">
+</div>
+<ol class="org-ol">
+<li><a id="orga056340"></a><code>getPktsTotBad</code><br /></li>
+<li><a id="orgeda4b8a"></a><code>getPktsTotGood</code><br /></li>
+<li><a id="org8550214"></a><code>setMCLink</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org887d0ab" class="outline-3">
+<h3 id="org887d0ab"><span class="section-number-3">2.16</span> <code>Module/UW/HMMPHYSICAL/MCLINK</code> (<i>MCLink</i>) : <i>TclObject</i></h3>
+<div class="outline-text-3" id="text-2-16">
+</div>
+<div id="outline-container-orgcfbe116" class="outline-4">
+<h4 id="orgcfbe116"><span class="section-number-4">2.16.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-16-1">
+</div>
+<ol class="org-ol">
+<li><a id="org91891f0"></a><code>p_succ_good</code> (<i>p_succ_good</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-1">
+<p>
+<i>Prob of successful reception with good channel</i> 
+</p>
+</div>
+</li>
+<li><a id="org2ceae68"></a><code>p_succ_bad</code> (<i>p_succ_bad</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-2">
+<p>
+<i>Prob of successful reception with bad channel</i> 
+</p>
+</div>
+</li>
+<li><a id="org6a74d7e"></a><code>p_gb</code> (<i>p_gb</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-3">
+<p>
+<i>Prob of transition from good to bad channel</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc887930"></a><code>p_bg</code> (<i>p_bg</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-4">
+<p>
+<i>Prob of transition from bad to good channel</i> 
+</p>
+</div>
+</li>
+<li><a id="orgeface12"></a><code>ch_state</code> (<i>ch_state</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-5">
+<p>
+<i>last channel state</i> 
+</p>
+</div>
+</li>
+<li><a id="org32d1e81"></a><code>last_step</code> (<i>last_step</i>)<br />
+<div class="outline-text-5" id="text-2-16-1-6">
+<p>
+<i>last time step associate to channel state</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org6e91fa9" class="outline-4">
+<h4 id="org6e91fa9"><span class="section-number-4">2.16.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-16-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgafd6d21"></a><code>getLastStep</code><br /></li>
+<li><a id="orgee8333a"></a><code>getChState</code><br /></li>
+<li><a id="orgf187df4"></a><code>getPSucc</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org2a19c45" class="outline-3">
+<h3 id="org2a19c45"><span class="section-number-3">2.17</span> <code>Module/UW/UwModem/ModemCSA</code> (<i>UwModemCSA</i>) : <i>UwModem {</i></h3>
+<div class="outline-text-3" id="text-2-17">
+</div>
+<div id="outline-container-org817f1af" class="outline-4">
+<h4 id="org817f1af"><span class="section-number-4">2.17.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-17-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgeda7ba4"></a><code>buffer_size</code> (<i>DATA_BUFFER_LEN</i>)<br />
+<div class="outline-text-5" id="text-2-17-1-1">
+<p>
+<i>Size of the buffer that holds data</i> 
+</p>
+</div>
+</li>
+<li><a id="orga3c122e"></a><code>max_read_size</code> (<i>MAX_READ_BYTES</i>)<br />
+<div class="outline-text-5" id="text-2-17-1-2">
+<p>
+<i>Maximum number of bytes to be read by a single dump of data</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgda9a697" class="outline-4">
+<h4 id="orgda9a697"><span class="section-number-4">2.17.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-17-2">
+</div>
+<ol class="org-ol">
+<li><a id="org97bda0a"></a><code>setServer</code><br /></li>
+<li><a id="orgbf320a5"></a><code>setTCP</code><br /></li>
+<li><a id="orga839665"></a><code>setUDP</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org7f0b60c" class="outline-3">
+<h3 id="org7f0b60c"><span class="section-number-3">2.18</span> <code>Module/UW/OPTICAL/PHY</code> (<i>UwOpticalPhy</i>) : <i>MPhy_Bpsk</i></h3>
+<div class="outline-text-3" id="text-2-18">
+</div>
+<div id="outline-container-org0d2151a" class="outline-4">
+<h4 id="org0d2151a"><span class="section-number-4">2.18.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-2-18-1">
+</div>
+<ol class="org-ol">
+<li><a id="org5ba2d98"></a><code>Id_</code> (<i>Id</i>)<br /></li>
+<li><a id="orgd08fd5c"></a><code>Il_</code> (<i>Il</i>)<br /></li>
+<li><a id="orgaa632d0"></a><code>R_</code> (<i>R</i>)<br /></li>
+<li><a id="orgb80cb52"></a><code>S_</code> (<i>S</i>)<br /></li>
+<li><a id="org3f1510a"></a><code>T_</code> (<i>T</i>)<br /></li>
+<li><a id="org5d7c6fb"></a><code>Ar_</code> (<i>Ar_</i>)<br /></li>
+</ol>
+</div>
+<div id="outline-container-org8d487b2" class="outline-4">
+<h4 id="org8d487b2"><span class="section-number-4">2.18.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-18-2">
+</div>
+<ol class="org-ol">
+<li><a id="org4ede2a6"></a><code>useLUT</code><br /></li>
+<li><a id="orge112567"></a><code>useWOSS</code><br /></li>
+<li><a id="org8ed9f36"></a><code>setVariableTemperature</code><br /></li>
+<li><a id="org6b17611"></a><code>setLUTFileName</code><br /></li>
+<li><a id="org71a9bd1"></a><code>setLUTSeparator</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgbb499a3" class="outline-3">
+<h3 id="orgbb499a3"><span class="section-number-3">2.19</span> <code>Module/UW/PHYSICALDB</code> (<i>UnderwaterPhysicaldb</i>) : //</h3>
+<div class="outline-text-3" id="text-2-19">
+</div>
+<div id="outline-container-orgfe50b06" class="outline-4">
+<h4 id="orgfe50b06"><span class="section-number-4">2.19.1</span> Bound variables</h4>
+</div>
+<div id="outline-container-org39ac4b3" class="outline-4">
+<h4 id="org39ac4b3"><span class="section-number-4">2.19.2</span> Commands</h4>
+<div class="outline-text-4" id="text-2-19-2">
+</div>
+<ol class="org-ol">
+<li><a id="org72caa8e"></a><code>addr</code><br /></li>
+<li><a id="org5ad911a"></a><code>setCountry</code><br /></li>
+<li><a id="org34d3129"></a><code>setModulation</code><br /></li>
+<li><a id="orgd1a9dcd"></a><code>addSnr</code><br /></li>
+<li><a id="orgdc3c7bf"></a><code>addSir</code><br /></li>
+<li><a id="orgb31910b"></a><code>addOverlap</code><br /></li>
+<li><a id="org3415aca"></a><code>setPath</code><br /></li>
+<li><a id="org9d3769b"></a><code>setInterference</code><br /></li>
+<li><a id="org8bdbf91"></a><code>addRange</code><br /></li>
+<li><a id="org5e38d23"></a><code>addTypeOfNode</code><br /></li>
+<li><a id="org4a0b691"></a><code>addRangeNum</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org937c117" class="outline-2">
+<h2 id="org937c117"><span class="section-number-2">3</span> data_link layer</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgcd05fea" class="outline-3">
+<h3 id="orgcd05fea"><span class="section-number-3">3.1</span> <code>Module/UW/TLOHI</code> (<i>MMacTLOHI</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-1">
+</div>
+<div id="outline-container-orgc4c5d1b" class="outline-4">
+<h4 id="orgc4c5d1b"><span class="section-number-4">3.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="orga47d3e1"></a><code>max_prop_delay</code> (<i>max_prop_delay</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-1">
+<p>
+<i>One way maximum propagation delay (in seconds)   in the network</i> 
+</p>
+</div>
+</li>
+<li><a id="org474695c"></a><code>HDR_size</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-2">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="orge3059b9"></a><code>ACK_size</code> (<i>ACK_size</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-3">
+<p>
+<i>Size of the ACK.</i> 
+</p>
+</div>
+</li>
+<li><a id="org78d83a7"></a><code>max_tx_rounds</code> (<i>max_tx_rounds</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-4">
+<p>
+<i>Maximum transmission round for one packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org08f1937"></a><code>wait_costant</code> (<i>wait_costant</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-5">
+<p>
+<i>Adding factor in the calculation of the listen time</i> 
+</p>
+</div>
+</li>
+<li><a id="org3e6f47d"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-6">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="orgcc9b951"></a><code>max_payload</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-7">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org8df6c3a"></a><code>recontend_time</code> (<i>recontend_time</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-8">
+<p>
+<i>Time needed for the recontention</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd9ebd39"></a><code>tone_data_delay</code> (<i>tone_data_delay</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-9">
+<p>
+<i>Not used anymore</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd95560c"></a><code>max_tx_tries</code> (<i>max_tx_tries</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-10">
+<p>
+<i>Maximum number of retransmissions attempt.</i> 
+</p>
+</div>
+</li>
+<li><a id="org2047676"></a><code>buffer_pkts</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-1-1-11">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org6cc9ff7" class="outline-4">
+<h4 id="org6cc9ff7"><span class="section-number-4">3.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="org21b6a5a"></a><code>addTonePhy</code><br /></li>
+<li><a id="orgbd267e1"></a><code>addDataPhy</code><br /></li>
+<li><a id="orgdfc20c9"></a><code>setDataName</code><br /></li>
+<li><a id="orgbc38712"></a><code>setMacAddr</code><br /></li>
+<li><a id="org49fec4d"></a><code>setAckMode</code><br /></li>
+<li><a id="org061630f"></a><code>setNoAckMode</code><br /></li>
+<li><a id="org2d568b3"></a><code>setConservativeUnsyncMode</code><br /></li>
+<li><a id="org5e37fee"></a><code>setAggressiveUnsyncMode</code><br /></li>
+<li><a id="org9d4ed0e"></a><code>setSyncMode</code><br /></li>
+<li><a id="orga07c863"></a><code>initialize</code><br /></li>
+<li><a id="org54ee5f6"></a><code>printTransitions</code><br /></li>
+<li><a id="org60780bf"></a><code>getCRTime</code><br /></li>
+<li><a id="org51cadf5"></a><code>getQueueSize</code><br /></li>
+<li><a id="org5cebcf0"></a><code>getTonePktsTx</code><br /></li>
+<li><a id="orga0e9890"></a><code>getTonePktsRx</code><br /></li>
+<li><a id="orgdace9a0"></a><code>getUpLayersDataRx</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orge4b104e" class="outline-3">
+<h3 id="orge4b104e"><span class="section-number-3">3.2</span> <code>MInterference/MIV/WKUP</code> (<i>MInterfMivUwWakeUp</i>) : //</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-orgd97d7b1" class="outline-4">
+<h4 id="orgd97d7b1"><span class="section-number-4">3.2.1</span> Bound variables</h4>
+</div>
+<div id="outline-container-org69835ab" class="outline-4">
+<h4 id="org69835ab"><span class="section-number-4">3.2.2</span> Commands</h4>
+</div>
+</div>
+<div id="outline-container-orgd3c9667" class="outline-3">
+<h3 id="orgd3c9667"><span class="section-number-3">3.3</span> <code>Module/MPhy/Underwater/WKUP</code> (<i>MPhy_WakeUp</i>) : <i>MPhy</i></h3>
+<div class="outline-text-3" id="text-3-3">
+</div>
+<div id="outline-container-org5f1afc0" class="outline-4">
+<h4 id="org5f1afc0"><span class="section-number-4">3.3.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-3-1">
+</div>
+<ol class="org-ol">
+<li><a id="org9c85661"></a><code>AcquisitionThreshold_dB_</code> (<i>AcquisitionThreshold_dB_</i>)<br />
+<div class="outline-text-5" id="text-3-3-1-1">
+<p>
+<i>How many dB over noise are required   * for a signal to trigger    * acquisition (i.e., a RX attempt)</i> 
+</p>
+</div>
+</li>
+<li><a id="orgfc23415"></a><code>ToneDuration_</code> (<i>ToneDuration_</i>)<br />
+<div class="outline-text-5" id="text-3-3-1-2">
+<p>
+<i>predefined tone duration</i> 
+</p>
+</div>
+</li>
+<li><a id="org3b6c84f"></a><code>MaxTxRange_</code> (<i>MaxTxRange_</i>)<br />
+<div class="outline-text-5" id="text-3-3-1-3">
+<p>
+<i>Maximum Transmission Range</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org4096f29" class="outline-4">
+<h4 id="org4096f29"><span class="section-number-4">3.3.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="orga9d9adf"></a><code>getDroppedPktsTxPending</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org45ecafc" class="outline-3">
+<h3 id="org45ecafc"><span class="section-number-3">3.4</span> <code>Module/UW/ALOHA</code> (<i>UWAloha</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-4">
+</div>
+<div id="outline-container-orgcaf609d" class="outline-4">
+<h4 id="orgcaf609d"><span class="section-number-4">3.4.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-4-1">
+</div>
+<ol class="org-ol">
+<li><a id="org867c6ed"></a><code>HDR_size_</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-1">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="org4024845"></a><code>ACK_size_</code> (<i>ACK_size</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-2">
+<p>
+<i>Size of the ACK.</i> 
+</p>
+</div>
+</li>
+<li><a id="org2edb86a"></a><code>max_tx_tries_</code> (<i>max_tx_tries</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-3">
+<p>
+<i>Maximum number of retransmissions attempt.</i> 
+</p>
+</div>
+</li>
+<li><a id="org60072a7"></a><code>wait_constant_</code> (<i>wait_constant</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-4">
+<p>
+<i>This fixed time is employed to componsate  different time variations.</i> 
+</p>
+</div>
+</li>
+<li><a id="org4884264"></a><code>uwaloha_debug_</code> (<i>uwaloha_debug</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-5">
+<p>
+<i>Debuging Flag</i> 
+</p>
+</div>
+</li>
+<li><a id="org36ad489"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-6">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org821b1ef"></a><code>ACK_timeout_</code> (<i>ACK_timeout</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-7">
+<p>
+<i>ACK timeout for the initial packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbe7d14e"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-8">
+<p>
+<i>This variable is used to tune the RTT</i> 
+</p>
+</div>
+</li>
+<li><a id="orgdc906d9"></a><code>buffer_pkts_</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-9">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd38d8a0"></a><code>backoff_tuner_</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-10">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="org9db615d"></a><code>max_backoff_counter_</code> (<i>max_backoff_counter</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-11">
+<p>
+<i>Maximum number of backoff it will consider    while it increases the backoff exponentially</i> 
+</p>
+</div>
+</li>
+<li><a id="orge7f488d"></a><code>MAC_addr_</code> (<i>addr</i>)<br />
+<div class="outline-text-5" id="text-3-4-1-12">
+<p>
+<i>Previous mac address</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgd4548d5" class="outline-4">
+<h4 id="orgd4548d5"><span class="section-number-4">3.4.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-4-2">
+</div>
+<ol class="org-ol">
+<li><a id="org397f686"></a><code>setAckMode</code><br /></li>
+<li><a id="orgd43d749"></a><code>setNoAckMode</code><br /></li>
+<li><a id="org19fdd30"></a><code>initialize</code><br /></li>
+<li><a id="org308faad"></a><code>printTransitions</code><br /></li>
+<li><a id="orgd95e963"></a><code>getQueueSize</code><br /></li>
+<li><a id="org737065a"></a><code>getUpLayersDataRx</code><br /></li>
+<li><a id="org71da3d9"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgba7d3fa" class="outline-3">
+<h3 id="orgba7d3fa"><span class="section-number-3">3.5</span> <code>Module/UW/CSMA_ALOHA/TRIGGER/NODE</code> (<i>UwCsmaAloha_Trigger_NODE</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-5">
+</div>
+<div id="outline-container-org8bc6d45" class="outline-4">
+<h4 id="org8bc6d45"><span class="section-number-4">3.5.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-5-1">
+</div>
+<ol class="org-ol">
+<li><a id="org5c12442"></a><code>HDR_size_</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-1">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="orge452f58"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-2">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="org9593e38"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-3">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org59d6689"></a><code>buffer_pkts_</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-4">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+<li><a id="org51f23b2"></a><code>listen_time_</code> (<i>listen_time</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-5">
+<p>
+<i>A short channel sensing time</i> 
+</p>
+</div>
+</li>
+<li><a id="orgad72a40"></a><code>tx_timer_duration_</code> (<i>tx_timer_duration</i>)<br />
+<div class="outline-text-5" id="text-3-5-1-6">
+<p>
+<i>Duration of the time in which the node is   allowed to transmit</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgb1ced0a" class="outline-4">
+<h4 id="orgb1ced0a"><span class="section-number-4">3.5.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-5-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgaca02b5"></a><code>initialize</code><br /></li>
+<li><a id="org0cbf09a"></a><code>getQueueSize</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgb4ef474" class="outline-3">
+<h3 id="orgb4ef474"><span class="section-number-3">3.6</span> <code>Module/UW/CSMA_ALOHA/TRIGGER/SINK</code> (<i>UwCsmaAloha_Trigger_SINK</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-6">
+</div>
+<div id="outline-container-org3e04666" class="outline-4">
+<h4 id="org3e04666"><span class="section-number-4">3.6.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-6-1">
+</div>
+<ol class="org-ol">
+<li><a id="org807d40a"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-6-1-1">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc6768ea"></a><code>TRIGGER_size_</code> (<i>TRIGGER_size</i>)<br />
+<div class="outline-text-5" id="text-3-6-1-2">
+<p>
+<i>Size of the TRIGGER packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org5cc3d8a"></a><code>tx_timer_duration_</code> (<i>tx_timer_duration</i>)<br />
+<div class="outline-text-5" id="text-3-6-1-3">
+<p>
+<i>Duration of the time in which the node is   allowed to transmit</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org1db9713" class="outline-4">
+<h4 id="org1db9713"><span class="section-number-4">3.6.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-6-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgecbbaa5"></a><code>sinkRun</code><br /></li>
+<li><a id="org43478dc"></a><code>getNTriggerSent</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org1b7da64" class="outline-3">
+<h3 id="org1b7da64"><span class="section-number-3">3.7</span> <code>Module/UW/TDMA</code> (<i>UwTDMA</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-7">
+</div>
+<div id="outline-container-org5515f09" class="outline-4">
+<h4 id="org5515f09"><span class="section-number-4">3.7.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-7-1">
+</div>
+<ol class="org-ol">
+<li><a id="org6109438"></a><code>queue_size_</code> (<i>max_queue_size</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-1">
+<p>
+<i>Maximum dimension of Queue</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb1f19e1"></a><code>frame_duration</code> (<i>frame_duration</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-2">
+<p>
+<i>Frame duration</i> 
+</p>
+</div>
+</li>
+<li><a id="org520cd94"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-3">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="org344dae6"></a><code>sea_trial_</code> (<i>sea_trial_</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-4">
+<p>
+<i>Sea Trial flag: To activate if the protocol is    going to be tested at the sea</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf2b1fd0"></a><code>fair_mode</code> (<i>fair_mode</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-5">
+<p>
+<i>Fair modality on if 1: then only set    tot_slots and common guard_time</i> 
+</p>
+</div>
+</li>
+<li><a id="orge280961"></a><code>HDR_size_</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-6">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbf5ec79"></a><code>max_packet_per_slot</code> (<i>max_packet_per_slot</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-7">
+<p>
+<i>max numer of packet it can transmit per slot</i> 
+</p>
+</div>
+</li>
+<li><a id="org672e3de"></a><code>drop_old_</code> (<i>drop_old_</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-8">
+<p>
+<i>flag to set the drop packet policy in case of buffer overflow:  if 0 (default) drops the new packet, if 1 the oldest</i> 
+</p>
+</div>
+</li>
+<li><a id="orge50a92f"></a><code>checkPriority_</code> (<i>checkPriority</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-9">
+<p>
+<i>flag to set to 1 if UWCBR module uses packets with priority, set to 0 otherwise. Priority can be used only with UWCBR module</i> 
+</p>
+</div>
+</li>
+<li><a id="org257550c"></a><code>mac2phy_delay_</code> (<i>mac2phy_delay_</i>)<br /></li>
+<li><a id="orgf37a875"></a><code>guard_time</code> (<i>guard_time</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-11">
+<p>
+<i>A time which is used to componsate variating in   timing</i> 
+</p>
+</div>
+</li>
+<li><a id="org413bdc6"></a><code>tot_slots</code> (<i>tot_slots</i>)<br />
+<div class="outline-text-5" id="text-3-7-1-12">
+<p>
+<i>Number of slots in the frame (fair_mode)</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orga3b32c8" class="outline-4">
+<h4 id="orga3b32c8"><span class="section-number-4">3.7.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-7-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgca1ec67"></a><code>start</code><br /></li>
+<li><a id="org4c5084a"></a><code>stop</code><br /></li>
+<li><a id="org748c5a6"></a><code>get_buffer_size</code><br /></li>
+<li><a id="org2f6f43e"></a><code>get_upper_data_pkts_rx</code><br /></li>
+<li><a id="org3d33669"></a><code>get_sent_pkts</code><br /></li>
+<li><a id="org572891b"></a><code>get_recv_pkts</code><br /></li>
+<li><a id="org2569b8d"></a><code>setStartTime</code><br /></li>
+<li><a id="orge94eac9"></a><code>setSlotDuration</code><br /></li>
+<li><a id="org2d4194b"></a><code>setGuardTime</code><br /></li>
+<li><a id="org30c5b05"></a><code>setSlotNumber</code><br /></li>
+<li><a id="orgc74d2b2"></a><code>setMacAddr</code><br /></li>
+<li><a id="orge53b6b4"></a><code>setLogLabel</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgd6a55a5" class="outline-3">
+<h3 id="orgd6a55a5"><span class="section-number-3">3.8</span> <code>Module/UW/TDMA_FRAME</code> (<i>UwTDMA_frame</i>) : <i>UwTDMA</i></h3>
+<div class="outline-text-3" id="text-3-8">
+</div>
+<div id="outline-container-orge264010" class="outline-4">
+<h4 id="orge264010"><span class="section-number-4">3.8.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-8-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgf6f2aef"></a><code>guard_time</code> (<i>guard_time</i>)<br />
+<div class="outline-text-5" id="text-3-8-1-1">
+<p>
+<i>A time which is used to componsate variating in   timing</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgf1d0daf" class="outline-4">
+<h4 id="orgf1d0daf"><span class="section-number-4">3.8.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-8-2">
+</div>
+<ol class="org-ol">
+<li><a id="orga3e8b64"></a><code>start</code><br /></li>
+<li><a id="orgd320595"></a><code>stop</code><br /></li>
+<li><a id="org5d9c4be"></a><code>setSlotNumber</code><br /></li>
+<li><a id="org24b0a30"></a><code>setTopologyIndex</code><br /></li>
+<li><a id="orgcd9707f"></a><code>setSTopologyFileName</code><br /></li>
+<li><a id="org2ebaa8a"></a><code>setTopologySeparator</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org7a15ee2" class="outline-3">
+<h3 id="org7a15ee2"><span class="section-number-3">3.9</span> <code>Module/UW/DACAP</code> (<i>MMacDACAP</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-9">
+</div>
+<div id="outline-container-org214cf01" class="outline-4">
+<h4 id="org214cf01"><span class="section-number-4">3.9.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-9-1">
+</div>
+<ol class="org-ol">
+<li><a id="org32c2765"></a><code>t_min</code> (<i>t_min</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-1">
+<p>
+<i>Minimum time needed to do an hand-shaking</i> 
+</p>
+</div>
+</li>
+<li><a id="org3d296a8"></a><code>T_W_min</code> (<i>T_W_min</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-2">
+<p>
+<i>Minimum Warning Time in sencods</i> 
+</p>
+</div>
+</li>
+<li><a id="org7a7bcc9"></a><code>delta_D</code> (<i>delta_D</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-3">
+<p>
+<i>Value (in m) that indicates how far we want the CTS    propagates over the sender before initiate the data    transmission process (it determines the T_w value)</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb0cbb0c"></a><code>delta_data</code> (<i>delta_data</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-4">
+<p>
+<i>Dimension difference (in bytes) among data packets   (&lt;i&gt; 0 &lt;/i&gt; if the packets have always the same   dimension)</i> 
+</p>
+</div>
+</li>
+<li><a id="org42ccd9c"></a><code>max_prop_delay</code> (<i>max_prop_delay</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-5">
+<p>
+<i>One way maximum propagation delay (in seconds)   in the network</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc630684"></a><code>CTS_size</code> (<i>CTS_size</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-6">
+<p>
+<i>Size (in bytes) of the CTS packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org502143f"></a><code>RTS_size</code> (<i>RTS_size</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-7">
+<p>
+<i>Size (in bytes) of the RTS packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orgaf669f7"></a><code>WRN_size</code> (<i>WRN_size</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-8">
+<p>
+<i>Size (in bytes) of the WRN packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org55a8325"></a><code>HDR_size</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-9">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd9dc719"></a><code>ACK_size</code> (<i>ACK_size</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-10">
+<p>
+<i>Size of the ACK.</i> 
+</p>
+</div>
+</li>
+<li><a id="org264b873"></a><code>backoff_tuner</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-11">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="org9d5234a"></a><code>wait_costant</code> (<i>wait_costant</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-12">
+<p>
+<i>Adding factor in the calculation of the listen time</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb543e35"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-13">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="orge603238"></a><code>max_payload</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-14">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="orga8d9214"></a><code>max_tx_tries</code> (<i>max_tx_tries</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-15">
+<p>
+<i>Maximum number of retransmissions attempt.</i> 
+</p>
+</div>
+</li>
+<li><a id="org28e769d"></a><code>buffer_pkts</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-16">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+<li><a id="org13078b2"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-17">
+<p>
+<i>This variable is used to tune the RTT</i> 
+</p>
+</div>
+</li>
+<li><a id="org972017a"></a><code>max_backoff_counter</code> (<i>max_backoff_counter</i>)<br />
+<div class="outline-text-5" id="text-3-9-1-18">
+<p>
+<i>Maximum number of backoff it will consider    while it increases the backoff exponentially</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org5da8eba" class="outline-4">
+<h4 id="org5da8eba"><span class="section-number-4">3.9.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-9-2">
+</div>
+<ol class="org-ol">
+<li><a id="org41a41db"></a><code>printTransitions</code><br /></li>
+<li><a id="org4eb4324"></a><code>setAckMode</code><br /></li>
+<li><a id="org91d9784"></a><code>setNoAckMode</code><br /></li>
+<li><a id="org6858fe3"></a><code>setBackoffFreeze</code><br /></li>
+<li><a id="org551b09c"></a><code>setBackoffNoFreeze</code><br /></li>
+<li><a id="org63be1b3"></a><code>setMultiHopMode</code><br /></li>
+<li><a id="org7b940bf"></a><code>getQueueSize</code><br /></li>
+<li><a id="org1c2c0ab"></a><code>getMeanDeferTime</code><br /></li>
+<li><a id="orgbf8e120"></a><code>getTotalDeferTimes</code><br /></li>
+<li><a id="org6832c9c"></a><code>getWrnPktsTx</code><br /></li>
+<li><a id="org3ed0869"></a><code>getWrnPktsRx</code><br /></li>
+<li><a id="orge653674"></a><code>getRtsPktsTx</code><br /></li>
+<li><a id="org7842a20"></a><code>getRtsPktsRx</code><br /></li>
+<li><a id="org2bf405a"></a><code>getCtsPktsTx</code><br /></li>
+<li><a id="org06d15c6"></a><code>getCtsPktsRx</code><br /></li>
+<li><a id="org72c6501"></a><code>getUpLayersDataRx</code><br /></li>
+<li><a id="org2bbf149"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org8f8d6a1" class="outline-3">
+<h3 id="org8f8d6a1"><span class="section-number-3">3.10</span> <code>Module/UW/UFETCH/AUV</code> (<i>uwUFetch_AUV</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-10">
+</div>
+<div id="outline-container-orgfd1f5af" class="outline-4">
+<h4 id="orgfd1f5af"><span class="section-number-4">3.10.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-10-1">
+</div>
+<ol class="org-ol">
+<li><a id="orga76d503"></a><code>T_min_RTS_</code> (<i>T_MIN_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-1">
+<p>
+<i>Lower bound of the interval in which HN choice the  back-off time to tx RTS pck</i> 
+</p>
+</div>
+</li>
+<li><a id="org2fe0a17"></a><code>T_max_RTS_</code> (<i>T_MAX_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-2">
+<p>
+<i>Upper bound of the interval in which HN choice the  back-off time to tx RTS pck</i> 
+</p>
+</div>
+</li>
+<li><a id="orge9eb9a1"></a><code>T_guard_</code> (<i>T_GUARD</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-3">
+<p>
+<i>Guard time interval used between two consecutive    transmissions of data packets</i> 
+</p>
+</div>
+</li>
+<li><a id="org0644991"></a><code>t_RTS_</code> (<i>T_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-4">
+<p>
+<i>Interval time in which the AUV want to receive an RTS  packet in answer to the trigger</i> 
+</p>
+</div>
+</li>
+<li><a id="org85ca410"></a><code>MAX_PAYLOAD</code> (<i>MAX_PAYLOAD</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-5">
+<p>
+<i>Maximum size of DATA PAYLOAD packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org7c3501a"></a><code>num_max_DATA_AUV_want_receive_</code> (<i>NUM_MAX_DATA_AUV_WANT_RX</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-6">
+<p>
+<i>Maximum number of data packet that AUV  want to receive from the HN in a single  cycle of TRIGGER-RTS-CTS-DATA</i> 
+</p>
+</div>
+</li>
+<li><a id="org8db1d3e"></a><code>TIME_BEFORE_TX_TRIGGER_PCK_</code> (<i>T_START_PROC_TRIGGER</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-7">
+<p>
+<i>Time before that the AUV start the procedure to transmit a TRIGGER packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org5e40314"></a><code>MY_DEBUG_</code> (<i>debugMio_</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-8">
+<p>
+<i>Used if we want to create the logging file</i> 
+</p>
+</div>
+</li>
+<li><a id="org225b722"></a><code>NUMBER_OF_RUN_</code> (<i>N_RUN</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-9">
+<p>
+<i>Number of run in execution</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc77c994"></a><code>HEAD_NODE_1_</code> (<i>HEAD_NODE_1</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-10">
+<p>
+<i>Id number of HN 1</i> 
+</p>
+</div>
+</li>
+<li><a id="orgaca5656"></a><code>HEAD_NODE_2_</code> (<i>HEAD_NODE_2</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-11">
+<p>
+<i>Id number of HN 2</i> 
+</p>
+</div>
+</li>
+<li><a id="org151a87e"></a><code>HEAD_NODE_3_</code> (<i>HEAD_NODE_3</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-12">
+<p>
+<i>Id number of HN 3</i> 
+</p>
+</div>
+</li>
+<li><a id="org06163e8"></a><code>HEAD_NODE_4_</code> (<i>HEAD_NODE_4</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-13">
+<p>
+<i>Id number of HN 4</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf984778"></a><code>MODE_COMM_</code> (<i>mode_comm_hn_auv</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-14">
+<p>
+<i>Indicate how the communication takes place with  or without RTS-CTS packets</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd43ece7"></a><code>NUM_HN_NETWORK_</code> (<i>NUM_HN_NET</i>)<br />
+<div class="outline-text-5" id="text-3-10-1-15">
+<p>
+<i>Number of Head Nodes in the network</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org4ac80ec" class="outline-4">
+<h4 id="org4ac80ec"><span class="section-number-4">3.10.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-10-2">
+</div>
+<ol class="org-ol">
+<li><a id="org9282a3b"></a><code>initialize</code><br /></li>
+<li><a id="org95d2ade"></a><code>printTransitions</code><br /></li>
+<li><a id="org1ee22d8"></a><code>getTRIGGERtxByAUV</code><br /></li>
+<li><a id="orgc0d49d4"></a><code>getRTSrxByAUV</code><br /></li>
+<li><a id="org15b79b7"></a><code>getRTSCorruptedRxByAUV</code><br /></li>
+<li><a id="org2b4da4c"></a><code>getCTStxByAUV</code><br /></li>
+<li><a id="org0b4e1e0"></a><code>getDataRxByAUV</code><br /></li>
+<li><a id="orgfa3e72e"></a><code>getDataCorruptedRxByAUV</code><br /></li>
+<li><a id="org8e0ee17"></a><code>AUVNodeStart</code><br /></li>
+<li><a id="org5828d7e"></a><code>setMacAddr</code><br /></li>
+<li><a id="org1a6c9cc"></a><code>initialize</code><br /></li>
+<li><a id="org73827a1"></a><code>printTransitions</code><br /></li>
+<li><a id="org59dd48f"></a><code>getTRIGGERtxByAUV</code><br /></li>
+<li><a id="org63f18c6"></a><code>getRTSrxByAUV</code><br /></li>
+<li><a id="orgea88852"></a><code>getRTSCorruptedRxByAUV</code><br /></li>
+<li><a id="org6ad1044"></a><code>getCTStxByAUV</code><br /></li>
+<li><a id="org345a51f"></a><code>getDataRxByAUV</code><br /></li>
+<li><a id="orgeed2582"></a><code>getDataCorruptedRxByAUV</code><br /></li>
+<li><a id="org34f0de6"></a><code>AUVNodeStart</code><br /></li>
+<li><a id="org51b8c8a"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org7c0454c" class="outline-3">
+<h3 id="org7c0454c"><span class="section-number-3">3.11</span> <code>Module/UW/UFETCH/NODE</code> (<i>uwUFetch_NODE</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-11">
+</div>
+<div id="outline-container-orgb071a89" class="outline-4">
+<h4 id="orgb071a89"><span class="section-number-4">3.11.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-11-1">
+</div>
+<ol class="org-ol">
+<li><a id="orge39743d"></a><code>TIME_BEFORE_START_COMU_HN_NODE_</code> (<i>T_START_PROCEDURE_HN_NODE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-1">
+<p>
+<i>Time within HN is enabled to   received a TRIGGER packet from AUV. If   in this time the AUV never receive a   TRIGGER packet start the communication   with the SN</i> 
+</p>
+</div>
+</li>
+<li><a id="org71718d6"></a><code>MAXIMUM_VALUE_BACKOFF_PROBE_</code> (<i>T_MAX_BACKOFF_PROBE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-2">
+<p>
+<i>Upper bound timer interval of back-off    value used by the SN to choice its back-off    time before to transmit a PROBE packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orga88d217"></a><code>MINIMUM_VALUE_BACKOFF_PROBE_</code> (<i>T_MIN_BACKOFF_PROBE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-3">
+<p>
+<i>Lower bound timer interval of back-off    value used by the SN to choice its back-off    time before to transmit a PROBE packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org211fe37"></a><code>MAXIMUM_NODE_POLLED_</code> (<i>MAX_POLLED_NODE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-4">
+<p>
+<i>Maximum number of PROBE packets that the HN can receive from the SN after the transmission of a BEACON or CBEACON</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd45ca51"></a><code>MAXIMUM_PAYLOAD_SIZE_</code> (<i>MAX_PAYLOAD</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-5">
+<p>
+<i>Maximum size of DATA PAYLOAD packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orgadca9c2"></a><code>TIME_TO_WAIT_PROBES_PCK_</code> (<i>T_PROBE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-6">
+<p>
+<i>alias defined to access the ACK SINK HEADER</i> 
+</p>
+</div>
+</li>
+<li><a id="orgaf9f605"></a><code>TIME_TO_WAIT_POLL_PCK_</code> (<i>T_POLL</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-7">
+<p>
+<i>alias defined to access the ACK SINK HEADER</i> 
+</p>
+</div>
+</li>
+<li><a id="org76d8eee"></a><code>TIME_BETWEEN_2_DATA_TX_HN_</code> (<i>TIME_BETWEEN_2_TX_DATA_HN_AUV</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-8">
+<p>
+<i>Interval time used by  HN before   to transmit the next DATA packet   to the AUV</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb89ed6f"></a><code>TIME_BETWEEN_2_DATA_TX_NODE_</code> (<i>TIME_BETWEEN_2_TX_DATA_NODE_HN</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-9">
+<p>
+<i>Interval time used by the SN   before to transmit the next DATA   packet to the HN</i> 
+</p>
+</div>
+</li>
+<li><a id="org21e5842"></a><code>SEE_THE_TRANSITIONS_STATE_</code> (<i>PRINT_TRANSITIONS_INT</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-10">
+<p>
+<i>&lt;i&gt; 0 &lt;/i&gt; reason because the SN or HN is   passed from a state to another state is not   logged in a file</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb717773"></a><code>GUARD_INTERVAL_</code> (<i>T_GUARD</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-11">
+<p>
+<i>Guard time interval used between two consecutive    transmissions of data packets</i> 
+</p>
+</div>
+</li>
+<li><a id="org149c074"></a><code>MAXIMUM_BUFFER_SIZE_</code> (<i>MAXIMUM_BUFFER_DATA_PCK_NODE</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-12">
+<p>
+<i>Maximum number of DATA packets that  the SN can store in Its queue</i> 
+</p>
+</div>
+</li>
+<li><a id="org544441a"></a><code>MAXIMUM_CBEACON_TRANSMISSIONS_</code> (<i>MAX_ALLOWED_CBEACON_TX</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-13">
+<p>
+<i>Interval time in which HN is enabled to received PROBE packets from SNs after the transmission of TRIGGER packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org44816dc"></a><code>MAXIMUM_PCK_WANT_RX_HN_FROM_NODE_</code> (<i>MAX_PCK_HN_WANT_RX_FROM_NODE</i>)<br /></li>
+<li><a id="org9a13196"></a><code>MY_DEBUG_</code> (<i>debugMio_</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-15">
+<p>
+<i>Used if we want to create the logging file</i> 
+</p>
+</div>
+</li>
+<li><a id="orgca8ee83"></a><code>NUMBER_OF_RUN_</code> (<i>N_RUN</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-16">
+<p>
+<i>Number of run in execution</i> 
+</p>
+</div>
+</li>
+<li><a id="org4dc5c98"></a><code>TIME_TO_WAIT_CTS_</code> (<i>T_CTS</i>)<br /></li>
+<li><a id="org431a382"></a><code>MODE_COMM_</code> (<i>MODE_COMM_HN_AUV</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-18">
+<p>
+<i>Indicate the type of communication between HN and  AUV, 0 = communication with RTS-CTS, 1 =  communication without RTS-CTS</i> 
+</p>
+</div>
+</li>
+<li><a id="org557295a"></a><code>BURST_DATA_</code> (<i>MODE_BURST_DATA</i>)<br />
+<div class="outline-text-5" id="text-3-11-1-19">
+<p>
+<i>Indicate if it's used or not the burst data. 0=not use burst date, 1=use burst data.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org7bfc167" class="outline-4">
+<h4 id="org7bfc167"><span class="section-number-4">3.11.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-11-2">
+</div>
+<ol class="org-ol">
+<li><a id="org91e66f8"></a><code>initialize</code><br /></li>
+<li><a id="org97d70de"></a><code>printTransitions</code><br /></li>
+<li><a id="orgdf763d5"></a><code>getDataQueueSize</code><br /></li>
+<li><a id="orge3ccff1"></a><code>getBEACONrxByNODE</code><br /></li>
+<li><a id="orgba31466"></a><code>getBEACONrxCorruptedByNODE</code><br /></li>
+<li><a id="org1a99e98"></a><code>getPROBEtxByNODE</code><br /></li>
+<li><a id="orgc64daf3"></a><code>getPOLLrxByNODE</code><br /></li>
+<li><a id="org1578c66"></a><code>getPOLLrxCorruptedByNODE</code><br /></li>
+<li><a id="orgdce8ec8"></a><code>getDATAtxByNODE</code><br /></li>
+<li><a id="org9407731"></a><code>getCBEACONrxByNODE</code><br /></li>
+<li><a id="org00dc251"></a><code>getCBEACONrxCorruptedByNODE</code><br /></li>
+<li><a id="org384d241"></a><code>SimpleNodeStart</code><br /></li>
+<li><a id="org10081e0"></a><code>getBEACONtxByHN</code><br /></li>
+<li><a id="org03798f0"></a><code>getPROBErxByHN</code><br /></li>
+<li><a id="orgb7dd99e"></a><code>getPROBErxCorruptedByHN</code><br /></li>
+<li><a id="org5b996ec"></a><code>getPOLLtxByHN</code><br /></li>
+<li><a id="org16666a0"></a><code>getDATArxByHN</code><br /></li>
+<li><a id="org138fc21"></a><code>getDATArxCorruptedByHN</code><br /></li>
+<li><a id="orge55265b"></a><code>getCBEACONtxbyHN</code><br /></li>
+<li><a id="org1f14be2"></a><code>getTRIGGERrxByHN</code><br /></li>
+<li><a id="orgfadc104"></a><code>getTRIGGERrxCorrupteByHN</code><br /></li>
+<li><a id="orga4a7bce"></a><code>getRTStxByHN</code><br /></li>
+<li><a id="orgfeaf1e4"></a><code>getCTSrxByHN</code><br /></li>
+<li><a id="orgb91a855"></a><code>getCTSrxCorrupteByHN</code><br /></li>
+<li><a id="orgcad63fe"></a><code>getDATAtxByHN</code><br /></li>
+<li><a id="orga438a22"></a><code>HeadNodeStart</code><br /></li>
+<li><a id="orgf8e6fb6"></a><code>BeHeadNode</code><br /></li>
+<li><a id="org9cf5bf4"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org6281868" class="outline-3">
+<h3 id="org6281868"><span class="section-number-3">3.12</span> <code>Module/UW/UFETCH/AUV</code> (<i>uwUFetch_AUV</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-12">
+</div>
+<div id="outline-container-org0315cf6" class="outline-4">
+<h4 id="org0315cf6"><span class="section-number-4">3.12.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-12-1">
+</div>
+<ol class="org-ol">
+<li><a id="org535a49d"></a><code>T_min_RTS_</code> (<i>T_MIN_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-1">
+<p>
+<i>Lower bound of the interval in which HN choice the  back-off time to tx RTS pck</i> 
+</p>
+</div>
+</li>
+<li><a id="org85b8e3d"></a><code>T_max_RTS_</code> (<i>T_MAX_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-2">
+<p>
+<i>Upper bound of the interval in which HN choice the  back-off time to tx RTS pck</i> 
+</p>
+</div>
+</li>
+<li><a id="org23a19ee"></a><code>T_guard_</code> (<i>T_GUARD</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-3">
+<p>
+<i>Guard time interval used between two consecutive    transmissions of data packets</i> 
+</p>
+</div>
+</li>
+<li><a id="org4c1d99f"></a><code>t_RTS_</code> (<i>T_RTS</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-4">
+<p>
+<i>Interval time in which the AUV want to receive an RTS  packet in answer to the trigger</i> 
+</p>
+</div>
+</li>
+<li><a id="org5f3a4e5"></a><code>MAX_PAYLOAD</code> (<i>MAX_PAYLOAD</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-5">
+<p>
+<i>Maximum size of DATA PAYLOAD packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orga334b3f"></a><code>num_max_DATA_AUV_want_receive_</code> (<i>NUM_MAX_DATA_AUV_WANT_RX</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-6">
+<p>
+<i>Maximum number of data packet that AUV  want to receive from the HN in a single  cycle of TRIGGER-RTS-CTS-DATA</i> 
+</p>
+</div>
+</li>
+<li><a id="orgaf8e8a1"></a><code>TIME_BEFORE_TX_TRIGGER_PCK_</code> (<i>T_START_PROC_TRIGGER</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-7">
+<p>
+<i>Time before that the AUV start the procedure to transmit a TRIGGER packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org1e630b9"></a><code>MY_DEBUG_</code> (<i>debugMio_</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-8">
+<p>
+<i>Used if we want to create the logging file</i> 
+</p>
+</div>
+</li>
+<li><a id="org8c98733"></a><code>NUMBER_OF_RUN_</code> (<i>N_RUN</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-9">
+<p>
+<i>Number of run in execution</i> 
+</p>
+</div>
+</li>
+<li><a id="org2c203a1"></a><code>HEAD_NODE_1_</code> (<i>HEAD_NODE_1</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-10">
+<p>
+<i>Id number of HN 1</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf9c70b5"></a><code>HEAD_NODE_2_</code> (<i>HEAD_NODE_2</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-11">
+<p>
+<i>Id number of HN 2</i> 
+</p>
+</div>
+</li>
+<li><a id="org79a8399"></a><code>HEAD_NODE_3_</code> (<i>HEAD_NODE_3</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-12">
+<p>
+<i>Id number of HN 3</i> 
+</p>
+</div>
+</li>
+<li><a id="org34bbba7"></a><code>HEAD_NODE_4_</code> (<i>HEAD_NODE_4</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-13">
+<p>
+<i>Id number of HN 4</i> 
+</p>
+</div>
+</li>
+<li><a id="org090189b"></a><code>MODE_COMM_</code> (<i>mode_comm_hn_auv</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-14">
+<p>
+<i>Indicate how the communication takes place with  or without RTS-CTS packets</i> 
+</p>
+</div>
+</li>
+<li><a id="org36e8b52"></a><code>NUM_HN_NETWORK_</code> (<i>NUM_HN_NET</i>)<br />
+<div class="outline-text-5" id="text-3-12-1-15">
+<p>
+<i>Number of Head Nodes in the network</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org11e2222" class="outline-4">
+<h4 id="org11e2222"><span class="section-number-4">3.12.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-12-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgacf0aad"></a><code>initialize</code><br /></li>
+<li><a id="org45abc24"></a><code>printTransitions</code><br /></li>
+<li><a id="org1d8bca7"></a><code>getTRIGGERtxByAUV</code><br /></li>
+<li><a id="orgdce1e43"></a><code>getRTSrxByAUV</code><br /></li>
+<li><a id="orgce78bf6"></a><code>getRTSCorruptedRxByAUV</code><br /></li>
+<li><a id="org68bad27"></a><code>getCTStxByAUV</code><br /></li>
+<li><a id="org0ffc9fb"></a><code>getDataRxByAUV</code><br /></li>
+<li><a id="org490c6c9"></a><code>getDataCorruptedRxByAUV</code><br /></li>
+<li><a id="orgedcbc43"></a><code>AUVNodeStart</code><br /></li>
+<li><a id="orgf946b43"></a><code>setMacAddr</code><br /></li>
+<li><a id="org35744a8"></a><code>initialize</code><br /></li>
+<li><a id="orgcf6a931"></a><code>printTransitions</code><br /></li>
+<li><a id="org1ce67c0"></a><code>getTRIGGERtxByAUV</code><br /></li>
+<li><a id="orga2e6fbc"></a><code>getRTSrxByAUV</code><br /></li>
+<li><a id="org115f5ba"></a><code>getRTSCorruptedRxByAUV</code><br /></li>
+<li><a id="org0f74259"></a><code>getCTStxByAUV</code><br /></li>
+<li><a id="org24dbc6a"></a><code>getDataRxByAUV</code><br /></li>
+<li><a id="orgdbd3ab4"></a><code>getDataCorruptedRxByAUV</code><br /></li>
+<li><a id="orgcee56a4"></a><code>AUVNodeStart</code><br /></li>
+<li><a id="org3df9080"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org5d773bc" class="outline-3">
+<h3 id="org5d773bc"><span class="section-number-3">3.13</span> <code>Module/UW/CSMA_ALOHA</code> (<i>CsmaAloha</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-13">
+</div>
+<div id="outline-container-org2c7a3af" class="outline-4">
+<h4 id="org2c7a3af"><span class="section-number-4">3.13.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-13-1">
+</div>
+<ol class="org-ol">
+<li><a id="org6ee9bc9"></a><code>HDR_size_</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-1">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="orgdebf6ce"></a><code>ACK_size_</code> (<i>ACK_size</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-2">
+<p>
+<i>Size of the ACK.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgec48e88"></a><code>max_tx_tries_</code> (<i>max_tx_tries</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-3">
+<p>
+<i>Maximum number of retransmissions attempt.</i> 
+</p>
+</div>
+</li>
+<li><a id="orga8f11ab"></a><code>wait_costant_</code> (<i>wait_costant</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-4">
+<p>
+<i>Adding factor in the calculation of the listen time</i> 
+</p>
+</div>
+</li>
+<li><a id="org9d609de"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-5">
+<p>
+<i>Debug variable: 0 for no info, &gt;-5 for small info, &lt;-5 for complete info</i> 
+</p>
+</div>
+</li>
+<li><a id="org435bf0a"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-6">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org3ae0cc3"></a><code>ACK_timeout_</code> (<i>ACK_timeout</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-7">
+<p>
+<i>ACK timeout for the initial packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org5285560"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-8">
+<p>
+<i>This variable is used to tune the RTT</i> 
+</p>
+</div>
+</li>
+<li><a id="org9d8387d"></a><code>backoff_tuner_</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-9">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc54e086"></a><code>buffer_pkts_</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-10">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+<li><a id="org65c1c91"></a><code>max_backoff_counter_</code> (<i>max_backoff_counter</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-11">
+<p>
+<i>Maximum number of backoff it will consider    while it increases the backoff exponentially</i> 
+</p>
+</div>
+</li>
+<li><a id="orgca8f4ff"></a><code>listen_time_</code> (<i>listen_time</i>)<br />
+<div class="outline-text-5" id="text-3-13-1-12">
+<p>
+<i>A short channel sensing time</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org4b73bcc" class="outline-4">
+<h4 id="org4b73bcc"><span class="section-number-4">3.13.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-13-2">
+</div>
+<ol class="org-ol">
+<li><a id="orga9d009a"></a><code>setAckMode</code><br /></li>
+<li><a id="orgda231dc"></a><code>setNoAckMode</code><br /></li>
+<li><a id="org44a7dc5"></a><code>initialize</code><br /></li>
+<li><a id="org23c76f1"></a><code>printTransitions</code><br /></li>
+<li><a id="org4dfa51e"></a><code>getQueueSize</code><br /></li>
+<li><a id="org021fe1b"></a><code>getUpLayersDataRx</code><br /></li>
+<li><a id="org1485d79"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org425f496" class="outline-3">
+<h3 id="org425f496"><span class="section-number-3">3.14</span> <code>Module/UW/MLL</code> (<i>UWMllModule</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-3-14">
+</div>
+<div id="outline-container-org640272b" class="outline-4">
+<h4 id="org640272b"><span class="section-number-4">3.14.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-14-1">
+</div>
+<ol class="org-ol">
+<li><a id="org2d1afab"></a><code>enable_addr_copy_</code> (<i>enable_addr_copy</i>)<br /></li>
+</ol>
+</div>
+<div id="outline-container-org7785508" class="outline-4">
+<h4 id="org7785508"><span class="section-number-4">3.14.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-14-2">
+</div>
+<ol class="org-ol">
+<li><a id="org22e6a95"></a><code>reset</code><br /></li>
+<li><a id="orge67f5b8"></a><code>getArpPacketDrop</code><br /></li>
+<li><a id="org37c6431"></a><code>addentry</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgc2443eb" class="outline-3">
+<h3 id="orgc2443eb"><span class="section-number-3">3.15</span> <code>Module/UW/POLLING/NODE</code> (<i>Uwpolling_NODE</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-15">
+</div>
+<div id="outline-container-orgceb0fb4" class="outline-4">
+<h4 id="orgceb0fb4"><span class="section-number-4">3.15.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-15-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgaed453a"></a><code>T_poll_guard_</code> (<i>T_poll_guard</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-1">
+<p>
+<i>Guard time for initial POLL timer</i> 
+</p>
+</div>
+</li>
+<li><a id="org6662bd5"></a><code>backoff_tuner_</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-2">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="org37a0f9e"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-3">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org999c796"></a><code>buffer_data_pkts_</code> (<i>buffer_data_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-4">
+<p>
+<i>Length of buffer of DATA pkts in number of pkts</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd9f4b7c"></a><code>Max_DATA_Pkts_TX_</code> (<i>max_data_pkt_tx</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-5">
+<p>
+<i>Max number of DATA packets to transmit each cycle</i> 
+</p>
+</div>
+</li>
+<li><a id="org6a8b923"></a><code>node_id_</code> (<i>node_id</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-6">
+<p>
+<i>Unique Node ID</i> 
+</p>
+</div>
+</li>
+<li><a id="org7878153"></a><code>print_stats_</code> (<i>print_stats</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-7">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="org6597785"></a><code>sea_trial_</code> (<i>sea_trial</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-8">
+<p>
+<i>Sea Trial flag: To activate if the protocol is going to   be tested at the sea</i> 
+</p>
+</div>
+</li>
+<li><a id="org36ba3e7"></a><code>intra_data_guard_time_</code> (<i>Intra_data_Guard_Time</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-9">
+<p>
+<i>Guard Time between one data packet and the   following</i> 
+</p>
+</div>
+</li>
+<li><a id="orgefc746b"></a><code>n_run_</code> (<i>n_run</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-10">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="org8902a51"></a><code>useAdaptiveTpoll_</code> (<i>useAdaptiveTpoll</i>)<br />
+<div class="outline-text-5" id="text-3-15-1-11">
+<p>
+<i>True if an adaptive T_poll is used</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgf375ca4" class="outline-4">
+<h4 id="orgf375ca4"><span class="section-number-4">3.15.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-15-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgcfc6b8d"></a><code>initialize</code><br /></li>
+<li><a id="orgf93dfb3"></a><code>getDataQueueSize</code><br /></li>
+<li><a id="orgcd2235f"></a><code>getDataQueueLog</code><br /></li>
+<li><a id="org011c017"></a><code>getProbeSent</code><br /></li>
+<li><a id="orgfdb4742"></a><code>getTimesPolled</code><br /></li>
+<li><a id="org7aebbf6"></a><code>getTriggerReceived</code><br /></li>
+<li><a id="orgaff961d"></a><code>getTriggerDropped</code><br /></li>
+<li><a id="orgda22d63"></a><code>getPollDropped</code><br /></li>
+<li><a id="org453abb9"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org9c46cf7" class="outline-3">
+<h3 id="org9c46cf7"><span class="section-number-3">3.16</span> <code>Module/UW/POLLING/AUV</code> (<i>Uwpolling_AUV</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-16">
+</div>
+<div id="outline-container-org39dfccd" class="outline-4">
+<h4 id="org39dfccd"><span class="section-number-4">3.16.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-16-1">
+</div>
+<ol class="org-ol">
+<li><a id="org52b7aa2"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-1">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbb01d46"></a><code>T_probe_guard_</code> (<i>T_probe_guard</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-2">
+<p>
+<i>Guard time for PROBE packet:  T_probe=T_max+T_probe_guard</i> 
+</p>
+</div>
+</li>
+<li><a id="orgcf723d9"></a><code>T_min_</code> (<i>T_min</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-3">
+<p>
+<i>Minimum value in which the node can choose his backoff  time</i> 
+</p>
+</div>
+</li>
+<li><a id="org4f729eb"></a><code>T_max_</code> (<i>T_max</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-4">
+<p>
+<i>Maximum value in which the node can choose his backoff  time</i> 
+</p>
+</div>
+</li>
+<li><a id="orge570780"></a><code>T_guard_</code> (<i>T_guard</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-5">
+<p>
+<i>Guard time added to the calculation of the data TO</i> 
+</p>
+</div>
+</li>
+<li><a id="org39f3762"></a><code>T_ack_timer_</code> (<i>T_ack_timer</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-6">
+<p>
+<i>Guard time for PROBE packet:  T_probe=T_max+T_probe_guard</i> 
+</p>
+</div>
+</li>
+<li><a id="org47b0079"></a><code>max_polled_node_</code> (<i>max_polled_node</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-7">
+<p>
+<i>Maximum number of node that the AUV can poll each time.</i> 
+</p>
+</div>
+</li>
+<li><a id="org55a1cd3"></a><code>sea_trial_</code> (<i>sea_trial_</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-8">
+<p>
+<i>Sea Trial flag: To activate if the protocol is    going to be tested at the sea</i> 
+</p>
+</div>
+</li>
+<li><a id="org5ae1395"></a><code>print_stats_</code> (<i>print_stats_</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-9">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf88a62b"></a><code>modem_data_bit_rate_</code> (<i>modem_data_bit_rate</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-10">
+<p>
+<i>Bit rate of the modem used</i> 
+</p>
+</div>
+</li>
+<li><a id="org587bfa5"></a><code>n_run_</code> (<i>n_run</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-11">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="org4e140de"></a><code>Data_Poll_guard_time_</code> (<i>DATA_POLL_guard_time_</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-12">
+<p>
+<i>Guard time between the reception of the   last data and the transmission of the   following POLL</i> 
+</p>
+</div>
+</li>
+<li><a id="org3c7a90b"></a><code>max_buffer_size_</code> (<i>max_buffer_size</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-13">
+<p>
+<i>Max size for the transmission buffer</i> 
+</p>
+</div>
+</li>
+<li><a id="orgfe6d349"></a><code>max_tx_pkts_</code> (<i>max_tx_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-14">
+<p>
+<i>Max number of packets can be transmitted by the AUV during a TxData session</i> 
+</p>
+</div>
+</li>
+<li><a id="org98616a2"></a><code>ack_enabled_</code> (<i>ack_enabled</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-15">
+<p>
+<i>True if ack is enabled, false if disabled, default true</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbd86f41"></a><code>full_knowledge_</code> (<i>full_knowledge</i>)<br />
+<div class="outline-text-5" id="text-3-16-1-16">
+<p>
+<i>Set to a number != 0 means we have full_knowledge  about the estimate of neighbors</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org9d42c80" class="outline-4">
+<h4 id="org9d42c80"><span class="section-number-4">3.16.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-16-2">
+</div>
+<ol class="org-ol">
+<li><a id="org6207246"></a><code>initialize</code><br /></li>
+<li><a id="org7e8551c"></a><code>run</code><br /></li>
+<li><a id="org0daa66d"></a><code>stop_count_time</code><br /></li>
+<li><a id="org98e683f"></a><code>GetTotalReceivingTime</code><br /></li>
+<li><a id="orga0db9ba"></a><code>getTriggerSent</code><br /></li>
+<li><a id="org542a245"></a><code>getWrongNodeDataSent</code><br /></li>
+<li><a id="org13a988a"></a><code>getProbeReceived</code><br /></li>
+<li><a id="org04a2c84"></a><code>getPollSent</code><br /></li>
+<li><a id="org5284d75"></a><code>getDroppedProbePkts</code><br /></li>
+<li><a id="orgcd6b631"></a><code>getDroppedProbeWrongState</code><br /></li>
+<li><a id="org2297afc"></a><code>setMacAddr</code><br /></li>
+<li><a id="org86ad667"></a><code>getRxFromNode</code><br /></li>
+<li><a id="org06c3439"></a><code>set_adaptive_backoff_LUT</code><br /></li>
+<li><a id="orgc121e65"></a><code>setLUTSeparator</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga418fc7" class="outline-3">
+<h3 id="orga418fc7"><span class="section-number-3">3.17</span> <code>Module/UW/POLLING/SINK</code> (<i>Uwpolling_SINK</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-17">
+</div>
+<div id="outline-container-org951d4cf" class="outline-4">
+<h4 id="org951d4cf"><span class="section-number-4">3.17.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-17-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgb8f8176"></a><code>T_data_guard_</code> (<i>T_data_gurad</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-1">
+<p>
+<i>Guard time for RxDataTimer</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb609861"></a><code>backoff_tuner_</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-2">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="org3c7c464"></a><code>sink_id_</code> (<i>sink_id</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-3">
+<p>
+<i>Unique Node ID</i> 
+</p>
+</div>
+</li>
+<li><a id="org9a5c93e"></a><code>sea_trial_</code> (<i>sea_trial</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-4">
+<p>
+<i>Sea Trial flag: To activate if the protocol is going to   be tested at the sea</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc30cb95"></a><code>n_run_</code> (<i>n_run</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-5">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="org2812e8b"></a><code>print_stats_</code> (<i>print_stats</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-6">
+<p>
+<i>Print protocol's statistics of the protocol</i> 
+</p>
+</div>
+</li>
+<li><a id="org688741f"></a><code>useAdaptiveTdata_</code> (<i>useAdaptiveTdata</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-7">
+<p>
+<i>True if an adaptive T_poll is used</i> 
+</p>
+</div>
+</li>
+<li><a id="orgffa70fd"></a><code>ack_enabled_</code> (<i>ack_enabled</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-8">
+<p>
+<i>True if ack is enabled, false if disabled, default true</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb954a2e"></a><code>max_n_ack_</code> (<i>max_n_ack</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-9">
+<p>
+<i>Max number of ACK that can be sent in a single round.  The same value has to be used in packer, if needed.</i> 
+</p>
+</div>
+</li>
+<li><a id="org009c229"></a><code>T_guard_</code> (<i>T_guard</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-10">
+<p>
+<i>Guard time added to the calculation of the data TO</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd906b5a"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-11">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf8059e9"></a><code>modem_data_bit_rate_</code> (<i>modem_data_bit_rate</i>)<br />
+<div class="outline-text-5" id="text-3-17-1-12">
+<p>
+<i>Bit rate of the modem used</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org53898a8" class="outline-4">
+<h4 id="org53898a8"><span class="section-number-4">3.17.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-17-2">
+</div>
+<ol class="org-ol">
+<li><a id="org5006b5d"></a><code>initialize</code><br /></li>
+<li><a id="orge27602c"></a><code>getProbeSent</code><br /></li>
+<li><a id="orga2849b8"></a><code>getAckSent</code><br /></li>
+<li><a id="orgde307a8"></a><code>getTriggerReceived</code><br /></li>
+<li><a id="orgb6345c6"></a><code>getTriggerDropped</code><br /></li>
+<li><a id="org5e9d039"></a><code>getDuplicatedPkts</code><br /></li>
+<li><a id="org0ef030f"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org3c07a32" class="outline-3">
+<h3 id="org3c07a32"><span class="section-number-3">3.18</span> <code>Module/UW/CSMA_CA</code> (<i>CsmaCa</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-18">
+</div>
+<div id="outline-container-orgc108184" class="outline-4">
+<h4 id="orgc108184"><span class="section-number-4">3.18.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-18-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgf27d5a8"></a><code>queue_size_</code> (<i>max_queue_size</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-1">
+<p>
+<i>Maximum dimension of Queue</i> 
+</p>
+</div>
+</li>
+<li><a id="org363cb49"></a><code>backoff_delta_</code> (<i>backoff_delta</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-2">
+<p>
+<i>Delta value (configurable) to be added to backoff</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc18737c"></a><code>backoff_max</code> (<i>backoff_max</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-3">
+<p>
+<i>Maximum value in range of backoff</i> 
+</p>
+</div>
+</li>
+<li><a id="org07c3b38"></a><code>data_size_</code> (<i>data_size</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-4">
+<p>
+<i>Size of DATA packet</i> 
+</p>
+</div>
+</li>
+<li><a id="orgafab09c"></a><code>bitrate_</code> (<i>bitrate</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-5">
+<p>
+<i>Bit rate adopted</i> 
+</p>
+</div>
+</li>
+<li><a id="org33ce467"></a><code>cts_wait_val_</code> (<i>cts_wait_val</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-6">
+<p>
+<i>Timer duration of CTS</i> 
+</p>
+</div>
+</li>
+<li><a id="org5eec7e6"></a><code>data_wait_val_</code> (<i>data_wait_val</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-7">
+<p>
+<i>Timer duration of DATA</i> 
+</p>
+</div>
+</li>
+<li><a id="org01ade80"></a><code>ack_wait_val_</code> (<i>ack_wait_val</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-8">
+<p>
+<i>Timer duration of ACK</i> 
+</p>
+</div>
+</li>
+<li><a id="org6d08d3b"></a><code>log_level_</code> (<i>log_level</i>)<br />
+<div class="outline-text-5" id="text-3-18-1-9">
+<p>
+<i>Current log level chosen for protocol</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org30eb9d4" class="outline-4">
+<h4 id="org30eb9d4"><span class="section-number-4">3.18.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-18-2">
+</div>
+<ol class="org-ol">
+<li><a id="org30b2552"></a><code>initialize</code><br /></li>
+<li><a id="org4fc461b"></a><code>setAckMode</code><br /></li>
+<li><a id="orgf3d4302"></a><code>setNoAckMode</code><br /></li>
+<li><a id="org0e74eba"></a><code>getCTSDropped</code><br /></li>
+<li><a id="orgf096e8f"></a><code>getRTSDropped</code><br /></li>
+<li><a id="org156a45a"></a><code>getDataDropped</code><br /></li>
+<li><a id="org868598b"></a><code>getQueueSize</code><br /></li>
+<li><a id="orgbc450e6"></a><code>getUpDataRx</code><br /></li>
+<li><a id="org51f1c92"></a><code>getRTSRx</code><br /></li>
+<li><a id="orgeb84bda"></a><code>getCTSRx</code><br /></li>
+<li><a id="orgd8c1918"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org49d70ba" class="outline-3">
+<h3 id="org49d70ba"><span class="section-number-3">3.19</span> <code>Module/UW/USR</code> (<i>MMacUWSR</i>) : <i>MMac</i></h3>
+<div class="outline-text-3" id="text-3-19">
+</div>
+<div id="outline-container-org56b93e5" class="outline-4">
+<h4 id="org56b93e5"><span class="section-number-4">3.19.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-3-19-1">
+</div>
+<ol class="org-ol">
+<li><a id="org67a063b"></a><code>HDR_size_</code> (<i>HDR_size</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-1">
+<p>
+<i>Size of the HDR if any</i> 
+</p>
+</div>
+</li>
+<li><a id="org9612b44"></a><code>ACK_size_</code> (<i>ACK_size</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-2">
+<p>
+<i>Size of the ACK.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgfc21278"></a><code>max_tx_tries_</code> (<i>max_tx_tries</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-3">
+<p>
+<i>Maximum number of retransmissions attempt.</i> 
+</p>
+</div>
+</li>
+<li><a id="org0dac724"></a><code>wait_costant_</code> (<i>wait_constant</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-4">
+<p>
+<i>This fixed time is employed to componsate  different time variations.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd340d89"></a><code>uwsr_debug</code> (<i>uwsr_debug</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-5">
+<p>
+<i>Debuging flag.</i> 
+</p>
+</div>
+</li>
+<li><a id="org7359d38"></a><code>max_payload_</code> (<i>max_payload</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-6">
+<p>
+<i>Maximum number of payload in a packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org4a868be"></a><code>ACK_timeout_</code> (<i>ACK_timeout</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-7">
+<p>
+<i>ACK timeout for the initial packet</i> 
+</p>
+</div>
+</li>
+<li><a id="org3a51ff7"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-8">
+<p>
+<i>This variable is used to tune the RTT</i> 
+</p>
+</div>
+</li>
+<li><a id="org64a8ef6"></a><code>backoff_tuner_</code> (<i>backoff_tuner</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-9">
+<p>
+<i>Tunes the backoff duration.</i> 
+</p>
+</div>
+</li>
+<li><a id="org3e4fdf9"></a><code>buffer_pkts_</code> (<i>buffer_pkts</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-10">
+<p>
+<i>Number of packets a node can store in the container</i> 
+</p>
+</div>
+</li>
+<li><a id="org70b8edf"></a><code>max_backoff_counter_</code> (<i>max_backoff_counter</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-11">
+<p>
+<i>Maximum number of backoff it will consider    while it increases the backoff exponentially</i> 
+</p>
+</div>
+</li>
+<li><a id="org0fe4b3e"></a><code>listen_time_</code> (<i>listen_time</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-12">
+<p>
+<i>A short channel sensing time</i> 
+</p>
+</div>
+</li>
+<li><a id="org1ade558"></a><code>guard_time_</code> (<i>guard_time</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-13">
+<p>
+<i>A time which is used to componsate variating in   timing</i> 
+</p>
+</div>
+</li>
+<li><a id="org16e4de3"></a><code>node_speed_</code> (<i>node_speed</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-14">
+<p>
+<i>Speed of the mobile node [m/s]</i> 
+</p>
+</div>
+</li>
+<li><a id="org820ed8f"></a><code>var_k_</code> (<i>var_k</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-15">
+<p>
+<i>It is employed to decrease the window size.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbc99f70"></a><code>uwsr_debug_</code> (<i>uwsr_debug</i>)<br />
+<div class="outline-text-5" id="text-3-19-1-16">
+<p>
+<i>Debuging flag.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgea6f7ed" class="outline-4">
+<h4 id="orgea6f7ed"><span class="section-number-4">3.19.2</span> Commands</h4>
+<div class="outline-text-4" id="text-3-19-2">
+</div>
+<ol class="org-ol">
+<li><a id="org867a3b9"></a><code>initialize</code><br /></li>
+<li><a id="orgc0c2b4d"></a><code>printTransitions</code><br /></li>
+<li><a id="org3f358d9"></a><code>getQueueSize</code><br /></li>
+<li><a id="org404e210"></a><code>getBackoffCount</code><br /></li>
+<li><a id="org269e41d"></a><code>getAvgPktsTxIn1RTT</code><br /></li>
+<li><a id="org2c10d5d"></a><code>setMacAddr</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org32e307c" class="outline-2">
+<h2 id="org32e307c"><span class="section-number-2">4</span> network layer</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgfe74b63" class="outline-3">
+<h3 id="orgfe74b63"><span class="section-number-3">4.1</span> <code>Module/UW/SUNNode</code> (<i>SunIPRoutingNode</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-1">
+</div>
+<div id="outline-container-org83bc75b" class="outline-4">
+<h4 id="org83bc75b"><span class="section-number-4">4.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org37a1a72"></a><code>ipAddr_</code> (<i>ipAddr_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-1">
+<p>
+<i>IP of the current node.</i> 
+</p>
+</div>
+</li>
+<li><a id="org7f2851d"></a><code>metrics_</code> (<i>metrics_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-2">
+<p>
+<i>Metric used by the current node.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc06fe7e"></a><code>PoissonTraffic_</code> (<i>PoissonTraffic_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-3">
+<p>
+<i>Enable (&lt;i&gt;1&lt;/i&gt;) or disable (&lt;i&gt;0&lt;/i&gt;) the Poisson traffic for SUN packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org9ec8414"></a><code>period_status_</code> (<i>period_status_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-4">
+<p>
+<i>Period of the Poisson traffic for status and    ack packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6e6f712"></a><code>period_data_</code> (<i>period_data_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-5">
+<p>
+<i>Period of the Poisson traffic for data packets in the buffer.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6b82513"></a><code>max_ack_error_</code> (<i>max_ack_error_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-6">
+<p>
+<i>Maximum number of Ack errors tollerated by the    node.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6584fb2"></a><code>timer_route_validity_</code> (<i>timer_route_validity_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-7">
+<p>
+<i>Maximum validity time for a route entry.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb6b62a7"></a><code>timer_sink_probe_validity_</code> (<i>timer_sink_probe_validity_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-8">
+<p>
+<i>Maximum validity time for a sink   probe.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6ad2b85"></a><code>timer_buffer_</code> (<i>timer_buffer_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-9">
+<p>
+<i>Timer for buffer management.</i> 
+</p>
+</div>
+</li>
+<li><a id="org34594c5"></a><code>timer_search_path_</code> (<i>timer_search_path_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-10">
+<p>
+<i>Timer for the search path mechanism.</i> 
+</p>
+</div>
+</li>
+<li><a id="org3b24951"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-11">
+<p>
+<i>Parameters used by Load metric. It is a correlation   factor.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb4a7111"></a><code>printDebug_</code> (<i>printDebug_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-12">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="orge5f55d8"></a><code>probe_min_snr_</code> (<i>probe_min_snr_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-13">
+<p>
+<i>Value below which if a node receives a probe it   discards it.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6aba2dc"></a><code>buffer_max_size_</code> (<i>buffer_max_size_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-14">
+<p>
+<i>Maximum length of the data buffer.</i> 
+</p>
+</div>
+</li>
+<li><a id="org1207101"></a><code>safe_timer_buffer_</code> (<i>safe_timer_buffer_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-15">
+<p>
+<i>Enables a mechanism used to modify the    &lt;i&gt;timer_buffer_&lt;/i&gt; in case of the sending    time is shorter than the time needed to    receive acks.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6b12e72"></a><code>disable_path_error_</code> (<i>disable_path_error_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-16">
+<p>
+<i>Flag to enable or disable the possibility to send &lt;i&gt;Path Error&lt;/i&gt; packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org030a281"></a><code>reset_buffer_if_error_</code> (<i>reset_buffer_if_error_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-17">
+<p>
+<i>If == 1 when a node identify a broken    link it will automatically free its    buffer.</i> 
+</p>
+</div>
+</li>
+<li><a id="org691200d"></a><code>max_retx_</code> (<i>max_retx_</i>)<br />
+<div class="outline-text-5" id="text-4-1-1-18">
+<p>
+<i>Maximum Number of transmissions performed: real retransmissions counter    the counter is increased only when the packet is sent downlayer</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org9dd24f1" class="outline-4">
+<h4 id="org9dd24f1"><span class="section-number-4">4.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="org01da490"></a><code>initialize</code><br /></li>
+<li><a id="org974dd03"></a><code>clearhops</code><br /></li>
+<li><a id="org09dbd1c"></a><code>printhopcount</code><br /></li>
+<li><a id="org320ce6b"></a><code>printhops</code><br /></li>
+<li><a id="org0980fef"></a><code>printselectedroutes</code><br /></li>
+<li><a id="org83ffaf0"></a><code>getackcount</code><br /></li>
+<li><a id="orga7e53d2"></a><code>getdatapktcount</code><br /></li>
+<li><a id="orgc49c779"></a><code>getforwardedcount</code><br /></li>
+<li><a id="orgcc10ac8"></a><code>getdatapktdroppedbuffer</code><br /></li>
+<li><a id="org313aa05"></a><code>getdatapktdroppedmaxretx</code><br /></li>
+<li><a id="org469f177"></a><code>getpathestablishmentpktcount</code><br /></li>
+<li><a id="orgb1e3b67"></a><code>getackheadersize</code><br /></li>
+<li><a id="org24f767b"></a><code>getdatapktheadersize</code><br /></li>
+<li><a id="orgc068afe"></a><code>getpathestheadersize</code><br /></li>
+<li><a id="orgf291b6b"></a><code>getNpathsestablished</code><br /></li>
+<li><a id="orga81f62a"></a><code>getbufferstatus</code><br /></li>
+<li><a id="orgf755b57"></a><code>getmeanretx</code><br /></li>
+<li><a id="org1ae0d38"></a><code>gettransmittedpackets</code><br /></li>
+<li><a id="orgfd78ffe"></a><code>getstats</code><br /></li>
+<li><a id="org25ba3be"></a><code>addr</code><br /></li>
+<li><a id="org412933d"></a><code>trace</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org92ae943" class="outline-3">
+<h3 id="org92ae943"><span class="section-number-3">4.2</span> <code>Module/UW/SUNSink</code> (<i>SunIPRoutingSink</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-2">
+</div>
+<div id="outline-container-orge31ed29" class="outline-4">
+<h4 id="orge31ed29"><span class="section-number-4">4.2.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="org1a722f8"></a><code>t_probe</code> (<i>t_probe</i>)<br />
+<div class="outline-text-5" id="text-4-2-1-1">
+<p>
+<i>Period of the probing.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6d8bfdb"></a><code>ipAddr_</code> (<i>ipAddr_</i>)<br />
+<div class="outline-text-5" id="text-4-2-1-2">
+<p>
+<i>IP of the current node.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc3fb97e"></a><code>PoissonTraffic_</code> (<i>PoissonTraffic_</i>)<br />
+<div class="outline-text-5" id="text-4-2-1-3">
+<p>
+<i>Enable (&lt;i&gt;1&lt;/i&gt;) or disable (&lt;i&gt;0&lt;/i&gt;) the Poisson traffic for SUN packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org66dffe0"></a><code>periodPoissonTraffic_</code> (<i>periodPoissonTraffic_</i>)<br />
+<div class="outline-text-5" id="text-4-2-1-4">
+<p>
+<i>Period of the Poisson traffic.</i> 
+</p>
+</div>
+</li>
+<li><a id="org03adc3f"></a><code>printDebug_</code> (<i>printDebug_</i>)<br />
+<div class="outline-text-5" id="text-4-2-1-5">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org20e944b" class="outline-4">
+<h4 id="org20e944b"><span class="section-number-4">4.2.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-2-2">
+</div>
+<ol class="org-ol">
+<li><a id="org4681a4f"></a><code>initialize</code><br /></li>
+<li><a id="org00d851f"></a><code>start</code><br /></li>
+<li><a id="org03a1a47"></a><code>stop</code><br /></li>
+<li><a id="orga86ad00"></a><code>sendprobe</code><br /></li>
+<li><a id="org3c6e44c"></a><code>getprobetimer</code><br /></li>
+<li><a id="orgc4e6654"></a><code>getprobepktcount</code><br /></li>
+<li><a id="org5b0f843"></a><code>getackcount</code><br /></li>
+<li><a id="orga4fc0f9"></a><code>getprobepktheadersize</code><br /></li>
+<li><a id="orga5513f3"></a><code>getackheadersize</code><br /></li>
+<li><a id="org4a57739"></a><code>setnumberofnodes</code><br /></li>
+<li><a id="orgc42df1f"></a><code>addr</code><br /></li>
+<li><a id="org864f3fc"></a><code>trace</code><br /></li>
+<li><a id="orgd55ede6"></a><code>tracepaths</code><br /></li>
+<li><a id="org75b1e6c"></a><code>getstats</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgf957075" class="outline-3">
+<h3 id="orgf957075"><span class="section-number-3">4.3</span> <code>Module/UW/PosBasedRt</code> (<i>UwPosBasedRt</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-3">
+</div>
+<div id="outline-container-orgf1ade81" class="outline-4">
+<h4 id="orgf1ade81"><span class="section-number-4">4.3.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-3-1">
+</div>
+<ol class="org-ol">
+<li><a id="org63fe260"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-4-3-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="org44739a8"></a><code>maxTxRange_</code> (<i>maxTxRange</i>)<br />
+<div class="outline-text-5" id="text-4-3-1-2">
+<p>
+<i>Maximum transmission range,  in meters, for this node.</i> 
+</p>
+</div>
+</li>
+<li><a id="orge726a71"></a><code>ROV_speed_</code> (<i>ROV_speed</i>)<br />
+<div class="outline-text-5" id="text-4-3-1-3">
+<p>
+<i>Last known ROV speed.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org1ffaada" class="outline-4">
+<h4 id="org1ffaada"><span class="section-number-4">4.3.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="org909d04c"></a><code>setMaxTxRange</code><br /></li>
+<li><a id="orgd778cd7"></a><code>addr</code><br /></li>
+<li><a id="org16c8b24"></a><code>setNodePosition</code><br /></li>
+<li><a id="org56e0581"></a><code>addRoute</code><br /></li>
+<li><a id="org32ff9a2"></a><code>toMovingNode</code><br /></li>
+<li><a id="orgf7f8e2e"></a><code>toFixedNode</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgdad711d" class="outline-3">
+<h3 id="orgdad711d"><span class="section-number-3">4.4</span> <code>Module/UW/PosBasedRt/ROV</code> (<i>UwPosBasedRtROV</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-4">
+</div>
+<div id="outline-container-orge5e5036" class="outline-4">
+<h4 id="orge5e5036"><span class="section-number-4">4.4.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-4-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgd07c18b"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-4-4-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="org8916cc5"></a><code>maxTxRange_</code> (<i>maxTxRange</i>)<br />
+<div class="outline-text-5" id="text-4-4-1-2">
+<p>
+<i>Maximum transmission range,  in meters, for this node.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org1effb72" class="outline-4">
+<h4 id="org1effb72"><span class="section-number-4">4.4.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-4-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgd78ce44"></a><code>setMaxTxRange</code><br /></li>
+<li><a id="orged980f4"></a><code>addr</code><br /></li>
+<li><a id="orge97ba52"></a><code>setROVPosition</code><br /></li>
+<li><a id="orgb642bf2"></a><code>addPosition_IPotherNodes</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgbbc0baa" class="outline-3">
+<h3 id="orgbbc0baa"><span class="section-number-3">4.5</span> <code>Module/UW/IP</code> (<i>UWIPModule</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-5">
+</div>
+<div id="outline-container-org0b063c2" class="outline-4">
+<h4 id="org0b063c2"><span class="section-number-4">4.5.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-5-1">
+</div>
+<ol class="org-ol">
+<li><a id="orge6ce2f8"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-4-5-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org9d15a48" class="outline-4">
+<h4 id="org9d15a48"><span class="section-number-4">4.5.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-5-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgfb33b93"></a><code>addr</code><br /></li>
+<li><a id="orgc8f745f"></a><code>setaddrinet</code><br /></li>
+<li><a id="org34849b6"></a><code>setaddrilink</code><br /></li>
+<li><a id="orgc88e371"></a><code>addr-string</code><br /></li>
+<li><a id="org27ace95"></a><code>getipheadersize</code><br /></li>
+<li><a id="orgb3f873e"></a><code>printidspkts</code><br /></li>
+<li><a id="org48a9a5a"></a><code>addr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga3b778b" class="outline-3">
+<h3 id="orga3b778b"><span class="section-number-3">4.6</span> <code>Module/UW/FLOODING</code> (<i>UwFlooding</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-6">
+</div>
+<div id="outline-container-org8d476eb" class="outline-4">
+<h4 id="org8d476eb"><span class="section-number-4">4.6.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-6-1">
+</div>
+<ol class="org-ol">
+<li><a id="org5877dcd"></a><code>ttl_</code> (<i>ttl_</i>)<br />
+<div class="outline-text-5" id="text-4-6-1-1">
+<p>
+<i>Time to leave of the packet.</i> 
+</p>
+</div>
+</li>
+<li><a id="org292e517"></a><code>maximum_cache_time_</code> (<i>maximum_cache_time_</i>)<br />
+<div class="outline-text-5" id="text-4-6-1-2">
+<p>
+<i>Validity time of a packet entry.</i> 
+</p>
+</div>
+</li>
+<li><a id="org14e924e"></a><code>optimize_</code> (<i>optimize_</i>)<br />
+<div class="outline-text-5" id="text-4-6-1-3">
+<p>
+<i>Flag used to enable the mechanism to drop packets   processed twice.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf4dae64"></a><code>forward_timeout_</code> (<i>fwd_to</i>)<br />
+<div class="outline-text-5" id="text-4-6-1-4">
+<p>
+<i>Time out within which the forwarding is expected.</i> 
+</p>
+</div>
+</li>
+<li><a id="org6b0ece7"></a><code>alpha_snr_</code> (<i>alpha_snr</i>)<br />
+<div class="outline-text-5" id="text-4-6-1-5">
+<p>
+<i>Value to be used by the NeighborReputationHandler  object to combine new snr values and average snr.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org42ba8bc" class="outline-4">
+<h4 id="org42ba8bc"><span class="section-number-4">4.6.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-6-2">
+</div>
+<ol class="org-ol">
+<li><a id="org3f6733a"></a><code>getpacketsforwarded</code><br /></li>
+<li><a id="org4d5bf8c"></a><code>getfloodingheadersize</code><br /></li>
+<li><a id="org8b0dca5"></a><code>printNeighbor</code><br /></li>
+<li><a id="org845412a"></a><code>addr</code><br /></li>
+<li><a id="orge9b99c5"></a><code>trace</code><br /></li>
+<li><a id="orge43311c"></a><code>setReputation</code><br /></li>
+<li><a id="org480074f"></a><code>setPhyTag</code><br /></li>
+<li><a id="org6b67e77"></a><code>addTtlPerTraffic</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgf013347" class="outline-3">
+<h3 id="orgf013347"><span class="section-number-3">4.7</span> <code>Module/UW/ICRPNode</code> (<i>UwIcrpNode</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-7">
+</div>
+<div id="outline-container-orge5cc94f" class="outline-4">
+<h4 id="orge5cc94f"><span class="section-number-4">4.7.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-7-1">
+</div>
+<ol class="org-ol">
+<li><a id="orgf35cccd"></a><code>printDebug_</code> (<i>printDebug_</i>)<br />
+<div class="outline-text-5" id="text-4-7-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="org01f7c96"></a><code>maxvaliditytime_</code> (<i>max_validity_time_</i>)<br />
+<div class="outline-text-5" id="text-4-7-1-2">
+<p>
+<i>Maximum validity time of a route.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgdf132b6"></a><code>timer_ack_waiting_</code> (<i>timer_ack_waiting_</i>)<br />
+<div class="outline-text-5" id="text-4-7-1-3">
+<p>
+<i>Ack waiting timer.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orga29e8ca" class="outline-4">
+<h4 id="orga29e8ca"><span class="section-number-4">4.7.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-7-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgbd5c205"></a><code>initialize</code><br /></li>
+<li><a id="org0270b95"></a><code>clearhops</code><br /></li>
+<li><a id="org5b5b632"></a><code>printhops</code><br /></li>
+<li><a id="orgf0cc842"></a><code>getackheadersize</code><br /></li>
+<li><a id="org6c22316"></a><code>getdataheadersize</code><br /></li>
+<li><a id="org69ef9c5"></a><code>getstatusheadersize</code><br /></li>
+<li><a id="orgb921d2c"></a><code>getackpktcount</code><br /></li>
+<li><a id="org724e8ad"></a><code>getdatapktcount</code><br /></li>
+<li><a id="orgda1bca7"></a><code>getstatuspktcount</code><br /></li>
+<li><a id="org8236726"></a><code>ipsink</code><br /></li>
+<li><a id="org295cd95"></a><code>addr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org91b1ce2" class="outline-3">
+<h3 id="org91b1ce2"><span class="section-number-3">4.8</span> <code>Module/UW/ICRPSink</code> (<i>UwIcrpSink</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-4-8">
+</div>
+<div id="outline-container-org0fa6482" class="outline-4">
+<h4 id="org0fa6482"><span class="section-number-4">4.8.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-4-8-1">
+</div>
+<ol class="org-ol">
+<li><a id="org2aef9d7"></a><code>printDebug_</code> (<i>printDebug_</i>)<br />
+<div class="outline-text-5" id="text-4-8-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgdce593a" class="outline-4">
+<h4 id="orgdce593a"><span class="section-number-4">4.8.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-8-2">
+</div>
+<ol class="org-ol">
+<li><a id="org2f52b02"></a><code>initialize</code><br /></li>
+<li><a id="orge46704b"></a><code>getackheadersize</code><br /></li>
+<li><a id="org5479083"></a><code>getdataheadersize</code><br /></li>
+<li><a id="org488f1f8"></a><code>getstatusheadersize</code><br /></li>
+<li><a id="orgf52e888"></a><code>getackpktcount</code><br /></li>
+<li><a id="orgeb34129"></a><code>getstatuspktcount</code><br /></li>
+<li><a id="org9aa9e43"></a><code>addr</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org59c9198" class="outline-3">
+<h3 id="org59c9198"><span class="section-number-3">4.9</span> <code>Module/UW/StaticRouting</code> (<i>UwStaticRoutingModule</i>) : //</h3>
+<div class="outline-text-3" id="text-4-9">
+</div>
+<div id="outline-container-org203317f" class="outline-4">
+<h4 id="org203317f"><span class="section-number-4">4.9.1</span> Bound variables</h4>
+</div>
+<div id="outline-container-orgac11704" class="outline-4">
+<h4 id="orgac11704"><span class="section-number-4">4.9.2</span> Commands</h4>
+<div class="outline-text-4" id="text-4-9-2">
+</div>
+<ol class="org-ol">
+<li><a id="org3e769a0"></a><code>numroutes</code><br /></li>
+<li><a id="org176431f"></a><code>clearroutes</code><br /></li>
+<li><a id="orgc1d6778"></a><code>defaultGateway</code><br /></li>
+<li><a id="orgced3bde"></a><code>addroute</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org127b9b6" class="outline-2">
+<h2 id="org127b9b6"><span class="section-number-2">5</span> transport layer</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org00b613e" class="outline-3">
+<h3 id="org00b613e"><span class="section-number-3">5.1</span> <code>Module/UW/UDP</code> (<i>UwUdp</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-5-1">
+</div>
+<div id="outline-container-org6add93a" class="outline-4">
+<h4 id="org6add93a"><span class="section-number-4">5.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-5-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org4b83294"></a><code>drop_duplicated_packets_</code> (<i>drop_duplicated_packets_</i>)<br />
+<div class="outline-text-5" id="text-5-1-1-1">
+<p>
+<i>Flat to enable or disable the drop of  duplicated packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbfd873e"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-5-1-1-2">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org7a648af" class="outline-4">
+<h4 id="org7a648af"><span class="section-number-4">5.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-5-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgb6e3475"></a><code>getudpheadersize</code><br /></li>
+<li><a id="org406a99f"></a><code>printidspkts</code><br /></li>
+<li><a id="org7307238"></a><code>assignPort</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd3bb934" class="outline-2">
+<h2 id="orgd3bb934"><span class="section-number-2">6</span> application layer</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org5175991" class="outline-3">
+<h3 id="org5175991"><span class="section-number-3">6.1</span> <code>Module/UW/APPLICATION</code> (<i>uwApplicationModule</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-6-1">
+</div>
+<div id="outline-container-orgef45a91" class="outline-4">
+<h4 id="orgef45a91"><span class="section-number-4">6.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-6-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org935b25a"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgdef9bf3"></a><code>period_</code> (<i>PERIOD</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-2">
+<p>
+<i>Interval time between two successive generation data    packets</i> 
+</p>
+</div>
+</li>
+<li><a id="org099669e"></a><code>node_ID_</code> (<i>node_id</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-3">
+<p>
+<i>Variable that handle the file in which the   protocol write the statistics</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf524777"></a><code>EXP_ID_</code> (<i>exp_id</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-4">
+<p>
+<i>Variable that handle the file in which the   protocol write the statistics</i> 
+</p>
+</div>
+</li>
+<li><a id="org68f8c8b"></a><code>PoissonTraffic_</code> (<i>poisson_traffic</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-5">
+<p>
+<i>Enable or not the Poisson process for generation of data packets &lt;i&gt;1&lt;/i&gt; enabled &lt;i&gt;0&lt;/i&gt; not enabled</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbbe6383"></a><code>Payload_size_</code> (<i>payloadsize</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-6">
+<p>
+<i>Size of each data packet payaload generated</i> <b>**</b> <code>destAddr_</code> (<i>dst_addr</i>)
+</p>
+
+<p>
+<i>IP destination address.</i> 
+</p>
+</div>
+</li>
+<li><a id="org42d168b"></a><code>destPort_</code> (<i>port_num</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-7">
+<p>
+<i>Number of the port in which the server provide the  service</i> 
+</p>
+</div>
+</li>
+<li><a id="org48466b7"></a><code>Socket_Port_</code> (<i>servPort</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-8">
+<p>
+<i>Server port</i> 
+</p>
+</div>
+</li>
+<li><a id="org33ef0f7"></a><code>drop_out_of_order_</code> (<i>drop_out_of_order</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-9">
+<p>
+<i>Enable or not the ordering of data packet   received &lt;i&gt;1&lt;/i&gt; enabled &lt;i&gt;0&lt;/i&gt; not enabled</i> 
+</p>
+</div>
+</li>
+<li><a id="orgc804964"></a><code>max_read_length</code> (<i>MAX_READ_LEN</i>)<br />
+<div class="outline-text-5" id="text-6-1-1-10">
+<p>
+<i>Maximum size (bytes) of a single read of the socket</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org8c624f5" class="outline-4">
+<h4 id="org8c624f5"><span class="section-number-4">6.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-6-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="org7f7cb48"></a><code>start</code><br /></li>
+<li><a id="org8ed576b"></a><code>stop</code><br /></li>
+<li><a id="org9a19264"></a><code>getsentpkts</code><br /></li>
+<li><a id="org5546b66"></a><code>lostpkts</code><br /></li>
+<li><a id="orgb7149a1"></a><code>getrecvpkts</code><br /></li>
+<li><a id="orgbca65b4"></a><code>outofsequencepkts</code><br /></li>
+<li><a id="org51e6a21"></a><code>notknownpktrx</code><br /></li>
+<li><a id="orgd04bd43"></a><code>getrecvpktsqueue</code><br /></li>
+<li><a id="org099ab95"></a><code>getrtt</code><br /></li>
+<li><a id="orge7a29c8"></a><code>getrttstd</code><br /></li>
+<li><a id="org3273202"></a><code>getftt</code><br /></li>
+<li><a id="org8241404"></a><code>getfttstd</code><br /></li>
+<li><a id="orgb1d850f"></a><code>getper</code><br /></li>
+<li><a id="org45c26f1"></a><code>getthr</code><br /></li>
+<li><a id="org8c6980a"></a><code>print_log</code><br /></li>
+<li><a id="org87fea52"></a><code>SetSocketProtocol</code><br /></li>
+<li><a id="org53561dd"></a><code>UDP</code><br /></li>
+<li><a id="orga1e4634"></a><code>TCP</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgefc1f8e" class="outline-3">
+<h3 id="orgefc1f8e"><span class="section-number-3">6.2</span> <code>Module/UW/CBR</code> (<i>UwCbrModule</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-6-2">
+</div>
+<div id="outline-container-orgccf3859" class="outline-4">
+<h4 id="orgccf3859"><span class="section-number-4">6.2.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-6-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="org57355da"></a><code>period_</code> (<i>period_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-1">
+<p>
+<i>Period between two consecutive packet transmissions.</i> 
+</p>
+</div>
+</li>
+<li><a id="orga0b298e"></a><code>destPort_</code> (<i>dstPort_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-2">
+<p>
+<i>Destination port.</i> 
+</p>
+</div>
+</li>
+<li><a id="org910fb52"></a><code>destAddr_</code> (<i>dstAddr_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-3">
+<p>
+<i>IP of the destination.</i> 
+</p>
+</div>
+</li>
+<li><a id="orge9140dc"></a><code>packetSize_</code> (<i>pktSize_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-4">
+<p>
+<i>Packet size.</i> 
+</p>
+</div>
+</li>
+<li><a id="orge85bbb8"></a><code>PoissonTraffic_</code> (<i>PoissonTraffic_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-5">
+<p>
+<i>&lt;i&gt;1&lt;/i&gt; if the traffic is generated according to a poissonian distribution.</i> 
+</p>
+</div>
+</li>
+<li><a id="org3910953"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-6">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="org660a75f"></a><code>drop_out_of_order_</code> (<i>drop_out_of_order_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-7">
+<p>
+<i>Flag to enable or disable the check for out of    order packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org5cfb913"></a><code>traffic_type_</code> (<i>traffic_type_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-8">
+<p>
+<i>Traffic type of the packets.</i> 
+</p>
+</div>
+</li>
+<li><a id="org275116a"></a><code>tracefile_enabler_</code> (<i>tracefile_enabler_</i>)<br />
+<div class="outline-text-5" id="text-6-2-1-9">
+<p>
+<i>True if enable tracefile of received packets, default disabled.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org6925fb1" class="outline-4">
+<h4 id="org6925fb1"><span class="section-number-4">6.2.2</span> Commands</h4>
+<div class="outline-text-4" id="text-6-2-2">
+</div>
+<ol class="org-ol">
+<li><a id="orge02120c"></a><code>start</code><br /></li>
+<li><a id="orgc5fbcdf"></a><code>stop</code><br /></li>
+<li><a id="org4d2c263"></a><code>getrtt</code><br /></li>
+<li><a id="orgdcba523"></a><code>getftt</code><br /></li>
+<li><a id="orgb0742a7"></a><code>getper</code><br /></li>
+<li><a id="orgfc5c2e5"></a><code>getthr</code><br /></li>
+<li><a id="orgc2cdf9a"></a><code>getcbrheadersize</code><br /></li>
+<li><a id="org19e5a1a"></a><code>getrttstd</code><br /></li>
+<li><a id="org972a2e1"></a><code>getfttstd</code><br /></li>
+<li><a id="orgfde7199"></a><code>getsentpkts</code><br /></li>
+<li><a id="orgeeea5db"></a><code>getrecvpkts</code><br /></li>
+<li><a id="org1ba8753"></a><code>setprioritylow</code><br /></li>
+<li><a id="org528ff69"></a><code>setpriorityhigh</code><br /></li>
+<li><a id="org309dd0b"></a><code>sendPkt</code><br /></li>
+<li><a id="org4febd2c"></a><code>sendPktLowPriority</code><br /></li>
+<li><a id="orgf814a92"></a><code>sendPktHighPriority</code><br /></li>
+<li><a id="org7eca18b"></a><code>resetStats</code><br /></li>
+<li><a id="orgd3a31ea"></a><code>printidspkts</code><br /></li>
+<li><a id="orgc604319"></a><code>setLogSuffix</code><br /></li>
+<li><a id="org00c1b3d"></a><code>setLogSuffix</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orged36a4d" class="outline-3">
+<h3 id="orged36a4d"><span class="section-number-3">6.3</span> <code>Module/UW/VBR</code> (<i>UwVbrModule</i>) : <i>Module</i></h3>
+<div class="outline-text-3" id="text-6-3">
+</div>
+<div id="outline-container-orgb3cfa17" class="outline-4">
+<h4 id="orgb3cfa17"><span class="section-number-4">6.3.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-6-3-1">
+</div>
+<ol class="org-ol">
+<li><a id="orge969753"></a><code>period1_</code> (<i>period1_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-1">
+<p>
+<i>period between two consecutive packet transmissions (mode 1).</i> 
+</p>
+</div>
+</li>
+<li><a id="org7b4dd13"></a><code>period2_</code> (<i>period2_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-2">
+<p>
+<i>period between two consecutive packet transmissions (mode 2).</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd1f4161"></a><code>timer_switch_1_</code> (<i>timer_switch_1_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-3">
+<p>
+<i>Period in witch the node tramsmits with a    packet every period1_ seconds.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf6dcc19"></a><code>timer_switch_2_</code> (<i>timer_switch_2_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-4">
+<p>
+<i>Period in witch the node tramsmits with a    packet every period2_ seconds.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb9ae31b"></a><code>destPort_</code> (<i>dstPort_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-5">
+<p>
+<i>Destination port.</i> 
+</p>
+</div>
+</li>
+<li><a id="org61c7325"></a><code>destAddr_</code> (<i>dstAddr_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-6">
+<p>
+<i>IP of the destination.</i> 
+</p>
+</div>
+</li>
+<li><a id="org2235178"></a><code>packetSize_</code> (<i>pktSize_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-7">
+<p>
+<i>Packet size.</i> 
+</p>
+</div>
+</li>
+<li><a id="org475b263"></a><code>PoissonTraffic_</code> (<i>PoissonTraffic_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-8">
+<p>
+<i>&lt;i&gt;1&lt;/i&gt; if the traffic is generated according to a poissonian distribution.</i> 
+</p>
+</div>
+</li>
+<li><a id="org96df709"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-9">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+<li><a id="org98a4b35"></a><code>drop_out_of_order_</code> (<i>drop_out_of_order_</i>)<br />
+<div class="outline-text-5" id="text-6-3-1-10">
+<p>
+<i>Flag to enable or disable the check for out of    order packets.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgfda6ec3" class="outline-4">
+<h4 id="orgfda6ec3"><span class="section-number-4">6.3.2</span> Commands</h4>
+<div class="outline-text-4" id="text-6-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="orge4f3656"></a><code>start</code><br /></li>
+<li><a id="orgb67058f"></a><code>stop</code><br /></li>
+<li><a id="org8a72683"></a><code>getrtt</code><br /></li>
+<li><a id="org882c239"></a><code>getftt</code><br /></li>
+<li><a id="org0780689"></a><code>getper</code><br /></li>
+<li><a id="org2df5d86"></a><code>getthr</code><br /></li>
+<li><a id="org7224e8d"></a><code>getvbrheadersize</code><br /></li>
+<li><a id="org52f582a"></a><code>getrttstd</code><br /></li>
+<li><a id="orgf0f6ea9"></a><code>getfttstd</code><br /></li>
+<li><a id="org2b2c8ac"></a><code>getsentpkts</code><br /></li>
+<li><a id="org9575d76"></a><code>getrecvpkts</code><br /></li>
+<li><a id="org65e50d3"></a><code>sendPkt</code><br /></li>
+<li><a id="org7466d08"></a><code>resetStats</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org2a665da" class="outline-2">
+<h2 id="org2a665da"><span class="section-number-2">7</span> mobility layer</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-orgcd473f3" class="outline-3">
+<h3 id="orgcd473f3"><span class="section-number-3">7.1</span> <code>Position/UWSM</code> (<i>UWSMPosition</i>) : <i>Position</i></h3>
+<div class="outline-text-3" id="text-7-1">
+</div>
+<div id="outline-container-org351bde5" class="outline-4">
+<h4 id="org351bde5"><span class="section-number-4">7.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-7-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org7c755cf"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-7-1-1-1">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org9cc9526" class="outline-4">
+<h4 id="org9cc9526"><span class="section-number-4">7.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-7-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="orgf695566"></a><code>setdest</code><br /></li>
+<li><a id="orgf61a746"></a><code>setdest</code><br /></li>
+<li><a id="org3d89cca"></a><code>update</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org58e9857" class="outline-3">
+<h3 id="org58e9857"><span class="section-number-3">7.2</span> <code>Position/UWGM</code> (<i>UwGMPosition</i>) : <i>Position</i></h3>
+<div class="outline-text-3" id="text-7-2">
+</div>
+<div id="outline-container-org7ad7fdc" class="outline-4">
+<h4 id="org7ad7fdc"><span class="section-number-4">7.2.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-7-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="org35f6eac"></a><code>xFieldWidth_</code> (<i>xFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-1">
+<p>
+<i>Range of the x-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf8d0005"></a><code>yFieldWidth_</code> (<i>yFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-2">
+<p>
+<i>Range of the y-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="org89515c7"></a><code>zFieldWidth_</code> (<i>zFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-3">
+<p>
+<i>Range of the z-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="org804d43f"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-4">
+<p>
+<i>Parameter to be used to vary the randomness: &lt;i&gt;0&lt;/i&gt;:   totally random values (Brownian motion), &lt;i&gt;1&lt;/i&gt;: linear   motion.</i> 
+</p>
+</div>
+</li>
+<li><a id="org1ca6c19"></a><code>alphaPitch_</code> (<i>alphaPitch_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-5">
+<p>
+<i>Pitch of alpha variable.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd43c33a"></a><code>updateTime_</code> (<i>updateTime_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-6">
+<p>
+<i>Time between two update computation.</i> 
+</p>
+</div>
+</li>
+<li><a id="org61df350"></a><code>directionMean_</code> (<i>directionMean_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-7">
+<p>
+<i>Defines the mean value of the direction.</i> 
+</p>
+</div>
+</li>
+<li><a id="org50e8cfc"></a><code>pitchMean_</code> (<i>pitchMean_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-8">
+<p>
+<i>Mean value for the pitch.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgde0382b"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-7-2-1-9">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgc0fd1c1" class="outline-4">
+<h4 id="orgc0fd1c1"><span class="section-number-4">7.2.2</span> Commands</h4>
+<div class="outline-text-4" id="text-7-2-2">
+</div>
+<ol class="org-ol">
+<li><a id="org72b76d6"></a><code>bound</code><br /></li>
+<li><a id="org24e771a"></a><code>SPHERIC</code><br /></li>
+<li><a id="orgbfd7a78"></a><code>THOROIDAL</code><br /></li>
+<li><a id="org5e76744"></a><code>HARDWALL</code><br /></li>
+<li><a id="orgd736d01"></a><code>REBOUNCE</code><br /></li>
+<li><a id="orga4b09c2"></a><code>speedMean</code><br /></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga9903ce" class="outline-3">
+<h3 id="orga9903ce"><span class="section-number-3">7.3</span> <code>Position/UWDRIFT</code> (<i>UwDriftPosition</i>) : <i>Position</i></h3>
+<div class="outline-text-3" id="text-7-3">
+</div>
+<div id="outline-container-org15c2546" class="outline-4">
+<h4 id="org15c2546"><span class="section-number-4">7.3.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-7-3-1">
+</div>
+<ol class="org-ol">
+<li><a id="org21a5353"></a><code>xFieldWidth_</code> (<i>xFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-1">
+<p>
+<i>Range of the x-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgb254ab0"></a><code>yFieldWidth_</code> (<i>yFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-2">
+<p>
+<i>Range of the y-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgcf73d35"></a><code>zFieldWidth_</code> (<i>zFieldWidth_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-3">
+<p>
+<i>Range of the z-axis of the field to be simulated, in meters.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf41e820"></a><code>boundx_</code> (<i>boundx_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-4">
+<p>
+<i>&lt;i&gt;1&lt;/i&gt; if the x-axis is bounded, &lt;i&gt;0&lt;/i&gt; otherwise.</i> 
+</p>
+</div>
+</li>
+<li><a id="org90d2b08"></a><code>boundy_</code> (<i>boundy_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-5">
+<p>
+<i>&lt;i&gt;1&lt;/i&gt; if the y-axis is bounded, &lt;i&gt;0&lt;/i&gt; otherwise.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgf70fa20"></a><code>boundz_</code> (<i>boundz_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-6">
+<p>
+<i>&lt;i&gt;1&lt;/i&gt; if the z-axis is bounded, &lt;i&gt;0&lt;/i&gt; otherwise.</i> 
+</p>
+</div>
+</li>
+<li><a id="org29c13e2"></a><code>speed_horizontal_</code> (<i>speed_horizontal_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-7">
+<p>
+<i>Speed of the node in the x-axis, in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="org11ce693"></a><code>speed_longitudinal_</code> (<i>speed_longitudinal_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-8">
+<p>
+<i>Speed of the node in the y-axis, in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="org9a29a7c"></a><code>speed_vertical_</code> (<i>speed_vertical_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-9">
+<p>
+<i>Speed of the node in the z-axis, in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="org24e8e55"></a><code>alpha_</code> (<i>alpha_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-10">
+<p>
+<i>Parameter to be used to vary the randomness: &lt;i&gt;0&lt;/i&gt;:   totally random values (Brownian motion), &lt;i&gt;1&lt;/i&gt;: linear   motion.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd589add"></a><code>deltax_</code> (<i>deltax_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-11">
+<p>
+<i>Max value of the Uniform Distribution: Random movement    between [0, deltax_).</i> 
+</p>
+</div>
+</li>
+<li><a id="org74caf4e"></a><code>deltay_</code> (<i>deltay_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-12">
+<p>
+<i>Max value of the Uniform Distribution: Random movement    between [0, deltay_).</i> 
+</p>
+</div>
+</li>
+<li><a id="org6b2838a"></a><code>deltaz_</code> (<i>deltaz_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-13">
+<p>
+<i>Max value of the Uniform Distribution: Random movement    between [0, deltaz_).</i> 
+</p>
+</div>
+</li>
+<li><a id="org2cc5972"></a><code>starting_speed_x_</code> (<i>starting_speed_x_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-14">
+<p>
+<i>Initial speed of the node. x axis in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgbdbb3c5"></a><code>starting_speed_y_</code> (<i>starting_speed_y_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-15">
+<p>
+<i>Initial speed of the node. y axis in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="org257f5d9"></a><code>starting_speed_z_</code> (<i>starting_speed_z_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-16">
+<p>
+<i>Initial speed of the node. z axis in m/s.</i> 
+</p>
+</div>
+</li>
+<li><a id="org7b73f93"></a><code>updateTime_</code> (<i>updateTime_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-17">
+<p>
+<i>Time between two update computation.</i> 
+</p>
+</div>
+</li>
+<li><a id="orgee26c7f"></a><code>debug_</code> (<i>debug_</i>)<br />
+<div class="outline-text-5" id="text-7-3-1-18">
+<p>
+<i>Flag to enable or disable dirrefent levels of debug.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgd163caa" class="outline-4">
+<h4 id="orgd163caa"><span class="section-number-4">7.3.2</span> Commands</h4>
+</div>
+</div>
+</div>
+<div id="outline-container-org846823c" class="outline-2">
+<h2 id="org846823c"><span class="section-number-2">8</span> propagation layer</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-org967431e" class="outline-3">
+<h3 id="org967431e"><span class="section-number-3">8.1</span> <code>Module/UW/OPTICAL/Propagation</code> (<i>UwOpticalMPropagation</i>) : <i>MPropagation</i></h3>
+<div class="outline-text-3" id="text-8-1">
+</div>
+<div id="outline-container-orgfe35077" class="outline-4">
+<h4 id="orgfe35077"><span class="section-number-4">8.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-8-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org4440af4"></a><code>Ar_</code> (<i>Ar_</i>)<br />
+<div class="outline-text-5" id="text-8-1-1-1">
+<p>
+<i>Receiver area [m^2]</i> 
+</p>
+</div>
+</li>
+<li><a id="org2880ac8"></a><code>At_</code> (<i>At_</i>)<br />
+<div class="outline-text-5" id="text-8-1-1-2">
+<p>
+<i>Transmitter size [m^2]</i> 
+</p>
+</div>
+</li>
+<li><a id="org66b0bba"></a><code>c_</code> (<i>c_</i>)<br />
+<div class="outline-text-5" id="text-8-1-1-3">
+<p>
+<i>Lookup table map of the attenuation coefficient and the  temperature versus the depth</i> 
+</p>
+</div>
+</li>
+<li><a id="orgd768413"></a><code>theta_</code> (<i>theta_</i>)<br />
+<div class="outline-text-5" id="text-8-1-1-4">
+<p>
+<i>Transmitting beam diverge angle [rad]</i> 
+</p>
+</div>
+</li>
+<li><a id="org962a52e"></a><code>debug_</code> (<i>debug_</i>)<br /></li>
+</ol>
+</div>
+<div id="outline-container-orgbbaf699" class="outline-4">
+<h4 id="orgbbaf699"><span class="section-number-4">8.1.2</span> Commands</h4>
+<div class="outline-text-4" id="text-8-1-2">
+</div>
+<ol class="org-ol">
+<li><a id="org421c74b"></a><code>setOmnidirectional</code><br /></li>
+<li><a id="org80d7323"></a><code>setDirectional</code><br /></li>
+<li><a id="org26d2a08"></a><code>setVariableC</code><br /></li>
+<li><a id="orgd4a2bab"></a><code>setFixedC</code><br /></li>
+<li><a id="org0c2dd02"></a><code>setLUT</code><br /></li>
+<li><a id="org4e01209"></a><code>setAr</code><br /></li>
+<li><a id="org242589b"></a><code>setAt</code><br /></li>
+<li><a id="orgced3cb9"></a><code>setC</code><br /></li>
+<li><a id="org99497be"></a><code>setTheta</code><br /></li>
+<li><a id="org45858b0"></a><code>setLUTFileName</code><br /></li>
+<li><a id="orgb240fac"></a><code>setLUTSeparator</code><br /></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-orgeceb2de" class="outline-2">
+<h2 id="orgeceb2de"><span class="section-number-2">9</span> channel layer</h2>
+<div class="outline-text-2" id="text-9">
+</div>
+<div id="outline-container-orgf273678" class="outline-3">
+<h3 id="orgf273678"><span class="section-number-3">9.1</span> <code>Module/UW/Optical/Channel</code> (<i>UwOpticalChannel</i>) : <i>ChannelModule</i></h3>
+<div class="outline-text-3" id="text-9-1">
+</div>
+<div id="outline-container-org9fb00a1" class="outline-4">
+<h4 id="org9fb00a1"><span class="section-number-4">9.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-9-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org5a7452b"></a><code>RefractiveIndex_</code> (<i>refractive_index</i>)<br />
+<div class="outline-text-5" id="text-9-1-1-1">
+<p>
+<i>refractive index of the underwater medium.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org4c108a5" class="outline-4">
+<h4 id="org4c108a5"><span class="section-number-4">9.1.2</span> Commands</h4>
+</div>
+</div>
+</div>
+<div id="outline-container-org7beb3ea" class="outline-2">
+<h2 id="org7beb3ea"><span class="section-number-2">10</span> interference layer</h2>
+<div class="outline-text-2" id="text-10">
+</div>
+<div id="outline-container-orgd91d85c" class="outline-3">
+<h3 id="orgd91d85c"><span class="section-number-3">10.1</span> <code>Module/UW/INTERFERENCE</code> (<i>uwinterference</i>) : <i>MInterferenceMIV</i></h3>
+<div class="outline-text-3" id="text-10-1">
+</div>
+<div id="outline-container-org19d211d" class="outline-4">
+<h4 id="org19d211d"><span class="section-number-4">10.1.1</span> Bound variables</h4>
+<div class="outline-text-4" id="text-10-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org463c865"></a><code>use_maxinterval_</code> (<i>use_maxinterval_</i>)<br />
+<div class="outline-text-5" id="text-10-1-1-1">
+<p>
+<i>set to 1 to use maxinterval_.</i> 
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org4921c10" class="outline-4">
+<h4 id="org4921c10"><span class="section-number-4">10.1.2</span> Commands</h4>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Roberto Francescon &lt;roberto.francescon@wirelessandmore.it&gt;</p>
+<p class="date">Created: 2021-12-17 Fri 00:55</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
