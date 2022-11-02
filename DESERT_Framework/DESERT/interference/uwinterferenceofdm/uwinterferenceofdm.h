@@ -28,135 +28,97 @@
 //
 
 /**
- * @file   uwinterference.h
- * @author Alberto Signori
+ * @file   uwinterferenceofdm.h
+ * @author Sara Falleni
  * @version 1.0.0
  *
- * \brief Implementation of uwinterference class.
- *
+ * @brief Implementation of uwinterference class.
+ * Your can find the brief description of this module in the paper, named
+ * "Development and Testing of an OFDM Physical Layer for the DESERT Simulator"
+ * IEEE/OCEANS, San Diego-Porto, 2021.
  */
 
-#ifndef UW_INTERFERENCE
-#define UW_INTERFERENCE
+#ifndef UW_INTERFERENCEOFDM
+#define UW_INTERFERENCEOFDM
 
-#include <interference_miv.h>
-#include <list>
-#include <iostream>
-#include <scheduler.h>
-#include <vector>
-#include <assert.h>
-#include <cmath>
+#include "uwinterference.h"
+#include "uwofdmphy_hdr.h"
 
-enum PKT_TYPE { CTRL, DATA }; /**< Pkt type: CONTROL or DATA packet */
-// enum RX_STATE { START_RX, END_RX};
 
 typedef std::pair<int, int> counter; /**< counter of collisions */
 
-class ListNode
+
+class uwinterferenceofdm;
+
+class ListNodeOFDM : public ListNode
 {
 public:
-	double time;
-	double sum_power; /** sum of the rx power in the node at the given time*/
-	int ctrl_cnt; /** control packet counter */
-	int data_cnt; /** data packet counter */
+	std::vector<double> carrier_power;
+
 
 	/**
-	 * Constructor of the class ListNode
-	 */
-	ListNode()
-	{
-		time = 0;
-		sum_power = 0;
-		// n_pkts = 0;
-		ctrl_cnt = 0;
-		data_cnt = 0;
-	}
-
-	/**
-	 * Constructor of the class ListNode
-	 * @param t time when packet is added in the list, time at reception
+	 * Constructor of the class ListNode when used with multicarrier
+	 * @param t time
 	 * @param sum_pw sum of the rx power in the node at the given time
 	 * @param ctrl  control packet counter
 	 * @param data data packet counter
 	 */
-	ListNode(double t, double sum_pw, /*double n,*/ int ctrl, int data)
+	ListNodeOFDM(double t, double sum_pw, int ctrl, int data, const std::vector<double>& carPwr): 
+	carrier_power(carPwr)
 	{
 		time = t;
 		sum_power = sum_pw;
 		ctrl_cnt = ctrl;
-		data_cnt = data;
+		data_cnt = data;		
 	}
 
 	/**
 	 * Destructor of the class ListNode
 	 */
-	virtual ~ListNode()
+	virtual ~ListNodeOFDM()
 	{
 	}
 };
 
-class EndInterfEvent : public Event
+class EndInterfTimerOFDM : public Handler
 {
 public:
-	/**
-	 * Constructor of the class EndInterfEvent
-	 * @param pw Received power of the current packet
-	 * @param type type of the packet (DATA or CTRL)
-	 */
-	EndInterfEvent(double pw, PKT_TYPE tp)
-	{
-		power = pw;
-		type = tp;
-	}
-	/**
-	 * Constructor of the class EndInterfEvent for OFDM 
-	 * @param pw Received power of the current packet
-	 * @param type type of the packet (DATA or CTRL)
-	 */
-
-	EndInterfEvent(double pw, PKT_TYPE tp, const std::vector<double>& carPwr): carrier_power(carPwr)
-	{
-		power = pw;
-		type = tp;
-	}
-
-	/**
-	 * Destructor of the class EndInterfEvent
-	 */
-	virtual ~EndInterfEvent()
-	{
-	}
-	double power;
-	PKT_TYPE type;
-	std::vector<double> carrier_power;
-};
-
-class uwinterference;
-
-class EndInterfTimer : public Handler
-{
-public:
-	EndInterfTimer(uwinterference *ptr)
+	EndInterfTimerOFDM(uwinterferenceofdm *ptr)
 	{
 		interference = ptr;
 	}
 	virtual void handle(Event *e);
 
 protected:
-	uwinterference *interference;
+	uwinterferenceofdm *interference;
 };
 
-class uwinterference : public MInterferenceMIV
+
+class uwinterferenceofdm : public uwinterference
 {
 public:
+	int interfSubCarriers_;
+
+	/**
+   * TCL command interpreter. It implements the following OTcl methods:
+   *
+   * @param argc Number of arguments in <i>argv</i>.
+   * @param argv Array of strings which are the command parameters (Note that
+   * <i>argv[0]</i> is the name of the object).
+   * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+   * successfully or not.
+   *
+   */
+	virtual int command(int, const char *const *);
+
 	/**
 	 * Constructor of the class uwinterference
 	 */
-	uwinterference();
+	uwinterferenceofdm();
 	/**
 	 * Destructor of the class uwinterference
 	 */
-	virtual ~uwinterference();
+	virtual ~uwinterferenceofdm();
 	/**
 	 * Add a packet to the interference calculation
 	 * @param p Pointer to the interferer packet
@@ -166,14 +128,16 @@ public:
 	 * Add a packet to the interference calculation
 	 * @param pw Received power of the current packet
 	 * @param type type of the packet (DATA or CTRL)
+	 * @param carriers vector of carriers used in that packet
+	 * @param carNum explicit number of carriers
 	 */
-	virtual void addToInterference(double pw, PKT_TYPE tp);
+	virtual void addToInterference(double pw, PKT_TYPE tp, int* carriers, int carNum);
 	/**
 	 * Remove a packet to the interference calculation
 	 * @param pw Received power of the current packet
 	 * @param type type of the packet (DATA or CTRL)
 	 */
-	virtual void removeFromInterference(double pw, PKT_TYPE tp);
+	virtual void removeFromInterference(double pw, PKT_TYPE tp, const std::vector<double>& carPwr);
 	/**
 	 * Compute the average interference power for the given packet
 	 * @param p Pointer to the interferer packet
@@ -188,8 +152,15 @@ public:
 	 * @return average interference power
 	 */
 	virtual double getInterferencePower(
-			double power, double starttime, double duration);
+			double power, double starttime, double duration, int* carriers, int ncar);
+	/**/
 	virtual double getCurrentTotalPower();
+	/**
+	 * Compute the total power on a carrier
+	 * @param carrier Carrier targeted
+	 * @return the total power on a carrier
+	 */
+	virtual double getCurrentTotalPowerOnCarrier(int carrier);
 	/**
 	 * Returns the percentage of overlap between current packet and interference
 	 * packets
@@ -219,6 +190,22 @@ public:
 	 * @return counter variable that represent the counters of the interference
 	 */
 	virtual counter getCounters(double starttime, double duration, PKT_TYPE tp);
+
+	/**
+	 * @return number of carriers used by the node
+	 */
+	inline int getInterfCarriers(){
+		return interfSubCarriers_;
+	}
+	/**
+	 * Sets number of carriers used by the node
+	 * @param sc number of carriers
+	 */
+	inline void setInterfCarriers(int sc){
+		interfSubCarriers_ = sc;		
+		return;
+	}
+
 	/**
 	 * Get the timestamp of the start of reception phase
 	 * @return timestamp of the start of reception phase
@@ -250,15 +237,11 @@ public:
 	}
 
 protected:
-	std::list<ListNode> power_list; /**<List with power and counters*/
-	EndInterfTimer end_timer; /**< Timer for schedules end of interference
-									 for a transmission */
-	double use_maxinterval_; /**< set to 1 to use maxinterval_. */
 
-	double initial_interference_time; /**< timestamp of the begin of reception
-										 of the first interferer packet */
-	double start_rx_time; /**< timestamp of the start of reception phase */
-	double end_rx_time; /**< timetamp of the end of reception phase */
+	std::list<ListNodeOFDM> power_list; /**<List with power and counters*/
+	EndInterfTimerOFDM end_timerOFDM; /**< Timer for schedules end of interference for a transmission */
+	int inodeID; /* ID of the node */
+
 };
 
 #endif /*UW_INTERFERENCE*/

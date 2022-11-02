@@ -53,6 +53,7 @@ extern ClMessage_t CLMSG_UWPHY_TX_POWER;
 extern ClMessage_t CLMSG_UWPHY_B_RATE;
 extern ClMessage_t CLMSG_UWPHY_THRESH;
 extern ClMessage_t CLMSG_UWPHY_LOSTPKT;
+extern ClMessage_t CLMSG_UWPHY_TX_BUSY;
 
 /**
 * ClMsgUwPhy should be extended and used to ask to set or get a parameter of a specific phy.
@@ -341,6 +342,70 @@ private:
 
   uint lost_packets; /* < Number of packets lost by the phy.*/
   bool is_control;
+   
+};
+
+/**
+* ClMsgUwPhyTxBusy should be and used to ask either to set or get the
+* transmitting busy variable of a specific phy.
+* In addition, ClMsgUwPhyTxBusy can be used from the phy to reply such a request.
+**/
+
+class 	ClMsgUwPhyTxBusy : public ClMsgUwPhy
+{
+public:
+
+  /**
+  * Broadcast constructor of the ClMsgUwPhyTxBusy class
+  **/
+  ClMsgUwPhyTxBusy();
+
+  /**
+  * Unicast constructor of the ClMsgUwPhyTxBusy class
+  * @param int stack_id: id of the stack
+  * @param dest_mod_id: id of the destination module
+  **/
+  ClMsgUwPhyTxBusy(int stack_id, int dest_module_id);
+
+  /**
+  * Copy constructor
+  * @param const ClMsgUwPhy& msg: ClMsgUwPhyTxBusy that has to be copied
+  */
+  ClMsgUwPhyTxBusy(const ClMsgUwPhyTxBusy& msg);
+
+  /**
+    * Destructor of the  class
+  **/
+  ~ClMsgUwPhyTxBusy();
+
+  /**
+  * method to return the transmitting power
+  * @return tx_busy
+  */
+  int getTxBusy();
+
+  /**
+  * method to set the transmitting busy variable
+  * @param int busy: busy value to set
+  */
+  void setTxBusy(int powr);
+
+  /**
+  * method to return the transmitting power
+  * @return tx_busy
+  */
+  int getGetOp();
+
+  /**
+  * method to return the transmitting power
+  * @return tx_busy
+  */
+  void setGetOp(int);
+
+private:
+
+int tx_busy; /* < Transmission power. Its definition (W, dB, dB re uPa, ...) depends on the specific phy.*/
+int getop; // To signal if mac just wants to read the value
     
 };
 

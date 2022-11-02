@@ -222,7 +222,12 @@ public:
 	 * @return Forward Trip Time.
 	 */
 	virtual double GetFTT() const;
-
+		/**
+	 * Returns the mean transmission time.
+	 *
+	 * @return transmission time.
+	 */
+	virtual double GetTxTime() const;
 	/**
 	 * Returns the mean Packet Error Rate.
 	 *
@@ -318,6 +323,7 @@ protected:
 	double sumftt; /**< Sum of FTT samples. */
 	double sumftt2; /**< Sum of (FTT^2). */
 	int fttsamples; /**< Number of FTT samples. */
+		double sumtxtimes = 0; /**< Sum of transmission times  */
 
 	double sumbytes; /**< Sum of bytes received. */
 	double sumdt; /**< Sum of the delays. */
