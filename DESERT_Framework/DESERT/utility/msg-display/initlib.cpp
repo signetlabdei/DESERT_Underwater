@@ -28,41 +28,25 @@
 
 /**
  * @file  initlib.cc
- * @author Filippo Campagnaro
+ * @author Sara Falleni
  * @version 1.0.0
  * 
- * \brief file to initialize the libuwphy_clmsgs.so library
+ * \brief file to initialize the libumsg-display.so library
  */
 
 #include <tclcl.h>
-#include <uwphy-clmsg.h>
+#include <msg-display.h>
 
-ClMessage_t CLMSG_UWPHY_TX_POWER;
-ClMessage_t CLMSG_UWPHY_B_RATE;
-ClMessage_t CLMSG_UWPHY_THRESH;
-ClMessage_t CLMSG_UWPHY_LOSTPKT;
-ClMessage_t CLMSG_S2C_TX_MODE;
-ClMessage_t CLMSG_S2C_POWER_LEVEL;
-ClMessage_t CLMSG_S2C_RX_FAILED;
-ClMessage_t CLMSG_UWPHY_TX_BUSY;
 
-extern EmbeddedTcl UwPhyClMsgsInitTclCode;
+extern EmbeddedTcl MsgdisplayInitTclCode;
 
-extern "C" int Uwphy_clmsgs_Init() {
-	CLMSG_UWPHY_TX_POWER = ClMessage::addClMessage();
-	CLMSG_UWPHY_B_RATE = ClMessage::addClMessage();
-	CLMSG_UWPHY_THRESH = ClMessage::addClMessage();
-	CLMSG_UWPHY_TX_BUSY = ClMessage::addClMessage();
-	CLMSG_UWPHY_LOSTPKT = ClMessage::addClMessage();
-	CLMSG_S2C_TX_MODE = ClMessage::addClMessage();
-	CLMSG_S2C_POWER_LEVEL = ClMessage::addClMessage();
-	CLMSG_S2C_RX_FAILED = ClMessage::addClMessage();
-	UwPhyClMsgsInitTclCode.load();
+extern "C" int Msgdisplay_Init() {
+	MsgdisplayInitTclCode.load();
 	return 0;
 }
 
-extern "C" int CygUwphy_clmsgs_Init_Init() {
-    Uwphy_clmsgs_Init();
+extern "C" int CygMsgdisplay_Init_Init() {
+    Msgdisplay_Init();
     return 0;
 }
 

@@ -52,6 +52,7 @@ SUBDIRS = m4 \
     data_link/uwdacap \
     data_link/uwpolling \
     data_link/uwaloha \
+    data_link/uw-ofdm-aloha \
     data_link/uwsr \
     data_link/uw-t-lohi \
     data_link/uwUFetch \
@@ -64,14 +65,15 @@ SUBDIRS = m4 \
     physical/uwphysicalrogersmodel\
     physical/uwphysicalfromdb\
     physical/uwmphy_modem \
-	physical/uwmodem \
+    physical/uwmodem \
     physical/uwmodemcsa \
 	physical/uwconnector \
     physical/ms2c_evologics \
     physical/ms2c_evologics_lowlev \
-	physical/uwevologicss2cmodem \
+    physical/uwevologicss2cmodem \
     physical/uwmphypatch \
     physical/uwhermesphy \
+    physical/uwofdmphy \
     physical/uwahoi_phy \
     physical/uwahoimodem \
     physical/uwoptical_phy \
@@ -80,11 +82,14 @@ SUBDIRS = m4 \
     physical/uw-al/packer_common \
     physical/uw-al/packer_mac \
     physical/uwphy_clmsgs \
+    utility/msg-display \
     mobility/uwdriftposition \
     mobility/uwgmposition \
     mobility/uwrandomlib \
     mobility/uwsmposition \
     interference/uwinterference \
+    interference/uwinterferenceofdm \
     propagation/uwoptical_propagation \
-    channel/uwoptical_channel
+    channel/uwoptical_channel 
+    
 

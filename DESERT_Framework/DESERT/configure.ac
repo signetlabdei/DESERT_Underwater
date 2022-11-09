@@ -72,6 +72,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-ca'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwdacap'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwpolling'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwaloha'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-ofdm-aloha'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwsr'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-t-lohi'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha-trigger'
@@ -96,18 +97,22 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_common
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_mac'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalracun'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhermesphy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwofdmphy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoimodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphy_clmsgs'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/utility/msg-display'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwrandomlib'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwsmposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
+
 
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
 
@@ -150,6 +155,7 @@ AC_CONFIG_FILES([
     data_link/uwdacap/Makefile
     data_link/uwpolling/Makefile
     data_link/uwaloha/Makefile
+    data_link/uw-ofdm-aloha/Makefile
     data_link/uwsr/Makefile
     data_link/uw-t-lohi/Makefile
     data_link/uwUFetch/Makefile
@@ -162,7 +168,7 @@ AC_CONFIG_FILES([
 	physical/uwconnector/Makefile
     physical/ms2c_evologics/Makefile
     physical/ms2c_evologics_lowlev/Makefile
-	physical/uwevologicss2cmodem/Makefile
+    physical/uwevologicss2cmodem/Makefile
     physical/uwmphypatch/Makefile
     physical/uwphysical/Makefile
     physical/uwphysicalrogersmodel/Makefile
@@ -173,18 +179,22 @@ AC_CONFIG_FILES([
     physical/uw-al/packer_common/Makefile
     physical/uw-al/packer_mac/Makefile    
     physical/uwhermesphy/Makefile
+    physical/uwofdmphy/Makefile
     physical/uwahoi_phy/Makefile
     physical/uwahoimodem/Makefile
     physical/uwoptical_phy/Makefile
     physical/uwopticalbeampattern/Makefile
     physical/uwphy_clmsgs/Makefile
+    utility/msg-display/Makefile
     mobility/uwdriftposition/Makefile
     mobility/uwgmposition/Makefile
     mobility/uwrandomlib/Makefile
     mobility/uwsmposition/Makefile
     interference/uwinterference/Makefile
+    interference/uwinterferenceofdm/Makefile
     propagation/uwoptical_propagation/Makefile
     channel/uwoptical_channel/Makefile
+    
     ])
 
 AC_OUTPUT 

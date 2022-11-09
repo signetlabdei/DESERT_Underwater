@@ -177,6 +177,51 @@ void ClMsgUwPhyThresh::setThresh(double thresh)
 	threshold = thresh;
 }
 
+
+ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy()
+: ClMsgUwPhy(CLMSG_UWPHY_TX_BUSY),
+  tx_busy(0),
+  getop(0)
+{
+}
+
+ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy(int sid, int dest_module_id)
+: ClMsgUwPhy(sid, dest_module_id,CLMSG_UWPHY_TX_BUSY),
+  tx_busy(0),
+  getop(0)
+{
+}
+
+ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy(const ClMsgUwPhyTxBusy& msg)
+: ClMsgUwPhy(msg)
+{
+  tx_busy = msg.tx_busy;
+}
+
+ClMsgUwPhyTxBusy::~ClMsgUwPhyTxBusy()
+{
+}
+
+int ClMsgUwPhyTxBusy::getTxBusy()
+{
+	return tx_busy;
+}
+
+void ClMsgUwPhyTxBusy::setTxBusy(int busy)
+{
+	tx_busy = busy;
+}
+
+int ClMsgUwPhyTxBusy::getGetOp()
+{
+	return getop;
+}
+
+void ClMsgUwPhyTxBusy::setGetOp(int go)
+{
+	getop = go;
+}
+
 ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(bool control)
 : ClMsgUwPhy(CLMSG_UWPHY_LOSTPKT)
 , lost_packets(0)
