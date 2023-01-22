@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -43,14 +43,13 @@
 
 #include <tclcl.h>
 
-int hdr_sun_ack::offset_ =
-		0; /**< Offset used to access in <i>hdr_sun_ack</i> packets header. */
-int hdr_sun_data::offset_ =
-		0; /**< Offset used to access in <i>hdr_sun_data</i> packets header. */
+int hdr_sun_ack::offset_ = 0; /**< Offset used to access in <i>hdr_sun_ack</i> packets header. */
+
+int hdr_sun_data::offset_ =	0; /**< Offset used to access in <i>hdr_sun_data</i> packets header. */
+
 int hdr_sun_path_est::offset_ = 0; /**< Offset used to access in
 									  <i>hdr_sun_path_est</i> packets header. */
-int hdr_sun_probe::offset_ =
-		0; /**< Offset used to access in <i>hdr_sun_probe</i> packets header. */
+int hdr_sun_probe::offset_ = 0; /**< Offset used to access in <i>hdr_sun_probe</i> packets header. */
 
 /**
  * Adds the header for <i>hdr_sun_ack</i> packets in ns2.

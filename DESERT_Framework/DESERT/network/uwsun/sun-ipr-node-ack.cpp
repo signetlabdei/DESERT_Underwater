@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@
  */
 
 #include "sun-ipr-node.h"
+#include "sun-ipr-common-structures.h"
 
 /* This function uses the value contained in the header of a uwcbr packet.
  * TODO: try to modifies this in order to use the ch->uid() field instead.
@@ -46,7 +47,7 @@ void
 SunIPRoutingNode::sendBackAck(const Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> sendBackAck()" << endl;
+		std::cout << "> sendBackAck()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
@@ -61,12 +62,14 @@ SunIPRoutingNode::sendBackAck(const Packet *p)
 	iph_ack->daddr() = ch->prev_hop_;
 	hack->uid() = uwcbrh->sn();
 
-	if (printDebug_ > 5)
-		cout << "@" << Scheduler::instance().clock()
-			 << ":Node:" << this->printIP(ipAddr_)
-			 << ":hc:" << this->getNumberOfHopToSink()
-			 << ":SEND:ACK_PKT:to:" << printIP(ch_ack->next_hop())
-			 << ":id:" << hack->uid() << endl;
+	if (printDebug_ > 5) {
+		std::cout << "[" <<  NOW 
+				  << "]::Node[IP:" << this->printIP(ipAddr_)
+				  << "||hops:" << this->getNumberOfHopToSink()
+				  << "]::ACK_SENT_TO:" << printIP(ch_ack->next_hop())
+				  << "::SN:" << uwcbrh->sn()
+				  << std::endl;
+	}
 	number_of_ackpkt_++;
 	if (trace_)
 		this->tracePacket(p_ack, "SEND_ACK");
@@ -77,7 +80,7 @@ void
 SunIPRoutingNode::initPktAck(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> initPktPathEstSearch()" << endl;
+		std::cout << "> initPktPathEstSearch()" << std::endl;
 
 	// Common header.
 	hdr_cmn *ch = HDR_CMN(p);
@@ -107,8 +110,15 @@ SunIPRoutingNode::initPktAck(Packet *p)
 void
 SunIPRoutingNode::createRouteError(const Packet *p_data, Packet *p)
 { // p is a path establishment packet beacause it contains a list of hops.
+	if (printDebug_ > 5) {
+		std::cout << "[" <<  NOW
+				  << "]::Node[IP:" << this->printIP(ipAddr_)
+				  << "||hops:" << this->getNumberOfHopToSink()
+				  << "]::GENERATING_ROUTE_ERROR"
+				  << std::endl;
+	}
 	if (STACK_TRACE)
-		cout << "> createRouteError()" << endl;
+		std::cout << "> createRouteError()" << std::endl;
 	this->initPktPathEstSearch(p);
 	hdr_cmn *ch_data = HDR_CMN(p_data);
 	hdr_uwip *iph_data = HDR_UWIP(p_data);
@@ -150,7 +160,7 @@ void
 SunIPRoutingNode::sendRouteErrorBack(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> sendRouteErrorBack()" << endl;
+		std::cout << "> sendRouteErrorBack()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);

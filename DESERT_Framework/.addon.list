@@ -7,9 +7,12 @@ packer_uwpolling
 packer_uwudp
 packer_uwufetch
 uwrov
+uwtracker
 uwmulti_stack_controller
 uwmulti_traffic_control
 uwmulti_destination
+uwmphy_modem
+ms2c_evologics_lowlev (requires uwmphy_modem)
 wossgmmob3D    (requires WOSS)
 wossgroupmob3D (requires WOSS)
 ALL            (installs all addons)

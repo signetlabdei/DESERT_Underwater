@@ -294,14 +294,14 @@ UwAhoiModem::start()
 	else {
 		printOnLog(
 		    LogLevel::ERROR, "AHOIMODEM", "start::BAUD_RATE_NOT_VALID");
-		return;
+		exit(1);
 	}
 
 
 	if (!p_connector->openConnection(modem_address)) {
 		printOnLog(
 		    LogLevel::ERROR, "AHOIMODEM", "start::CONNECTION_OPEN_FAILED");
-		return;
+		exit(1);
 	}
 
 	// set flags to true so loops can start

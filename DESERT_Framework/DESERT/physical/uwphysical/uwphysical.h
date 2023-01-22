@@ -43,6 +43,7 @@
 #include "uwinterference.h"
 #include "mac.h"
 
+#include "clmsg-stats.h"
 #include <phymac-clmsg.h>
 #include <string.h>
 
@@ -56,6 +57,54 @@
 #include <cmath>
 #include <limits>
 #include <climits>
+
+class UwPhysicalStats : public Stats
+{
+public:
+	/**
+	 * Constructor of UwPhysicalStats class
+	 */
+	UwPhysicalStats();
+
+	/**
+	 *	Constructor of UwPhysicalStats class
+	 */
+	UwPhysicalStats(int mod_id, int stck_id);
+
+	/**
+	 * Destructor of UwPhysicalStats class
+	 */
+	virtual ~UwPhysicalStats()
+	{
+	}
+
+	/**
+	 * Virtual method used by the Module class in order to copy its stats an a generic fashion,
+	 * without the need to know the derived stats implementation.
+	 * @return the copy of a module the stats.
+  	**/
+	virtual Stats* clone() const;
+
+	/**
+	 * Method to update stats with the param of last received packet
+	 * @param rx_pwr, received power of the packet
+	 * @param noise_pwr, noise power
+	 * @param interf_pwr, noise power
+	 * @param error, true if packet has error
+	 */
+	enum ChannelStates {NOT_DEFINED = -1, GOOD = 1, BAD = 2};
+	virtual void updateStats(int mod_id, int stck_id, double rx_pwr, 
+		double noise_pwr, double interf_pwr, bool error, 
+		ChannelStates channel_state = NOT_DEFINED);
+
+	double last_rx_power; /** Power of the last received packet.*/
+	double last_noise_power; /** Noise power of the last received packet. */
+	double instant_noise_power; /** Noise power measured on query. */
+	double last_interf_power; /** Interference power of the last rx packet.*/
+	bool has_error; /** True if last packet wasn't correctly received. */
+	ChannelStates channel_state {NOT_DEFINED}; /** used by UwHMMPhysical */
+};
+
 
 class UnderwaterPhysical : public UnderwaterMPhyBpsk
 {
@@ -101,6 +150,11 @@ public:
 	int recvSyncClMsg(ClMessage* m);
 
 protected:
+	/**
+	 * Update the stats before sending them through crosslayer message
+	 */
+	virtual void updateInstantaneousStats();
+
 	/**
 	 * Handles the end of a packet transmission
 	 *

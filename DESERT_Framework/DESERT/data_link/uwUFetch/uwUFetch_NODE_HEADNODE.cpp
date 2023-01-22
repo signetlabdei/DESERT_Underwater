@@ -41,6 +41,7 @@
 #include "mmac.h"
 #include "uwUFetch_NODE.h"
 #include "uwUFetch_cmn_hdr.h"
+#include "rng.h"
 
 /*******************************************************************************
  *                          GENERAL METHODS                                    *
@@ -3419,8 +3420,7 @@ uwUFetch_NODE::choiceBackOffTimer_HN()
 					  << ") choiceBackOffTimer() ---->HN is choosing the "
 						 "back-off timer."
 					  << std::endl;
-		srand(time(NULL) + addr);
-		int random = rand() % (int) T_max_bck_DATA + (int) T_min_bck_DATA;
+		int random = (int) RNG::defaultrng()->uniform(T_min_bck_DATA, T_max_bck_DATA);
 
 		if (debug_)
 			std::cout << NOW << " uwUFetch_NODE(" << addr
@@ -3436,8 +3436,7 @@ uwUFetch_NODE::choiceBackOffTimer_HN()
 					  << ") choiceBackOffTimer() ---->HN is choosing the "
 						 "back-off timer."
 					  << std::endl;
-		srand(time(NULL) + addr);
-		int random = rand() % (int) T_max_bck_RTS + (int) T_min_bck_RTS;
+			int random = (int) RNG::defaultrng()->uniform(T_min_bck_RTS, T_max_bck_RTS);
 
 		if (debug_)
 			std::cout << NOW << " uwUFetch_NODE(" << addr

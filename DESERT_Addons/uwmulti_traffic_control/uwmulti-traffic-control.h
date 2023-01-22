@@ -69,7 +69,8 @@ struct BufferType {
     max_size(size),
     behavior_buff(behav),
     send_delay(del),
-    pkts_lost(0)
+    pkts_lost(0),
+    last_sched_tx(0)
   {
   }
 

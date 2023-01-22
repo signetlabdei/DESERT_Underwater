@@ -37,6 +37,7 @@
  * Implementation of UWDRIFTPOSITION class.
  */
 
+#include <rng.h>
 #include "uwdriftposition.h"
 
 #include <ostream>
@@ -101,7 +102,6 @@ UwDriftPosition::UwDriftPosition()
 	old_speed_x_ = starting_speed_x_;
 	old_speed_y_ = starting_speed_y_;
 	old_speed_z_ = starting_speed_z_;
-	srand((unsigned) time(0));
 }
 
 UwDriftPosition::~UwDriftPosition()
@@ -122,23 +122,14 @@ UwDriftPosition::update(const double &now)
 	for (t = nextUpdateTime_; t < now; t += updateTime_) {
 		// Calculate new speed
 		double vx_ = (alpha_ * old_speed_x_) +
-				(1 - alpha_) * (speed_horizontal_ +
-									   deltax_ * (rand() / (static_cast<double>(
-																	RAND_MAX) +
-																   1.0)) *
-											   getSign());
+				(1.0 - alpha_) * (speed_horizontal_ +
+						deltax_ * RNG::defaultrng()->uniform_double() * getSign());
 		double vy_ = (alpha_ * old_speed_y_) +
-				(1 - alpha_) * (speed_longitudinal_ +
-									   deltay_ * (rand() / (static_cast<double>(
-																	RAND_MAX) +
-																   1.0)) *
-											   getSign());
+				(1.0 - alpha_) * (speed_longitudinal_ +
+						deltay_ * RNG::defaultrng()->uniform_double() * getSign());
 		double vz_ = (alpha_ * old_speed_z_) +
-				(1 - alpha_) * (speed_vertical_ +
-									   deltaz_ * (rand() / (static_cast<double>(
-																	RAND_MAX) +
-																   1.0)) *
-											   getSign());
+				(1.0 - alpha_) * (speed_vertical_ +
+						deltaz_ * RNG::defaultrng()->uniform_double() * getSign());
 
 		// Save the new speed in a variable
 		old_speed_x_ = vx_;
@@ -236,13 +227,12 @@ UwDriftPosition::update(const double &now)
 short
 UwDriftPosition::getSign() const
 {
-	double rand_sign = (rand() / (static_cast<double>(RAND_MAX) + 1.0));
+	double rand_sign = RNG::defaultrng()->uniform_double();
 	if (rand_sign < 0.5) {
-		return 1;
-	} else if (rand_sign > 0.5) {
-		return -1;
-	} else { // rand_sign == 0.5
-		return getSign();
+		return 1.;
+	} else  
+	{
+		return -1.;
 	}
 }
 

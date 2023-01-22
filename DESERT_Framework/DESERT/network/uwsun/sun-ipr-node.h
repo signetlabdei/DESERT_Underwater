@@ -64,6 +64,7 @@
 #include <ctime>
 #include <vector>
 #include <fstream>
+#include <map>
 
 
 
@@ -308,6 +309,24 @@ protected:
 	 * Prints in the stdout the routing table of the current node.
 	 */
 	virtual void printHopTable() const;
+
+	/**
+	 * Print the nodes that were chosen as relay nodes
+	 * to rach the sink and how many times each node was chosen.
+	 */
+	virtual void printSelectedRoutes() const;
+
+	/**
+	 * Print how many times the node was established as relay node
+	 * for other nodes of the netwok.
+	 *
+	 * @return number of times the node was established as relay node
+	 */
+	inline const long &
+	getNPathsEstablished()
+	{
+	  return n_paths_established;
+	}
 
 	/**
 	 * Returns a string with an IP in the classic form "x.x.x.x" converting an
@@ -929,6 +948,14 @@ protected:
 										 * for different values of hop count. It
 										* is used for statistics purposes.
 										 */
+
+	std::map<uint8_t, uint> paths_selected; /**< Map containing the nodes selected as relay to
+											   the sink and the number of times each node
+											   was selected */
+
+	long n_paths_established; /**< Number of times the node is established as realy
+								 node by the other nodes of the network */
+
 	static long
 			number_of_pathestablishment_; /**< Comulative number of Path
 											 Establishment packets processed by
@@ -949,6 +976,9 @@ protected:
 	static long
 			number_of_pkt_forwarded_; /**< Comulative number of Data packets
 										 forwarded by the network. */
+
+	uint max_retx_; /**< Maximum Number of transmissions performed: real retransmissions counter
+					   the counter is increased only when the packet is sent downlayer */
 
 private:
 	/**

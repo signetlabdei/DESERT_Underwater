@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021  Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@
  */
 
 #include "sun-ipr-node.h"
+#include "uwcbr-module.h"
 
 extern packet_t PT_SUN_ACK;
 extern packet_t PT_SUN_DATA;
@@ -60,15 +61,17 @@ SunIPRoutingNode::bufferManager()
 		cout << "> bufferManager()" << endl;
 	double delay_tx_ = this->getDelay(period_data_);
 	if (buffer_data.size() >= 1) { // There is at least 1 pkt in the buffer.
-		buffer_element _tmp =
-				buffer_data
-						.front(); // Pointer to the first element in the buffer.
-		if (_tmp.num_retx_ < max_ack_error_) { // The first pkt is valid.
+
+		buffer_element _tmp = buffer_data.front(); // Pointer to the first element in the buffer.
+
+		// If the first pkt is valid.
+		if (_tmp.retx_ <= max_retx_ && _tmp.num_attempts_ < max_ack_error_) {
 			Packet *p = _tmp.p_->copy();
 
 			hdr_cmn *ch = HDR_CMN(p);
 			hdr_uwip *iph = HDR_UWIP(p);
 			hdr_sun_data *hdata = HDR_SUN_DATA(p);
+			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
 			//            cout << printIP(ipAddr_) << ":hc:" <<
 			//            this->getNumberOfHopToSink() << ":destination:" <<
@@ -87,11 +90,13 @@ SunIPRoutingNode::bufferManager()
 			//            cout << endl;
 
 			if (this->getNumberOfHopToSink() == 1) {
+
 				if (iph->daddr() == 0) { // The packet is not initialized.
+
 					this->initPktDataPacket(p);
-					_tmp.num_retx_++;
 					_tmp.t_last_tx_ = Scheduler::instance().clock();
 					ch->next_hop() = sink_associated;
+					ch->prev_hop_ = ipAddr_;
 					iph->daddr() = sink_associated;
 					_tmp.p_ = p->copy();
 					Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -107,16 +112,15 @@ SunIPRoutingNode::bufferManager()
 					pkt_tx_++;
 					if (trace_)
 						this->tracePacket(_tmp.p_, "SEND_DTA");
-					ch->prev_hop_ = ipAddr_;
 					sendDown(_tmp.p_->copy(), delay_tx_);
 				} else { // The packet was previously initialized.
-					_tmp.num_retx_++;
+					_tmp.retx_++;
 					_tmp.t_last_tx_ = Scheduler::instance().clock();
 					ch->next_hop() = sink_associated;
+					ch->prev_hop_ = ipAddr_;
 					iph->daddr() = sink_associated;
 					_tmp.p_ = p->copy();
-					Packet::free(((buffer_element) buffer_data.front())
-										 .p_); // FF: to fix a mem leak
+					Packet::free(((buffer_element) buffer_data.front()).p_); // FF: to fix a mem leak
 					buffer_data.erase(buffer_data.begin());
 					buffer_data.insert(buffer_data.begin(), _tmp);
 					if (iph->saddr() != ipAddr_) {
@@ -126,10 +130,24 @@ SunIPRoutingNode::bufferManager()
 					pkt_tx_++;
 					if (trace_)
 						this->tracePacket(_tmp.p_, "SEND_DTA");
-					ch->prev_hop_ = ipAddr_;
 					sendDown(_tmp.p_->copy(), delay_tx_);
 				}
+				if (printDebug_ > 5) {
+					std::cout << "[" <<  NOW
+							  << "]::Node[IP:" << this->printIP(ipAddr_)
+							  << "||hops:" << this->getNumberOfHopToSink()
+							  << "]::PACKET_SENT::RETX:" << _tmp.retx_
+							  << "::UID:" << ch->uid()
+							  << "::SN:" << uwcbrh->sn()
+							  << "::SRC:" << printIP(iph->saddr())
+							  << "::PATH:";
+					for (int i = 0; i < hdata->list_of_hops_length(); i++) {
+					  std::cout << printIP(hdata->list_of_hops()[i]) << ";";
+					}
+					std::cout << std::endl;
+				}
 			} else if (this->getNumberOfHopToSink() == 0) {
+
 				if (search_path_enable_) {
 					this->searchPath(); // Node not connected with any sink:
 										// send a path establishment request.
@@ -139,7 +157,8 @@ SunIPRoutingNode::bufferManager()
 				if (iph->daddr() == 0) { // The packet is not initialized and
 										 // the current node doesn't have any
 										 // path to the sink: wait.
-					_tmp.num_retx_++;
+				    ch->prev_hop_ = ipAddr_;
+					_tmp.num_attempts_++;
 					_tmp.t_last_tx_ = Scheduler::instance().clock();
 					_tmp.p_ = p->copy();
 					Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -151,7 +170,7 @@ SunIPRoutingNode::bufferManager()
 												   // have a path to the sink ->
 												   // reset the packet.
 						iph->daddr() = 0;
-						_tmp.num_retx_++;
+						_tmp.num_attempts_++;
 						_tmp.t_last_tx_ = Scheduler::instance().clock();
 						_tmp.p_ = p->copy();
 						Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -159,7 +178,7 @@ SunIPRoutingNode::bufferManager()
 						buffer_data.insert(buffer_data.begin(), _tmp);
 						pkt_tx_++;
 					} else { // Otherwise forward.
-						_tmp.num_retx_++;
+						_tmp.num_attempts_++;
 						_tmp.t_last_tx_ = Scheduler::instance().clock();
 						_tmp.p_ = p->copy();
 						Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -168,8 +187,18 @@ SunIPRoutingNode::bufferManager()
 						this->forwardDataPacket(_tmp.p_->copy());
 					}
 				}
+				if (printDebug_ > 5) {
+					std::cout << "[" <<  NOW
+							  << "]::Node[IP:" << this->printIP(ipAddr_)
+							  << "||hops:" << this->getNumberOfHopToSink()
+							  << "]::PACKET_WAITING::NO_ROUTE::RETX:" << _tmp.retx_
+							  << "::UID:" << ch->uid()
+							  << "::SN:" << uwcbrh->sn()
+							  << std::endl;
+				}
 			}
 			if (this->getNumberOfHopToSink() > 1) {
+
 				if (iph->daddr() == 0) { // The packet is not initialized.
 					//                    cout << "node:" << printIP(ipAddr_) <<
 					//                    "-bufsize:" << buffer_data.size() <<
@@ -178,9 +207,10 @@ SunIPRoutingNode::bufferManager()
 					//                    "-init." << endl;
 					this->initPktDataPacket(p);
 					ch->next_hop() = this->hop_table[0];
+					ch->prev_hop_ = ipAddr_;
 					iph->daddr() = sink_associated;
 					number_of_datapkt_++;
-					_tmp.num_retx_++;
+					_tmp.retx_++;
 					_tmp.t_last_tx_ = Scheduler::instance().clock();
 					_tmp.p_ = p->copy();
 					Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -190,7 +220,6 @@ SunIPRoutingNode::bufferManager()
 					pkt_tx_++;
 					if (trace_)
 						this->tracePacket(_tmp.p_, "SEND_DTA");
-					ch->prev_hop_ = ipAddr_;
 					sendDown(_tmp.p_->copy(), delay_tx_);
 				} else {
 					//                    cout << "node:" << printIP(ipAddr_) <<
@@ -198,7 +227,8 @@ SunIPRoutingNode::bufferManager()
 					//                    "-hop:" <<
 					//                    this->getNumberOfHopToSink() <<
 					//                    "-send." << endl;
-					_tmp.num_retx_++;
+				    ch->prev_hop_ = ipAddr_;
+				    _tmp.retx_++;
 					_tmp.t_last_tx_ = Scheduler::instance().clock();
 					_tmp.p_ = p->copy();
 					Packet::free(((buffer_element) buffer_data.front()).p_);
@@ -209,11 +239,24 @@ SunIPRoutingNode::bufferManager()
 						pkt_tx_++;
 						if (trace_)
 							this->tracePacket(_tmp.p_, "SEND_DTA");
-						ch->prev_hop_ = ipAddr_;
 						sendDown(_tmp.p_->copy(), delay_tx_);
 					} else { // Otherwise forward.
 						this->forwardDataPacket(_tmp.p_->copy());
 					}
+				}
+				if (printDebug_ > 5) {
+					std::cout << "[" <<  NOW
+							  << "]::Node[IP:" << this->printIP(ipAddr_)
+							  << "||hops:" << this->getNumberOfHopToSink()
+							  << "]::PACKET_SENT::RETX:" << _tmp.retx_
+							  << "::UID:" << ch->uid()
+							  << "::SN:" << uwcbrh->sn()
+							  << "::SRC:" << printIP(iph->saddr())
+							  << "::ROUTE:";
+					for (int i = 0; i < hdata->list_of_hops_length(); i++) {
+					  std::cout << printIP(hdata->list_of_hops()[i]) << ";";
+					}
+					std::cout << std::endl;
 				}
 			}
 			Packet::free(p);
@@ -221,6 +264,8 @@ SunIPRoutingNode::bufferManager()
 			Packet *p = _tmp.p_->copy();
 			hdr_cmn *ch = HDR_CMN(p);
 			hdr_uwip *iph = HDR_UWIP(p);
+			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+
 			if (iph->saddr() == ipAddr_) { // Current node creates the packet
 										   // that generated an error: remove
 										   // the routing information.
@@ -236,19 +281,17 @@ SunIPRoutingNode::bufferManager()
 						this->clearHops();
 						this->setNumberOfHopToSink(0);
 					} else if (ch->next_hop() != 0 &&
-							ch->next_hop() ==
-									hop_table[0]) { // If the next hop of the
-													// packet that generated an
-													// error is equal to the
-													// next hop of the current
-													// node: update the routing
-													// information.
+							ch->next_hop() == hop_table[0]) { // If the next hop of the
+															  // packet that generated an
+															  // error is equal to the
+															  // next hop of the current
+															  // node: update the routing
+															  // information.
 						this->clearHops();
 						this->setNumberOfHopToSink(0);
 					}
 					if (trace_)
 						this->tracePacket(p_error, "SEND_ERR");
-					ch->prev_hop_ = ipAddr_;
 					sendDown(p_error->copy());
 					Packet::free(p_error);
 				}
@@ -263,6 +306,14 @@ SunIPRoutingNode::bufferManager()
 					Packet::free(((buffer_element) buffer_data.front()).p_);
 					buffer_data.erase(buffer_data.begin());
 				}
+			}
+			if (printDebug_ > 5) {
+				std::cout << "[" <<  NOW
+						  << "]::Node[IP:" << this->printIP(ipAddr_)
+						  << "||hops:" << this->getNumberOfHopToSink()
+						  << "]::INVALID_PACKET::UID:" << ch->uid()
+						  << "::SN:" << uwcbrh->sn()
+						  << std::endl;
 			}
 		}
 	}

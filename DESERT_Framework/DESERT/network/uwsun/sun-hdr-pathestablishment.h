@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -62,10 +62,8 @@ typedef struct hdr_sun_path_est {
 	uint8_t sink_associated_; /**< IP of the sink associated with the packet */
 	packet_path_est ptype_; /**< Idientifier of the packet type: PATH_SEARCH,
 							   PATH_ANSWER or PATH_ERROR */
-	uint8_t list_of_hops_
-			[MAX_HOP_NUMBER]; /**< List of IPs saved in the header */
-	int8_t
-			pointer_to_list_of_hops_; /**< Pointer used to keep track of the
+	uint8_t list_of_hops_ [MAX_HOP_NUMBER]; /**< List of IPs saved in the header */
+	int8_t pointer_to_list_of_hops_; /**< Pointer used to keep track of the
 										 last IPs processed */
 	uint8_t list_of_hops_length_; /**< Current number of IPs stored in the
 									 header */

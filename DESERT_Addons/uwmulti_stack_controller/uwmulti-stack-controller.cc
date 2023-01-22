@@ -57,7 +57,6 @@ public:
   }
 } class_stack_controller;
 
-const double UwMultiStackController::threshold_not_exist = nan("");;
 const int UwMultiStackController::layer_not_exist = -1;
 
 UwMultiStackController::UwMultiStackController() 
@@ -180,17 +179,19 @@ double UwMultiStackController::getMetricFromSelectedLowerLayer(int id, Packet* p
  	return m.getMetrics();
 }
 
-double UwMultiStackController::getThreshold(int i, int j) { 
+bool UwMultiStackController::getThreshold(int i, int j, double& thres_ij) { 
   ThresMatrix::iterator it = threshold_map.find(i); 
   if (it != threshold_map.end()) {
     ThresMap thres_i = it->second;
     ThresMap::iterator it_thres_ij = thres_i.find(j);
-    if(it_thres_ij != thres_i.end())
-      return it_thres_ij->second;
+    if(it_thres_ij != thres_i.end()) {
+      thres_ij = it_thres_ij->second;
+      return true;
+    }
     else
-      return UwMultiStackController::threshold_not_exist;
+      return false;
   }
-  return threshold_not_exist;
+  return false;
 }
 
 void UwMultiStackController::eraseThreshold(int i, int j) { 

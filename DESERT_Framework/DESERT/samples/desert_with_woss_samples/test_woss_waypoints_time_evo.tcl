@@ -1,6 +1,6 @@
 # WOSS - World Ocean Simulation System -
 # 
-# Copyright (C) 2015 Regents of Patavina Technologies 
+# Copyright (C) 2022 Regents of Patavina Technologies 
 # 
 # Author: Federico Guerra - federico@guerra-tlc.com
 # 
@@ -24,16 +24,16 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,   #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.    #"
 # You can download the sediment and SSP databases at the following link:            #"
-#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz 			    #"
-# After the download, please set opt(db_path) to the correct path.	        	    #" 
-#	Please note that we cannot redistribute the GEBCO bathymetry database. You can 	#"
-# download the database by registering on the GEBCO web site at:					#"
-#     http://http://www.gebco.net/												    #"
-# For any question, please refer to the DESERT Underwater mailing list              #"
-#     <desert-usergroup@dei.unipd.it>                                               #"
+#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz              #"
+# After the download, please set opt(db_path) to the correct path.                  #" 
+#	Please note that we cannot redistribute the GEBCO bathymetry database. You can    #"
+# download the database by registering on the GEBCO web site at:                    #"
+#     http://http://www.gebco.net/                                                  #"
 #####################################################################################"
 
 # Module libraries
+
+set opt(bash_parameters)  0
 
 load libMiracle.so
 load libmphy.so
@@ -83,17 +83,23 @@ set opt(nn)           4
 set opt(knots)        4
 set opt(speed)        [expr $opt(knots) * 0.51444444444]
 set opt(pktsize)      512.0
-set opt(period)       500.0
-set opt(rep_num)      13
+set opt(cbr_period)   400.0
+set opt(rngstream)    13
 set opt(ack_mode)     "setNoAckMode" 
 
 set opt(starttime)    0.1
-set opt(stoptime)     10800.0 
+#set to 3600 to simulate the SSP changes over 1h; 4 AUV loops = 3h
+set opt(stoptime)     1800.0
 set opt(txduration)   [expr $opt(stoptime) - $opt(starttime)]
 
 set opt(start_lat)    42.59
 set opt(start_long)   10.125
 
+set opt(auv_min_angle)       -90.0
+set opt(auv_max_angle)       90.0
+
+set opt(node_min_angle)       -89.0
+set opt(node_max_angle)       89.0
 
 set opt(maxinterval_) 10.0
 set opt(freq)         17500.0
@@ -107,52 +113,41 @@ set opt(per_tgt)            0.01
 set opt(rx_snr_penalty_db)  -10.0
 set opt(tx_margin_db)       10.0
 
+set opt(db_path)     "/usr/share/woss/dbs/"
+
+if {$opt(bash_parameters)} {
+  if {$argc != 3} {
+    puts "This script requires two numbers to be inputed. one for the random generator substream and one for cbr period"
+    puts "For example, ns test_woss_waypoints_time_evo.tcl 1 500 /usr/share/woss/dbs"
+    puts "If you want to leave the default values, please set to 0"
+    puts "the value opt(bash_parameters) in the tcl script"
+    puts "Please try again."
+    exit
+  }   else { 
+    set opt(rngstream)	 	[lindex $argv 0]
+    set opt(cbr_period)   [lindex $argv 1]
+    set opt(db_path)      [lindex $argv 2]
+  }
+}
 
 # offset in meter from bathymetry depth
 set opt(node_bathy_offset) -2.0
 set opt(auv_depth)         10.0
 
+set opt(db_res_path)  "./test_aloha_no_dbs_waypoints_with_time_evo_res_arr"
 
-set opt(db_path)     "insert_db_path_here"
-set opt(db_res_path)  "."
-
-if { $opt(db_path) == "insert_db_path_here" } {
-	puts "#######################################################################################"
-	puts "#                                  README                                             #"
-	puts "#                                                                                     #"
-	puts "# This example showcases the use of WOSS at the physical layer, along with DESERT's   #"
-	puts "# Interference computation capabilities and network protocol stack. In particular,    #"
-	puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
-	puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
-	puts "# You can download the sediment and SSP databases at the following link:              #"
-	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
-	puts "# After the download, please set opt(db_path) to the correct path.                    #" 
-	puts "#	Please note that we cannot redistribute the GEBCO bathymetry database.        #"
-	puts "# You can download the database by registering on the GEBCO web site at:              #"
-	puts "#     http://http://www.gebco.net/                                                    #"
-	puts "# For any question, please refer to the DESERT Underwater mailing list                #"
-	puts "#     <desert-usergroup@dei.unipd.it>                                                 #"
-	puts "#######################################################################################"
-  	exit
-}
 set exists_transducers [file exists "$opt(db_path)/transducers/ITC/ITC-ITC-3001-17.5kHz.txt"]
-set exists_ssp [file exists "$opt(db_path)/ssp/2WOA2009_SSP_Annual.nc"]
-if { $exists_ssp == 0 || $exists_transducers == 0 } {
+if { $exists_transducers == 0 } {
 	puts "#######################################################################################"
 	puts "#                                  README                                             #"
 	puts "#                                                                                     #"
 	puts "# This example showcases the use of WOSS at the physical layer, along with DESERT's   #"
 	puts "# Interference computation capabilities and network protocol stack. In particular,    #"
-	puts "# this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
-	puts "# sediments, as well as for the characteristics of electro-acoustic transducers.      #"
-	puts "# You can download the sediment and SSP databases at the following link:              #"
-	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz                #"
+	puts "# this tcl sample requires the use of electro-acoustic transducers.                   #"
+	puts "# You can download the databases at the following link:                               #"
+	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
 	puts "# After the download, please set opt(db_path) to the correct path.                    #" 
-	puts "#	Please note that we cannot redistribute the GEBCO bathymetry database.        #"
-	puts "# You can download the database by registering on the GEBCO web site at:              #"
-	puts "#     http://http://www.gebco.net/                                                    #"
-	puts "# For any question, please refer to the DESERT Underwater mailing list                #"
-	puts "#     <desert-usergroup@dei.unipd.it>                                                 #"
+  puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 	puts "#######################################################################################"
 	exit
 }
@@ -175,9 +170,7 @@ set opt(start_clock) [clock seconds]
 ########################################
 
 #generators for the bathymetry 
-global def_rng
-set def_rng [new RNG]
-$def_rng default
+global defaultRNG
 
 set positionrng [new RNG]
 
@@ -193,8 +186,8 @@ $rdepth set max_ 8.0
 $rdepth use-rng $positionrng
 
 
-for {set k 0} {$k < $opt(rep_num)} {incr k} {
-     $def_rng next-substream
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+     $defaultRNG next-substream
      $positionrng next-substream
 }
 
@@ -204,8 +197,8 @@ for {set k 0} {$k < $opt(rep_num)} {incr k} {
 ########################################
 
 
-WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rep_num)
-WOSS/Definitions/RandomGenerator/C set seed_ $opt(rep_num)
+WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rngstream)
+WOSS/Definitions/RandomGenerator/C set seed_ $opt(rngstream)
 
 #### we create the mandatory prototype objects that will be used by the whole framework.
 #### We also do the mandatory intialization of the chosen random generator.
@@ -216,8 +209,8 @@ set time_arr_creator    [new "WOSS/Definitions/TimeArr"]
 set time_reference      [new "WOSS/Definitions/TimeReference/NS2"]
 set transducer_creator  [new "WOSS/Definitions/Transducer"]
 set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
-# set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
-set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
+set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
+#set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
 $rand_generator initialize
 
 #### we plug the chosen prototypes into the woss::DefinitionHandler
@@ -236,7 +229,7 @@ set woss_utilities [new WOSS/Utilities]
 
 #WOSS/Creator/Database/Textual/Results/TimeArr set debug           0
 #WOSS/Creator/Database/Textual/Results/TimeArr set woss_db_debug   0
-#WOSS/Creator/Database/Textual/Results/TimeArr set space_sampling  2.0
+#WOSS/Creator/Database/Textual/Results/TimeArr set space_sampling  5.0
 
 #set db_res_arr [new WOSS/Creator/Database/Textual/Results/TimeArr]
 #$db_res_arr setDbPathName "${opt(db_res_path)}/test_aloha_no_dbs_waypoints_with_time_evo_res_arr.txt"
@@ -246,11 +239,10 @@ set woss_utilities [new WOSS/Utilities]
 #### a Database that will store (in a binary file) all the channel responses
 WOSS/Creator/Database/Binary/Results/TimeArr set debug           0
 WOSS/Creator/Database/Binary/Results/TimeArr set woss_db_debug   0
-WOSS/Creator/Database/Binary/Results/TimeArr set space_sampling  2.0
+WOSS/Creator/Database/Binary/Results/TimeArr set space_sampling  5.0
 
 set db_res_arr [new "WOSS/Creator/Database/Binary/Results/TimeArr"]
 $db_res_arr setDbPathName "${opt(db_res_path)}/test_aloha_no_dbs_waypoints_with_time_evo_res_arr.dat"
-
 
 WOSS/Database/Manager set debug 0
 
@@ -276,12 +268,12 @@ set time_evo_ssp_1 [new "WOSS/Definitions/Time"]
 set time_evo_ssp_2 [new "WOSS/Definitions/Time"]
 set time_evo_ssp_3 [new "WOSS/Definitions/Time"]
 
-#first ssp, time key is 1st january 2014, 9:01 am
-$time_evo_ssp_1 setTime 1 1 2014 8 0 1
-#first ssp, time key is 1st january 2014, 10:01 am
-$time_evo_ssp_2 setTime 1 1 2014 10 0 1
-#first ssp, time key is 1st january 2014, 11:01 am
-$time_evo_ssp_3 setTime 1 1 2014 13 0 1
+#first ssp, time key is 1st january 2014, 10:11:01
+$time_evo_ssp_1 setTime 1 1 2014 10 11 1
+#first ssp, time key is 1st january 2014, 10:40:01
+$time_evo_ssp_2 setTime 1 1 2014 10 40 1
+#first ssp, time key is 1st january 2014, 11:01:01
+$time_evo_ssp_3 setTime 1 1 2014 11 0 1
 
 #### We create the mandatory woss::WossDbManager and we set a custom sediment and SSP for ALL
 #### the channel computations involved. 
@@ -294,17 +286,18 @@ set db_manager [new "WOSS/Database/Manager"]
 $db_manager setCustomSediment   "Test Sedim" 1560 200 1.5 0.9 0.8 1.0
 $db_manager setCustomAltimetry  $cust_altimetry
 #we insert in the custom SSP database, each SSP value with its related Time key
-$db_manager setCustomSSP        $time_evo_ssp_1 "./ssp-test.txt"
-$db_manager setCustomSSP        $time_evo_ssp_2 "./ssp-test_2.txt"
-$db_manager setCustomSSP        $time_evo_ssp_3 "./ssp-test_3.txt"
-#$db_manager setCustomBathymetry $opt(start_lat) $opt(start_long) -500.0 4 0.0 100.0 500.0 200.0 1500.0 200.0 2500.0 100.0
+$db_manager setCustomSSP        $time_evo_ssp_1 "./dbs/ssp-test.txt"
+$db_manager setCustomSSP        $time_evo_ssp_2 "./dbs/ssp-test_2.txt"
+$db_manager setCustomSSP        $time_evo_ssp_3 "./dbs/ssp-test_3.txt"
 
 
 WOSS/Creator/Bellhop set debug                        0.0
 WOSS/Creator/Bellhop set woss_debug                   0.0
 WOSS/Creator/Bellhop set woss_clean_workdir           1.0
-WOSS/Creator/Bellhop set evolution_time_quantum       3600.0
-WOSS/Creator/Bellhop set total_runs                   5
+WOSS/Creator/Bellhop set bellhop_arr_syntax           2
+WOSS/Creator/Bellhop set evolution_time_quantum       1800.0
+#increase to 5 for better accuracy
+WOSS/Creator/Bellhop set total_runs                   1
 WOSS/Creator/Bellhop set frequency_step               0.0
 WOSS/Creator/Bellhop set total_range_steps            1000.0
 WOSS/Creator/Bellhop set tx_min_depth_offset          0.0
@@ -324,25 +317,26 @@ WOSS/Creator/Bellhop set normalized_ssp_depth_steps   100000
 
 
 set woss_creator [new "WOSS/Creator/Bellhop"]
-$woss_creator setWorkDirPath     "/dev/shm/woss/test_aloha_no_dbs_waypoints_with_time_evo_res_arr/woss_channel_"
+$woss_creator setWorkDirPath     "./test_aloha_no_dbs_waypoints_with_time_evo_res_arr/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
 $woss_creator setBathymetryType     0 0 "L"
+$woss_creator setBathymetryMethod   0 0 "S"
 $woss_creator setAltimetryType      0 0 "L"
-$woss_creator setSimulationTimes    0 0 1 1 2014 9 0 1 2 1 2014 1 0 1
+$woss_creator setSimulationTimes    0 0 1 1 2014 10 11 1 1 1 2014 11 0 1
 
 
 ### choose between single-threaded or multithreaded WossManager
 ### by uncomment/comment the followings lines
 #WOSS/Manager/Simple set debug                       0
-#WOSS/Manager/Simple set is_time_evolution_active    10
-#WOSS/Manager/Simple set space_sampling              0.0
+#WOSS/Manager/Simple set is_time_evolution_active    1
+#WOSS/Manager/Simple set space_sampling              5.0
 #set woss_manager [new "WOSS/Manager/Simple"]
 
 WOSS/Manager/Simple/MultiThread set debug                     0.0
-WOSS/Manager/Simple/MultiThread set is_time_evolution_active  10.0
-WOSS/Manager/Simple/MultiThread set space_sampling            0.0
+WOSS/Manager/Simple/MultiThread set is_time_evolution_active  1.0
+WOSS/Manager/Simple/MultiThread set space_sampling            5.0
 WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
 
@@ -369,15 +363,15 @@ $woss_controller initialize
 WOSS/PlugIn/ChannelEstimator set debug_ 0
 
 WOSS/ChannelEstimator set debug_           0.0
-WOSS/ChannelEstimator set space_sampling_  2.0
+WOSS/ChannelEstimator set space_sampling_  5.0
 WOSS/ChannelEstimator set avg_coeff_       0.9
 set channel_estimator [ new "WOSS/ChannelEstimator"]
 
 
-WOSS/Module/Channel set channel_eq_snr_threshold_db_ 	 0
-WOSS/Module/Channel set channel_symbol_resolution_   5e-3
-WOSS/Module/Channel set channel_eq_time_ 	 -1
-WOSS/Module/Channel set debug_                    	 0
+WOSS/Module/Channel set channel_eq_snr_threshold_db_   0
+WOSS/Module/Channel set channel_symbol_resolution_     5e-3
+WOSS/Module/Channel set channel_eq_time_              -1
+WOSS/Module/Channel set debug_                         0
 
 set channel [new "WOSS/Module/Channel"]
 $channel setWossManager      $woss_manager
@@ -396,7 +390,7 @@ $data_mask setBandwidth  $opt(bw)
 
 WOSS/Module/CBR set debug_               0
 WOSS/Module/CBR set packetSize_          $opt(pktsize)
-WOSS/Module/CBR set period_              $opt(period)
+WOSS/Module/CBR set period_              $opt(cbr_period)
 WOSS/Module/CBR set PoissonTraffic_      1
 
 
@@ -460,7 +454,7 @@ WOSS/Position/WayPoint set maxVerticalOrientation_    40.0
   set ipif($id)      [new Module/UW/IP]
   set mll($id)       [new Module/UW/MLL] 
   set mac($id)       [new Module/UW/ALOHA]
-  set phy_data($id)  [new "WOSS/Module/MPhy/BPSK"]
+  set phy_data($id)  [new WOSS/Module/MPhy/BPSK]
 
   $node($id) addModule 6 $cbr($id)       0 "CBR"
   $node($id) addModule 5 $port($id)      0 "PRT"
@@ -707,9 +701,7 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###############################
 
 proc finish {} {
-  global ns opt cbr mac propagation cbr_auv mac_auv phy_data phy_data_auv channel db_manager
-
-  $db_manager closeAllConnections
+  global ns opt cbr mac propagation cbr_auv mac_auv phy_data phy_data_auv channel db_manager woss_manager
 
   set totenergy                     0.0
   set total_cbr_tx_pkts             0.0
@@ -752,6 +744,9 @@ proc finish {} {
   $ns flush-trace
   close $opt(tracefile)
 
+  puts "Delete WOSS objects to force file operations"
+  delete $woss_manager
+  delete $db_manager
 }
  
 

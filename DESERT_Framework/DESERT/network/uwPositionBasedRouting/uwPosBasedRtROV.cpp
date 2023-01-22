@@ -86,7 +86,7 @@ int UwPosBasedRtROV::command(int argc, const char *const *argv)
 
 	if(argc == 3) {
 		if (strcasecmp(argv[1],"setMaxTxRange") == 0) {
-			if (argv[2] <= 0) {
+			if (atof(argv[2]) <= 0) {
 				std::cerr << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
 					<< ")::invalid value for max transmission range, "
 					<< "use a value >= 0";
@@ -146,7 +146,6 @@ void UwPosBasedRtROV::recv(Packet* p)
 
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
-	hdr_uwpos_based_rt *pbrh = HDR_UWPOS_BASED_RT(p);
 
 	if (ch->direction() == hdr_cmn::UP) {
 

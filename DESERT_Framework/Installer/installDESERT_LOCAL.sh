@@ -853,25 +853,6 @@ build_BELLHOP() {
     info_L1 "bellhop"
     start="$(date +%s)"
 
-    #***
-    # CHECK if the GCC compiler version is less than 4.6.3.
-    # In this case the .../at/Makefile will be pached
-    GCC_VERSION=$(gcc --version | grep ^gcc | sed 's/^.* //g')
-    __GNUC__=$(echo ${GCC_VERSION} | awk '{ print substr( $0, 1, 1 ) }')
-    __GNUC_MINOR__=$(echo ${GCC_VERSION} | awk '{ print substr( $0, 3, 1 ) }')
-    __GNUC_PATCHLEVEL__=$(echo ${GCC_VERSION} | awk '{ print substr( $0, 5, 1 ) }')
-
-    # TODO:
-    # substitute the "if - elif" sequence with a single test
-    if [ "$__GNUC__" -lt "4" ]; then
-        sed -i -e 's/-std=gnu -O3 -ffast-math/-std=gnu -O2 -ffast-math/' Makefile
-    elif [ "$__GNUC__" -eq "4" ] && [ "$__GNUC_MINOR__" -lt "6" ]; then
-        sed -i -e 's/-std=gnu -O3 -ffast-math/-std=gnu -O2 -ffast-math/' Makefile
-    elif [ "$__GNUC__" -eq "4" ] && [ "$__GNUC_MINOR__" -eq "6" ] && [ "$__GNUC_PATCHLEVEL__" -lt "3" ]; then
-        sed -i -e 's/-std=gnu -O3 -ffast-math/-std=gnu -O2 -ffast-math/' Makefile
-    fi
-    #*
-
     type gfortran > /dev/null
     if [ $? -ne 0 ]; then
         err_L1 "gfortran not found. gfortran is required to compile Bellhop! Exiting ..."
@@ -962,7 +943,12 @@ build_WOSS() {
         tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
-
+    make check >> ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log 2>&1
+    if [ $? -ne 0 ]; then
+	err_L1 "Error during make check of woss-${WOSS_VERSION}! Exiting..."
+	tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
+	exit 1
+    fi
     make install >>  "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the installation of woss-${WOSS_VERSION}! Exiting ..."

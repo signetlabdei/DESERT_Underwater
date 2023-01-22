@@ -42,6 +42,7 @@
 #include "mmac.h"
 
 #include "uwcbr-module.h"
+#include "rng.h"
 
 #include <sstream>
 #include <sys/time.h>
@@ -192,8 +193,7 @@ Uwpolling_NODE::Uwpolling_NODE()
 	if (max_data_pkt_tx == 0) {
 		max_data_pkt_tx = 1;
 	}
-	srand(n_run + addr);
-}	
+}
 
 Uwpolling_NODE::~Uwpolling_NODE()
 {
@@ -442,7 +442,7 @@ Uwpolling_NODE::stateTxData()
 			packet_index++;
 		}
 		refreshState(UWPOLLING_NODE_STATUS_TX_DATA);
-		curr_data_pkt = (Q_data.front())->copy();
+		curr_data_pkt = Q_data.front();
 		Q_data.pop();
 		hdr_uwcbr *cbrh = HDR_UWCBR(curr_data_pkt);
 		if (debug_)
@@ -628,7 +628,7 @@ Uwpolling_NODE::stateRxTrigger()
 double
 Uwpolling_NODE::getBackOffTime()
 {
-	double random = ((double)(rand() % (int)((T_fin-T_in)*100)))/100 + T_in;
+	double random = ((double)(RNG::defaultrng()->uniform(INT_MAX) % (int)((T_fin-T_in)*100)))/100 + T_in;
 	if (debug_)
 	    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
 				  << ")::BACKOFF_TIMER_VALUE = " << backoff_tuner * random

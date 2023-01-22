@@ -164,6 +164,7 @@ uwinterference::removeFromInterference(double pw, PKT_TYPE tp)
 	if (power_list.empty()) {
 		std::cerr << "uwinterference::removeFromInterference, "
 				  << "some interference removed wrongly" << std::endl;
+		return;
 	} else {
 		double power_temp = power_list.back().sum_power;
 		int ctrl_temp = power_list.back().ctrl_cnt;

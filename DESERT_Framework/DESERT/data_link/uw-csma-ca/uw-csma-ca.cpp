@@ -44,6 +44,7 @@
 #include <stdlib.h>
 #include "mac.h"
 #include "mmac.h"
+#include "rng.h"
 
 extern packet_t PT_CA_CTS;
 extern packet_t PT_CA_RTS;
@@ -234,7 +235,6 @@ CsmaCa::initializeLog()
 	if (!outLog) {
 		cout << "Error creating log for Csma-Ca" << endl;
 	}
-	srand(time(NULL) + 100 * addr);
 }
 
 void
@@ -464,7 +464,7 @@ CsmaCa::state_Backoff(int tx_time)
 {
 	LOGINFO("State Backoff");
 	updateState(CSMA_CA_BACKOFF);
-	int random = rand() % (int) backoff_max + (int) (tx_time + backoff_delta);
+	int random = RNG::defaultrng()->uniform(backoff_max) + (int) (tx_time + backoff_delta);
 	backoff_timer.resched(random);
 }
 

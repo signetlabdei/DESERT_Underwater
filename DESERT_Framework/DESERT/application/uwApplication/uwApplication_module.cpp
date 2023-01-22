@@ -36,6 +36,7 @@
  *
  */
 
+#include <rng.h>
 #include <sstream>
 #include <time.h>
 #include "uwApplication_cmn_header.h"
@@ -461,14 +462,14 @@ uwApplicationModule::init_Packet()
 	// Create the payload message
 	if (getpayloadsize() < MAX_LENGTH_PAYLOAD) {
 		for (int i = 0; i < getpayloadsize(); i++) {
-			(*uwApph).payload_msg[i] = rand() % 26 + 'a';
+			(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
 		}
 		for (int i = getpayloadsize(); i < MAX_LENGTH_PAYLOAD; i++) {
 			(*uwApph).payload_msg[i] = '0';
 		}
 	} else {
 		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
-			(*uwApph).payload_msg[i] = rand() % 26 + 'a';
+			(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
 		}
 	}
 

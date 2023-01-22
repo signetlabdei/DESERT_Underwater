@@ -38,6 +38,51 @@
 
 #include "uwphysical.h"
 #include "uwphy-clmsg.h"
+#include "uwstats-utilities.h"
+
+UwPhysicalStats::UwPhysicalStats()
+	:
+	Stats(),
+	last_rx_power(0),
+	last_noise_power(0),
+	instant_noise_power(0),
+	last_interf_power(0),
+	has_error(false)
+{
+	type_id = (int)StatsEnum::STATS_PHY_LAYER;
+}
+UwPhysicalStats::UwPhysicalStats(int mod_id, int stck_id)
+	:
+	Stats(mod_id,stck_id),
+	last_rx_power(0),
+	last_noise_power(0),
+	instant_noise_power(0),
+	last_interf_power(0),
+	has_error(false)
+{
+	type_id = (int)StatsEnum::STATS_PHY_LAYER;
+}
+
+void 
+UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double noise_pwr, double interf_pwr, 
+		bool error, ChannelStates channel_state)
+{
+	module_id = mod_id;
+	stack_id = stck_id;
+	last_rx_power = rx_pwr;
+	last_noise_power = noise_pwr;
+	instant_noise_power = noise_pwr;
+	last_interf_power = interf_pwr;
+	has_error = error;
+	channel_state = channel_state;
+}
+
+Stats*
+UwPhysicalStats::clone() const
+{
+	return new UwPhysicalStats( *this );
+}
+
 
 static class UwPhysicalClass : public TclClass
 {
@@ -70,11 +115,12 @@ UnderwaterPhysical::UnderwaterPhysical()
 	, collisionDataCTRL(0)
 	, collisionCTRL(0)
 	, collisionDATA(0)
-
+	, interference_(nullptr)
 	// int collisionDATA;
 {
 	bind("rx_power_consumption_", &rx_power_);
 	bind("tx_power_consumption_", &tx_power_);
+	stats_ptr = new UwPhysicalStats();
 }
 
 int
@@ -137,7 +183,7 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			}
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setInterferenceModel") == 0) {
-			Interference_Model = (string) argv[2];
+			Interference_Model = (std::string) argv[2];
 			if (Interference_Model != "CHUNK" &&
 					Interference_Model != "MEANPOWER") {
 				std::cerr << "Empty or wrong name of the Interference Model: "
@@ -348,7 +394,6 @@ UnderwaterPhysical::endRx(Packet *p){
 	if (PktRx != 0) {
 		if (PktRx == p) {
 			double per_ni;
-
 			int nbits = ch->size() * 8;
 			double x = RNG::defaultrng()->uniform_double();
 			bool error_n = 0; // x <= per_n;
@@ -358,18 +403,24 @@ UnderwaterPhysical::endRx(Packet *p){
 				if (Interference_Model == "CHUNK") {
 					const PowerChunkList &power_chunk_list =
 							interference_->getInterferencePowerChunkList(p);
-					for (PowerChunkList::const_iterator itInterf =
-									power_chunk_list.begin();
-							itInterf != power_chunk_list.end();
-							itInterf++) {
-						int nbits2 = itInterf->second * BitRate_;
-						interference_power = itInterf->first;
-						per_ni = getPER(
-								ph->Pr / (ph->Pn + itInterf->first), nbits2, p);
-						x = RNG::defaultrng()->uniform_double();
+					if (power_chunk_list.size() < 1) {
+						// we have no interferent
+						per_ni = getPER((ph->Pr / ph->Pn), nbits, p);
 						error_ni = x <= per_ni;
-						if (error_ni) {
-							break;
+					} else {
+						for (PowerChunkList::const_iterator itInterf =
+										power_chunk_list.begin();
+								itInterf != power_chunk_list.end();
+								itInterf++) {
+							int nbits2 = itInterf->second * BitRate_;
+							interference_power = itInterf->first;
+							per_ni = getPER(
+									ph->Pr / (ph->Pn + itInterf->first), nbits2, p);
+							x = RNG::defaultrng()->uniform_double();
+							error_ni = x <= per_ni;
+							if (error_ni) {
+								break;
+							}
 						}
 					}
 				} else if (Interference_Model == "MEANPOWER") {
@@ -395,6 +446,13 @@ UnderwaterPhysical::endRx(Packet *p){
 				error_n = error_ni;
 				error_ni = 0; // error transfered on noise
 			}
+			//update stats and trigger the modules that collect the stats
+			dynamic_cast<UwPhysicalStats *>(stats_ptr)->updateStats(getId(),
+				getStackId(), ph->Pr, ph->Pn, interference_power, 
+					(error_n>0||error_ni>0));
+			ClMsgTriggerStats m = ClMsgTriggerStats();
+				sendSyncClMsg(&m);
+
 			if (time_ready_to_end_rx_ > Scheduler::instance().clock()) {
 				Rx_Time_ = Rx_Time_ + ph->duration - time_ready_to_end_rx_ +
 						Scheduler::instance().clock();
@@ -492,5 +550,31 @@ int UnderwaterPhysical::recvSyncClMsg(ClMessage* m)
 		((ClMsgUwPhyGetLostPkts*)m)->setLostPkts(lost_packet);
 		return 0;
 	}
+	if (m->type() == CLMSG_STATS)
+	{
+		updateInstantaneousStats();
+		(dynamic_cast<ClMsgStats*>(m))->setStats(stats_ptr);
+		return 0;
+	}
 	return UnderwaterMPhyBpsk::recvSyncClMsg(m);
+}
+
+void UnderwaterPhysical::updateInstantaneousStats()
+{
+	Packet *temp = Packet::alloc();
+	hdr_MPhy *ph = HDR_MPHY(temp);
+	ph->dstSpectralMask = getRxSpectralMask(temp);
+	ph->dstPosition = getPosition();
+	ph->dstAntenna = getRxAntenna(temp);
+	assert(ph->dstSpectralMask);
+	assert(ph->dstPosition);
+
+	ph->srcSpectralMask = getTxSpectralMask(temp);
+	ph->srcAntenna = getTxAntenna(temp);
+	ph->srcPosition = getPosition();
+	assert(ph->srcSpectralMask);
+
+	(dynamic_cast<UwPhysicalStats*>(stats_ptr))->instant_noise_power = 
+		getNoisePower(temp);
+	Packet::free(temp);
 }

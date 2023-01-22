@@ -43,6 +43,7 @@
 #include <rng.h>
 #include <stdint.h>
 #include <fstream>
+#include <cstdlib>
 
 extern packet_t PT_UWCBR;
 
@@ -222,7 +223,7 @@ UwCbrModule::command(int argc, const char *const *argv)
 			log_suffix = std::string(tmp_);
 			tracefilename = "tracefile" + log_suffix + ".txt";
 			if (tracefile_enabler_) {
-				tracefile.open(tracefilename , std::ios::out | std::ios::app);
+				tracefile.open(tracefilename.c_str() , std::ios_base::out | std::ios_base::app);
 			}
 		return TCL_OK;	
 		}
@@ -233,7 +234,7 @@ UwCbrModule::command(int argc, const char *const *argv)
 			log_suffix = std::string(tmp_);
 			tracefilename = "tracefile" + log_suffix + ".txt";
 			if (tracefile_enabler_) {
-				tracefile.open(tracefilename , std::ios::out | std::ios::app);
+				tracefile.open(tracefilename.c_str() , std::ios_base::out | std::ios_base::app);
 				tracefile.precision(precision);
 			}
 
@@ -412,9 +413,7 @@ UwCbrModule::recv(Packet *p)
 	}
 
 	if (tracefile_enabler_) {
-		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " " 
-				<< (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " " << ch->size() <<"\n";
-		tracefile.flush();
+		printReceivedPacket(p);
 	}
 
 	updateFTT(rftt);
@@ -495,17 +494,10 @@ UwCbrModule::GetFTTstd() const
 double
 UwCbrModule::GetPER() const
 {
-	if (drop_out_of_order_) {
-		if ((pkts_recv + pkts_lost) > 0) {
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-		} else {
-			return 0;
-		}
+	if ((pkts_recv + pkts_lost) > 0) {
+		return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
 	} else {
-		if (esn > 1)
-			return (1 - (double) pkts_recv / (double) (esn - 1));
-		else
-			return 0;
+		return 0;
 	}
 }
 
@@ -601,5 +593,18 @@ UwCbrModule::getTimeBeforeNextPkt()
 	} else {
 		// CBR
 		return period_;
+	}
+}
+
+void 
+UwCbrModule::printReceivedPacket(Packet *p)
+{
+	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+	hdr_cmn *ch = hdr_cmn::access(p);
+	hdr_uwip *uwiph = hdr_uwip::access(p);
+	if (tracefile_enabler_) {
+		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " " 
+				<< (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " " << ch->size() <<"\n";
+		tracefile.flush();
 	}
 }

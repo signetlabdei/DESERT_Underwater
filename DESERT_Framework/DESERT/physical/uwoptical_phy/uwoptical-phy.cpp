@@ -149,13 +149,7 @@ double
 UwOpticalPhy::getSNRdB(Packet *p)
 {
 	hdr_MPhy *ph = HDR_MPHY(p);
-	double il = (Il == IL_ILLEGAL ? S * ph->Pr : Il);
-	double t = variable_temperature_ ? getVarTemperature(p) : T;
-	t = t > NOT_VARIABLE_TEMPERATURE ? t : T;
-	double snr_linear = pow((S * ph->Pr), 2) /
-			((2 * q * (Id + il) * ph->srcSpectralMask->getBandwidth() +
-					 ((4 * K * t * ph->srcSpectralMask->getBandwidth()) / R)) +
-								ph->Pn);
+	double snr_linear = pow((S * ph->Pr), 2) / ph->Pn;
 	return snr_linear ? 10 * log10(snr_linear) : -DBL_MAX;
 }
 
@@ -177,7 +171,12 @@ UwOpticalPhy::getNoisePower(Packet *p)
 	assert(dest);
 	double depth = use_woss_ ? -dest->getAltitude() : -dest->getZ();
 	double lut_value = lut_map.empty() ? 0 : lookUpLightNoiseE(depth);
-	return pow(lut_value * Ar_ * S, 2); // right now returns 0, due to not bias
+	double t = variable_temperature_ ? getVarTemperature(p) : T;
+	double il = (Il == IL_ILLEGAL ? S * ph->Pr : Il);
+	t = t > NOT_VARIABLE_TEMPERATURE ? t : T;
+	double circuit_noise = 2 * q * (Id + il) * ph->srcSpectralMask->getBandwidth() + 
+			(4 * K * t * ph->srcSpectralMask->getBandwidth()) / R;
+	return circuit_noise + pow(lut_value * Ar_ * S, 2); // right now returns 0, due to not bias
 										// the snr calculation with unexpected
 										// values
 }

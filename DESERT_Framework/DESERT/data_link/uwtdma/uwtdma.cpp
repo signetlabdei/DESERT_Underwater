@@ -289,8 +289,8 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 		if (ch->error()) {
 			if (debug_)
 				cout << NOW << " TDMA(" << addr
-					 << ")::Phy2MacEndRx() dropping corrupted pkt "
-					 << std::endl;
+					 << ")::Phy2MacEndRx() dropping corrupted pkt from node = "
+					 << src_mac << std::endl;
 
 			incrErrorPktsRx();
 			Packet::free(p);
@@ -322,18 +322,18 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 			txData();
 
 	} else {
-		if(!sea_trial_) {
-			Packet::free(p);
-		}
 		if (debug_)
 			std::cout << NOW << " ID " << addr
 					  << ": Received packet while transmitting " << std::endl;
-		if (sea_trial_)
+		if (sea_trial_) {
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::RCVD_PCK_WHILE_TX"
 						   << std::endl;
 			sendUp(p);
 			incrDataPktsRx();
+		} else {
+			Packet::free(p);
+		}
 	}
 }
 

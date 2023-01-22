@@ -1,7 +1,4 @@
 LOCAL                    (install on this machine)
 <YOUR_DEVICE>            (please see the user guide for more information on custom installers)
-Gumstix-yocto-poky
-Raspberry-Pi-yocto-poky
-Udoo
-Pandaboard
-EvoLogics-sandbox
+Raspberry-Pi-zero-Raspbian
+EvoLogics-sandbox-debian_armhf

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -106,7 +106,12 @@ typedef struct buffer_element {
 	int id_pkt_; /**< ID of the packet buffered. */
 	double t_reception_; /**< Time instant in which the packet was buffered. */
 	double t_last_tx_; /**< Time instant of the last transmission attempt. */
-	int num_retx_; /**< Number of retransmission tentatives. */
+	int num_attempts_; /**< Number of transmission attempts. */
+	/**
+	 * Real retransmission counter: incremented only if packet is sent donwlayer
+	 */
+	unsigned int retx_;
+
 	buffer_element()
 	{
 	} /**< Constructor for buffer_element. */
@@ -117,7 +122,8 @@ typedef struct buffer_element {
 		, id_pkt_(_id_pkt_)
 		, t_reception_(_t_reception_)
 		, t_last_tx_(_t_last_tx_)
-		, num_retx_(_num_retx_)
+		, num_attempts_(_num_retx_)
+		, retx_(0)
 	{
 	} /**< Constructor for buffer_element. */
 

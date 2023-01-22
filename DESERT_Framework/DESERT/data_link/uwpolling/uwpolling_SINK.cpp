@@ -41,6 +41,7 @@
 #include "mac.h"
 #include "uwcbr-module.h"
 #include "mphy_pktheader.h"
+#include "rng.h"
 
 #include <algorithm>
 #include <sstream>
@@ -140,8 +141,6 @@ Uwpolling_SINK::Uwpolling_SINK()
 
 	if (T_data_gurad <= 0)
 		T_data_gurad = MIN_T_DATA;
-	
-	srand(n_run + addr);
 }
 
 Uwpolling_SINK::~Uwpolling_SINK()
@@ -327,7 +326,7 @@ Uwpolling_SINK::stateRxTrigger()
 double 
 Uwpolling_SINK::getBackOffTime()
 {
-	double random = ((double)(rand() % (int)((T_fin-T_in)*100)))/100 + T_in;
+	double random = ((double)(RNG::defaultrng()->uniform(INT_MAX) % (int)((T_fin-T_in)*100)))/100 + T_in;
 	if (debug_)
 		std::cout << NOW << "Uwpolling_SINK(" << addr
 				  << ")::BACKOFF_TIMER_VALUE = " << backoff_tuner * random
@@ -485,6 +484,7 @@ Uwpolling_SINK::stateRxData()
 		hdr_AUV_MULE *auvh = HDR_AUV_MULE(curr_data_pkt);
 		hdr_cmn* ch = HDR_CMN(curr_data_pkt);
 		hdr_MPhy *ph = HDR_MPHY(curr_data_pkt);
+		uint16_t auv_uid = auvh->pkt_uid();
 
 		if (first_rx_pkt) {
 			first_rx_pkt = false;
@@ -492,7 +492,7 @@ Uwpolling_SINK::stateRxData()
 			expected_last_id = auvh->last_pkt_uid();
 			double expected_pkts = 0;
 			if (!ack_enabled) {
-				expected_pkts = expected_last_id - auvh->pkt_uid() + 1;
+				expected_pkts = expected_last_id - auv_uid + 1;
 			} else {
 				expected_pkts = max(expected_last_id - prev_expect_last_id, 0) +
 									missing_id_list.size();
@@ -523,23 +523,23 @@ Uwpolling_SINK::stateRxData()
 		if (debug_) {
 			std::cout << NOW << "Uwpolling_SINK(" << addr
 					<< ")::STATE_RX_DATA::RX_DATA_ID_" << cbrh->sn_
-					<< "::POLLING_UID_" << auvh->pkt_uid()
+					<< "::POLLING_UID_" << auv_uid
 					<< "_FROM_NODE_" << mach->macSA() << endl;
 		}
 		
-		if (auvh->pkt_uid() == last_rx+1) { //no missing packet
-			last_rx = auvh->pkt_uid();
-		} else if(auvh->pkt_uid() > last_rx+1){ //lost some packets in between
-			uint16_t n_miss = (auvh->pkt_uid()-1) - last_rx;
+		if (auv_uid == last_rx+1) { //no missing packet
+			last_rx = auv_uid;
+		} else if(auv_uid > last_rx+1){ //lost some packets in between
+			uint16_t n_miss = (auv_uid-1) - last_rx;
 			addMissPkt2List(n_miss);
-			last_rx = auvh->pkt_uid();
+			last_rx = auv_uid;
 		} 
 		
-		if(auvh->pkt_uid() <= prev_expect_last_id) { //retransmission
+		if(auv_uid <= prev_expect_last_id) { //retransmission
 			
 			std::list<uint16_t>::iterator it = 
 				std::find(missing_id_list.begin(),missing_id_list.end(),
-						auvh->pkt_uid());
+						auv_uid);
 			if (it != missing_id_list.end()) { //the packet was previously lost
 				//erase packet from list
 				missing_id_list.erase(it);
@@ -547,7 +547,7 @@ Uwpolling_SINK::stateRxData()
 				if(debug_)
 					std::cout << NOW << "Uwpolling_SINK(" << addr
 							<< ")received duplicate packet with id2 " 
-							<< auvh->pkt_uid() << std::endl;
+							<< auv_uid << std::endl;
 				
 				incrDuplicatedPkt(); //the packet will be sendUp and discarded 
 								  //by the application
@@ -557,9 +557,9 @@ Uwpolling_SINK::stateRxData()
 		incrDataPktsRx();
 		n_curr_rx_pkts++;
 		ch->size() -= sizeof(hdr_AUV_MULE);
-		sendUp(curr_data_pkt->copy()); 
+		sendUp(curr_data_pkt);
 		
-		if (expected_last_id == auvh->pkt_uid()) {
+		if (expected_last_id == auv_uid) {
 			rx_data_timer.force_cancel();
 			n_curr_rx_pkts = 0;
 			RxDataEnabled = false;

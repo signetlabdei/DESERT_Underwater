@@ -591,8 +591,9 @@ Uwpolling_AUV::Phy2MacEndRx(Packet *p)
 
 	if (cmh->error()) {
 		if (cmh->ptype_ == PT_POLL) {
-			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
-					  << ")::PHY2MACENDRX_DROP_POLL" << endl;
+			if (debug_)
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
+						<< ")::PHY2MACENDRX_DROP_POLL" << endl;
 		} else if (cmh->ptype_ == PT_PROBE || cmh->ptype() == PT_PROBE_SINK) {
 			if (debug_)
 				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
@@ -611,8 +612,9 @@ Uwpolling_AUV::Phy2MacEndRx(Packet *p)
 						<< ")::PHY2MACENDRX_DROP_ACK" << endl;
 			incrDroppedAckPkts();
 		}else if (cmh->ptype_ == PT_TRIGGER) {
-			std::cerr << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
-					  << ")::PHY2MACENDRX_DROP_TRIGGER" << endl;
+			if (debug_)
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
+						<< ")::PHY2MACENDRX_DROP_TRIGGER" << endl;
 		} else {
 			if (debug_)
 				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr
@@ -1173,7 +1175,7 @@ Uwpolling_AUV::stateTxData()
 	if (TxEnabled) {
 		refreshState(UWPOLLING_AUV_STATUS_TX_DATA);
 
-		curr_tx_data_packet = (tx_buffer.front())->copy();
+		curr_tx_data_packet = tx_buffer.front();
 		tx_buffer.pop_front();
 		temp_buffer.push_back(curr_tx_data_packet->copy());
 				
@@ -1236,10 +1238,14 @@ Uwpolling_AUV::handleAck()
 		if (debug_)
 			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr 
 					<< ")::handleAck()::NO_ERROR" << std::endl;
-		temp_buffer.clear();
+		while (!temp_buffer.empty()) {
+			Packet* p = temp_buffer.back();
+			temp_buffer.pop_back();
+			Packet::free(p);
+		}
 	} else {
-		while (!temp_buffer.empty())
-		{
+		while (!temp_buffer.empty()) {
+
 			Packet* p = temp_buffer.back();
 			temp_buffer.pop_back();
 			hdr_AUV_MULE* auvh = HDR_AUV_MULE(p);
@@ -1263,8 +1269,7 @@ Uwpolling_AUV::handleNoAck()
 	if (debug_)
 		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr 
 				<< ")::handleNoAck()::reinsert pkts in tx buffer" << std::endl;
-	while (!temp_buffer.empty())
-	{
+	while (!temp_buffer.empty()) {
 		Packet* p = temp_buffer.back();
 		temp_buffer.pop_back();
 		tx_buffer.push_front(p);
@@ -1284,7 +1289,11 @@ Uwpolling_AUV::handleProbeAck()
 		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr 
 				<< ")::handleProbeAck()::rx ACK in probe pkt,no error" 
 				<< std::endl;
-		temp_buffer.clear();
+		while (!temp_buffer.empty()) {
+			Packet* p = temp_buffer.back();
+			temp_buffer.pop_back();
+			Packet::free(p);
+		}
 	} else {
 		if (debug_)
 		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_AUV(" << addr 
@@ -1296,6 +1305,8 @@ Uwpolling_AUV::handleProbeAck()
 			hdr_AUV_MULE* auvh = HDR_AUV_MULE(p);
 			if (auvh->pkt_uid() >= probeh->id_ack()) {
 				tx_buffer.push_front(p);
+			} else {
+				Packet::free(p);
 			}
 		}
 	}

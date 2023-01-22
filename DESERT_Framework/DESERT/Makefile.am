@@ -40,10 +40,10 @@ SUBDIRS = m4 \
     application/uwApplication \
     transport/uwudp \
     network/uwstaticrouting \
+    network/uwflooding \
     network/uwsun \
     network/uwicrp \
     network/uwip \
-    network/uwflooding \
     network/uwPositionBasedRouting \
     data_link/uwmll \
     data_link/uwmmac_clmsgs \
@@ -59,17 +59,16 @@ SUBDIRS = m4 \
     data_link/uw-csma-aloha-trigger \
     data_link/uwtdma \
     data_link/uwtdma-frame \
+    data_link/uwtokenbus \
     physical/uwphysical \
+    physical/uwhmmphysical \
     physical/uwgainfromdb \
     physical/uwphysicaldb\
     physical/uwphysicalrogersmodel\
     physical/uwphysicalfromdb\
-    physical/uwmphy_modem \
     physical/uwmodem \
     physical/uwmodemcsa \
-	physical/uwconnector \
-    physical/ms2c_evologics \
-    physical/ms2c_evologics_lowlev \
+    physical/uwconnector \
     physical/uwevologicss2cmodem \
     physical/uwmphypatch \
     physical/uwhermesphy \
@@ -90,6 +89,7 @@ SUBDIRS = m4 \
     interference/uwinterference \
     interference/uwinterferenceofdm \
     propagation/uwoptical_propagation \
-    channel/uwoptical_channel 
-    
-
+    channel/uwoptical_channel \
+    statistics/uwstats_utilities \
+    ranging/uwranging_tokenbus \
+    ranging/uwranging_tdma

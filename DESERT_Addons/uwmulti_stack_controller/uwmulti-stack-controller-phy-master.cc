@@ -182,16 +182,18 @@ int UwMultiStackControllerPhyMaster::checkBestLayer()
 
   int id_short_range = getShorterRangeLayer(last_layer_used_);
   int id_long_range = getLongerRangeLayer(last_layer_used_);
-  double upper_threshold = getThreshold(last_layer_used_,id_short_range);
-  double lower_threshold = getThreshold(last_layer_used_,id_long_range);
+  double upper_threshold; //meaningful value only if (upper_threshold_valid)
+  double lower_threshold; //meaningful value only if (lower_threshold_valid)
+  bool upper_threshold_valid = getThreshold(last_layer_used_,id_short_range,upper_threshold);
+  bool lower_threshold_valid = getThreshold(last_layer_used_,id_long_range,lower_threshold);
 
-  lower_id_active_ = (upper_threshold != UwMultiStackController::threshold_not_exist 
-                      && power_statistics_ > upper_threshold) ?
-                      id_short_range : lower_id_active_;
+  if (upper_threshold_valid && (power_statistics_ > upper_threshold)) {
+    lower_id_active_ = id_short_range;
+  }                    
+  if (lower_threshold_valid && (power_statistics_ < lower_threshold)) {
+    lower_id_active_ = id_long_range;
+  }
 
-  lower_id_active_ = (lower_threshold != UwMultiStackController::threshold_not_exist 
-                      && power_statistics_ < lower_threshold) ?
-                      id_long_range : lower_id_active_;
   if (debug_)
   {
     std::cout << NOW << " ControllerPhyMaster("<< mac_addr 

@@ -31,4 +31,5 @@ MODEM_log_*
 ***/*.tr
 ***/test-driver
 ***/.clang-format
+***/configure~
 .DS_Store

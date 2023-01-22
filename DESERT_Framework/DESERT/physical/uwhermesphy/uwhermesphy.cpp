@@ -127,7 +127,8 @@ UwHermesPhy::initializeLUT()
 			line_stream >> d;
 			line_stream >> p;
 			range2pdr_[d] = p;
-			std::cout << d << " " << p << endl;
+			if (debug_)
+				std::cout << d << " " << p << endl;
 		}
 	} else {
 		cerr << "Impossible to open file " << pdr_file_name_ << endl;

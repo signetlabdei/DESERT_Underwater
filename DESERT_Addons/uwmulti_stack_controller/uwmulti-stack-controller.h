@@ -62,7 +62,6 @@ class UwMultiStackController : public Module {
 public:
 
   // constant definitions
-  static double const threshold_not_exist; /**< This constant is returned when a searched threshold does not exist>*/
   static int const layer_not_exist; /**< This constant is returned when a searched layer does not exist>*/
 
   /**
@@ -193,10 +192,10 @@ protected:
    *
    * @param i id of the layer i
    * @param j id of the layer j
-   *
-   * @return the threshold
+   * @param thres_ij output reference to threshold(i,j); if it doesn't exist, the original value is left untouched
+   * @return True iff threshold exists and thres_ij is set
    */
-  virtual double getThreshold(int i, int j);
+  virtual bool getThreshold(int i, int j, double& thres_ij);
   
   /** 
    * remove the threshold value for the transition from layer i to layer j, checking first whether

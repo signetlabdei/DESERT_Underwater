@@ -30,7 +30,7 @@
 /**
  * @file   sun-ipr-node.cpp
  * @author Giovanni Toso
- * @version 1.1.1
+ * @version 1.2.1
  *
  * \brief Implements a SunIPRoutingNode.
  *
@@ -122,9 +122,12 @@ SunIPRoutingNode::SunIPRoutingNode()
 	, sinkProbeTimer_(this)
 	, bufferTmr_(this)
 	, searchPathTmr_(this)
+	, paths_selected()
+	, n_paths_established(0)
+	, max_retx_(1)
 {
 	if (STACK_TRACE)
-		cout << "> SunIPRoutingNode()" << endl;
+	  std::cout << "> SunIPRoutingNode()" << std::endl;
 	bind("ipAddr_", &ipAddr_);
 	bind("metrics_", &metrics_);
 	bind("PoissonTraffic_", &PoissonTraffic_);
@@ -142,6 +145,7 @@ SunIPRoutingNode::SunIPRoutingNode()
 	bind("safe_timer_buffer_", &safe_timer_buffer_);
 	bind("disable_path_error_", &disable_path_error_);
 	bind("reset_buffer_if_error_", &reset_buffer_if_error_);
+	bind("max_retx_", &max_retx_);
 	hop_table = new nsaddr_t[MAX_HOP_NUMBER];
 	bufferTmr_.resched(timer_buffer_);
 	for (int i = 0; i < MAX_HOP_NUMBER; i++)
@@ -156,12 +160,13 @@ SunIPRoutingNode::SunIPRoutingNode()
 SunIPRoutingNode::~SunIPRoutingNode()
 {
 	if (STACK_TRACE)
-		cout << "> ~SunIPRoutingNode()" << endl;
-	if (printDebug_ > 5)
-		cout << "@" << Scheduler::instance().clock()
-			 << ":Node:" << this->printIP(ipAddr_)
-			 << ":hc:" << this->getNumberOfHopToSink() << ":node_deleted."
-			 << endl;
+	  std::cout << "> ~SunIPRoutingNode()" << std::endl;
+    if (printDebug_ > 5) {
+ 	  std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+ 				<< "||hops:" << this->getNumberOfHopToSink()
+ 				<< "]::NODE_DELETED"
+ 				<< std::endl;
+	}
 	delete[] hop_table;
 	delete[] trace_file_name_;
 } /* SunIPRoutingNode::~SunIPRoutingNode */
@@ -170,7 +175,7 @@ int
 SunIPRoutingNode::recvSyncClMsg(ClMessage *m)
 {
 	if (STACK_TRACE)
-		cout << "> recvSyncClMsg()" << endl;
+	  std::cout << "> recvSyncClMsg()" << std::endl;
 	return Module::recvSyncClMsg(m);
 } /* SunIPRoutingNode::recvSyncClMsg */
 
@@ -178,7 +183,7 @@ int
 SunIPRoutingNode::recvAsyncClMsg(ClMessage *m)
 {
 	if (STACK_TRACE)
-		cout << "> recvAsyncClMsg()" << endl;
+	  std::cout << "> recvAsyncClMsg()" << std::endl;
 	if (m->type() == UWIP_CLMSG_SEND_ADDR) {
 		UWIPClMsgSendAddr *m_ = (UWIPClMsgSendAddr *) m;
 		ipAddr_ = m_->getAddr();
@@ -192,7 +197,16 @@ void
 SunIPRoutingNode::clearHops()
 {
 	if (STACK_TRACE)
-		cout << "> clearHops()" << endl;
+	  std::cout << "> clearHops()" << std::endl;
+    if (printDebug_ > 5) {
+	  std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+				<< "||hops:" << this->getNumberOfHopToSink()
+				<< "]::CLEARING_HOPS::";
+	  for (int i = 0; i < hop_table_length; i++) {
+		std::cout << printIP(hop_table[i])<< "|";
+	  }
+	  std::cout << std::endl;
+	}
 	for (int i = 0; i < MAX_HOP_NUMBER; i++) {
 		hop_table[i] = 0;
 	}
@@ -222,7 +236,7 @@ void
 SunIPRoutingNode::initialize()
 {
 	if (STACK_TRACE)
-		cout << "> initialize()" << endl;
+	  std::cout << "> initialize()" << std::endl;
 	// Asking for the IP of the current Node.
 	if (ipAddr_ == 0) {
 		UWIPClMsgReqAddr *m = new UWIPClMsgReqAddr(getId());
@@ -236,12 +250,26 @@ void
 SunIPRoutingNode::printHopTable() const
 {
 	if (STACK_TRACE)
-		cout << "> printHopTable()" << endl;
-	printf("NextHopList\n");
+	  std::cout << "> printHopTable()" << std::endl;
+
+	std::cout << "HOPS_LIST:" << "\n";
 	for (int i = 0; i < hop_table_length; i++) {
-		cout << this->printIP(hop_table[i]);
+	  std::cout << ">" << this->printIP(hop_table[i]) << "\n";
 	}
+	std::cout << std::endl;
 } /* SunIPRoutingNode::printHopTable */
+
+void
+SunIPRoutingNode::printSelectedRoutes() const
+{
+	auto it = paths_selected.begin();
+	std::cout << "END_NODES_MAP:" << "\n";
+	while (it != paths_selected.end()) {
+	  std::cout << "NODE::" << printIP(it->first) << "::SELECTED::" << (uint)it->second << "::TIMES\n";
+	  it++;
+	}
+	std::cout << std::endl;
+}
 
 /* This function convert an IP from a nsaddr_t to a string in the
  * classical form: x.x.x.x. It returns a string, it doesn't print
@@ -251,7 +279,7 @@ string
 SunIPRoutingNode::printIP(const nsaddr_t &ip_)
 {
 	if (STACK_TRACE)
-		cout << "> printIP()" << endl;
+	  std::cout << "> printIP()" << std::endl;
 	stringstream out;
 	out << ((ip_ & 0xff000000) >> 24);
 	out << ".";
@@ -276,7 +304,7 @@ nsaddr_t
 SunIPRoutingNode::str2addr(const char *str)
 {
 	if (STACK_TRACE)
-		cout << "> str2addr()" << endl;
+	  std::cout << "> str2addr()" << std::endl;
 	int level[4] = {0, 0, 0, 0};
 	char tmp[20];
 	strncpy(tmp, str, 19);
@@ -301,7 +329,7 @@ int
 SunIPRoutingNode::command(int argc, const char *const *argv)
 {
 	if (STACK_TRACE)
-		cout << "> command()" << endl;
+	  std::cout << "> command()" << std::endl;
 	Tcl &tcl = Tcl::instance();
 
 	if (argc == 2) {
@@ -313,14 +341,17 @@ SunIPRoutingNode::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "printhopcount") == 0) {
 			if (num_hop_to_sink <= 0)
-				cout << "N: " << this->printIP(ipAddr_)
-					 << " not connected to the sink." << endl;
+			  std::cout << "N: " << this->printIP(ipAddr_)
+						<< " not connected to the sink." << std::endl;
 			else
-				cout << "N: " << this->printIP(ipAddr_)
-					 << " # hops to sink = " << num_hop_to_sink << endl;
+			  std::cout << "N: " << this->printIP(ipAddr_)
+						<< " # hops to sink = " << num_hop_to_sink << std::endl;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "printhops") == 0) {
 			this->printHopTable();
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "printselectedroutes") == 0) {
+			printSelectedRoutes();
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getackcount") == 0) {
 			tcl.resultf("%lu", this->getAckCount());
@@ -349,7 +380,13 @@ SunIPRoutingNode::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "getpathestheadersize") == 0) {
 			tcl.resultf("%d", this->getPathEstHeaderSize());
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getmeanretx") == 0) {
+		} else if (strcasecmp(argv[1], "getNpathsestablished") == 0) {
+			tcl.resultf("%d", getNPathsEstablished());
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "getbufferstatus") == 0) {
+			tcl.resultf("%d", buffer_data.size());
+			return TCL_OK;
+ 	   } else if (strcasecmp(argv[1], "getmeanretx") == 0) {
 			//            double num = double(pkt_tx_) - double(pkt_stored_ -
 			//            buffer_data.size());
 			//            double den = double(pkt_stored_ - buffer_data.size());
@@ -413,7 +450,7 @@ void
 SunIPRoutingNode::recv(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> recv()" << endl;
+	  std::cout << "> recv()" << std::endl;
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
@@ -429,8 +466,8 @@ SunIPRoutingNode::recv(Packet *p)
 					(iph->daddr() == UWIP_BROADCAST) ||
 					(iph->daddr() == ipAddr_)) { // Redundant check already made
 												 // in UWIP (just in case).
-				if (ch->ptype() ==
-						PT_SUN_PATH_EST) { // Path Establishment Packet.
+				if (ch->ptype() ==  PT_SUN_PATH_EST) { // Path Establishment Packet.
+
 					if (hpest->ptype() == PATH_SEARCH) { // Path Search.
 						if (iph->saddr() == ipAddr_) { // Garbage: the node
 													   // received a request
@@ -439,16 +476,13 @@ SunIPRoutingNode::recv(Packet *p)
 							return;
 						} else {
 							if (printDebug_ > 5) {
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":Packet:" << ch->uid()
-									 << ":UP:PATH_EST:PATH_REQUEST:source:"
-									 << printIP(iph->saddr()) << "." << endl;
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":replyPathEstSearch." << endl;
+								std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+										  << "||hops:" << this->getNumberOfHopToSink()
+										  << "]::RECEIVED_PATH_EST::REQUEST_FROM:"
+										  << printIP(iph->saddr())
+										  << "::UID:" << ch->uid()
+										  << "::SENDING_REPLYPATHESTABLISHMENT"
+										  << std::endl;
 							}
 							if (trace_)
 								this->tracePacket(p, "RECV_SRC");
@@ -467,19 +501,14 @@ SunIPRoutingNode::recv(Packet *p)
 														   // arrived to the
 														   // destination.
 								if (printDebug_ > 5) {
-									cout << "@" << Scheduler::instance().clock()
-										 << ":Node:" << this->printIP(ipAddr_)
-										 << ":hc:"
-										 << this->getNumberOfHopToSink()
-										 << ":Packet:" << ch->uid()
-										 << ":UP:PATH_EST:PATH_ANSWER:source:"
-										 << printIP(iph->saddr()) << "."
-										 << endl;
-									cout << "@" << Scheduler::instance().clock()
-										 << ":Node:" << this->printIP(ipAddr_)
-										 << ":hc:"
-										 << this->getNumberOfHopToSink()
-										 << ":evaluatePath." << endl;
+								  std::cout << "[" <<  NOW
+											<< "]::Node[IP:" << this->printIP(ipAddr_)
+									        << "||hops:" << this->getNumberOfHopToSink()
+											<< "]::RECEIVED_PATH_EST::PATH_ANSWER_FROM:"
+											<< printIP(iph->saddr())
+											<< "::EVALUATE_PATH"
+											<< "::UID:" << ch->uid()
+											<< std::endl;
 								}
 								if (trace_)
 									this->tracePacket(p, "RECV_PTH");
@@ -488,19 +517,13 @@ SunIPRoutingNode::recv(Packet *p)
 								return;
 							} else {
 								if (printDebug_ > 5) {
-									cout << "@" << Scheduler::instance().clock()
-										 << ":Node:" << this->printIP(ipAddr_)
-										 << ":hc:"
-										 << this->getNumberOfHopToSink()
-										 << ":Packet:" << ch->uid()
-										 << ":UP:PATH_EST:PATH_ANSWER:source:"
-										 << printIP(iph->saddr()) << "."
-										 << endl;
-									cout << "@" << Scheduler::instance().clock()
-										 << ":Node:" << this->printIP(ipAddr_)
-										 << ":hc:"
-										 << this->getNumberOfHopToSink()
-										 << ":sendRouteBack." << endl;
+								  std::cout << "[" <<  NOW
+											<< "]::Node[IP:" << this->printIP(ipAddr_)
+											<< "||hops:" << this->getNumberOfHopToSink()
+											<< "]::RECEIVED_PATH_EST::PATH_ANSWER_FROM:"
+											<< printIP(iph->saddr())
+											<< "::SEND_ROUTE_BACK"
+											<< std::endl;
 								}
 								this->sendRouteBack(p->copy());
 								Packet::free(p);
@@ -516,21 +539,16 @@ SunIPRoutingNode::recv(Packet *p)
 						} else { // Path error: reset the route information and
 								 // send back the route error packet.
 							if (printDebug_ > 5) {
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":Packet:" << ch->uid()
-									 << ":UP:PATH_EST:PATH_ERROR:source:"
-									 << printIP(iph->saddr()) << "." << endl;
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":clearHops,setNumberOfHopToSink(0)."
-									 << endl;
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":sendRouteErrorBack." << endl;
+								if (printDebug_ > 5) {
+									std::cout << "[" <<  NOW
+											  << "]::Node[IP:" << this->printIP(ipAddr_)
+											  << "||hops:" << this->getNumberOfHopToSink()
+											  << "]::PATH_EST:PATH_ERROR_FROM:"
+											  << printIP(iph->saddr())
+											  << "::UID:"
+											  << ch->uid()
+											  << std::endl;
+								}
 							}
 							if (trace_)
 								this->tracePacket(p, "RECV_ERR");
@@ -541,9 +559,7 @@ SunIPRoutingNode::recv(Packet *p)
 								if (reset_buffer_if_error_) {
 									while (!buffer_data.empty()) {
 										Packet::free(
-												((buffer_element) buffer_data
-																.front())
-														.p_);
+												((buffer_element) buffer_data.front()).p_);
 										buffer_data.erase(buffer_data.begin());
 										Packet::free(p);
 										return;
@@ -563,13 +579,15 @@ SunIPRoutingNode::recv(Packet *p)
 						Packet::free(p);
 						return;
 					} else {
-						if (printDebug_ > 5)
-							cout << "@" << Scheduler::instance().clock()
-								 << ":Node:" << this->printIP(ipAddr_)
-								 << ":hc:" << this->getNumberOfHopToSink()
-								 << ":Packet:" << ch->uid()
-								 << ":UP:ACK:source:" << printIP(iph->saddr())
-								 << "." << endl;
+						if (printDebug_ > 5) {
+							std::cout << "[" <<  NOW
+									  << "]::Node[IP:" << this->printIP(ipAddr_)
+									  << "||hops:" << this->getNumberOfHopToSink()
+									  << "]::RECEIVED_ACK_FROM:"
+									  << printIP(iph->saddr())
+									  << "::UID:" << hack->uid()
+									  << std::endl;
+						}
 						if (trace_)
 							this->tracePacket(p, "RECV_ACK");
 						this->updateAcksCount();
@@ -597,13 +615,14 @@ SunIPRoutingNode::recv(Packet *p)
 												2;
 									}
 								}
-								if (printDebug_ > 5)
-									cout << "@" << Scheduler::instance().clock()
-										 << ":Node:" << this->printIP(ipAddr_)
-										 << ":hc:"
-										 << this->getNumberOfHopToSink()
-										 << ":buf_size:" << buffer_data.size()
-										 << ":packet_removed." << endl;
+								if (printDebug_ > 5) {
+									std::cout << "[" <<  NOW
+											  << "]::Node[IP:" << this->printIP(ipAddr_)
+											  << "||hops:" << this->getNumberOfHopToSink()
+											  << "]::BUFFER_SIZE:" << buffer_data.size()
+											  << "::PACKET_REMOVED:" << ch->uid()
+											  << std::endl;
+								}
 								Packet::free(
 										((buffer_element) buffer_data.front())
 												.p_);
@@ -618,41 +637,40 @@ SunIPRoutingNode::recv(Packet *p)
 					}
 				} else if (ch->ptype() == PT_SUN_PROBE) { // Probe Packet.
 					if (printDebug_ > 5) {
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":Packet:" << ch->uid()
-							 << ":UP:PROBE:source:" << printIP(iph->saddr())
-							 << "." << endl;
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":receiveProbe." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::RECEIVED_PROBE_FROM:"
+								  << printIP(iph->saddr())
+								  << std::endl;
 					}
 					if (trace_)
 						this->tracePacket(p, "RECV_PRB");
 					this->receiveProbe(p);
 					Packet::free(p);
 					return;
-				} else { // ch->ptype_ == Data packet.
+				} else { // ch->ptype_ == Data packet.+
+				    hdr_sun_data *hdata = HDR_SUN_DATA(p);
 					if (trace_)
 						this->tracePacket(p, "RECV_DTA");
 					this->updatePacketsCount();
+
+					if (printDebug_ > 5) {
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::RECEIVED_DATA_FROM:"
+								  << printIP(iph->saddr())
+								  << "::PREV_HOP:" << printIP(ch->prev_hop_)
+								  << "::UID:" << ch->uid()
+								  << std::endl;
+					}
+
 					if (iph->daddr() == ipAddr_) { // The packet is arrived at
 												   // destination: send it up.
 						// Send back an ack
-						if (printDebug_ > 5)
-							cout << "@" << Scheduler::instance().clock()
-								 << ":Node:" << this->printIP(ipAddr_)
-								 << ":hc:" << this->getNumberOfHopToSink()
-								 << ":sendBackAck." << endl;
 						this->sendBackAck(p);
 
-						if (printDebug_ > 5)
-							cout << "@" << Scheduler::instance().clock()
-								 << ":Node:" << this->printIP(ipAddr_)
-								 << ":hc:" << this->getNumberOfHopToSink()
-								 << ":UP:DATA:DESTINATION_REACHED." << endl;
 						ch->size() -= sizeof(hdr_sun_data);
 						sendUp(p->copy());
 						Packet::free(p);
@@ -662,19 +680,26 @@ SunIPRoutingNode::recv(Packet *p)
 														 // forward the Data
 														 // packet.
 						// Send back an ack
-						if (printDebug_ > 5)
-							cout << "@" << Scheduler::instance().clock()
-								 << ":Node:" << this->printIP(ipAddr_)
-								 << ":hc:" << this->getNumberOfHopToSink()
-								 << ":sendBackAck." << endl;
 						this->sendBackAck(p); // Send back an ack.
 
-						if (buffer_data.size() < buffer_max_size_) {
-							if (printDebug_ > 5)
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":UP:DATA:PKT_BUFFERED." << endl;
+						  if (buffer_data.size() < buffer_max_size_) {
+							if (printDebug_ > 5) {
+							  std::cout << "[" <<  NOW
+										<< "]::Node[IP:" << this->printIP(ipAddr_)
+										<< "||hops:" << this->getNumberOfHopToSink()
+										<< "]::DATA_PACKET_TO_FORWARD"
+										<< "::SRC:" <<  printIP(iph->saddr())
+										<< "::DST:"	<< printIP(iph->daddr())
+										<< "::NHOP:"<< printIP(ch->next_hop())
+										<< "::PHOP:"<< printIP(ch->prev_hop_)
+										<< "::UID:" << ch->uid()
+										<< "::SN:" << uwcbrh->sn()
+										<< "::PATH:";
+							  for (int i = 0; i < hdata->list_of_hops_length(); i++) {
+								std::cout << printIP(hdata->list_of_hops()[i]) << ";";
+							  }
+							  std::cout << std::endl;
+							}
 							//                            if (buffer_data.size()
 							//                            == 0) { //TODO: enable
 							//                            this?
@@ -694,11 +719,14 @@ SunIPRoutingNode::recv(Packet *p)
 									Scheduler::instance().clock()));
 							Packet::free(p);
 						} else {
-							if (printDebug_ > 5)
-								cout << "@" << Scheduler::instance().clock()
-									 << ":Node:" << this->printIP(ipAddr_)
-									 << ":hc:" << this->getNumberOfHopToSink()
-									 << ":UP:DATA:DROP:BUFFER_IS_FULL." << endl;
+							if (printDebug_ > 5) {
+							  std::cout << "[" <<  NOW
+										<< "]::Node[IP:" << this->printIP(ipAddr_)
+										<< "||hops:" << this->getNumberOfHopToSink()
+										<< "]::BUFFER_FULL:DROPPING_PACKET"
+										<< "::UID:" << ch->uid()
+										<< std::endl;
+							}
 							number_of_drops_buffer_full_++;
 							drop(p, 1, DROP_BUFFER_IS_FULL);
 						}
@@ -707,11 +735,11 @@ SunIPRoutingNode::recv(Packet *p)
 				}
 			} else { // Wrong destination.
 				if (printDebug_ > 5)
-					cout << "@" << Scheduler::instance().clock()
-						 << ":Node:" << this->printIP(ipAddr_)
-						 << ":hc:" << this->getNumberOfHopToSink()
-						 << ":Packet:" << ch->uid() << ":UP:DATA:DROP:wrong_ip."
-						 << endl;
+				  std::cout << "[" <<  NOW
+							<< "]::Node[IP:" << this->printIP(ipAddr_)
+							<< "||hops:" << this->getNumberOfHopToSink()
+							<< "]::DROPPING_PACKET::WRONG_IP"
+							<< std::endl;
 				drop(p, 1, DROP_PACKET_NOT_FOR_ME);
 				return;
 			}
@@ -727,10 +755,13 @@ SunIPRoutingNode::recv(Packet *p)
 															 // to buffer the
 															 // packet.
 					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":DOWN:DATA:PKT_BUFFERED." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::TO_SEND::PACKET_BUFFERED"
+								  << "::UID:" << ch->uid()
+								  << "::SN::" << uwcbrh->sn()
+								  << std::endl;
 					pkt_stored_++;
 					buffer_data.push_back(buffer_element(p->copy(),
 							uwcbrh->sn(),
@@ -738,10 +769,11 @@ SunIPRoutingNode::recv(Packet *p)
 					Packet::free(p);
 				} else {
 					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":DOWN:DATA:DROP:BUFFER_IS_FULL." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::TO_SEND::DROPPING::BUFFER_FULL"
+								  << std::endl;
 					number_of_drops_buffer_full_++;
 					drop(p, 1, DROP_BUFFER_IS_FULL);
 				}
@@ -749,14 +781,16 @@ SunIPRoutingNode::recv(Packet *p)
 			} else { // The current node is not directly connected with the
 					 // sink.
 				iph->saddr() = ipAddr_;
-				iph->daddr() =
-						0; // Used to set that the packet is not initialized.
+				iph->daddr() = 0; // Used to set that the packet is not initialized.
 				if (buffer_data.size() < buffer_max_size_) {
 					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":DOWN:DATA:PKT_BUFFERED." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::TO_SEND::PACKET_BUFFERED"
+								  << "::UID:" << ch->uid()
+								  << "::SN::" << uwcbrh->sn()
+								  << std::endl;
 					pkt_stored_++;
 					buffer_data.push_back(buffer_element(p->copy(),
 							uwcbrh->sn(),
@@ -764,19 +798,21 @@ SunIPRoutingNode::recv(Packet *p)
 					Packet::free(p);
 				} else {
 					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":DOWN:DATA:DROP:BUFFER_IS_FULL." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::TO_SEND::DROPPING::BUFFER_FULL"
+								  << std::endl;
 					number_of_drops_buffer_full_++;
 					drop(p, 1, DROP_BUFFER_IS_FULL);
 				}
 				if (this->getNumberOfHopToSink() == 0) {
 					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Node:" << this->printIP(ipAddr_)
-							 << ":hc:" << this->getNumberOfHopToSink()
-							 << ":searchPath." << endl;
+						std::cout << "[" <<  NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "||hops:" << this->getNumberOfHopToSink()
+								  << "]::BEGIN_SEARCH_PATH"
+								  << std::endl;
 					if (search_path_enable_) {
 						this->searchPath(); // Node not connected with any sink:
 											// send a path establishment
@@ -789,10 +825,11 @@ SunIPRoutingNode::recv(Packet *p)
 			}
 		} else {
 			if (printDebug_ > 5)
-				cout << "@" << Scheduler::instance().clock()
-					 << ":Node:" << this->printIP(ipAddr_)
-					 << ":Packet:" << ch->uid()
-					 << ":DOWN:DATA:DROP:NO_DIRECTION." << endl;
+				std::cout << "[" <<  NOW
+						  << "]::Node[IP:" << this->printIP(ipAddr_)
+						  << "||hops:" << this->getNumberOfHopToSink()
+						  << "]::DOWN:DATA:DROP:NO_DIRECTION"
+						  << std::endl;
 			drop(p, 1, DROP_PACKET_WITHOUT_DIRECTION);
 			return;
 		}
@@ -809,7 +846,7 @@ const int &
 SunIPRoutingNode::setNumberOfHopToSink(const int &hop)
 {
 	if (STACK_TRACE)
-		cout << "> setNumberOfHopToSink()" << endl;
+	  std::cout << "> setNumberOfHopToSink()" << std::endl;
 	if (hop < 0) {
 		num_hop_to_sink = 0;
 		return this->getNumberOfHopToSink();
@@ -828,7 +865,7 @@ const int &
 SunIPRoutingNode::getNumberOfHopToSink() const
 {
 	if (STACK_TRACE)
-		cout << "> getNumberOfHopToSink()" << endl;
+	  std::cout << "> getNumberOfHopToSink()" << std::endl;
 	return num_hop_to_sink;
 } /* SunIPRoutingNode::getNumberOfHopToSink */
 
@@ -836,7 +873,7 @@ void
 SunIPRoutingNode::receiveProbe(const Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> receiveProbe()" << endl;
+	  std::cout << "> receiveProbe()" << std::endl;
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	if (this->isZero(ph->Pn)) { // If the power of noise value is not
@@ -845,6 +882,14 @@ SunIPRoutingNode::receiveProbe(const Packet *p)
 		this->setNumberOfHopToSink(1);
 		sink_associated = iph->saddr();
 		sinkProbeTimer_.resched(timer_sink_probe_validity_);
+		if (printDebug_ > 5) {
+			std::cout << "[" <<  NOW
+					  << "]::Node[IP:" << this->printIP(ipAddr_)
+					  << "||hops:" << this->getNumberOfHopToSink()
+					  << "]::BECAME_END_NODE"
+					  << "::" << (uint)iph->saddr()
+					  << std::endl;
+		}
 	} else if (10 * log10(ph->Pr / (ph->Pi + ph->Pn)) >
 			probe_min_snr_) { // Accept the probe only if its snr is greater
 							  // than a minimum value.
@@ -856,6 +901,14 @@ SunIPRoutingNode::receiveProbe(const Packet *p)
 		sink_associated = iph->saddr();
 		snr_to_sink_ = 10 * log10(ph->Pr / (ph->Pn));
 		sinkProbeTimer_.resched(timer_sink_probe_validity_);
+		if (printDebug_ > 5) {
+			std::cout << "[" <<  NOW
+					  << "]::Node[IP:" << this->printIP(ipAddr_)
+					  << "||hops:" << this->getNumberOfHopToSink()
+					  << "]::BECAME_END_NODE"
+					  << "::" << (uint)iph->saddr()
+					  << std::endl;
+		}
 	}
 } /* SunIPRoutingNode::receiveProbe */
 
@@ -867,7 +920,7 @@ void
 SunIPRoutingNode::lostSink()
 {
 	if (STACK_TRACE)
-		cout << "> lostSink()" << endl;
+	  std::cout << "> lostSink()" << std::endl;
 	if (this->getNumberOfHopToSink() ==
 			1) { // Only a node with hc 1 can lost the sink.
 		this->clearHops();
@@ -880,7 +933,7 @@ void
 SunIPRoutingNode::searchPathExpire()
 {
 	if (STACK_TRACE)
-		cout << "> searchPathExpire()" << endl;
+	  std::cout << "> searchPathExpire()" << std::endl;
 	search_path_enable_ = true;
 	return;
 } /* SunIPRoutingNode::searchPathExpire */
@@ -892,12 +945,13 @@ void
 SunIPRoutingNode::expTimerHopTable()
 {
 	if (STACK_TRACE)
-		cout << "> expTimerHopTable()" << endl;
+	  std::cout << "> expTimerHopTable()" << std::endl;
 	if (printDebug_ > 5)
-		cout << "@" << Scheduler::instance().clock()
-			 << ":Node:" << this->printIP(ipAddr_)
-			 << ":hc:" << this->getNumberOfHopToSink()
-			 << ":routing_table_expired." << endl;
+		std::cout << "[" <<  NOW
+				  << "]::Node[IP:" << this->printIP(ipAddr_)
+				  << "||hops:" << this->getNumberOfHopToSink()
+				  << "]::ROUTING_TABLE_EXPIRED"
+				  << std::endl;
 	this->clearHops();
 	this->setNumberOfHopToSink(0);
 } /* SunIPRoutingNode::expTimerHopTable */
@@ -906,7 +960,7 @@ void
 SunIPRoutingNode::tracePacket(const Packet *const p, const string &position)
 {
 	if (STACK_TRACE)
-		cout << "> tracePacket()" << endl;
+	  std::cout << "> tracePacket()" << std::endl;
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_cmn *ch = HDR_CMN(p);
@@ -957,7 +1011,7 @@ SunIPRoutingNode::createTraceString(const string &info_string,
 		const int &direction_, const int &pkt_type)
 {
 	if (STACK_TRACE)
-		cout << "> createTraceString()" << endl;
+	  std::cout << "> createTraceString()" << std::endl;
 	osstream_.clear();
 	osstream_.str("");
 	osstream_ << info_string << this->trace_separator_ << simulation_time_
@@ -977,7 +1031,7 @@ void
 SunIPRoutingNode::writeInTrace(const string &string_to_write_)
 {
 	if (STACK_TRACE)
-		cout << "> writeInTrace()" << endl;
+	  std::cout << "> writeInTrace()" << std::endl;
 	trace_file_.open(trace_file_name_, fstream::app);
 	trace_file_ << string_to_write_ << endl;
 	trace_file_.close();

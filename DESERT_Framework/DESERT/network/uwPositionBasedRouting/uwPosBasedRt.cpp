@@ -62,9 +62,9 @@ public:
 
 UwPosBasedRt::UwPosBasedRt()
 	: ipAddr(0)
+	, timestamp(0)
 	, ROV_speed(1)
 	, maxTxRange(3000)
-	, timestamp(0)
 	, node_pos()
 {
 	static_routing.clear();
@@ -95,7 +95,7 @@ int UwPosBasedRt::command(int argc, const char *const *argv)
 
 	if(argc == 3) {
 		if (strcasecmp(argv[1],"setMaxTxRange") == 0) {
-			if (argv[2] <= 0) {
+			if (atof(argv[2]) <= 0) {
 				std::cerr << " UwPosBasedRt(IP=" <<(int)ipAddr << ")::invalid "
 					<< "value for max transmission range, use a value >= 0";
 				return TCL_ERROR;
@@ -152,7 +152,6 @@ void UwPosBasedRt::recv(Packet* p)
 
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
-	hdr_uwpos_based_rt *pbrh = HDR_UWPOS_BASED_RT(p);
 
 	if (ch->direction() == hdr_cmn::UP) {
 

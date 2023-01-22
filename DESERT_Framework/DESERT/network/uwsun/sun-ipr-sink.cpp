@@ -37,6 +37,7 @@
  */
 
 #include "sun-ipr-sink.h"
+#include "sun-ipr-common-structures.h"
 #include "mphy_pktheader.h"
 
 extern packet_t PT_SUN_ACK;
@@ -80,7 +81,7 @@ SunIPRoutingSink::SunIPRoutingSink()
 	, trace_path_(false)
 { // Binding to TCL variables.
 	if (STACK_TRACE)
-		cout << "> SunIPRoutingSink()" << endl;
+		std::cout << "> SunIPRoutingSink()" << std::endl;
 	bind("t_probe", &t_probe);
 	bind("ipAddr_", &ipAddr_);
 	bind("PoissonTraffic_", &PoissonTraffic_);
@@ -92,16 +93,16 @@ SunIPRoutingSink::SunIPRoutingSink()
 SunIPRoutingSink::~SunIPRoutingSink()
 {
 	if (STACK_TRACE)
-		cout << "> ~SunIPRoutingSink()" << endl;
+		std::cout << "> ~SunIPRoutingSink()" << std::endl;
 	if (printDebug_ > 10)
-		cout << "S: " << this->printIP(ipAddr_) << " deleted." << endl;
+		std::cout << "S: " << this->printIP(ipAddr_) << " deleted." << std::endl;
 }
 
 int
 SunIPRoutingSink::recvSyncClMsg(ClMessage *m)
 {
 	if (STACK_TRACE)
-		cout << "> recvSyncClMsg()" << endl;
+		std::cout << "> recvSyncClMsg()" << std::endl;
 	return Module::recvSyncClMsg(m);
 }
 
@@ -109,7 +110,7 @@ int
 SunIPRoutingSink::recvAsyncClMsg(ClMessage *m)
 {
 	if (STACK_TRACE)
-		cout << "> recvAsyncClMsg()" << endl;
+		std::cout << "> recvAsyncClMsg()" << std::endl;
 	if (m->type() == UWIP_CLMSG_SEND_ADDR) {
 		UWIPClMsgSendAddr *m_ = (UWIPClMsgSendAddr *) m;
 		ipAddr_ = m_->getAddr();
@@ -121,7 +122,7 @@ int
 SunIPRoutingSink::command(int argc, const char *const *argv)
 {
 	if (STACK_TRACE)
-		cout << "> command()" << endl;
+		std::cout << "> command()" << std::endl;
 	Tcl &tcl = Tcl::instance();
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "initialize") == 0) {
@@ -222,7 +223,7 @@ void
 SunIPRoutingSink::recv(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> recv()" << endl;
+	    std::cout << "> recv()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_data *hdata = HDR_SUN_DATA(p);
@@ -239,15 +240,16 @@ SunIPRoutingSink::recv(Packet *p)
 				//                - P: " << ch->uid() << " - Packet Received -
 				//                UP." << endl;
 				if (ch->next_hop() == ipAddr_ || iph->daddr() == ipAddr_) {
-					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Sink:" << this->printIP(ipAddr_)
-							 << ":UP:DATA:SINK_REACHED." << endl;
 
-					if (printDebug_ > 5)
-						cout << "@" << Scheduler::instance().clock()
-							 << ":Sink:" << this->printIP(ipAddr_)
-							 << ":sendBackAck." << endl;
+				  if (printDebug_ > 5) {
+					  std::cout << "[" <<  NOW
+								<< "]::Node[IP:" << this->printIP(ipAddr_)
+								<< "]::RECEIVED_PACKET_FROM:" << printIP(iph->saddr())
+								<< "::UID:" << ch->uid()
+								<< "::::::PREV_HOP:" << printIP(ch->prev_hop_)
+								<< std::endl;
+				  }
+
 					this->sendBackAck(p);
 
 					if (numberofnodes_ != 0) {
@@ -290,7 +292,7 @@ void
 SunIPRoutingSink::initialize()
 {
 	if (STACK_TRACE)
-		cout << "> initialize()" << endl;
+	    std::cout << "> initialize()" << std::endl;
 	// Asking for the IP of the current Node.
 	if (ipAddr_ == 0) {
 		UWIPClMsgReqAddr *m = new UWIPClMsgReqAddr(getId());
@@ -303,7 +305,7 @@ void
 SunIPRoutingSink::sendProbe()
 {
 	if (STACK_TRACE)
-		cout << "> sendProbe()" << endl;
+	    std::cout << "> sendProbe()" << std::endl;
 	Packet *p = Packet::alloc();
 
 	hdr_cmn *ch = HDR_CMN(p);
@@ -323,10 +325,14 @@ SunIPRoutingSink::sendProbe()
 	ch->size() += sizeof(hdr_sun_probe);
 	ch->timestamp() = Scheduler::instance().clock();
 
-	if (printDebug_ > 10)
-		cout << "@" << Scheduler::instance().clock()
-			 << " -> S: " << this->printIP(ipAddr_) << " - P: " << ch->uid()
-			 << " - Probe Sent." << endl;
+	if (printDebug_ > 5) {
+		std::cout << "[" <<  NOW
+				  << "]::Node[IP:" << this->printIP(ipAddr_)
+				  << "]::PROBE_SENT"
+				  << "::UID:" << ch->uid()
+				  << std::endl;
+	}
+
 	probe_count_++; // Only for statistics
 	if (trace_)
 		this->tracePacket(p, "SEND_PRB");
@@ -337,7 +343,7 @@ string
 SunIPRoutingSink::printIP(const nsaddr_t &ip_)
 {
 	if (STACK_TRACE)
-		cout << "> printIP()" << endl;
+		std::cout << "> printIP()" << std::endl;
 	stringstream out;
 	out << ((ip_ & 0xff000000) >> 24);
 	out << ".";
@@ -362,7 +368,7 @@ nsaddr_t
 SunIPRoutingSink::str2addr(const char *str)
 {
 	if (STACK_TRACE)
-		cout << "> str2addr()" << endl;
+		std::cout << "> str2addr()" << std::endl;
 	int level[4] = {0, 0, 0, 0};
 	char tmp[20];
 	strncpy(tmp, str, 19);
@@ -386,7 +392,7 @@ void
 SunIPRoutingSink::start()
 {
 	if (STACK_TRACE)
-		cout << "> start()" << endl;
+		std::cout << "> start()" << std::endl;
 	sendTmr_.resched(this->getProbeTimer());
 }
 
@@ -394,7 +400,7 @@ void
 SunIPRoutingSink::stop()
 {
 	if (STACK_TRACE)
-		cout << "> stop()" << endl;
+		std::cout << "> stop()" << std::endl;
 	sendTmr_.force_cancel();
 }
 
@@ -402,7 +408,7 @@ void
 SunIPRoutingSink::transmit()
 {
 	if (STACK_TRACE)
-		cout << "> transmit()" << endl;
+		std::cout << "> transmit()" << std::endl;
 	this->sendProbe();
 	sendTmr_.resched(this->getProbeTimer());
 }
@@ -411,7 +417,7 @@ void
 SunIPRoutingSink::setProbeTimer(const double &t_)
 {
 	if (STACK_TRACE)
-		cout << "> setProbeTimer()" << endl;
+		std::cout << "> setProbeTimer()" << std::endl;
 	if (t_ > 0) {
 		t_probe = t_;
 	}
@@ -421,7 +427,7 @@ const double &
 SunIPRoutingSink::getProbeTimer() const
 {
 	if (STACK_TRACE)
-		cout << "> getProbeTimer()" << endl;
+		std::cout << "> getProbeTimer()" << std::endl;
 	return t_probe;
 }
 
@@ -429,7 +435,7 @@ void
 SunIPRoutingSink::sendBackAck(const Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> sendBackAck()" << endl;
+	    std::cout << "> sendBackAck()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
@@ -444,11 +450,13 @@ SunIPRoutingSink::sendBackAck(const Packet *p)
 	iph_ack->daddr() = ch->prev_hop_;
 	hack->uid() = uwcbrh->sn();
 
-	if (printDebug_ > 10)
-		cout << "@" << Scheduler::instance().clock()
-			 << " -> N: " << this->printIP(ipAddr_) << " - P: " << ch->uid()
-			 << " - Sending back Data Ack to: " << printIP(ch->prev_hop_) << "."
-			 << endl;
+	if (printDebug_ > 5) {
+		std::cout << "[" <<  NOW
+				  << "]::Node[IP:" << this->printIP(ipAddr_)
+				  << "]::UID:" << ch->uid()
+				  << "::ACK_TO:" << printIP(ch->prev_hop_)
+				  << std::endl;
+	}
 	number_of_ackpkt_++;
 	//    cout << printIP(ipAddr_) << ":ack:" << printIP(ch->prev_hop_) << endl;
 	if (trace_)
@@ -460,7 +468,7 @@ void
 SunIPRoutingSink::initPktAck(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> initPktPathEstSearch()" << endl;
+		std::cout << "> initPktPathEstSearch()" << std::endl;
 
 	// Common header.
 	hdr_cmn *ch = HDR_CMN(p);
@@ -485,7 +493,7 @@ void
 SunIPRoutingSink::tracePacket(const Packet *const p, const string &position)
 {
 	if (STACK_TRACE)
-		cout << "> tracePacket()" << endl;
+		std::cout << "> tracePacket()" << std::endl;
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_cmn *ch = HDR_CMN(p);
@@ -536,7 +544,7 @@ SunIPRoutingSink::createTraceString(const string &info_string,
 		const int &direction_, const int &pkt_type)
 {
 	if (STACK_TRACE)
-		cout << "> createTraceString()" << endl;
+		std::cout << "> createTraceString()" << std::endl;
 	osstream_.clear();
 	osstream_.str("");
 	osstream_ << info_string << this->trace_separator_ << simulation_time_
@@ -556,7 +564,7 @@ void
 SunIPRoutingSink::writeInTrace(const string &string_to_write_)
 {
 	if (STACK_TRACE)
-		cout << "> writeInTrace()" << endl;
+		std::cout << "> writeInTrace()" << std::endl;
 
 	trace_file_.open(trace_file_name_, fstream::app);
 	trace_file_ << string_to_write_ << endl;
@@ -567,7 +575,7 @@ void
 SunIPRoutingSink::writePathInTrace(const Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> writePathInTrace()" << endl;
+		std::cout << "> writePathInTrace()" << std::endl;
 
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_cmn *ch = HDR_CMN(p);

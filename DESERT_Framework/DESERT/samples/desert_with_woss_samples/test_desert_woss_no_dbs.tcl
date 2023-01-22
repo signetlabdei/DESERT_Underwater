@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,9 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# Author: Federico Favaro <favarofe@dei.unipd.it>
+# Author: Federico Favaro <fedefava86@gmail.com>
 # Version: 1.0.0
 #
-# NOTE: tcl sample tested on Ubuntu 12.04 LTS, 64 bits OS
 #
 #######################################################################################
 #                                                                                     #
@@ -43,8 +42,7 @@
 # This complete example is provided with the aim to demonstrate the fully             #
 # compatibility with DESERT stack and WOSS channel models, propagation models,        #
 # and PHY layer. The interference model, instead, is provided by DESERT framework     #
-# For more information please refer to http://telecom.dei.unipd.it/ns/woss/ or the    #
-# samples into DESERT_Framework/woss-1.3.5/samples                                    #
+# For more information please refer to http://telecom.dei.unipd.it/ns/woss/           #
 #                                                                                     #
 #######################################################################################
 #
@@ -105,9 +103,6 @@ $ns use-Miracle
 # Tcl variables  #
 ##################
 
-set opt(start_clock) [clock seconds]
-
-
 set opt(start_lat)      42.59 
 set opt(start_long)     10.125
 set opt(nn)             4.0    ;#Number of nodes
@@ -116,38 +111,27 @@ set opt(stoptime)       100000
 set opt(dist_nodes)     1000.0  ;# Distace of the nodes in m
 set opt(nn_in_row)      2       ;# Number of a nodes in m
 set opt(ack_mode)       "setNoAckMode"
+set opt(rngstream) 	  1
+set opt(cbr_period)	100
 
-set rng [new RNG]
 if {$opt(bash_parameters)} {
 	if {$argc != 2} {
 		puts "Tcl example need two parameters"
-		puts "- The first for seed"
+		puts "- The first for the random generator substream"
 		puts "- The second for CBR period"
 		puts "For example, ns test_uw_csma_aloha.tcl 4 100"
     puts "If you want to leave the default values, please set to 0"
     puts "the value opt(bash_parameters) in the tcl script"
 		puts "Please try again."
 	} else { 
-		$rng seed 					[lindex $argv 0]
-		set opt(rep_num)		[lindex $argv 0]
+		set opt(rngstream)		[lindex $argv 0]
 		set opt(cbr_period)	[lindex $argv 1]
 	}
-} else {
-	$rng seed 			    1
-	set opt(rep_num) 	  1
-	set opt(cbr_period)	100
 }
 
-set opt(cbrpr) [expr int($opt(cbr_period))]
-set opt(rnpr)  [expr int($opt(rep_num))]
-set opt(apr)   "a"
-
-if {$opt(ack_mode) == "setNoAckMode"} {
-   set opt(apr)  "na" 
-}
 set opt(starttime)       	0.1
 set opt(txduration)     	[expr $opt(stoptime) - $opt(starttime)]
-set opt(extra_time)			  250.0
+set opt(extra_time)			  1000.0
 
 #PHY PARAMETERS:
 
@@ -184,18 +168,15 @@ if {$opt(trace_files)} {
 	set opt(cltracefile) [open $opt(cltracefilename) w]
 }
 
-set opt(db_res_path) "."
+set opt(db_res_path) "./test_desert_woss_no_dbs"
 
 ####################################################
 #Random Number Generators and Module Configuration #
 ####################################################
 
-global def_rng
-set def_rng [new RNG]
-$def_rng default
-
-for {set k 0} {$k < $opt(rep_num)} {incr k} {
-     $def_rng next-substream
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+  $defaultRNG next-substream
 }
 
 #WOSS/Utilities set debug 0
@@ -217,8 +198,8 @@ set woss_manager [new "WOSS/Manager/Simple"]
 #set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
 
 
-WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rep_num)
-WOSS/Definitions/RandomGenerator/C   set seed_       $opt(rep_num)
+WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rngstream)
+WOSS/Definitions/RandomGenerator/C   set seed_       $opt(rngstream)
 
 #### we create the mandatory prototype objects that will be used by the whole framework.
 #### We also do the mandatory intialization of the chosen random generator.
@@ -227,11 +208,11 @@ set sediment_creator    [new "WOSS/Definitions/Sediment"]
 set pressure_creator    [new "WOSS/Definitions/Pressure"]
 set time_arr_creator    [new "WOSS/Definitions/TimeArr"]
 #set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
- set altimetry_creator   [new "WOSS/Definitions/Altimetry/Flat"]
+set altimetry_creator   [new "WOSS/Definitions/Altimetry/Flat"]
 set time_reference      [new "WOSS/Definitions/TimeReference/NS2"]
 set transducer_creator  [new "WOSS/Definitions/Transducer"]
-# set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
-set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
+set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
+#set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
 $rand_generator initialize
 
 #### we plug the chosen prototypes into the woss::DefinitionHandler
@@ -280,13 +261,14 @@ set cust_altimetry   [new "WOSS/Definitions/Altimetry/Flat"]
 set db_manager [new "WOSS/Database/Manager"]
 $db_manager setCustomSediment   "Test Sedim" 1560 200 1.5 0.9 0.8 1.0
 $db_manager setCustomAltimetry  $cust_altimetry
-$db_manager setCustomSSP        0 "./ssp-test.txt"
+$db_manager setCustomSSP        0 "./dbs/ssp-test.txt"
 $db_manager setCustomBathymetry $opt(start_lat) $opt(start_long) -500.0 4 0.0 100.0 500.0 200.0 1500.0 200.0 2500.0 100.0
 
 
 WOSS/Creator/Bellhop set debug                        0.0
 WOSS/Creator/Bellhop set woss_debug                   0.0
 WOSS/Creator/Bellhop set woss_clean_workdir           1.0
+WOSS/Creator/Bellhop set bellhop_arr_syntax           2
 WOSS/Creator/Bellhop set evolution_time_quantum      -1.0
 WOSS/Creator/Bellhop set total_runs                   5
 WOSS/Creator/Bellhop set frequency_step               0.0
@@ -315,6 +297,7 @@ $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
 $woss_creator setBathymetryType     0 0 "L"
+$woss_creator setBathymetryMethod   0 0 "S"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 12 2009 0 0 1 1 12 2009 0 0 1
 
@@ -480,6 +463,8 @@ proc createNode { id } {
     $ch_estimator_plugin($id) insertNode [$mac($id) addr] $position($id)
     $node($id) addPlugin $ch_estimator_plugin($id) 19 "CHE"
 
+    #### we set custom angles for this particular woss::Location and all rx woss::Location
+    $woss_creator setCustomAngles $position($id) 0 $opt(node_min_angle) $opt(node_max_angle)
 
     puts "node $id at ([$position($id) getLatitude_], [$position($id) getLongitude_], [$position($id) getAltitude_]) , ([$position($id) getX_], [$position($id) getY_], [$position($id) getZ_])"
 
@@ -488,8 +473,6 @@ proc createNode { id } {
     $interf_data($id) set maxinterval_ $opt(maxinterval_)
     $interf_data($id) set debug_       0
 
-
-    
     $phy_data($id) setSpectralMask $data_mask
     $phy_data($id) setInterference $interf_data($id)
     $phy_data($id) setPropagation $propagation
@@ -556,12 +539,11 @@ proc createSink { } {
      $position_sink setLongitude_ $curr_lon
      $position_sink setAltitude_  [expr -1.0 * $sink_depth]
 
-    
+     $woss_creator setCustomAngles $position_sink 0 $opt(sink_min_angle) $opt(sink_max_angle)
+
      #$ipif_sink addr "1.0.0.253"
      $ipif_sink addr 253
 
-    
-      
      puts "node sink at ([$position_sink getLatitude_], [$position_sink getLongitude_], [$position_sink getAltitude_]) , ([$position_sink getX_], [$position_sink getY_], [$position_sink getZ_])"
 
      set interf_data_sink [new "Module/UW/INTERFERENCE"]
@@ -636,20 +618,20 @@ set force_stop $opt(stoptime)
 
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
       $ns at $opt(starttime)	     "$cbr($id1) start"
-      $ns at $opt(stoptime)          "$cbr($id1) stop"
+      $ns at $opt(stoptime)        "$cbr($id1) stop"
 }
 
 
 
 
 proc finish { } {
-    global ns opt cbr mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
-    global woss_manager outfile outfile_sink
-    
+    global ns opt cbr mac propagation cbr_sink mac_sink phy_data phy_data_sink channel propagation
+    global woss_manager db_manager outfile outfile_sink
+
 	if {$opt(verbose)} {
 		puts "\n"
 		puts "CBR_PERIOD : $opt(cbr_period)"
-		puts "SEED: $opt(rep_num)"
+		puts "SEED: $opt(rngstream)"
 		puts "NUMBER OF NODES: $opt(nn)"
 	} else {
 		puts "Simulation done!"
@@ -696,6 +678,10 @@ proc finish { } {
 	}
     $ns flush-trace
     close $opt(tracefile)
+    
+    puts "Delete Woss objects to force write"
+    delete $woss_manager
+    delete $db_manager
 }
 
 

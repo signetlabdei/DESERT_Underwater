@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ void
 SunIPRoutingNode::initPktDataPacket(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> initPktDataPacket()" << endl;
+		std::cout << "> initPktDataPacket()" << std::endl;
 
 	// Common header.
 	hdr_cmn *ch = HDR_CMN(p);
@@ -62,8 +62,7 @@ SunIPRoutingNode::initPktDataPacket(Packet *p)
 
 	// IP Header.
 	hdr_uwip *iph = HDR_UWIP(p);
-	iph->daddr() =
-			sink_associated; // The destination is always the Sink associated.
+	iph->daddr() = sink_associated; // The destination is always the Sink associated.
 	// iph->dport() = 0; // Set by the Application above.
 	iph->saddr() = ipAddr_;
 	// iph->sport() = 0; // Set by the Application above.
@@ -89,22 +88,16 @@ void
 SunIPRoutingNode::forwardDataPacket(Packet *p)
 {
 	if (STACK_TRACE)
-		cout << "> forwardDataPacket()" << endl;
+		std::cout << "> forwardDataPacket()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
+	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_data *hdata = HDR_SUN_DATA(p);
 
-	if (this->getNumberOfHopToSink() == 1) { // Useless: nodes with hop count 1
-											 // will forward packets directly to
-											 // the sink
-		Packet::free(p);
-		return;
-	} else if (hdata->list_of_hops_length() <= 0) { // Garbage Packet.
+	if (hdata->list_of_hops_length() <= 0) { // Garbage Packet.
 		drop(p, 1, DROP_DATA_HOPS_LENGTH_EQUALS_ZERO);
-	} else if (hdata->list_of_hops_length() >
-			0) { // The current node acts as relay.
+	} else if (hdata->list_of_hops_length() > 0) { // The current node acts as relay.
 		int i_ = hdata->pointer();
-		if (hdata->list_of_hops()[i_] ==
-				ipAddr_) { // If I'm the right next hop.
+		if (hdata->list_of_hops()[i_] == ipAddr_) { // If I'm the right next hop.
 			if (this->getNumberOfHopToSink() == 1) { // Send to the sink.
 				ch->next_hop() = sink_associated;
 				ch->prev_hop_ = ipAddr_;
@@ -113,12 +106,18 @@ SunIPRoutingNode::forwardDataPacket(Packet *p)
 				ch->prev_hop_ = ipAddr_;
 				hdata->pointer()++;
 			}
-			if (printDebug_ > 10)
-				cout << "@" << Scheduler::instance().clock()
-					 << " -> N: " << this->printIP(ipAddr_)
-					 << " - P: " << ch->uid()
-					 << " - Forward Data Packet to: " << printIP(ch->next_hop())
-					 << "." << endl;
+
+			if (printDebug_ > 5) {
+				std::cout << "[" <<  NOW
+						  << "]::Node[IP:" << this->printIP(ipAddr_)
+						  << "||hops:" << this->getNumberOfHopToSink()
+						  << "]::PACKET::UID:" << ch->uid()
+						  << "::SRC:" << printIP(iph->saddr())
+						  << "::DST:" << printIP(iph->daddr())
+						  << "::FORWARDED_TO:" << printIP(ch->next_hop())
+						  << std::endl;
+			}
+
 			number_of_datapkt_++;
 			number_of_pkt_forwarded_++;
 			double delay_tx_ = this->getDelay(period_data_);

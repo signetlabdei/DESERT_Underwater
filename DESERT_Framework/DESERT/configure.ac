@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-AC_INIT(DESERT,3.1.0)
+AC_INIT(DESERT,3.3.0)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -61,9 +61,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/application/uwApplication'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/transport/uwudp'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwsun'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwstaticrouting'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwflooding'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwicrp'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwip'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwflooding'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/network/uwPositionBasedRouting'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmmac_clmsgs'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwmll'
@@ -79,15 +79,14 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha-trig
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwUFetch'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma-frame'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmphy_modem'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodemcsa'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwconnector'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/ms2c_evologics'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/ms2c_evologics_lowlev'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwevologicss2cmodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmphypatch'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysical'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhmmphysical'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalrogersmodel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwgainfromdb'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicaldb'
@@ -112,6 +111,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/statistics/uwstats_utilities'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
 
 
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
@@ -144,9 +146,9 @@ AC_CONFIG_FILES([
     transport/uwudp/Makefile
     network/uwsun/Makefile
     network/uwstaticrouting/Makefile
+    network/uwflooding/Makefile
     network/uwicrp/Makefile
     network/uwip/Makefile
-    network/uwflooding/Makefile
     network/uwPositionBasedRouting/Makefile
     data_link/uwmmac_clmsgs/Makefile
     data_link/uwmll/Makefile
@@ -162,15 +164,14 @@ AC_CONFIG_FILES([
     data_link/uw-csma-aloha-trigger/Makefile
     data_link/uwtdma/Makefile
     data_link/uwtdma-frame/Makefile
-    physical/uwmphy_modem/Makefile
+    data_link/uwtokenbus/Makefile
     physical/uwmodem/Makefile
     physical/uwmodemcsa/Makefile
-	physical/uwconnector/Makefile
-    physical/ms2c_evologics/Makefile
-    physical/ms2c_evologics_lowlev/Makefile
+    physical/uwconnector/Makefile
     physical/uwevologicss2cmodem/Makefile
     physical/uwmphypatch/Makefile
     physical/uwphysical/Makefile
+    physical/uwhmmphysical/Makefile
     physical/uwphysicalrogersmodel/Makefile
     physical/uwgainfromdb/Makefile
     physical/uwphysicaldb/Makefile
@@ -194,7 +195,9 @@ AC_CONFIG_FILES([
     interference/uwinterferenceofdm/Makefile
     propagation/uwoptical_propagation/Makefile
     channel/uwoptical_channel/Makefile
-    
+    statistics/uwstats_utilities/Makefile
+    ranging/uwranging_tokenbus/Makefile
+    ranging/uwranging_tdma/Makefile
     ])
 
-AC_OUTPUT 
+AC_OUTPUT

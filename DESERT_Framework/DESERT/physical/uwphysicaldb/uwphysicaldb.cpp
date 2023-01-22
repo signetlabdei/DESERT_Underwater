@@ -53,6 +53,20 @@ public:
 } class_UnderwaterPhysicaldb;
 
 UnderwaterPhysicaldb::UnderwaterPhysicaldb()
+	: path_(nullptr),
+	interference_(nullptr),
+	snr({}),
+	overlap({}),
+	sir({}),
+	range({}),
+	type_of_node({}),
+	range_nums({}),
+	country(nullptr),
+	modulation(nullptr),
+	interf_val({0.0,0.0}),
+	token_separator(0),
+	osstream(0)
+
 {
 	bind_error("token_separator_", &token_separator);
 	path_ = "";

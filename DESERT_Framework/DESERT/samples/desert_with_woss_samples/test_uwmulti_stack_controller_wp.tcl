@@ -102,6 +102,7 @@ load libuwcbr.so
 load libuwcsmaalohatrigger.so
 load libuwinterference.so
 load libuwphy_clmsgs.so
+load libuwstats_utilities.so
 load libuwphysical.so
 load libuwmulti_stack_controller.so
 load libuwoptical_channel.so
@@ -114,10 +115,6 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-
-set opt(start_clock) [clock seconds]
-
-
 set opt(start_lat)  	 	  44.51  ;# Starting Latitude
 set opt(start_long)    		13.5   ;# Starting Longitude
 set opt(nn) 			        8.0    ;# Number of nodes
@@ -131,28 +128,22 @@ set opt(node_depth)       125.0
 set opt(time_in_wp)       0.5
 set opt(trigger_time)     5.0 ;#>5
 set opt(time_interval)    10.0
-set rng [new RNG]
+set opt(rngstream)    1
+set opt(cbr_period) 0.001;#0.01
 
 if {$opt(bash_parameters)} {
   if {$argc != 2} {
-    puts "The aloha.tcl script requires two numbers to be inputed. one for seed and one for cbr period"
+    puts "This script requires two numbers to be inputed: one for the random generator substream and one for cbr period"
     puts "For example, ns test_uwpolling.tcl 1 100"
     puts "If you want to leave the default values, please set to 0"
     puts "the value opt(bash_parameters) in the tcl script"
     puts "Please try again."
   }   else { 
-    $rng seed 			[lindex $argv 0]
-    set opt(rep_num)	 	[lindex $argv 0]
+    set opt(rngstream)	 	[lindex $argv 0]
     set opt(cbr_period)   [lindex $argv 1]
   }
-} else {
-  set opt(rep_num)    1
-  $rng seed [lindex $argv 0]
-  set opt(cbr_period) 0.001;#0.01
 }
 
-set opt(cbrpr) [expr int($opt(cbr_period))]
-set opt(rnpr)  [expr int($opt(rep_num))]
 set opt(starttime)       	0.1
 set opt(txduration)     	[expr $opt(stoptime) - $opt(starttime)]
 
@@ -221,12 +212,9 @@ if {$opt(trace_files)} {
 #Random Number Generators #
 ###########################
 
-global def_rng
-set def_rng [new RNG]
-$def_rng default
-
-for {set k 0} {$k < $opt(rep_num)} {incr k} {
-  $def_rng next-substream
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+  $defaultRNG next-substream
 }
 
 #########################
@@ -721,7 +709,7 @@ proc finish { } {
   global mac cbr_sink mac_sink db_manager propagation
   if {$opt(verbose)} {
     puts "CBR_PERIOD : $opt(cbr_period)"
-    puts "SEED: $opt(rep_num)"
+    puts "SEED: $opt(rngstream)"
     puts "NUMBER OF NODES: $opt(nn)"
   } else {
     puts "End of simulation"

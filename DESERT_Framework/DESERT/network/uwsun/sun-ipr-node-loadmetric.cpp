@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2021 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ void
 SunIPRoutingNode::updatePacketsCount()
 {
 	if (STACK_TRACE)
-		cout << "> updatePacketsCount()" << endl;
+		std::cout << "> updatePacketsCount()" << std::endl;
 	double current_instant_ = Scheduler::instance().clock();
 	list_packets_max_time_ = current_instant_;
 	list_packets[pointer_packets_] = current_instant_;
@@ -60,7 +60,7 @@ void
 SunIPRoutingNode::updateAcksCount()
 {
 	if (STACK_TRACE)
-		cout << "> updateAcksCount()" << endl;
+		std::cout << "> updateAcksCount()" << std::endl;
 	double current_instant_ = Scheduler::instance().clock();
 	list_acks_max_time_ = current_instant_;
 	list_acks[pointer_acks_] = current_instant_;
@@ -76,7 +76,7 @@ const int
 SunIPRoutingNode::getPacketsLastMinute() const
 {
 	if (STACK_TRACE)
-		cout << "> getPacketsLastMinute()" << endl;
+	  std::cout << "> getPacketsLastMinute()" << std::endl;
 	long t_max_ = list_packets_max_time_;
 	long t_min_ = t_max_;
 	int position_min_ = 0;
@@ -118,7 +118,7 @@ const int
 SunIPRoutingNode::getAcksLastMinute() const
 {
 	if (STACK_TRACE)
-		cout << "> getAcksLastMinute()" << endl;
+		std::cout << "> getAcksLastMinute()" << std::endl;
 	long t_max_ = list_acks_max_time_;
 	long t_min_ = t_max_;
 	int position_min_ = 0;
@@ -156,7 +156,7 @@ const double
 SunIPRoutingNode::getLoad() const
 {
 	if (STACK_TRACE)
-		cout << "> getLoad()" << endl;
+		std::cout << "> getLoad()" << std::endl;
 	int packets_ = getPacketsLastMinute();
 	int acks_ = getAcksLastMinute();
 	return packets_ * alpha_ + (packets_ - acks_) * (1 - alpha_);

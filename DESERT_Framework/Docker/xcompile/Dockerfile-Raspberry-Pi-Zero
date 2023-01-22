@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+FROM debian:10.10
+
+RUN echo "deb http://deb.debian.org/debian buster main" > /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian buster-updates main" >> /etc/apt/sources.list
+RUN echo "deb-src http://deb.debian.org/debian buster main" >> /etc/apt/sources.list
+RUN echo "deb-src http://deb.debian.org/debian buster-updates main" >> /etc/apt/sources.list
+
+
+RUN apt update && \
+    apt -y upgrade && \
+    apt install -y \
+        wget \
+        build-essential \
+        autoconf \
+        automake \
+        libtool \
+        flex \
+        bison \
+        autoconf-archive \
+        gettext
+COPY make-rpi-toolchain.sh /
+RUN /make-rpi-toolchain.sh
+WORKDIR /work

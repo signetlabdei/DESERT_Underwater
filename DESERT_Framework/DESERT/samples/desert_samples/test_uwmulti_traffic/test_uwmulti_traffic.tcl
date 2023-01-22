@@ -82,6 +82,7 @@ set opt(bash_parameters)    0
 load libMiracle.so
 load libMiracleBasicMovement.so
 load libmphy.so
+load libmmac.so
 load libUwmStd.so
 load libuwcsmaaloha.so
 load libuwmmac_clmsgs.so
@@ -92,9 +93,23 @@ load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
 load libuwtdma.so
+load libuwsmposition.so
+load libuwinterference.so
+load libUwmStd.so
+load libUwmStdPhyBpskTracer.so
+load libuwphy_clmsgs.so
+load libuwstats_utilities.so
+load libuwphysical.so
+load libuwposbasedrt.so
+<<<<<<< DESERT_Framework/DESERT/samples/desert_samples/test_uwmulti_traffic/test_uwmulti_traffic.tcl
+=======
+load libuwnoderep.so
+>>>>>>> DESERT_Framework/DESERT/samples/desert_samples/test_uwmulti_traffic/test_uwmulti_traffic.tcl
+load libuwsecurity_clmsg.so
 load libuwflooding.so
 load libuwinterference.so
 load libuwphy_clmsgs.so
+load libuwstats_utilities.so
 load libuwphysical.so
 load libuwoptical_propagation.so
 load libuwoptical_channel.so
@@ -111,13 +126,11 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(start_clock) [clock seconds]
-
 set opt(n_diver)                 4 ;# Number of Nodes
 set opt(starttime)          1
 set opt(stoptime)           100000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
-set opt(seedcbr)            0
+set opt(rngstream)            1
 
 set opt(maxinterval_)       20.0
 set opt(freq)               25000.0
@@ -131,9 +144,6 @@ set opt(ack_mode)           "setNoAckMode"
 
 set opt(txpower)            135.0 
 set opt(txpower_hf)         135.0 
-
-set rng [new RNG]
-set rng_position [new RNG]
 
 set opt(tdma_frame) 20
 set opt(tdma_gard)  1
@@ -167,12 +177,30 @@ set opt(id)                [expr 1.0e-9]
 set opt(il)                [expr 1.0e-6]
 set opt(shuntRes)          [expr 1.49e9]
 set opt(sensitivity)       0.26
-set opt(LUTpath)           "dbs/optical_noise/LUT.txt"
+set opt(LUTpath)           "..dbs/optical_noise/LUT.txt"
+set opt(rngstream) 13
+set opt(cbr_period) 60
 
-
-set rnd_gen [new RandomVariable/Uniform]
-$rng seed $opt(seedcbr)
-$rnd_gen use-rng $rng
+if {$opt(bash_parameters)} {
+    if {$argc != 2} {
+        puts "The script requires two inputs:"
+        puts "- the first for the Poisson CBR period"
+        puts "- the second for the rngstream"
+        puts "example: ns test_uw_rov.tcl 60 13"
+        puts "If you want to leave the default values, please set to 0"
+        puts "the value opt(bash_parameters) in the tcl script"
+        puts "Please try again."
+        return
+    } else {
+        set opt(cbr_period) [lindex $argv 0]
+        set opt(rngstream) [lindex $argv 1];
+    }   
+} 
+#random generator
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+	$defaultRNG next-substream
+}
 
 if {$opt(trace_files)} {
     set opt(tracefilename) "./test_uwcbr.tr"

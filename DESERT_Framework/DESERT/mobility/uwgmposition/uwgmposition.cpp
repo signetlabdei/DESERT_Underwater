@@ -93,7 +93,6 @@ UwGMPosition::UwGMPosition()
 	bind("directionMean_", &directionMean_);
 	bind("pitchMean_", &pitchMean_);
 	bind("debug_", &debug_);
-	srand(time(NULL));
 }
 
 UwGMPosition::~UwGMPosition()
@@ -140,29 +139,9 @@ UwGMPosition::command(int argc, const char *const *argv)
 double
 UwGMPosition::Gaussian()
 {
-	double x1, x2, w, y1;
-	static double y2;
-	static int use_last = 0;
-
-	if (use_last) {
-		y1 = y2;
-		use_last = 0;
-	} else {
-		do {
-			x1 = 2.0 * ((float) rand() / (float) RAND_MAX) - 1.0;
-			x2 = 2.0 * ((float) rand() / (float) RAND_MAX) - 1.0;
-			//			x1 = 2.0 * RNG::defaultrng()->uniform_double() - 1.0;
-			//			x2 = 2.0 * RNG::defaultrng()->uniform_double() - 1.0;
-			w = x1 * x1 + x2 * x2;
-		} while (w >= 1.0);
-
-		w = sqrt((-2.0 * log(w)) / w);
-		y1 = x1 * w;
-		y2 = x2 * w;
-		use_last = 1;
-	}
-	return (y1);
+	return RNG::defaultrng()->normal(0.0,1.0);
 }
+
 
 void
 UwGMPosition::update(double now)

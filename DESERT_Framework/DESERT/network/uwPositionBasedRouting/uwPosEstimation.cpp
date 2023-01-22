@@ -105,7 +105,7 @@ Position UwPosEstimation::getEstimatePos(double time)
 	double deltaT = time - timestamp;
 	double dist = nodesDistance(initialPos,destPos);
 	Position estimated_ROV_pos;
-	if (dist/speed < deltaT) {  //waypoint reached
+	if (speed == 0 || dist/speed < deltaT) {  //waypoint reached
 		estimated_ROV_pos.setX(x_wp);
 		estimated_ROV_pos.setY(y_wp);
 		estimated_ROV_pos.setZ(z_wp);

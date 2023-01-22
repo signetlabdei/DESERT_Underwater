@@ -40,6 +40,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <array>
 
 #include "ahoitypes.h"
 

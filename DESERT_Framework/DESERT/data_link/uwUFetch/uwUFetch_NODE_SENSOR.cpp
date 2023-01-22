@@ -43,6 +43,7 @@
 #include "uwcbr-module.h"
 #include <sstream>
 #include <time.h>
+#include "rng.h"
 
 /**< class uwUFetchNODEModuleClass*/
 static class uwUFetchNODEModuleClass : public TclClass
@@ -2821,10 +2822,7 @@ uwUFetch_NODE::isHeadNode()
 double
 uwUFetch_NODE::choiceBackOffTimer()
 {
-	// RNG::defaultrng()->set_seed(addr*5);
-	srand(time(NULL) + addr);
-	int random =
-			rand() % (int) T_max_bck_probe_node + (int) T_min_bck_probe_node;
+	int random = (int) RNG::defaultrng()->uniform(T_min_bck_probe_node, T_max_bck_probe_node);
 
 	if (debug_)
 		std::cout << NOW << "uwUFetch_NODE(" << addr

@@ -270,13 +270,14 @@ private:
     {
       this->module = m;
       this->conn = c;
-
-      std::cout << NOW
-                << "::UwMultiPhyControl::ResilienceTimer::constructor"
-                << "::localIP(" << this->module->localIP << ")"
-                << "::localMAC(" << this->conn.localMacID << ")"
-                << "::remoteIP(" << this->conn.remoteIP << ")"
-                << std::endl;
+      if (this->module != NULL && this->module->debug_ >= 3) {
+        std::cout << NOW
+                  << "::UwMultiPhyControl::ResilienceTimer::constructor"
+                  << "::localIP(" << this->module->localIP << ")"
+                  << "::localMAC(" << this->conn.localMacID << ")"
+                  << "::remoteIP(" << this->conn.remoteIP << ")"
+                  << std::endl;
+      }
     }
     ~ResilienceTimer() {
       if (this->module != NULL && this->module->debug_ >= 3) {

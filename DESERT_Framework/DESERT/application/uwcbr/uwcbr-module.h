@@ -435,6 +435,13 @@ protected:
 	virtual double getTimeBeforeNextPkt();
 
 	/**
+	 * Print to tracefile details about a received packet
+	 *
+	 * @param Packet* Pointer to the received packet 
+	 */
+	virtual void printReceivedPacket(Packet *p);
+
+	/**
 	 * Returns the size in byte of a <i>hdr_uwcbr</i> packet header.
 	 *
 	 * @return The size of a <i>hdr_uwcbr</i> packet header.
