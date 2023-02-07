@@ -53,6 +53,7 @@ SUBDIRS = m4 \
     data_link/uwpolling \
     data_link/uwaloha \
     data_link/uw-ofdm-aloha \
+    data_link/uw-smart-ofdm \
     data_link/uwsr \
     data_link/uw-t-lohi \
     data_link/uwUFetch \
