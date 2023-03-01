@@ -236,8 +236,6 @@ UWSmartOFDM::UWSmartOFDM()
 	  batch_sending(false), RTSvalid(true), max_rts_tries(0), nextFreeTime(0),
 	  ackToSend(false), waitPkt(0), nextRTSts(0), nextRTS(0), fullBand(false)
 {
-	mac2phy_delay_ = 1e-19;
-
 	bind("HDR_size_", (int *)&HDR_size);
 	bind("ACK_size_", (int *)&ACK_size);
 	bind("RTS_size_", (int *)&RTS_size);
@@ -422,6 +420,7 @@ void UWSmartOFDM::initInfo()
 	reason_info[UWSMARTOFDM_REASON_MAX_RTS_TRIES] = "Max RTS tries reached";
 	reason_info[UWSMARTOFDM_REASON_WAIT_DATA] = "CTS Sent, waiting for DATA to arrive";
 	reason_info[UWSMARTOFDM_REASON_DATAT_EXPIRED] = "DATA Timer Expired";
+	reason_info[UWSMARTOFDM_REASON_PREVIOUS_RTS] = "Previously received and RTS";
 
 	pkt_type_info[UWSMARTOFDM_ACK_PKT] = "ACK pkt";
 	pkt_type_info[UWSMARTOFDM_DATA_PKT] = "DATA pkt";
@@ -1070,10 +1069,8 @@ void UWSmartOFDM::txRTS()
 		double RTS_Backoff;
 		double amp = curr_rts_tries > 1 ? (curr_rts_tries / 2) : curr_rts_tries;
 		if (nextFreeTime > NOW)
-			// RTS_Backoff = abs(nextFreeTime - NOW + ((double)rand() / (RAND_MAX)) * curr_rts_tries);
 			RTS_Backoff = abs(nextFreeTime - NOW + ((double)rand() / (RAND_MAX)) * amp);
 		else
-			// RTS_Backoff = abs(((double)rand() / (RAND_MAX)) * curr_rts_tries);
 			RTS_Backoff = abs(((double)rand() / (RAND_MAX)) * amp);
 
 		RTS_Backoff = RTS_Backoff == 0 ? ((double)rand() / (RAND_MAX)) : RTS_Backoff;
@@ -1081,6 +1078,7 @@ void UWSmartOFDM::txRTS()
 		RTS_timer.schedule(RTS_Backoff);
 		Mac2PhySetTxBusy(0);
 		RTSvalid = false;
+		Packet::free(rts_pkt);
 		stateIdle();
 	}
 }
@@ -1139,6 +1137,7 @@ void UWSmartOFDM::txCTS(int dest_addr, int *otherFree, int brequested)
 		msgDisp.printStatus("No matching carriers, back to idle", "txCTS", NOW, addr);
 
 		Mac2PhySetTxBusy(0);
+		Packet::free(cts_pkt);
 		stateIdle();
 	}
 }
@@ -1240,15 +1239,12 @@ void UWSmartOFDM::stateIdle()
 	Packet *next_p;
 	mapAckTimer.clear();
 	backoff_timer.stop();
-	int freec[10];
-	double leftAssigTime;
+	int freec[data_car];
 	refreshState(UWSMARTOFDM_STATE_IDLE);
 
 	if (print_transitions)
 		printStateInfo();
 
-	// leftAssigTime = NOW - assignment_valid_timer.startTime();
-	// std::cout << "Left Assignment Time " << leftAssigTime <<  "car_assigned " << car_assigned << std::endl;
 	msgDisp.printStatus("queue_size=" + std::to_string(mapPacket.size()), "stateIdle", NOW, addr);
 
 	if (!mapPacket.empty() && ((mapPacket.size() > 0) || car_assigned) && current_rcvs == 0)
@@ -1281,7 +1277,7 @@ void UWSmartOFDM::stateIdle()
 	}
 	else if (nextRTS && ((NOW - nextRTSts) < 1.5) && !current_rcvs && (pickFreeCarriers(freec) > 0))
 	{
-		// TODO: refreshreason
+		refreshReason(UWSMARTOFDM_REASON_PREVIOUS_RTS);
 		Mac2PhySetTxBusy(1);
 		stateSendCTS(nextRTS);
 		msgDisp.printStatus("CTS from IDLE", "stateIdle", NOW, addr);
@@ -1365,8 +1361,6 @@ void UWSmartOFDM::stateRxCTS(Packet *p)
 	if (newNextFreeT > nextFreeTime)
 		nextFreeTime = newNextFreeT;
 
-	// cout << NOW << "  UWSmartOFDM (" << addr << ")::stateRxCTS() nextFreeTime=" << nextFreeTime << "ofdmmac->timereserved="<<ofdmmac->timeReserved<< std::endl;
-	// cout << NOW << "  UWSmartOFDM (" << addr << ")::stateRxCTS() slots=" << slots << " timeslot_length="<< timeslot_length << std::endl;
 	car_assigned = true;
 
 	for (int i = 0; i < mac_carVec.size(); i++)
@@ -1380,7 +1374,7 @@ void UWSmartOFDM::stateRxCTS(Packet *p)
 			mac_carVec[val] = 1;
 		}
 	}
-	int freec[10];
+	int freec[data_car];
 	if (current_rcvs == 0 && !mapPacket.empty() && pickFreeCarriers(freec) > 0)
 	{
 		string txcarriers = "Going to transmit. mac_carVec = ";
@@ -1437,15 +1431,10 @@ void UWSmartOFDM::stateBackoffCTS()
 {
 	double CTSBackoff = ((double)rand() / (RAND_MAX)) / 1.6 * (curr_rts_tries);
 	CTSBackoff = CTSBackoff + 0.16;
-	// if (CTSBackoff < 0.4)
-	// 	CTSBackoff = 0.4;
 	CTS_timer.force_cancel();
 	refreshState(UWSMARTOFDM_STATE_CTRL_BACKOFF);
 	RTSvalid = false;
 
-	// if (CTS_timer.isFrozen())
-	// 	CTS_timer.unFreeze();
-	// else
 	msgDisp.printStatus("SCHEDULING CTS BACKOFF of " + std::to_string(CTSBackoff), "stateBackoffCTS", NOW, addr);
 	CTS_timer.schedule(CTSBackoff);
 

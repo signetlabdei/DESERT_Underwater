@@ -69,7 +69,7 @@
 # Flags to enable or disable options #
 ######################################
 set opt(trace_files)        0
-set opt(bash_parameters)    0
+set opt(bash_parameters)    1
 
 #####################
 # Library Loading   #
@@ -125,7 +125,6 @@ set opt(subCarSize)         [expr $opt(bw)/$opt(subCarrier) ]     ;# used to def
 set opt(ack_mode)           "setNoAckMode"
 set opt(filename)           "expLog.xls"
 set opt(init_mode)          "f"
-set opt(bash_parameters)    1
 set opt(modulation)         "BPSK"
 set opt(AckInBand)          0
 set opt(ctrlCar)            2
@@ -134,6 +133,7 @@ set opt(interfNodeEnabled)  0
 set opt(dpktsize)           100
 set opt(dpktcbr)            0.25
 set opt(macdebug)           0
+set opt(fullBand)           0
 
 
 set opt(txpower)            130.0  ;# Transmitting sensitivity 130dB ±3dB re 1µPa/V at 1m at 100kHz TC4013
@@ -145,7 +145,7 @@ set rng_position [new RNG]
 # argument. If no argument is found some default value is set. 
 if {$opt(bash_parameters)} {
     if {$argc != 14} {
-        puts "The script requires five inputs:"
+        puts "The script requires fourteen inputs:"
         puts "- the first is the cbr period;"
         puts "- the second is the filename;"
         puts "- the third is the num of nodes"
@@ -159,7 +159,7 @@ if {$opt(bash_parameters)} {
         puts "- the eleventh n of timeslots reserved each time"
         puts "- the twelveth min num of packets queued to ask for bandwidth"
         puts "- the thirteen interference period"
-        puts "example: ns test_uwcbr_smart_ofdm_mhop.tcl 5 fullBandexp.xls 5 f BPSK"
+        puts "example: ns test_uwcbr_smartofdm.tcl 10 test.csv 5 0 BPSK 1 384 10 0.05 10 1 5 0 $opt(ack_mode) 1"
         puts "Please try again."
         return
     } else {
