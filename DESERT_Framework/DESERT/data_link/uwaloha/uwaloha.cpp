@@ -258,7 +258,7 @@ UWAloha::updateRTT(double curr_rtt)
 	sumrtt += curr_rtt;
 	sumrtt2 += curr_rtt * curr_rtt;
 	rttsamples++;
-	ACK_timeout = (sumrtt / rttsamples);
+	ACK_timeout = srtt;
 }
 
 void
