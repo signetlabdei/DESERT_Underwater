@@ -315,7 +315,7 @@ CsmaAloha::updateRTT(double curr_rtt)
 	sumrtt += curr_rtt;
 	sumrtt2 += curr_rtt * curr_rtt;
 	rttsamples++;
-	ACK_timeout = (srtt / rttsamples);
+	ACK_timeout = srtt;
 }
 
 void
@@ -984,6 +984,17 @@ CsmaAloha::stateRxData(Packet *data_pkt)
 				stateTxAck(dst_addr);
 			else
 				stateCheckBackoffExpired();
+		} break;
+
+		case CSMA_STATE_RX_WAIT_ACK: {
+			hdr_cmn *ch = hdr_cmn::access(data_pkt);
+			ch->size() = ch->size() - HDR_size;
+			incrDataPktsRx();
+			sendUp(data_pkt);
+			if (ack_mode == CSMA_ACK_MODE)
+				stateTxAck(dst_addr);
+			else
+				stateCheckAckExpired();
 		} break;
 
 		default:

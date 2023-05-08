@@ -1,3 +1,6 @@
+3.3.1 - 2023-03-30
+	* Fixes on MAC protocols (uw-aloha and uw-csma-aloha)
+	* Fixes on AHOI SIR csv DB
 3.3.0 - 2023-01-16
 	* OFDM support (thanks to Sara Falleni <falleni.s@husky.neu.edu>)
 	* Updated WOSS and its dependancies

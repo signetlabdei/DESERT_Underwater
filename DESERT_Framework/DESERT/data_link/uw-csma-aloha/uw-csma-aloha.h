@@ -727,7 +727,7 @@ protected:
 	}
 
 	///////////// input
-	int max_tx_tries; /**< Maximum number of re-transmissions for one packet */
+	int max_tx_tries; /**< Maximum number of transmissions for one packet */
 	double backoff_tuner; /**< Multiplier factor in the calculation of the
 							 backoff */
 	double wait_costant; /**< Adding factor in the calculation of the listen
@@ -738,7 +738,7 @@ protected:
 	double ACK_timeout; /**< Duration of the ACK waiting time */
 	int buffer_pkts; /**< Length of the data buffer in number of packets */
 	double alpha_; /**< smooth factor in the calculation of the RTT */
-	double max_backoff_counter; /**< Number of times a backoff is calculated */
+	int max_backoff_counter; /**< Number of times a backoff is calculated */
 	double listen_time; /**< Time in which the node sense the channel */
 	//////////////
 

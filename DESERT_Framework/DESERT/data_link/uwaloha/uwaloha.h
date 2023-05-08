@@ -731,7 +731,7 @@ protected:
 	}
 
 	///////////// input
-	int max_tx_tries; /**< Maximum number of retransmissions attempt. */
+	int max_tx_tries; /**< Maximum number of transmissions for one packet. */
 	double wait_constant; /**< This fixed time is used to componsate different
 							 time variations. */
 	double backoff_tuner; /**< Tunes the backoff duration. */
@@ -741,7 +741,7 @@ protected:
 	double ACK_timeout; /**< ACK timeout for the initial packet */
 	int buffer_pkts; /**< Number of packets a node can store in the container */
 	double alpha_; /**< This variable is used to tune the RTT */
-	double max_backoff_counter; /**< Maximum number of backoff it will consider
+	int max_backoff_counter; /**< Maximum number of backoff it will consider
 								   while it increases the backoff exponentially
 								   */
 	int uwaloha_debug; /**< Debuging Flag */
