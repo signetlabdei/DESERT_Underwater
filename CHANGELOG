@@ -1,3 +1,5 @@
+3.3.2 - 2023-05-09
+	* Fixes on uw-csma-aloha
 3.3.1 - 2023-03-30
 	* Fixes on MAC protocols (uw-aloha and uw-csma-aloha)
 	* Fixes on AHOI SIR csv DB

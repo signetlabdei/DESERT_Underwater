@@ -514,6 +514,13 @@ CsmaAloha::Phy2MacEndTx(const Packet *p)
 						 << status_info[CSMA_STATE_IDLE] << endl;
 
 				stateIdle();
+			} else if (prev_prev_state == CSMA_STATE_RX_WAIT_ACK) {
+				if (debug_)
+					cout << NOW << "  CsmaAloha(" << addr
+						<< ")::Phy2MacEndTx() ack sent, from "
+						<< status_info[curr_state] << " to "
+						<< status_info[CSMA_STATE_IDLE] << endl;
+				stateCheckAckExpired();
 			} else {
 
 				cout << NOW << "  CsmaAloha(" << addr

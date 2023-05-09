@@ -135,7 +135,7 @@ set opt(nn_in_row)      2       ;# Number of a nodes in m
 set opt(ack_mode)       "setNoAckMode"
 set opt(rngstream)    1
 set opt(cbr_period) 100
-set opt(db_path)   "/home/federico/work/uwsignet/dbs/"
+set opt(db_path)   "/usr/share/woss/dbs/"
 
 
 if {$opt(bash_parameters)} {
