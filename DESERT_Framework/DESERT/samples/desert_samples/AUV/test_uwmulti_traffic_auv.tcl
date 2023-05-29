@@ -430,7 +430,7 @@ foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
         $ns at $t "update_and_check"
         for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
-		    $ns at $t "$suv_app($id) sendPosition [expr $x+$id] [expr $y+$id] [expr $z+$id]"
+		    $ns at $t "$suv_app($id) sendPosition [expr $x+($id*10)] [expr $y-($id*10)] [expr $z+$id]"
         }
     }
 }
@@ -476,19 +476,29 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
 #$ns at $opt(stoptime)     "$mac_op_suv stop"
 
 proc update_and_check {} {
-    set outfile [open "test_uwauv_results.csv" "a"]
+    set outfile_auv0 [open "test_uwauv0_results.csv" "a"]
+    set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
+    set outfile_suv [open "test_uwsuv_results.csv" "a"]
     global position_auv position_suv auv_app suv_app opt n_auv auv_err suv_err
-    for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
-        $position_auv($id1) update
-        $position_suv update
-        puts $outfile "positions AUV: x( $id1 ) = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
-        puts $outfile "positions AUV_ERR: x( $id1 ) = [$auv_err($id1) getX], y = [$auv_err($id1) getY], z =  [$auv_err($id1) getZ]"  
-    }
-    puts $outfile "positions SUV: x = [$suv_app(0) getX], y = [$suv_app(0) getY], z =  [$suv_app(0) getZ]"
-    puts $outfile "positions SUV_ERR: x = [$suv_err(0) getX], y = [$suv_err(0) getY], z =  [$suv_err(0) getZ]"
-    #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
+    #for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
+    #    $position_auv($id1) update
+    #    $position_suv update
+    #    puts $outfile "positions AUV: x( $id1 ) = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
+    #    puts $outfile "positions AUV_ERR: x( $id1 ) = [$auv_err($id1) getX], y = [$auv_err($id1) getY], z =  [$auv_err($id1) getZ]"  
+    #}
+
+    $position_auv(0) update
+    $position_auv(1) update
+    $position_suv update
+
+    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
+    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
+    puts $outfile_suv "[$suv_app(0) getX],[$suv_app(0) getY],[$suv_app(0) getZ]"
+      #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
     
-    close $outfile
+    close $outfile_auv0
+    close $outfile_auv1
+    close $outfile_suv
 }
 ###
 

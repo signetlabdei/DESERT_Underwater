@@ -217,7 +217,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 		}
 
 	} else { //packet in order
-		posit->setdest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
+		posit->setdest(uwAUVh->x(),uwAUVh->y(),posit->getZ(),uwAUVh->speed());
 		last_sn_confirmed = uwAUVh->sn();
 	}
 

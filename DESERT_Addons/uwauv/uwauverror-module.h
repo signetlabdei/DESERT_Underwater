@@ -60,6 +60,20 @@ using namespace std;
 class UwAUVErrorModule;
 
 /**
+* UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
+*/
+class UwAUVErrorSendTimer : public UwSendTimer {
+	public:
+
+	/**
+   * Conscructor of UwSendTimer class 
+   * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+   */
+	UwAUVErrorSendTimer(UwAUVErrorModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	};
+};
+
+/**
 * UwAUVModule class is used to manage <i>UWAUV</i> packets and to collect statistics about them.
 */
 class UwAUVErrorModule : public UwCbrModule {
@@ -113,6 +127,19 @@ public:
 	* @param Handler* Handler.
 	*/
 	virtual void recv(Packet* p, Handler* h);
+
+	/**
+	* Reset retransmissions
+	*/
+	inline void reset_retx() {p=NULL; sendTmr_.force_cancel();}
+
+
+	/**
+	* Creates and transmits a packet.
+	*
+	* @see UwCbrModule::sendPkt()
+	*/
+	virtual void transmit();
 
 	/**
 	* Sets the position of the AUV
@@ -175,7 +202,7 @@ protected:
 
 	int log_flag; /**< Flag to enable log file writing.*/
 	Packet* p;
-
+	int period;
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 };
 

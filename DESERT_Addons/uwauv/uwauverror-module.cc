@@ -75,6 +75,7 @@ public:
 } class_module_uwAUV;
 
 
+
 UwAUVErrorModule::UwAUVErrorModule() 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
@@ -85,6 +86,7 @@ UwAUVErrorModule::UwAUVErrorModule()
 	, drop_old_waypoints(0)
 	, log_flag(0)
 	, out_file_stats(0)
+	, period(60)
 {
 	UWSMPosition p = UWSMPosition();
 	speed = 5;
@@ -92,6 +94,7 @@ UwAUVErrorModule::UwAUVErrorModule()
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
+	bind("period_", (int*) &period );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -110,12 +113,14 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p)
 	, drop_old_waypoints(0)
 	, log_flag(0)
 	, out_file_stats(0)
+	, period(60)
 {
 	posit = p;
 	speed = 5;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
+	bind("period_", (int*) &period );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -203,6 +208,18 @@ int UwAUVErrorModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
+void UwAUVErrorModule::transmit() {
+	sendPkt();
+
+	if (debug_) {
+		std::cout << NOW << " UwAUVErrorModule::Sending pkt with period:  " << period_ 
+			<< std::endl;
+	}
+
+	
+	sendTmr_.resched(period);
+}
+
 void UwAUVErrorModule::initPkt(Packet* p) {
 	
 	//hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
@@ -217,13 +234,10 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 
 		double randomValue = distrib(generator) ;
 
-		std::cout << NOW << " UwAUVErrorModule::r.v " 
-				<< randomValue<< std::endl;
-
-		if(randomValue < 0.75){
+		if(randomValue > 0.75){
 			uwAUVh->x() = posit->getX();
 			uwAUVh->y() = posit->getY();
-			uwAUVh->z() = posit->getZ();
+			//uwAUVh->z() = posit->getZ();
 			uwAUVh->speed() = speed;
 			uwAUVh->sn() = ++sn;
 			this->p = p;
@@ -237,7 +251,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 		uwAUVh->x() = posit->getX();
 		uwAUVh->y() = posit->getY();
-		uwAUVh->z() = posit->getZ();
+		//uwAUVh->z() = posit->getZ();
 		uwAUVh->speed() = speed;
 		uwAUVh->sn() = sn;
 		if (debug_) { 
@@ -272,7 +286,7 @@ void UwAUVErrorModule::recv(Packet* p) {
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
 	if(uwAUVh->ack() == sn + 1) {
-		sendTmr_.force_cancel();
+		//sendTmr_.force_cancel();
 		this->p = NULL;
 	}
 	
