@@ -50,6 +50,7 @@
 #include "uwsmposition.h"
 #include "node-core.h"
 #include <queue>
+#include <fstream>
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -57,7 +58,21 @@
 #define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
 #define HDR_UWAUV_ERROR(p) (hdr_uwAUV_error::access(p))
 using namespace std;
-class UwAUVCtrModule;
+class UwAUVCtrErModule;
+
+/**
+* UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
+*/
+class UwAUVErrorSendTimer : public UwSendTimer {
+	public:
+
+	/**
+   * Conscructor of UwSendTimer class 
+   * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+   */
+	UwAUVErrorSendTimer(UwAUVCtrErModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	};
+};
 
 
 /**
@@ -116,6 +131,19 @@ public:
 	* @return the current AUVCtr position
 	*/
 	inline UWSMPosition* getPosition() { return posit;}
+
+	/**
+	* Reset retransmissions
+	*/
+	inline void reset_retx() {p=NULL; sendTmr_.force_cancel();}
+
+
+	/**
+	* Creates and transmits a packet.
+	*
+	* @see UwCbrModule::sendPkt()
+	*/
+	virtual void transmit();
 	
 
 	/**
@@ -164,18 +192,22 @@ public:
 protected:
 
 	UWSMPosition* posit; /**< Controller position.*/
-	int last_sn_confirmed;
+	int last_sn_confirmed; /**< Sequence number of the last command Packete received.*/
+	int sn; /**Sequence number of the last control packet sent.*/
 	int ack;
 	int drop_old_waypoints;
-	float x_auv; /**< X of the last AUV position monitored.*/
-	float y_auv; /**< Y of the last AUV position monitored.*/
-	float z_auv; /**< Z of the last AUV position monitored.*/
+	float x_auv; /**< X of the last AUV position with an error.*/
+	float y_auv; /**< Y of the last AUV position with an error.*/
+	float z_auv; /**< Z of the last AUV position with an error.*/
 	float speed; /**< Moving speed sent to the AUV.*/
-	int sn; /**Sequence number of the last control packet sent.*/
+	int period;
+	
 	Packet* p;
 	int log_flag;
-	std::ofstream out_file_stats;	
+	std::ofstream pos_log;
+	std::ofstream err_log;	
 	int ackTimeout;	
+	bool alarm_mode;
 
 };
 

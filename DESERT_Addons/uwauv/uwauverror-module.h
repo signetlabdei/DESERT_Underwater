@@ -184,7 +184,8 @@ protected:
 	UWSMPosition* posit; /**< AUV position.*/
 	float speed;
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
-	int sn; /**< If not zero, contains the ACK to the last command Packete received.*/
+	int sn; 
+	int ack;
 	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
 	std::queue<Packet*> buffer; /**< Packets buffer.*/
 	UWAUV_ACK_POLICY ackPolicy; /**< Flag to set the policy for ACK transimission,
@@ -204,6 +205,9 @@ protected:
 	Packet* p;
 	int period;
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
+	std::ofstream error_log;
+	float x_e;
+	float y_e;
 };
 
 #endif // UWAUVError_MODULE_H

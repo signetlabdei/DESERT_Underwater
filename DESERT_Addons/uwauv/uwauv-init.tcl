@@ -41,7 +41,7 @@ Module/UW/AUV set destPort_           0
 Module/UW/AUV set destAddr_           0
 Module/UW/AUV set debug_              0
 Module/UW/AUV set PoissonTraffic_     1
-Module/UW/AUV set drop_out_of_order_  0
+Module/UW/AUV set drop_out_of_order_  1
 Module/UW/AUV set ackTimeout_		  10
 Module/UW/AUV set ackPriority_ 		  0
 Module/UW/AUV set drop_old_waypoints_ 0
@@ -72,7 +72,7 @@ Module/UW/AUV/ERR set destPort_           0
 Module/UW/AUV/ERR set destAddr_           0
 Module/UW/AUV/ERR set debug_              0
 Module/UW/AUV/ERR set PoissonTraffic_     1
-Module/UW/AUV/ERR set drop_out_of_order_  0
+Module/UW/AUV/ERR set drop_out_of_order_  1
 Module/UW/AUV/ERR set adaptiveRTO_     	  0
 
 Module/UW/AUV/ERR instproc init {args} {
@@ -86,7 +86,7 @@ Module/UW/AUV/CER set destPort_           0
 Module/UW/AUV/CER set destAddr_           0
 Module/UW/AUV/CER set debug_              0
 Module/UW/AUV/CER set PoissonTraffic_     1
-Module/UW/AUV/CER set drop_out_of_order_  0
+Module/UW/AUV/CER set drop_out_of_order_  1
 Module/UW/AUV/CER set adaptiveRTO_        0
 
 Module/UW/AUV/CER instproc init {args} {

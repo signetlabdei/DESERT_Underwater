@@ -192,7 +192,7 @@ if {$opt(bash_parameters)} {
     }   
 } 
 
-set opt(waypoint_file)  "../dbs/wp_path/rov_path.csv"
+set opt(waypoint_file)  "../dbs/wp_path/rov_path_simple.csv"
 
 #random generator
 global defaultRNG
@@ -241,7 +241,7 @@ Module/UW/AUV/ERR set debug_               1
 Module/UW/AUV/CER set packetSize_          $opt(pktsize)
 Module/UW/AUV/CER set period_              $opt(auv_period)
 Module/UW/AUV/CER set PoissonTraffic_      1
-Module/UW/AUV/CER set debug_               1
+Module/UW/AUV/CER set debug_               0
 
 
 # BPSK              
@@ -387,18 +387,20 @@ $position_suv setZ_ -1
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
     #$cbr_suv($id) setPosition $position_suv
-    $suv_app($id) setPosition $position_suv
-    $suv_err($id) setPosition $position_suv
+    $suv_app($id) setPosition $position_suv 
+    $suv_err($id) setPosition $position_suv 5
 
     Position/UWSM debug_ 0
 
     set position_auv($id) [new "Position/UWSM"]
-    $position_auv($id) setX_ [expr -50 * (1 + $id % $opt(n_auv)/2) - 25 + 50 * rand()]
-    $position_auv($id) setY_ [expr -50 + 100 * ($id%2) - 25 + 50 * rand()]
+    #$position_auv($id) setX_ [expr -50 * (1 + $id % $opt(n_auv)/2) - 25 + 50 * rand()]
+    $position_auv($id) setX_ 0
+    #$position_auv($id) setY_ [expr -50 + 100 * ($id%2) - 25 + 50 * rand()]
+    $position_auv($id) setY_  0
     $position_auv($id) setZ_ -1000
 
-    $auv_app($id) setPosition $position_auv($id)
-    $auv_err($id) setPosition $position_auv($id)
+    $auv_app($id) setPosition $position_auv($id) 
+    $auv_err($id) setPosition $position_auv($id) 
 
     puts "x = [$position_auv($id) getX_]; y = [$position_auv($id) getY_]; z = [$position_auv($id) getZ_]"
 }
@@ -430,7 +432,7 @@ foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
         $ns at $t "update_and_check"
         for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
-		    $ns at $t "$suv_app($id) sendPosition [expr $x+($id*10)] [expr $y-($id*10)] [expr $z+$id]"
+		    $ns at $t "$suv_app($id) sendPosition [expr $x*($id*(-2))+$x] [expr $y*($id*(-2))+$y] [expr $z]"
         }
     }
 }
@@ -491,9 +493,9 @@ proc update_and_check {} {
     $position_auv(1) update
     $position_suv update
 
-    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
-    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
-    puts $outfile_suv "[$suv_app(0) getX],[$suv_app(0) getY],[$suv_app(0) getZ]"
+    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ],[$auv_app(0) getSpeed]" 
+    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ],[$auv_app(1) getSpeed]" 
+    puts $outfile_suv "[$suv_app(0) getX],[$suv_app(0) getY],[$suv_app(0) getZ],[$auv_app(0) getSpeed]"
       #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
     
     close $outfile_auv0

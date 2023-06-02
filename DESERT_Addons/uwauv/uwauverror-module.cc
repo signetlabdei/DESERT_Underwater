@@ -80,10 +80,11 @@ UwAUVErrorModule::UwAUVErrorModule()
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
+	, ack(0)
 	, ackPolicy(ACK_PIGGYBACK)
 	, ackTimeout(10)
 	, ackNotPgbk(0)
-	, drop_old_waypoints(0)
+	, drop_old_waypoints(1)
 	, log_flag(0)
 	, out_file_stats(0)
 	, period(60)
@@ -101,16 +102,18 @@ UwAUVErrorModule::UwAUVErrorModule()
     	ackTimeout = 10;
     }
 
+
 }
 
 UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
+	, ack(0)
 	, ackPolicy(ACK_PIGGYBACK)
 	, ackTimeout(10)
 	, ackNotPgbk(0)
-	, drop_old_waypoints(0)
+	, drop_old_waypoints(1)
 	, log_flag(0)
 	, out_file_stats(0)
 	, period(60)
@@ -126,6 +129,7 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p)
     		<< std::endl;
     	ackTimeout = 10;
     }
+	
 
 
 }
@@ -212,7 +216,7 @@ void UwAUVErrorModule::transmit() {
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVErrorModule::Sending pkt with period:  " << period_ 
+		std::cout << NOW << " UwAUVErrorModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
 
@@ -221,39 +225,57 @@ void UwAUVErrorModule::transmit() {
 }
 
 void UwAUVErrorModule::initPkt(Packet* p) {
-	
-	//hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+		
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+
+	uwAUVh->ack() = ack;
+	ack = 0;
 
 
 	if(this->p == NULL){
+
 		random_device rd;
 		mt19937 generator(rd());
 		uniform_real_distribution<double> distrib(0.0, 1.0);
-		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+
 
 		double randomValue = distrib(generator) ;
 
-		if(randomValue > 0.75){
+		if(randomValue > 0.65){
+
 			uwAUVh->x() = posit->getX();
 			uwAUVh->y() = posit->getY();
-			//uwAUVh->z() = posit->getZ();
-			uwAUVh->speed() = speed;
+			x_e = posit->getX();
+			y_e = posit->getY();
+
 			uwAUVh->sn() = ++sn;
 			this->p = p;
+
+			//TODO: stop devices when send the alarm
+
+
 			if (debug_) { 
 			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "ERROR!"<< std::endl;
+				<< "ERROR!"<<"(speed="<<posit->getSpeed()<<")" << std::endl;
 			}
+
+			if (log_flag == 1) {
+				error_log.open("error_calling_log.csv",std::ios_base::app);
+				error_log << NOW << "," << posit->getX()<<","<<posit->getY()<< std::endl;
+				error_log.close();
+			}
+
 		}
 	}
-	else{
-		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
-		uwAUVh->x() = posit->getX();
-		uwAUVh->y() = posit->getY();
-		//uwAUVh->z() = posit->getZ();
-		uwAUVh->speed() = speed;
+	else{  //Retransmit
+		
+
+		//retrasmission of the point where the error was called
+		uwAUVh->x() = x_e;
+		uwAUVh->y() = y_e;
 		uwAUVh->sn() = sn;
+
 		if (debug_) { 
 			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
 				<< "Retransmitting"<< std::endl;
@@ -265,16 +287,18 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 		std::cout << NOW << " UwAUVErrorModule::initPkt(Packet *p) AUV current "
 			<< "position: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
 			<< ", Z = " << uwAUVh->z()<< std::endl;
-	}
+		}
 
 	//ackTimer_.force_cancel();
 	UwCbrModule::initPkt(p);
 
-	if (debug_) {
-		std::cout << NOW << " UwAUVErrorModule::sending packet with priority " 
-			<< (int)uwcbrh->priority() << std::endl;
+	if (log_flag == 1) {
+			out_file_stats.open("postion_log_a.csv",std::ios_base::app);
+			out_file_stats << left << NOW << "," << posit->getX() << ","<< posit->getY() 
+				<< "," << posit->getZ() << std::endl;
+			out_file_stats.close();
 	}
-	//priority_ = 0;
+
 }
 
 void UwAUVErrorModule::recv(Packet* p, Handler* h) {
@@ -286,9 +310,41 @@ void UwAUVErrorModule::recv(Packet* p) {
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
 	if(uwAUVh->ack() == sn + 1) {
-		//sendTmr_.force_cancel();
-		this->p = NULL;
+		this->p = NULL;	
 	}
+	
+	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+			if (debug_) {
+				std::cout << NOW << " UwAUVErrModule::old error with sn " 
+					<< uwAUVh->sn() << " dropped " << std::endl;
+			}
+
+		} else { //packet in order
+			//TODO: When sv reaches the right position set speed > 0
+			if(uwAUVh->speed() == 100){
+				//posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),1);
+				if (debug_) {
+					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error solved "
+					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;
+	}
+			}
+			last_sn_confirmed = uwAUVh->sn();
+	}
+
+	ack = last_sn_confirmed+1;
+
+	//to update 
+	if (log_flag == 1) {
+		out_file_stats.open("postion_log_a.csv",std::ios_base::app);
+		out_file_stats << left << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< "," << posit->getZ() << std::endl;
+		out_file_stats.close();
+	}
+
+	UwCbrModule::recv(p);
+
+
+	UwCbrModule::sendPkt();
 	
 
 	if(uwAUVh->ack() > 0 && debug_) 

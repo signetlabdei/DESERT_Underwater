@@ -74,16 +74,20 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMPosition* p)
 	: UwCbrModule()
 	, ack(0)
 	, last_sn_confirmed(0)
+	, sn(0)
 	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	, out_file_stats(0)
+	, pos_log(0)
+	, alarm_mode(false)
+	, period(60)
 {
 	posit=p;
 	speed=5;
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
+	bind("period_", (int*) &period );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -95,10 +99,13 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	: UwCbrModule()
 	, ack(0)
 	, last_sn_confirmed(0)
+	, sn(0)
 	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	, out_file_stats(0) 
+	//, out_file_stats(0)
+	, alarm_mode(false) 
+	, period(60)
 
 {
 	p = NULL;
@@ -109,6 +116,7 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
+	bind("period_", (int*) &period );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -157,7 +165,7 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 			return TCL_OK;
 		} 
 	}
-	else if(argc == 5){
+	/*else if(argc == 4){
 		/**if (strcasecmp(argv[1], "sendPosition") == 0) {
 			newX = atof(argv[2]);
 			newY = atof(argv[3]);
@@ -177,8 +185,9 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 			this->transmit();
 			tcl.resultf("%s", "position Setted");
 			return TCL_OK;
-		}**/
-	}
+		}
+	}*/
+
 	return UwCbrModule::command(argc,argv);
 }
 
@@ -186,19 +195,77 @@ void UwAUVCtrErModule::start() {}
 
 void UwAUVCtrErModule::setPosition(UWSMPosition* p){
 	posit = p;
+
+}
+
+void UwAUVCtrErModule::transmit() {
+	sendPkt();
+
+	if (debug_) {
+		std::cout << NOW << " UwAUVCtrErModule::Sending pkt with period:  " << period 
+			<< std::endl;
+	}
+
+	
+	sendTmr_.resched(period);
 }
 
 void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+
 	uwAUVh->ack() = ack;
-	
 	ack = 0;
 
+	if(this->p == NULL){ 
+
+		if ((abs(posit->getX() - x_auv) < 0.1) && (abs(posit->getY() - y_auv ) < 0.1)){
+			
+			uwAUVh->speed() = 100;
+			alarm_mode = false;
+			uwAUVh->sn() = ++sn;
+			this->p = p;
+
+			if (debug_) {
+				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR SOLVED" 
+			<< std::endl;
+		}
+
+		}
+
+		if (debug_) {
+		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ACK recv" 
+			<< std::endl;
+		}
+
+	//Retransmission
+	}else if ((abs(posit->getX() - x_auv) < 0.1) && (abs(posit->getY() - y_auv ) < 0.1) ){
+
+		uwAUVh->speed() = 100;
+		alarm_mode = false;
+		uwAUVh->sn() = sn;
+
+		if (debug_) {
+		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR SOLVED" 
+			<< std::endl;
+		}
+	}
+	
 	UwCbrModule::initPkt(p);
+
 	if (debug_) {
 		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  setting last ack" 
 			<< std::endl;
+	}
+
+	if (log_flag == 1) {
+
+			pos_log.open("position_log.csv",std::ios_base::app);
+			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+				<< ","<< posit->getZ() << std::endl;
+			pos_log.close();
+
 	}
 }
 
@@ -209,41 +276,74 @@ void UwAUVCtrErModule::recv(Packet* p, Handler* h) {
 void UwAUVCtrErModule::recv(Packet* p) {
 	
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	
 
-	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
-		if (debug_) {
-			std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
-				<< uwAUVh->sn() << " dropped " << std::endl;
+	if(uwAUVh->ack() == sn + 1) { //ack received
+		//sendTmr_.force_cancel();
+		this->p = NULL;
+	}
+	
+
+	if(uwAUVh->ack() > 0 && debug_) 
+		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error ACK "
+			<< "received " << uwAUVh->ack()<< std::endl;
+	else if((uwAUVh->ack())<0 && debug_)
+		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
+			<<"received"<< std::endl;
+
+	if (!alarm_mode){
+
+		if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+			if (debug_) {
+				std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
+					<< uwAUVh->sn() << " dropped " << std::endl;
+			}
+
+		} else { //packet in order
+			x_auv = uwAUVh->x();
+			y_auv = uwAUVh->y();
+			posit->setdest(x_auv,y_auv,posit->getZ(),1);
+			last_sn_confirmed = uwAUVh->sn();
+			alarm_mode = true;
+
+			if (log_flag == 1) {
+				err_log.open("error_log.csv",std::ios_base::app);
+				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
+				err_log.close();
+			}
+
 		}
 
-	} else { //packet in order
-		posit->setdest(uwAUVh->x(),uwAUVh->y(),posit->getZ(),uwAUVh->speed());
-		last_sn_confirmed = uwAUVh->sn();
+		ack = last_sn_confirmed+1;
+
+		if (log_flag == 1) {
+			pos_log.open("position_log.csv",std::ios_base::app);
+			pos_log<< NOW << ","<<posit->getX() << ","<< posit->getY() 
+				<< ","<< posit->getZ() << std::endl;
+			pos_log.close();
+		}
+
+
+		if (debug_) {
+			std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV received new "
+				"error: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
+				<< ", Z = " << uwAUVh->z() << " speed "<< uwAUVh->speed()<< std::endl;
+		}
+
+		UwCbrModule::recv(p);
+
+
+		if (debug_)
+			cout << NOW << " ACK sent immediately with standard priority " 
+				<< std::endl;
 	}
-
-	ack = last_sn_confirmed+1;
-
-	if (log_flag == 1) {
-		out_file_stats.open("my_log_file.csv",std::ios_base::app);
-		out_file_stats << left << "time: " << NOW << ", positions AUV: x = " 
-			<< posit->getX() << ", y = " << posit->getY() 
-			<< ", z = " << posit->getZ() << std::endl;
-		out_file_stats.close();
-	}
-
-
-	if (debug_) {
-		std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SUV received new "
-			"error: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
-			<< ", Z = " << uwAUVh->z()<< std::endl;
-	}
-	UwCbrModule::recv(p);
-
 
 	UwCbrModule::sendPkt();
-	if (debug_)
-		cout << NOW << " ACK sent immediately with standard priority " 
-			<< std::endl;
+
+	if (debug_) 
+		std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) Packet dropped: "
+			<< "alarm mode "<< std::endl;
+		
 
 }
 
