@@ -192,7 +192,7 @@ if {$opt(bash_parameters)} {
     }   
 } 
 
-set opt(waypoint_file)  "../dbs/wp_path/rov_path_simple.csv"
+set opt(waypoint_file)  "../dbs/wp_path/rov_path.csv"
 
 #random generator
 global defaultRNG
@@ -235,7 +235,7 @@ Module/UW/AUV set debug_               0
 Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
 Module/UW/AUV/ERR set period_              $opt(auv_period)
 Module/UW/AUV/ERR set PoissonTraffic_      1
-Module/UW/AUV/ERR set debug_               1
+Module/UW/AUV/ERR set debug_               0
 
 #UW/AUV/CERR
 Module/UW/AUV/CER set packetSize_          $opt(pktsize)
@@ -314,12 +314,12 @@ $data_mask_op setBandwidth  $opt(op_bw)
 ################################
 
 source "auv.tcl"
-source "suv.tcl"
+source "asv.tcl"
 
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     createAUV $id1
 }
-createSUV $opt(n_auv) 
+createASV $opt(n_auv) 
 #createROV [expr $opt(n_auv) + 1]
 
 ################################
@@ -327,21 +327,21 @@ createSUV $opt(n_auv)
 ################################
 
 proc connectNodes {id1} {
-    global ipif_suv ipr_suv portnum_suv portnum_auv portnum2_suv portnum2_auv
-    global suv_app suv_err
+    global ipif_asv ipr_asv portnum_asv portnum_auv portnum2_asv portnum2_auv
+    global asv_app asv_err
     global ipif_auv auv_app auv_err
-    $suv_app($id1) set destAddr_ [$ipif_auv($id1) addr]
-    $suv_app($id1) set destPort_ $portnum_auv($id1)
+    $asv_app($id1) set destAddr_ [$ipif_auv($id1) addr]
+    $asv_app($id1) set destPort_ $portnum_auv($id1)
 
-    $suv_err($id1) set destAddr_ [$ipif_auv($id1) addr]
-    $suv_err($id1) set destPort_ $portnum2_auv($id1)
+    $asv_err($id1) set destAddr_ [$ipif_auv($id1) addr]
+    $asv_err($id1) set destPort_ $portnum2_auv($id1)
     
 
-    $auv_app($id1) set destAddr_ [$ipif_suv addr]
-    $auv_app($id1) set destPort_ $portnum_suv($id1)
+    $auv_app($id1) set destAddr_ [$ipif_asv addr]
+    $auv_app($id1) set destPort_ $portnum_asv($id1)
 
-    $auv_err($id1) set destAddr_ [$ipif_suv addr]
-    $auv_err($id1) set destPort_ $portnum2_suv($id1)   
+    $auv_err($id1) set destAddr_ [$ipif_asv addr]
+    $auv_err($id1) set destPort_ $portnum2_asv($id1)   
 }
 
 # Setup flows
@@ -360,25 +360,25 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     #  $mll_auv($id1) addentry [$ipif_auv($id2) addr] [$mac_auv($id2) addr]
     #  $mll_op_auv($id1) addentry [$ipif_auv($id2) addr] [$mac_op_auv($id2) addr]
     #}   
-    $mll_auv($id1) addentry [$ipif_suv addr] [$mac_suv addr]
+    $mll_auv($id1) addentry [$ipif_asv addr] [$mac_asv addr]
     # $mll_diver($id1) addentry [$ipif_rov addr] [$mac_rov addr]
-    $mll_op_auv($id1) addentry [$ipif_suv addr] [$mac_op_suv addr]
+    $mll_op_auv($id1) addentry [$ipif_asv addr] [$mac_op_asv addr]
     # $mll_hf_diver($id1) addentry [$ipif_rov addr] [$mac_rov addr]
-    $mll_suv addentry [$ipif_auv($id1) addr] [$mac_auv($id1) addr]
-    $mll_op_suv addentry [$ipif_auv($id1) addr] [$mac_op_auv($id1) addr]
+    $mll_asv addentry [$ipif_auv($id1) addr] [$mac_auv($id1) addr]
+    $mll_op_asv addentry [$ipif_auv($id1) addr] [$mac_op_auv($id1) addr]
 }
 
-#$mll_suv addentry [$ipif_rov addr] [$mac_rov addr]
-#$mll_op_suv addentry [$ipif_rov addr] [$mac_op_rov addr]
+#$mll_asv addentry [$ipif_rov addr] [$mac_rov addr]
+#$mll_op_asv addentry [$ipif_rov addr] [$mac_op_rov addr]
 
 #$mll_rov addentry [$ipif_leader addr] [$mac_leader addr]
 #$mll_op_rov addentry [$ipif_leader addr] [$mac_op_leader addr]
 Position/UWSM debug_ 0
 # Setup positions
-set position_suv [new "Position/UWSM"]
-$position_suv setX_ 0
-$position_suv setY_ 0
-$position_suv setZ_ -1
+set position_asv [new "Position/UWSM"]
+$position_asv setX_ 0
+$position_asv setY_ 0
+$position_asv setZ_ -1
 
 #$position_rov setX_ 0
 #$position_rov setY_ 10
@@ -386,9 +386,9 @@ $position_suv setZ_ -1
 
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
-    #$cbr_suv($id) setPosition $position_suv
-    $suv_app($id) setPosition $position_suv 
-    $suv_err($id) setPosition $position_suv 5
+    #$cbr_asv($id) setPosition $position_asv
+    $asv_app($id) setPosition $position_asv 
+    $asv_err($id) setPosition $position_asv 
 
     Position/UWSM debug_ 0
 
@@ -407,8 +407,8 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
 
 # Setup routing table
 for {set id 0} {$id < $opt(n_auv)} {incr id}  {
-    $ipr_auv($id) addRoute [$ipif_suv addr] [$ipif_suv addr]
-    $ipr_suv addRoute [$ipif_auv($id) addr] [$ipif_auv($id) addr]
+    $ipr_auv($id) addRoute [$ipif_asv addr] [$ipif_asv addr]
+    $ipr_asv addRoute [$ipif_auv($id) addr] [$ipif_auv($id) addr]
 
     # $ipr2_diver($id) addRoute [$ipif2_rov addr] [$ipif2_leader addr]
     # $ipr2_leader addRoute [$ipif2_diver($id) addr] [$ipif2_diver($id) addr]
@@ -432,7 +432,7 @@ foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
         $ns at $t "update_and_check"
         for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
-		    $ns at $t "$suv_app($id) sendPosition [expr $x*($id*(-2))+$x] [expr $y*($id*(-2))+$y] [expr $z]"
+		    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(-2))+$x] [expr $y*($id*(-2))+$y] [expr $z]"
         }
     }
 }
@@ -440,15 +440,15 @@ foreach line $data {
 
 
 
-#$ns at $opt(starttime)    "$cbr3_suv($opt(n_auv)) start"
-#$ns at $opt(stoptime)     "$cbr3_suv($opt(n_auv)) stop"
+#$ns at $opt(starttime)    "$cbr3_asv($opt(n_auv)) start"
+#$ns at $opt(stoptime)     "$cbr3_asv($opt(n_auv)) stop"
 
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
-    #$ns at $opt(starttime)    "$cbr_suv($id1) start"
-    #$ns at $opt(stoptime)     "$cbr_suv($id1) stop"
+    #$ns at $opt(starttime)    "$cbr_asv($id1) start"
+    #$ns at $opt(stoptime)     "$cbr_asv($id1) stop"
 
-    $ns at $opt(starttime)    "$suv_app($id1) start"
-    $ns at $opt(stoptime)     "$suv_app($id1) stop"
+    $ns at $opt(starttime)    "$asv_app($id1) start"
+    $ns at $opt(stoptime)     "$asv_app($id1) stop"
 
     $ns at $opt(starttime)    "$auv_app($id1) start"
     $ns at $opt(stoptime)     "$auv_app($id1) stop"
@@ -456,8 +456,8 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     $ns at $opt(starttime)    "$auv_err($id1) start"
     $ns at $opt(stoptime)     "$auv_err($id1) stop"
 
-    $ns at $opt(starttime)    "$suv_err($id1) start"
-    $ns at $opt(stoptime)     "$suv_err($id1) stop"
+    $ns at $opt(starttime)    "$asv_err($id1) start"
+    $ns at $opt(stoptime)     "$asv_err($id1) stop"
 
     #$ns at $opt(starttime)    "$cbr3_auv($id1) start"
     #$ns at $opt(stoptime)     "$cbr3_auv($id1) stop"
@@ -471,36 +471,36 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     
 }
 
-#$ns at $opt(starttime)    "$mac_suv start"
-#$ns at $opt(stoptime)     "$mac_suv stop"
+#$ns at $opt(starttime)    "$mac_asv start"
+#$ns at $opt(stoptime)     "$mac_asv stop"
 
-#$ns at $opt(starttime)    "$mac_op_suv start"
-#$ns at $opt(stoptime)     "$mac_op_suv stop"
+#$ns at $opt(starttime)    "$mac_op_asv start"
+#$ns at $opt(stoptime)     "$mac_op_asv stop"
 
 proc update_and_check {} {
     set outfile_auv0 [open "test_uwauv0_results.csv" "a"]
     set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
-    set outfile_suv [open "test_uwsuv_results.csv" "a"]
-    global position_auv position_suv auv_app suv_app opt n_auv auv_err suv_err
+    set outfile_asv [open "test_uwasv_results.csv" "a"]
+    global position_auv position_asv auv_app asv_app opt n_auv auv_err asv_err
     #for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
     #    $position_auv($id1) update
-    #    $position_suv update
+    #    $position_asv update
     #    puts $outfile "positions AUV: x( $id1 ) = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
     #    puts $outfile "positions AUV_ERR: x( $id1 ) = [$auv_err($id1) getX], y = [$auv_err($id1) getY], z =  [$auv_err($id1) getZ]"  
     #}
 
     $position_auv(0) update
     $position_auv(1) update
-    $position_suv update
+    $position_asv update
 
-    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ],[$auv_app(0) getSpeed]" 
-    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ],[$auv_app(1) getSpeed]" 
-    puts $outfile_suv "[$suv_app(0) getX],[$suv_app(0) getY],[$suv_app(0) getZ],[$auv_app(0) getSpeed]"
+    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
+    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
+    puts $outfile_asv "[$asv_app(0) getX],[$asv_app(0) getY],[$asv_app(0) getZ]"
       #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
     
     close $outfile_auv0
     close $outfile_auv1
-    close $outfile_suv
+    close $outfile_asv
 }
 ###
 
@@ -511,15 +511,15 @@ proc update_and_check {} {
 proc finish {} {
     global ns opt n_auv
     global mac propagation phy_data channel db_manager propagation
-    global node_suv_coordinates 
-    global ipr_suv ipif_suv udp_suv phy 
-    global suv_app suv_err
+    global node_asv_coordinates 
+    global ipr_asv ipif_asv udp_asv phy 
+    global asv_app asv_err
     global auv_app auv_err mac_auv
-    global node_suv_stats tmp_node_suv_stats ipif_auv ipif_suv
+    global node_asv_stats tmp_node_asv_stats ipif_auv ipif_asv
 
     puts "---------------------------------------------------------------------"
     puts "Simulation summary"
-    puts "Leader addr = [$ipif_suv addr]"
+    puts "Leader addr = [$ipif_asv addr]"
     for {set i 0} {$i < $opt(n_auv)} {incr i}  {
         puts "Diver addr = [$ipif_auv($i) addr]"
         #puts "Packets in buffer [$mac_auv($i) get_buffer_size]"
@@ -546,21 +546,21 @@ proc finish {} {
 
 
     for {set i 0} {$i < $opt(n_auv)} {incr i}  {
-        set cbr_throughput           [$suv_app($i) getthr]
+        set cbr_throughput           [$asv_app($i) getthr]
         set cbr_sent_pkts        [$auv_app($i) getsentpkts]
-        set cbr_rcv_pkts           [$suv_app($i) getrecvpkts]
+        set cbr_rcv_pkts           [$asv_app($i) getrecvpkts]
 
         set cbr_throughput2           [$auv_app($i) getthr]
-        set cbr_sent_pkts2        [$suv_app($i) getsentpkts]
+        set cbr_sent_pkts2        [$asv_app($i) getsentpkts]
         set cbr_rcv_pkts2           [$auv_app($i) getrecvpkts]
 
-        set cbr_throughput4           [$suv_err($i) getthr]
+        set cbr_throughput4           [$asv_err($i) getthr]
         set cbr_sent_pkts4        [$auv_err($i) getsentpkts]
-        set cbr_rcv_pkts4           [$suv_err($i) getrecvpkts]
+        set cbr_rcv_pkts4           [$asv_err($i) getrecvpkts]
 
-        #set cbr_throughput3           [$cbr3_suv($i) getthr]
+        #set cbr_throughput3           [$cbr3_asv($i) getthr]
         #set cbr_sent_pkts3        [$cbr3_auv($i) getsentpkts]
-        #set cbr_rcv_pkts3           [$cbr3_suv($i) getrecvpkts]
+        #set cbr_rcv_pkts3           [$cbr3_asv($i) getrecvpkts]
 
         set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
         set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
@@ -575,22 +575,22 @@ proc finish {} {
         set sum_cbr_rcv_pkts4   [expr $sum_cbr_rcv_pkts4 + $cbr_rcv_pkts4]
     }
 
-    #set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + [$cbr_suv($opt(n_auv)) getsentpkts]]
-    #set sum_cbr_sent_pkts3 [expr $sum_cbr_sent_pkts3 + [$cbr3_suv getsentpkts]]
+    #set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + [$cbr_asv($opt(n_auv)) getsentpkts]]
+    #set sum_cbr_sent_pkts3 [expr $sum_cbr_sent_pkts3 + [$cbr3_asv getsentpkts]]
 
-    #set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + [$cbr_suv($opt(n_auv)) getrecvpkts]]
-    #set sum_cbr_rcv_pkts3  [expr $sum_cbr_rcv_pkts3 + [$cbr3_suv($opt(n_auv)) getrecvpkts]]
+    #set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + [$cbr_asv($opt(n_auv)) getrecvpkts]]
+    #set sum_cbr_rcv_pkts3  [expr $sum_cbr_rcv_pkts3 + [$cbr3_asv($opt(n_auv)) getrecvpkts]]
 
-    #set sum_cbr_throughput  [expr $sum_cbr_throughput + [$cbr_suv($opt(n_auv)) getthr]]
-    #set sum_cbr_throughput3  [expr $sum_cbr_throughput3 + [$cbr3_suv($opt(n_auv)) getthr]]
+    #set sum_cbr_throughput  [expr $sum_cbr_throughput + [$cbr_asv($opt(n_auv)) getthr]]
+    #set sum_cbr_throughput3  [expr $sum_cbr_throughput3 + [$cbr3_asv($opt(n_auv)) getthr]]
 
-    #set sum_cbr_throughput2       [expr [$cbr2_suv(0) getthr] + $sum_cbr_throughput2]
-    #set sum_cbr_rcv_pkts2         [expr [$cbr2_suv(0) getrecvpkts] + $sum_cbr_rcv_pkts2]
-    #set sum_cbr_sent_pkts2        [expr $sum_cbr_sent_pkts2 + [$cbr2_suv($opt(n_auv)) getsentpkts]]
+    #set sum_cbr_throughput2       [expr [$cbr2_asv(0) getthr] + $sum_cbr_throughput2]
+    #set sum_cbr_rcv_pkts2         [expr [$cbr2_asv(0) getrecvpkts] + $sum_cbr_rcv_pkts2]
+    #set sum_cbr_sent_pkts2        [expr $sum_cbr_sent_pkts2 + [$cbr2_asv($opt(n_auv)) getsentpkts]]
 
-    set ipheadersize        [$ipif_suv getipheadersize]
-    set udpheadersize       [$udp_suv getudpheadersize]
-    set cbrheadersize       [$suv_app(0) getcbrheadersize]
+    set ipheadersize        [$ipif_asv getipheadersize]
+    set udpheadersize       [$udp_asv getudpheadersize]
+    set cbrheadersize       [$asv_app(0) getcbrheadersize]
 
 
     puts "IP Pkt Header Size       : $ipheadersize"
