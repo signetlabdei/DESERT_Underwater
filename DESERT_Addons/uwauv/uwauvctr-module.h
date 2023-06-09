@@ -47,7 +47,7 @@
 #define UWAUV_CTR_MODULE_H
 #include <uwcbr-module.h>
 #include "uwauv-packet.h"
-#include "uwsmposition.h"
+#include "uwsmeposition.h"
 #include "node-core.h"
 #include <queue>
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -86,7 +86,7 @@ public:
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrModule(UWSMPosition* p);
+	UwAUVCtrModule(UWSMEPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
@@ -120,14 +120,14 @@ public:
 	*
 	* @param Position * p Pointer to the AUVCtr position
 	*/
-	virtual void setPosition(UWSMPosition* p);
+	virtual void setPosition(UWSMEPosition* p);
 
 	/**
 	* Returns the position of the AUVCtr
 	*
 	* @return the current AUVCtr position
 	*/
-	inline UWSMPosition* getPosition() { return posit;}
+	inline UWSMEPosition* getPosition() { return posit;}
 	
 	/**
 	* Returns the last AUV position monitored
@@ -187,7 +187,7 @@ public:
 
 protected:
 
-	UWSMPosition* posit; /**< Controller position.*/
+	UWSMEPosition* posit; /**< Controller position.*/
 	float x_auv; /**< X of the last AUV position monitored.*/
 	float y_auv; /**< Y of the last AUV position monitored.*/
 	float z_auv; /**< Z of the last AUV position monitored.*/

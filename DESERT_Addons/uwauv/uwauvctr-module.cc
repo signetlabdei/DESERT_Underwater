@@ -69,7 +69,7 @@ public:
 	}
 } class_module_uwAUV_ctr;
 
-UwAUVCtrModule::UwAUVCtrModule(UWSMPosition* p) 
+UwAUVCtrModule::UwAUVCtrModule(UWSMEPosition* p) 
 	: UwCbrModule()
 	, sn(0)
 	, adaptiveRTO(0)
@@ -99,7 +99,7 @@ UwAUVCtrModule::UwAUVCtrModule()
 	//, rttAcksamples(0)
 {
 	p = NULL;
-	UWSMPosition p = UWSMPosition();
+	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
 	//posit = Position();
 	speed = 1;
@@ -144,7 +144,7 @@ int UwAUVCtrModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit = p;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
@@ -196,7 +196,7 @@ void UwAUVCtrModule::transmit() {
 
 void UwAUVCtrModule::start() {}
 
-void UwAUVCtrModule::setPosition(UWSMPosition* p){
+void UwAUVCtrModule::setPosition(UWSMEPosition* p){
 	posit = p;
 }
 

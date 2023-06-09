@@ -88,14 +88,16 @@ UwAUVErrorModule::UwAUVErrorModule()
 	, log_flag(0)
 	, out_file_stats(0)
 	, period(60)
+	, error_p(0.2)
 {
-	UWSMPosition p = UWSMPosition();
+	UWSMEPosition p = UWSMEPosition();
 	speed = 5;
 	posit=&p;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
+	bind("error_p_", (int*) &error_p );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -105,7 +107,7 @@ UwAUVErrorModule::UwAUVErrorModule()
 
 }
 
-UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p) 
+UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -117,6 +119,7 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p)
 	, log_flag(0)
 	, out_file_stats(0)
 	, period(60)
+	, error_p(0.2)
 {
 	posit = p;
 	speed = 5;
@@ -124,6 +127,7 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p)
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
+	bind("error_p_", (int*) &error_p );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -136,7 +140,7 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMPosition* p)
 
 UwAUVErrorModule::~UwAUVErrorModule() {}
 
-void UwAUVErrorModule::setPosition(UWSMPosition* p){
+void UwAUVErrorModule::setPosition(UWSMEPosition* p){
 	posit = p;
 }
 
@@ -173,7 +177,7 @@ int UwAUVErrorModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit=p;
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
@@ -242,12 +246,15 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 
 		double randomValue = distrib(generator) ;
 
-		if(randomValue > 0.65){
+		if(randomValue < error_p){
 
 			uwAUVh->x() = posit->getX();
 			uwAUVh->y() = posit->getY();
 			x_e = posit->getX();
 			y_e = posit->getY();
+
+			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
+			posit->setAlarm(true);
 
 			uwAUVh->sn() = ++sn;
 			this->p = p;
@@ -322,7 +329,10 @@ void UwAUVErrorModule::recv(Packet* p) {
 		} else { //packet in order
 			//TODO: When sv reaches the right position set speed > 0
 			if(uwAUVh->speed() == 100){
-				//posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),1);
+
+				posit->setAlarm(false);
+				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),1);
+
 				if (debug_) {
 					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error solved "
 					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;

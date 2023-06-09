@@ -47,7 +47,7 @@
 #define UWAUVError_MODULE_H
 #include <uwcbr-module.h>
 #include "uwauv-packet.h"
-#include "uwsmposition.h"
+#include "uwsmeposition.h"
 #include "node-core.h"
 #include <queue>
 #include <fstream>
@@ -89,7 +89,7 @@ public:
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrErModule(UWSMPosition* p);
+	UwAUVCtrErModule(UWSMEPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
@@ -123,14 +123,14 @@ public:
 	*
 	* @param Position * p Pointer to the AUVCtr position
 	*/
-	virtual void setPosition(UWSMPosition* p);
+	virtual void setPosition(UWSMEPosition* p);
 
 	/**
 	* Returns the position of the AUVCtr
 	*
 	* @return the current AUVCtr position
 	*/
-	inline UWSMPosition* getPosition() { return posit;}
+	inline UWSMEPosition* getPosition() { return posit;}
 
 	/**
 	* Reset retransmissions
@@ -191,7 +191,7 @@ public:
 
 protected:
 
-	UWSMPosition* posit; /**< Controller position.*/
+	UWSMEPosition* posit; /**< Controller position.*/
 	int last_sn_confirmed; /**< Sequence number of the last command Packete received.*/
 	int sn; /**Sequence number of the last control packet sent.*/
 	int ack;
@@ -207,8 +207,12 @@ protected:
 	std::ofstream pos_log;
 	std::ofstream err_log;	
 	int ackTimeout;	
-	bool alarm_mode;
+	static bool alarm_mode;
+	
+	//bool alarm_mode;
 
 };
+
+bool UwAUVCtrErModule::alarm_mode = false;
 
 #endif // UWAUVCtr_MODULE_H

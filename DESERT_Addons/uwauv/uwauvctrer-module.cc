@@ -70,7 +70,7 @@ public:
 } class_module_uwAUV_error;
 
 
-UwAUVCtrErModule::UwAUVCtrErModule(UWSMPosition* p) 
+UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p) 
 	: UwCbrModule()
 	, ack(0)
 	, last_sn_confirmed(0)
@@ -79,11 +79,12 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMPosition* p)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, pos_log(0)
-	, alarm_mode(false)
+	//, alarm_mode(false)
 	, period(60)
 {
 	posit=p;
 	speed=5;
+	//alarm_mode = false;
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -104,15 +105,16 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	//, out_file_stats(0)
-	, alarm_mode(false) 
+	//, alarm_mode(false) 
 	, period(60)
 
 {
 	p = NULL;
-	UWSMPosition p = UWSMPosition();
+	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
 	//posit = Position();
 	speed = 5;
+	//alarm_mode = false;
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -156,7 +158,7 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit = p;
 			return TCL_OK;
 		} else
@@ -193,7 +195,7 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 
 void UwAUVCtrErModule::start() {}
 
-void UwAUVCtrErModule::setPosition(UWSMPosition* p){
+void UwAUVCtrErModule::setPosition(UWSMEPosition* p){
 	posit = p;
 
 }
@@ -218,9 +220,9 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	uwAUVh->ack() = ack;
 	ack = 0;
 
-	if(this->p == NULL){ 
+	if(this->p == NULL){ //TO FIX
 
-		if ((abs(posit->getX() - x_auv) < 0.1) && (abs(posit->getY() - y_auv ) < 0.1)){
+		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){
 			
 			uwAUVh->speed() = 100;
 			alarm_mode = false;
@@ -230,7 +232,13 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			if (debug_) {
 				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR SOLVED" 
 			<< std::endl;
-		}
+			}
+
+			if (log_flag == 1) {
+				err_log.open("error_log.csv",std::ios_base::app);
+				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
+				err_log.close();
+			}
 
 		}
 
@@ -240,11 +248,17 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 		}
 
 	//Retransmission
-	}else if ((abs(posit->getX() - x_auv) < 0.1) && (abs(posit->getY() - y_auv ) < 0.1) ){
+	}else if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){
 
 		uwAUVh->speed() = 100;
 		alarm_mode = false;
 		uwAUVh->sn() = sn;
+
+		if (log_flag == 1) {
+				err_log.open("error_log.csv",std::ios_base::app);
+				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
+				err_log.close();
+			}
 
 		if (debug_) {
 		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR SOLVED" 
@@ -305,12 +319,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 			posit->setdest(x_auv,y_auv,posit->getZ(),1);
 			last_sn_confirmed = uwAUVh->sn();
 			alarm_mode = true;
-
-			if (log_flag == 1) {
-				err_log.open("error_log.csv",std::ios_base::app);
-				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
-				err_log.close();
-			}
 
 		}
 
