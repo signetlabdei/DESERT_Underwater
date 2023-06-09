@@ -22,10 +22,10 @@ proc createASV { id } {
 
     # TRAFFICO 3: ERROR: AUV --> ASV
     Module/UW/AUV/CER set packetSize_          $opt(pktsize)
-    Module/UW/AUV/CER set period_              $opt(ctr_period)
+    Module/UW/AUV/CER set period_              500
     Module/UW/AUV/CER set PoissonTraffic_      1
     Module/UW/AUV/CER set traffic_type_ 3
-    Module/UW/AUV/CER set debug_ 0
+    Module/UW/AUV/CER set debug_                0
     Module/UW/AUV/CER set log_flag_            1
     for {set id1 0} {$id1 <= $opt(n_auv)} {incr id1} {
         set asv_err($id1)  [new Module/UW/AUV/CER]

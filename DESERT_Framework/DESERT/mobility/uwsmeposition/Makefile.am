@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
 #    names of its contributors may be used to endorse or promote products 
 #    derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS ProvIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
 # TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
 # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
@@ -29,23 +29,31 @@
 
 AM_CXXFLAGS = -Wall -ggdb3
 
-lib_LTLIBRARIES = libuwauv.la
+lib_LTLIBRARIES = libuwsmeposition.la
+check_PROGRAMS = 
 
-libuwauv_la_SOURCES = uwauv-module.cc uwauverror-module.cc uwauv-module.h uwauverror-module.h uwauv-packet.h uwauvctr-module.cc uwauvctrer-module.cc uwauvctr-module.h uwauvctrer-module.h initlib.cc
+SUBDIRS = 
 
-libuwauv_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libuwauv_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
-libuwauv_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+TESTS = 
 
-nodist_libuwauv_la_SOURCES = initTcl.cc
+libuwsmeposition_la_SOURCES = initlib.cpp\
+    uwsmeposition-default.tcl\
+    uwsmeposition.cpp
 
-BUILT_SOURCES = initTcl.cc
+libuwsmeposition_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+libuwsmeposition_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+libuwsmeposition_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
-CLEANFILES = initTcl.cc
+nodist_libuwsmeposition_la_SOURCES = InitTcl.cc
 
-TCL_FILES =  uwauv-init.tcl
 
-initTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwauvTclCode > initTcl.cc 
+BUILT_SOURCES = InitTcl.cc
+
+CLEANFILES = InitTcl.cc
+
+TCL_FILES = uwsmeposition-default.tcl
+
+InitTcl.cc: Makefile $(TCL_FILES)
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwSMEPositionTclCode > InitTcl.cc
 
 EXTRA_DIST = $(TCL_FILES)

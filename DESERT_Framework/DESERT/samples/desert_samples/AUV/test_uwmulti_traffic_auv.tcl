@@ -94,6 +94,7 @@ load libuwudp.so
 load libuwcbr.so
 load libuwtdma.so
 load libuwsmposition.so
+load libuwsmeposition.so
 load libuwinterference.so
 load libUwmStd.so
 load libUwmStdPhyBpskTracer.so
@@ -126,7 +127,7 @@ $ns use-Miracle
 ##################
 set opt(n_auv)                 2 ;# Number of Nodes
 set opt(starttime)          1
-set opt(stoptime)           100000
+set opt(stoptime)           6000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
@@ -150,7 +151,7 @@ set opt(pktsize)    125
 set opt(ctr_period) 60
 
 set opt(pktsize_monitoring) 50
-set opt(auv_period) [expr $opt(tdma_frame)*2]
+set opt(auv_period) 40
 
 #set opt(pktsize_control) 100
 #set opt(cbr_period_control)  [expr $opt(cbr_period_monitoring)*4]
@@ -192,7 +193,7 @@ if {$opt(bash_parameters)} {
     }   
 } 
 
-set opt(waypoint_file)  "../dbs/wp_path/rov_path.csv"
+set opt(waypoint_file)  "../dbs/wp_path/rov_path_simple.csv"
 
 #random generator
 global defaultRNG
@@ -373,9 +374,9 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
 
 #$mll_rov addentry [$ipif_leader addr] [$mac_leader addr]
 #$mll_op_rov addentry [$ipif_leader addr] [$mac_op_leader addr]
-Position/UWSM debug_ 0
+Position/UWSME debug_ 1
 # Setup positions
-set position_asv [new "Position/UWSM"]
+set position_asv [new "Position/UWSME"]
 $position_asv setX_ 0
 $position_asv setY_ 0
 $position_asv setZ_ -1
@@ -390,9 +391,9 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
     $asv_app($id) setPosition $position_asv 
     $asv_err($id) setPosition $position_asv 
 
-    Position/UWSM debug_ 0
+    Position/UWSME debug_ 1
 
-    set position_auv($id) [new "Position/UWSM"]
+    set position_auv($id) [new "Position/UWSME"]
     #$position_auv($id) setX_ [expr -50 * (1 + $id % $opt(n_auv)/2) - 25 + 50 * rand()]
     $position_auv($id) setX_ 0
     #$position_auv($id) setY_ [expr -50 + 100 * ($id%2) - 25 + 50 * rand()]
@@ -404,6 +405,7 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
 
     puts "x = [$position_auv($id) getX_]; y = [$position_auv($id) getY_]; z = [$position_auv($id) getZ_]"
 }
+
 
 # Setup routing table
 for {set id 0} {$id < $opt(n_auv)} {incr id}  {
@@ -420,8 +422,7 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
 # Start/Stop Timers #
 #####################
 # Set here the timers to start and/or stop modules (optional)
-# e.g., 
-
+# e.g.,
 
 set outfile [open "test_uwauv_results.csv" "w"]
 close $outfile
@@ -430,14 +431,12 @@ set file_data [read $fp]
 set data [split $file_data "\n"]
 foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
-        $ns at $t "update_and_check"
+        $ns at $t "update_and_check $t"
         for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
 		    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(-2))+$x] [expr $y*($id*(-2))+$y] [expr $z]"
         }
     }
 }
-
-
 
 
 #$ns at $opt(starttime)    "$cbr3_asv($opt(n_auv)) start"
@@ -477,7 +476,7 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
 #$ns at $opt(starttime)    "$mac_op_asv start"
 #$ns at $opt(stoptime)     "$mac_op_asv stop"
 
-proc update_and_check {} {
+proc update_and_check {t} {
     set outfile_auv0 [open "test_uwauv0_results.csv" "a"]
     set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
     set outfile_asv [open "test_uwasv_results.csv" "a"]
@@ -493,14 +492,16 @@ proc update_and_check {} {
     $position_auv(1) update
     $position_asv update
 
-    puts $outfile_auv0 "[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
-    puts $outfile_auv1 "[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
-    puts $outfile_asv "[$asv_app(0) getX],[$asv_app(0) getY],[$asv_app(0) getZ]"
+    puts $outfile_auv0 "$t,[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
+    puts $outfile_auv1 "$t,[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
+    puts $outfile_asv "$t,[$asv_app(0) getX],[$asv_app(0) getY],[$asv_app(0) getZ]"
       #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
     
     close $outfile_auv0
     close $outfile_auv1
     close $outfile_asv
+
+    
 }
 ###
 
@@ -516,6 +517,7 @@ proc finish {} {
     global asv_app asv_err
     global auv_app auv_err mac_auv
     global node_asv_stats tmp_node_asv_stats ipif_auv ipif_asv
+
 
     puts "---------------------------------------------------------------------"
     puts "Simulation summary"

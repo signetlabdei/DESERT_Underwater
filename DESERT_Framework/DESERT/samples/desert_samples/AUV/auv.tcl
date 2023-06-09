@@ -25,11 +25,11 @@ proc createAUV { id } {
     # TRAFFICO 3: ERROR AUV --> ASV
     set node_auv($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
     Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
-    Module/UW/AUV/ERR set period_              $opt(auv_period)
+    Module/UW/AUV/ERR set period_              500
     Module/UW/AUV/ERR set PoissonTraffic_      1
-    Module/UW/AUV/ERR set traffic_type_ 3
-    Module/UW/AUV/ERR set debug_ 0
-    Module/UW/AUV/ERR set log_flag_               1
+    Module/UW/AUV/ERR set traffic_type_        3
+    Module/UW/AUV/ERR set debug_               0
+    Module/UW/AUV/ERR set log_flag_            1
     set auv_err($id)  [new Module/UW/AUV/ERR]
 
 
@@ -114,11 +114,11 @@ proc createAUV { id } {
     set tmp_ [expr ($id) + 1]
     $ipif_auv($id) addr $tmp_
     
-    set position_auv($id) [new "Position/UWSM"] ; #Position/BM (?)
+    set position_auv($id) [new "Position/BM"] ; #Position/BM (?)
     $node_auv($id) addPosition $position_auv($id)
-    #set posdb_auv($id) [new "PlugIn/PositionDB"]
-    #$node_auv($id) addPlugin $posdb_auv($id) 20 "PDB"
-    #$posdb_auv($id) addpos [$ipif_auv($id) addr] $position_auv($id)
+    set posdb_auv($id) [new "PlugIn/PositionDB"]
+    $node_auv($id) addPlugin $posdb_auv($id) 20 "PDB"
+    $posdb_auv($id) addpos [$ipif_auv($id) addr] $position_auv($id)
     
     set interf_data($id) [new "Module/UW/INTERFERENCE"]
     $interf_data($id) set maxinterval_ $opt(maxinterval_)

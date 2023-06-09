@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
 #    names of its contributors may be used to endorse or promote products 
 #    derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS ProvIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
 # TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
 # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
@@ -26,26 +26,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+# @file   uwsmeposition-defaults.tcl
+# @author Filippo Campagnaro
+# @version 1.0.0
 
-AM_CXXFLAGS = -Wall -ggdb3
-
-lib_LTLIBRARIES = libuwauv.la
-
-libuwauv_la_SOURCES = uwauv-module.cc uwauverror-module.cc uwauv-module.h uwauverror-module.h uwauv-packet.h uwauvctr-module.cc uwauvctrer-module.cc uwauvctr-module.h uwauvctrer-module.h initlib.cc
-
-libuwauv_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libuwauv_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
-libuwauv_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
-
-nodist_libuwauv_la_SOURCES = initTcl.cc
-
-BUILT_SOURCES = initTcl.cc
-
-CLEANFILES = initTcl.cc
-
-TCL_FILES =  uwauv-init.tcl
-
-initTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwauvTclCode > initTcl.cc 
-
-EXTRA_DIST = $(TCL_FILES)
+Position/UWSME set debug_        0

@@ -28,13 +28,13 @@
 //
 
 /**
- * @file   uwsmposition.h
+ * @file   uwsmeposition.h
  * @author Filippo Campagnaro
  * @version 1.0.0
  *
- * \brief Provides the definition of the class <i>UWSMPosition</i>.
+ * \brief Provides the definition of the class <i>UWSMEPosition</i>.
  *
- * Provides the definition of the class <i>UWSMPosition</i>.
+ * Provides the definition of the class <i>UWSMEPosition</i>.
  * This class implements the a simple movement behaviour: it is possible to
  *define
  * the direction and the speed of the linear movement thanks to a TCL command
@@ -46,64 +46,65 @@
  * @see NodeCore, Position
  **/
 
-#ifndef _UWSMPOSITION_
-#define _UWSMPOSITION_
+#ifndef _UWSMEPOSITION_
+#define _UWSMEPOSITION_
 
 #include <node-core.h>
+#include <uwsmposition.h>
 
 #define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
 #define pi (4 * atan(1.0))
 
-class UWSMPosition : public Position
+class UWSMEPosition : public UWSMPosition
 {
 public:
 	/**
 	* Constructor
 	*/
-	UWSMPosition();
+	UWSMEPosition();
 	/**
 	* Destructor
 	*/
-	virtual ~UWSMPosition();
+	virtual ~UWSMEPosition();
 	/**
 	* Method that return the current projection of the node on the x-axis.
 	* If it's necessary (updating time ia expired), update the position values
 	* before returns it.
 	*/
-	virtual double getX();
+	//virtual double getX();
 	/**
 	* Method that return the current projection of the node on the y-axis.
 	* If it's necessary (updating time ia expired), update the position values
 	* before returns it.
 	*/
-	virtual double getY();
+//	virtual double getY();
 
 	/**
 	* Method that return the current projection of the node on the z-axis.
 	* If it's necessary (updating time ia expired), update the position values
 	* before returns it.
 	*/
-	virtual double getZ();
+	//virtual double getZ();
 
 	/**
 	* Method that return the x cooridnate of the destination point.
 	*/
-	virtual double getXdest() const;
+	//virtual double getXdest() const;
 
 	/**
 	* Method that return the y cooridnate of the destination point.
 	*/
-	virtual double getYdest() const;
+	//virtual double getYdest() const;
 
 	/**
 	* Method that return the z cooridnate of the destination point.
 	*/
-	virtual double getZdest() const;
+	//virtual double getZdest() const;
 
 	/**
 	* Method that return the actual speed.
 	*/
-	double getSpeed() const;
+	//double getSpeed() const;
 
 	/**
 	* TCL command interpreter
@@ -130,21 +131,22 @@ public:
 	virtual void setdest(
 			double x_dest, double y_dest, double z_dest, double spead);
 	virtual void setdest(double x_dest, double y_dest, double z_dest);
+	/*
 	virtual void setX(double x);
 	virtual void setY(double y);
-	virtual void setZ(double z);
+	virtual void setZ(double z);*/
+	virtual void setAlarm(bool alarm);
 
 protected:
-
 	/**
 	* Method that updates both the position coordinates
 	*/
 	virtual void update(double now);
 
-
 private:
+	
 
-	double trgTime_; /// time in which the TCL command <i>setdest</i> is invoked
+	/*double trgTime_; /// time in which the TCL command <i>setdest</i> is invoked
 	double lastUpdateTime_; /// time last updated of the coordinates was
 							/// computed
 	double Xdest_; /// position on the x-axis of the destination point
@@ -157,8 +159,11 @@ private:
 	double Zsorg_; /// position on the z-axis of the starting point (when the
 				   /// TCL command <i>setdest</i> is invoked)
 	double speed_; /// speed of the node
+	*/
 
 	int debug_;
+
+	bool alarm_mode;
 };
 
 #endif
