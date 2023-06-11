@@ -187,6 +187,8 @@ public:
 	*/
 	static inline int getAUVErrorHeaderSize() { return sizeof(hdr_uwAUV_error); }
 
+	float getDistance(float x_s,float y_s, float x_d, float y_d); 
+
 
 
 protected:
@@ -208,6 +210,8 @@ protected:
 	std::ofstream err_log;	
 	int ackTimeout;	
 	static bool alarm_mode;
+	float x_sorg;
+	float y_sorg;
 	
 	//bool alarm_mode;
 

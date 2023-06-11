@@ -92,7 +92,7 @@ UwAUVModule::UwAUVModule()
 	, log_flag(0)
 	, out_file_stats(0)
 {
-	UWSMPosition p = UWSMPosition();
+	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
@@ -106,7 +106,7 @@ UwAUVModule::UwAUVModule()
 
 }
 
-UwAUVModule::UwAUVModule(UWSMPosition* p) 
+UwAUVModule::UwAUVModule(UWSMEPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, ack(0)
@@ -135,7 +135,7 @@ UwAUVModule::UwAUVModule(UWSMPosition* p)
 
 UwAUVModule::~UwAUVModule() {}
 
-void UwAUVModule::setPosition(UWSMPosition* p){
+void UwAUVModule::setPosition(UWSMEPosition* p){
 	posit = p;
 }
 
@@ -169,7 +169,7 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit=p;
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
@@ -201,11 +201,17 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "setdest") == 0) {
 			posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
+		}else if (strcasecmp(argv[1], "adddest") == 0) {
+			posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+			return TCL_OK;
 		}
 	}
 	else if(argc == 6){
 	if (strcasecmp(argv[1], "setdest") == 0) {
 		posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+		return TCL_OK;
+		} else if (strcasecmp(argv[1], "adddest") == 0) {
+		posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
 		}
 	}
@@ -255,7 +261,7 @@ void UwAUVModule::recv(Packet* p) {
 		}
 
 	} else { //packet in order
-		posit->setdest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
+		posit->adddest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
 		last_sn_confirmed = uwAUVh->sn();
 	}
 

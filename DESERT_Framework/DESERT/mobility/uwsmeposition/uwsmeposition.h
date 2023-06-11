@@ -51,6 +51,7 @@
 
 #include <node-core.h>
 #include <uwsmposition.h>
+#include <vector>
 
 #define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
 #define pi (4 * atan(1.0))
@@ -130,7 +131,10 @@ public:
 	virtual int command(int argc, const char *const *argv);
 	virtual void setdest(
 			double x_dest, double y_dest, double z_dest, double spead);
+	virtual void adddest(
+			double x_dest, double y_dest, double z_dest, double spead);
 	virtual void setdest(double x_dest, double y_dest, double z_dest);
+	virtual void adddest(double x_dest, double y_dest, double z_dest);
 	/*
 	virtual void setX(double x);
 	virtual void setY(double y);
@@ -160,7 +164,7 @@ private:
 				   /// TCL command <i>setdest</i> is invoked)
 	double speed_; /// speed of the node
 	*/
-
+	std::vector<std::vector<double>> waypoints;
 	int debug_;
 
 	bool alarm_mode;

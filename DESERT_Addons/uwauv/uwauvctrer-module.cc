@@ -84,6 +84,8 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p)
 {
 	posit=p;
 	speed=5;
+	x_sorg = posit->getX();
+	y_sorg = posit->getY();
 	//alarm_mode = false;
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
@@ -112,6 +114,8 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	p = NULL;
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
+	x_sorg = 0;
+	y_sorg = 0;
 	//posit = Position();
 	speed = 5;
 	//alarm_mode = false;
@@ -212,17 +216,34 @@ void UwAUVCtrErModule::transmit() {
 	sendTmr_.resched(period);
 }
 
+float UwAUVCtrErModule::getDistance(float x_s,float y_s,float x_d,float y_d){
+	float dx = x_s - x_d;
+	float dy = y_s - y_d;
+	return std::sqrt(dx*dx + dy*dy); 
+}
+
 void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
+	bool found = false;
 
 	uwAUVh->ack() = ack;
 	ack = 0;
 
-	if(this->p == NULL){ //TO FIX
+	if(this->p == NULL){
+		 //TO FIX
 
-		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){
+		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){ //If in the right position
+			found = true;
+		}
+		//if((getDistance(x_sorg,y_sorg,x_auv,y_auv) < getDistance(posit->getX(),posit->getY(),x_auv,y_auv)) && alarm_mode){ //if the right position
+		//																													// has been already passed
+		//	found = true;
+		//}
+
+
+		if (found){
 			
 			uwAUVh->speed() = 100;
 			alarm_mode = false;
@@ -231,7 +252,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 			if (debug_) {
 				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR SOLVED" 
-			<< std::endl;
+				<< std::endl;
 			}
 
 			if (log_flag == 1) {
@@ -248,21 +269,32 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 		}
 
 	//Retransmission
-	}else if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){
+	}else{
+		
+		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){ //If in the right position
+			found = true;
+		}
+		//if((getDistance(x_sorg,y_sorg,x_auv,y_auv) < getDistance(posit->getX(),posit->getY(),x_auv,y_auv)) && alarm_mode){ //if the right position
+		//																													// has been already passed
+		//	found = true;
+		//}
+		
+		if (found){
 
-		uwAUVh->speed() = 100;
-		alarm_mode = false;
-		uwAUVh->sn() = sn;
+			uwAUVh->speed() = 100;
+			alarm_mode = false;
+			uwAUVh->sn() = sn;
 
-		if (log_flag == 1) {
+			if (debug_) {
+			std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR SOLVED" 
+				<< std::endl;
+			}
+			
+			if (log_flag == 1) {
 				err_log.open("error_log.csv",std::ios_base::app);
 				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
 				err_log.close();
 			}
-
-		if (debug_) {
-		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR SOLVED" 
-			<< std::endl;
 		}
 	}
 	
@@ -281,6 +313,9 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			pos_log.close();
 
 	}
+
+	x_sorg = posit->getX();
+	y_sorg = posit->getY();
 }
 
 void UwAUVCtrErModule::recv(Packet* p, Handler* h) {
@@ -319,6 +354,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 			posit->setdest(x_auv,y_auv,posit->getZ(),1);
 			last_sn_confirmed = uwAUVh->sn();
 			alarm_mode = true;
+			x_sorg = posit->getX();
+			y_sorg = posit->getY();
 
 		}
 

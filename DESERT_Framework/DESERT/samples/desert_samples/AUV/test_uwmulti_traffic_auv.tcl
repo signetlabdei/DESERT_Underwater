@@ -127,7 +127,7 @@ $ns use-Miracle
 ##################
 set opt(n_auv)                 2 ;# Number of Nodes
 set opt(starttime)          1
-set opt(stoptime)           6000
+set opt(stoptime)           15000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
@@ -193,7 +193,7 @@ if {$opt(bash_parameters)} {
     }   
 } 
 
-set opt(waypoint_file)  "../dbs/wp_path/rov_path_simple.csv"
+set opt(waypoint_file)  "../dbs/wp_path/rov_path.csv"
 
 #random generator
 global defaultRNG

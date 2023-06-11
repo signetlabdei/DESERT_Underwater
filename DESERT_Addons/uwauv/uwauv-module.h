@@ -45,7 +45,7 @@
 #define UWAUV_MODULE_H
 #include <uwcbr-module.h>
 #include <uwauv-packet.h>
-#include "uwsmposition.h"
+#include "uwsmeposition.h"
 #include <queue>
 #include <fstream>
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -87,9 +87,9 @@ public:
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
-	* @param UWSMPosition* p Pointer to the AUV position
+	* @param UWSMEPosition* p Pointer to the AUV position
 	*/
-	UwAUVModule(UWSMPosition* p);
+	UwAUVModule(UWSMEPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
@@ -131,16 +131,16 @@ public:
 	/**
 	* Sets the position of the AUV
 	*
-	* @param UWSMPosition * p Pointer to the AUV position
+	* @param UWSMEPosition * p Pointer to the AUV position
 	*/
-	virtual void setPosition(UWSMPosition* p);
+	virtual void setPosition(UWSMEPosition* p);
 
 	/**
 	* Returns the position of the AUV
 	*
 	* @return the current AUV position
 	*/
-  inline UWSMPosition* getPosition() { return posit; }
+  inline UWSMEPosition* getPosition() { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -166,7 +166,7 @@ protected:
 
 	enum UWAUV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
-	UWSMPosition* posit; /**< AUV position.*/
+	UWSMEPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int ack; /**< If not zero, contains the ACK to the last command Packete received.*/
 	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/

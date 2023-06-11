@@ -140,10 +140,6 @@ protected:
 	* Method that updates both the position coordinates
 	*/
 	virtual void update(double now);
-
-
-private:
-
 	double trgTime_; /// time in which the TCL command <i>setdest</i> is invoked
 	double lastUpdateTime_; /// time last updated of the coordinates was
 							/// computed
@@ -158,6 +154,8 @@ private:
 				   /// TCL command <i>setdest</i> is invoked)
 	double speed_; /// speed of the node
 
+
+private:
 	int debug_;
 };
 

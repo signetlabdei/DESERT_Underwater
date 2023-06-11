@@ -205,13 +205,20 @@ int UwAUVErrorModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "setdest") == 0) {
 			posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
+		}else if (strcasecmp(argv[1], "adddest") == 0) {
+			posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+			return TCL_OK;
 		}
 	}
 	else if(argc == 6){
 	if (strcasecmp(argv[1], "setdest") == 0) {
 		posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
+		}else if (strcasecmp(argv[1], "adddest") == 0) {
+		posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+		return TCL_OK;
 		}
+
 	}
 	return UwCbrModule::command(argc,argv);
 }

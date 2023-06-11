@@ -80,6 +80,13 @@ UWSMEPosition::command(int argc, const char *const *argv)
 					 << ")" << endl;
 			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
 			return TCL_OK;
+		} else if (strcasecmp(argv[1], "adddest") == 0) {
+			if (debug_)
+				cerr << NOW << "UWSMEPosition::command(adddest, " << argv[2]
+					 << ", " << argv[3] << ", " << argv[4] << ", " << argv[5]
+					 << ")" << endl;
+			adddest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+			return TCL_OK;
 		}
 	} else if (argc == 5) {
 		if (strcasecmp(argv[1], "setdest") == 0) {
@@ -87,6 +94,12 @@ UWSMEPosition::command(int argc, const char *const *argv)
 				cerr << NOW << "UWSMEPosition::command(setdest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ")" << endl;
 			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
+			return TCL_OK;
+		}else if (strcasecmp(argv[1], "adddest") == 0) {
+			if (debug_)
+				cerr << NOW << "UWSMEPosition::command(adddest, " << argv[2]
+					 << ", " << argv[3] << ", " << argv[4] << ")" << endl;
+			adddest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
 			return TCL_OK;
 		}
 	} else if (argc == 2) {
@@ -120,6 +133,44 @@ UWSMEPosition::setdest(
 }
 
 void
+UWSMEPosition::adddest(
+		double x_dest, double y_dest, double z_dest, double speed_setted)
+{
+	if (!waypoints.empty()){
+		waypoints.push_back({x_dest,y_dest,z_dest,speed_setted});
+		if (debug_)
+		printf("New waypoint (%f,%f,%f)\n",
+			x_dest,
+			y_dest,
+			z_dest);
+				
+	}else{
+		setdest(x_dest,y_dest,z_dest,speed_setted);
+	}
+	
+}
+
+void
+UWSMEPosition::adddest(
+		double x_dest, double y_dest, double z_dest)
+{
+	if (!waypoints.empty()){
+		waypoints.push_back({x_dest,y_dest,z_dest});
+
+		if (debug_)
+		printf("New waypoint (%f,%f,%f)\n",
+			x_dest,
+			y_dest,
+			z_dest);
+				
+	}else{
+		setdest(x_dest,y_dest,z_dest);
+	}
+		
+	
+}
+
+void
 UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
 {
 	UWSMPosition::setdest(x_dest,y_dest,z_dest);
@@ -128,7 +179,94 @@ UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
 void
 UWSMEPosition::update(double now)
 {
-	UWSMPosition::update(now);
+	//UWSMPosition::update(now);
+
+	if ((trgTime_ < 0.) || (now < lastUpdateTime_ + 1e-6))
+		return;
+
+	double gamma;
+	double theta;
+	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0) +				//distance to destination
+			pow(Xdest_ - Xsorg_, 2.0) + pow(Zdest_ - Zsorg_, 2.0));
+
+	if (theta_den == 0) {
+		x_ = Xsorg_;
+		y_ = Ysorg_;
+		z_ = Zsorg_;
+
+		if (!waypoints.empty()){
+			if(waypoints[0].size()>3){
+				setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+			}else{
+				setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+			}
+
+			waypoints.erase(waypoints.begin());
+			if (debug_)
+			printf("New dest (%f,%f,%f) from waypoints list\n",
+			Xdest_,
+			Ydest_,
+			Zdest_);
+		}
+
+	} else {
+
+		theta = acos((Zdest_ - Zsorg_) / theta_den);
+
+		if (Xdest_ - Xsorg_ == 0)
+			gamma = pi / 2 * sgn(Ydest_ - Ysorg_);
+
+		else
+			gamma = atan((Ydest_ - Ysorg_) / (Xdest_ - Xsorg_));
+
+		if ((Xdest_ - Xsorg_) < 0.0)
+
+			gamma += (Ysorg_ - Ydest_) >= 0.0 ? pi : -pi;
+		x_ = Xsorg_ + (speed_ * (now - trgTime_)) * sin(theta) * cos(gamma);
+		y_ = Ysorg_ + (speed_ * (now - trgTime_)) * sin(theta) * sin(gamma);
+		z_ = Zsorg_ + (speed_ * (now - trgTime_)) * cos(theta);
+
+		if (pow(Ydest_ - Ysorg_, 2.0) + pow(Xdest_ - Xsorg_, 2.0) +
+						pow(Zdest_ - Zsorg_, 2.0) <
+				pow(x_ - Xsorg_, 2.0) + pow(y_ - Ysorg_, 2.0) +
+						pow(z_ - Zsorg_, 2.0)) {
+			x_ = Xdest_;
+			y_ = Ydest_;
+			z_ = Zdest_;
+
+			if (!waypoints.empty()){
+				if(waypoints[0].size()>3){
+					setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+				}else{
+					setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+				}
+
+				waypoints.erase(waypoints.begin());
+				if (debug_)
+					printf("New dest (%f,%f,%f) from waypoints list\n",
+					Xdest_,
+					Ydest_,
+					Zdest_);
+			}
+
+		}
+		if (debug_)
+			printf("New pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), speed %f sen(%f)=%f\n",
+					x_,
+					y_,
+					z_,
+					Xdest_,
+					Ydest_,
+					Zdest_,
+					Xsorg_,
+					Ysorg_,
+					Zsorg_,
+					speed_,
+					gamma,
+					sin(gamma));
+	}
+
+	lastUpdateTime_ = now;
 }
 /*
 double
