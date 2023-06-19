@@ -39,6 +39,7 @@
 #define UWMC_MODULE_H
 #include <uwcbr-module.h>
 #include <uwsmposition.h>
+#include <node-core.h>
 #include <vector>
 #include <fstream>
 
@@ -59,7 +60,7 @@ public:
 	*
 	* @param UWSMPosition* p Pointer to the ROV position
 	*/
-	UwMCModule(Position p);
+	UwMCModule(UWSMPosition* p);
 
 	/**
 	* Destructor of UwMCModule class.
@@ -90,24 +91,34 @@ public:
 	*
 	* @param Position * p Pointer to the ROV leader position
 	*/
-	virtual void setPosition(Position p);
+	virtual void setPosition(UWSMPosition* p);
 
 	/**
 	* Returns the position of the ROV leader
 	*
 	* @return the current ROV leader position
 	*/
-	inline Position getPosition() { return posit;}
+	inline UWSMPosition* getPosition() { return leader_position;}
+
+	/**
+	 * recv syncronous cross layer messages to require an operation from another module
+	 *
+	 * @param m Pointer cross layer message
+	 *
+	 */
+	int recvSyncClMsg(ClMessage* m);
+
 
 protected:
+	UWSMPosition* leader_position; /**< ROV leader position */
+	std::vector<UWSMPosition*> follower_position; /**< ROV followers positions */
+	Position track_position; /**< Track positions */
 
-	Position posit; /**< ROV leader position.*/
-	UWSMPosition* track_position; /**< Track position.*/
-	std::vector<UWSMPosition*> rov_position;
-
-	int log_flag; /**< Flag to enable log file writing.*/
-
-	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
+	/**
+	 * Send the closest ROV follower to the last tracked position
+	 *
+	 */
+	void setFollowerPosition();	
 };
 
 #endif // UWMC_MODULE_H

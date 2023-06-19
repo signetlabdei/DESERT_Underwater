@@ -43,10 +43,6 @@
 #include <stdint.h>
 
 /**
-* Adds the module for UwROVModuleClass in ns2.
-*/
-
-/**
 * Class that represents the binding with the tcl configuration script 
 */
 static class UwMCModuleClass : public TclClass {
@@ -70,14 +66,18 @@ public:
 
 UwMCModule::UwMCModule() 
 	: UwCbrModule()
+	, leader_position()
+	, track_position()
+	, follower_position()
 {
-	posit = Position();
 }
 
-UwMCModule::UwMCModule(Position p) 
+UwMCModule::UwMCModule(UWSMPosition* p) 
 	: UwCbrModule()
+	, leader_position(p)
+	, track_position()
+	, follower_position()
 {
-	posit=p;
 }
 
 UwMCModule::~UwMCModule() {}
@@ -86,10 +86,6 @@ int UwMCModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwMCModule::setPosition(Position p){
-	posit = p;
-}
-
-void UwMCModule::recv(Packet* p) {
-	recv(p);
+void UwMCModule::setPosition(UWSMPosition* p){
+	leader_position = p;
 }
