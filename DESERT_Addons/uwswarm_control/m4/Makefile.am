@@ -1,6 +1,5 @@
-
 #
-# Copyright (c) 2007 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2012 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -15,7 +14,7 @@
 #    names of its contributors may be used to endorse or promote products 
 #    derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS ProvIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
 # TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
 # PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
@@ -26,27 +25,6 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
 
-AM_CXXFLAGS = -Wall -ggdb3
+EXTRA_DIST = nsallinone.m4 nsmiracle.m4 desertAddon.m4
 
-lib_LTLIBRARIES = libuwmc.la
-
-libuwmc_la_SOURCES = uwmc-module.cc uwmc-module.h initlib.cc
-
-libuwmc_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libuwmc_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
-libuwmc_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
-
-nodist_libuwmc_la_SOURCES = initTcl.cc
-
-BUILT_SOURCES = initTcl.cc
-
-CLEANFILES = initTcl.cc
-
-TCL_FILES =  uwmc-init.tcl
-
-initTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwmcTclCode > initTcl.cc 
-
-EXTRA_DIST = $(TCL_FILES)

@@ -1,4 +1,3 @@
-
 //
 // Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
@@ -37,7 +36,7 @@
 * Provides the <i>UWROVCtr</i> class implementation.
 */
 
-#include "uwmc-module.h"
+#include "uwsc-mission-coordinator-module.h"
 #include <iostream>
 #include <rng.h>
 #include <stdint.h>
@@ -45,13 +44,13 @@
 /**
 * Class that represents the binding with the tcl configuration script 
 */
-static class UwMCModuleClass : public TclClass {
+static class UwMissionCoordinatorModuleClass : public TclClass {
 public:
 
 	/**
    * Constructor of the class
    */
-	UwMCModuleClass() : TclClass("Module/UW/MC") {
+	UwMissionCoordinatorModuleClass() : TclClass("Module/UW/MC") {
 	}
 
 	/**
@@ -59,12 +58,12 @@ public:
    * @return Pointer to an TclObject
    */
 	TclObject* create(int, const char*const*) {
-		return (new UwMCModule());
+		return (new UwMissionCoordinatorModule());
 	}
 } class_module_uwMC;
 
 
-UwMCModule::UwMCModule() 
+UwMissionCoordinatorModule::UwMissionCoordinatorModule() 
 	: UwCbrModule()
 	, leader_position()
 	, track_position()
@@ -72,7 +71,7 @@ UwMCModule::UwMCModule()
 {
 }
 
-UwMCModule::UwMCModule(UWSMPosition* p) 
+UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p) 
 	: UwCbrModule()
 	, leader_position(p)
 	, track_position()
@@ -80,12 +79,12 @@ UwMCModule::UwMCModule(UWSMPosition* p)
 {
 }
 
-UwMCModule::~UwMCModule() {}
+UwMissionCoordinatorModule::~UwMissionCoordinatorModule() {}
 
-int UwMCModule::command(int argc, const char*const* argv) {
+int UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwMCModule::setPosition(UWSMPosition* p){
+void UwMissionCoordinatorModule::setPosition(UWSMPosition* p){
 	leader_position = p;
 }

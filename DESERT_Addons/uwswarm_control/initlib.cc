@@ -31,18 +31,18 @@
  * @author Filippo Campagnaro, Vincenzo Cimino
  * @version 1.0.0
  *
- * \brief Provides the initialization of uwmc libraries.
+ * \brief Provides the initialization of uwswarm_control libraries.
  *
- * Provides the initialization of uwmc libraries.
+ * Provides the initialization of uwswarm_control libraries.
  * 
  */
 
 #include <tclcl.h>
 
-extern EmbeddedTcl UwmcTclCode;
+extern EmbeddedTcl Uwswarm_controlTclCode;
 
 extern "C" int 
-Uwrov_Init() {
-	UwmcTclCode.load();
+Uwswarm_control_Init() {
+	Uwswarm_controlTclCode.load();
 	return 0;
 }

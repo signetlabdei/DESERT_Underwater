@@ -45,27 +45,27 @@
 
 
 /**
-* UwMCModule class is used to manage <i>UWROV</i> packets and to collect statistics about them.
+* UwMissionCoordinatorModule class is used to manage <i>UWROV</i> packets and to collect statistics about them.
 */
-class UwMCModule : public UwCbrModule {
+class UwMissionCoordinatorModule : public UwCbrModule {
 public:
 
 	/**
-	* Default Constructor of UwMCModule class.
+	* Default Constructor of UwMissionCoordinatorModule class.
 	*/
-	UwMCModule();
+	UwMissionCoordinatorModule();
 
 	/**
-	* Constructor with position setting of UwMCVModule class.
+	* Constructor with position setting of UwMissionCoordinatorVModule class.
 	*
 	* @param UWSMPosition* p Pointer to the ROV position
 	*/
-	UwMCModule(UWSMPosition* p);
+	UwMissionCoordinatorModule(UWSMPosition* p);
 
 	/**
-	* Destructor of UwMCModule class.
+	* Destructor of UwMissionCoordinatorModule class.
 	*/
-	virtual ~UwMCModule();
+	virtual ~UwMissionCoordinatorModule();
 
 	/**
    * TCL command interpreter. It implements the following OTcl methods:
