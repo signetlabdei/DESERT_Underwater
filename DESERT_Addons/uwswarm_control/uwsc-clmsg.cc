@@ -38,6 +38,70 @@
 
 #include "uwsc-clmsg.h"
 
+
+////////////////////////////////////////////////////////
+
+ClMsgCtr2McPosition::ClMsgCtr2McPosition(int dest_id)
+	: ClMessage(CLMSG_CTR2MC_VERBOSITY,
+		CLMSG_CTR2MC_GETPOS, UNICAST, dest_id)
+	, rov_position(nullptr)
+{
+}
+
+ClMsgCtr2McPosition::~ClMsgCtr2McPosition()
+{
+}
+
+ClMsgCtr2McPosition* 
+ClMsgCtr2McPosition::copy()
+{
+  return new ClMsgCtr2McPosition(*this);
+}
+
+void
+ClMsgCtr2McPosition::setRovPosition(UWSMPosition* position)
+{
+	rov_position = position;
+}
+
+UWSMPosition*
+ClMsgCtr2McPosition::getRovPosition() const
+{
+	return rov_position;
+}
+
+////////////////////////////////////////////////////////
+
+ClMsgMc2CtrPosition::ClMsgMc2CtrPosition(int dest_id)
+	: ClMessage(CLMSG_MC2CTR_VERBOSITY,
+		CLMSG_MC2CTR_SETPOS, UNICAST, dest_id)
+	, rov_destination(nullptr)
+{
+}
+
+ClMsgMc2CtrPosition::~ClMsgMc2CtrPosition()
+{
+}
+
+ClMsgMc2CtrPosition* 
+ClMsgMc2CtrPosition::copy()
+{
+  return new ClMsgMc2CtrPosition(*this);
+}
+
+void
+ClMsgMc2CtrPosition::setRovDestination(UWSMPosition* destination)
+{
+	rov_destination = destination;
+}
+
+UWSMPosition*
+ClMsgMc2CtrPosition::getRovDestination() const
+{
+	return rov_destination;
+}
+////////////////////////////////////////////////////////
+
 ClMsgTrack2McPosition::ClMsgTrack2McPosition(int dest_id)
 	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
 		CLMSG_TRACK2MC_TRACKPOS, UNICAST, dest_id)

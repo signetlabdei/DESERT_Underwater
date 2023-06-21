@@ -40,7 +40,6 @@
 #ifndef UWSC_CLMSG_H
 #define UWSC_CLMSG_H
 
-#include <packet.h>
 #include <clmessage.h>
 #include <uwsmposition.h>
 
@@ -55,7 +54,83 @@ extern ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
 class ClSAP;
 
 /**
- * Message to get the tracking position from uwtracker addon
+ * Message to get the rov follower position via uwrovctr module
+ */
+class ClMsgCtr2McPosition : public ClMessage
+{
+  public:
+
+	/**
+	 * Class constructor
+     * @param dest_id: id of the destination module
+	 */
+    ClMsgCtr2McPosition(int dest_id);
+        
+    virtual ~ClMsgCtr2McPosition();
+
+    /**
+     * Creates a copy of the object
+     * @return Pointer to a copy of the object
+     */
+    ClMsgCtr2McPosition* copy();
+
+    /**
+     * Sets the rov follower destination
+     * @param position rov follower current position
+     */
+    void setRovPosition(UWSMPosition* position);
+
+    /**
+     * Get the rov follower position
+     * @return rov_position rov follower current position
+     */
+    UWSMPosition* getRovPosition() const;
+    
+    
+  private:
+    UWSMPosition* rov_position; /*< Rov follower current position */
+};
+
+/**
+ * Message to set the rov follower destination via uwrovctr module
+ */
+class ClMsgMc2CtrPosition : public ClMessage
+{
+  public:
+
+	/**
+	 * Class constructor
+     * @param dest_id: id of the destination module
+	 */
+    ClMsgMc2CtrPosition(int dest_id);
+        
+    virtual ~ClMsgMc2CtrPosition();
+
+    /**
+     * Creates a copy of the object
+     * @return Pointer to a copy of the object
+     */
+    ClMsgMc2CtrPosition* copy();
+
+    /**
+     * Sets the rov follower destination
+     * @param destination rov follower destination
+     */
+    void setRovDestination(UWSMPosition* destination);
+
+    /**
+     * Get the rov follower destination
+     * @return rov_destination rov follower destination
+     */
+    UWSMPosition* getRovDestination() const;
+    
+    
+  private:
+    UWSMPosition* rov_destination; /*< Rov follower new destination */
+};
+
+/**
+ * Message to get the tracking position from uwtracker module
  */
 class ClMsgTrack2McPosition : public ClMessage
 {
@@ -79,7 +154,7 @@ class ClMsgTrack2McPosition : public ClMessage
      * Sets the tracking position received from uwtracker
      * @param track_position Tracked position from uwtracker
      */
-    void setTrackPosition(UWSMPosition* track_position);
+    void setTrackPosition(UWSMPosition* position);
 
     /**
      * Get the tracking position received from uwtracker
