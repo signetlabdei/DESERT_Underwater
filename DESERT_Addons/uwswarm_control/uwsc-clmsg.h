@@ -64,7 +64,7 @@ class ClMsgCtr2McPosition : public ClMessage
 	 * Class constructor
      * @param dest_id: id of the destination module
 	 */
-    ClMsgCtr2McPosition(int dest_id);
+    ClMsgCtr2McPosition(int source_id, int dest_id);
         
     virtual ~ClMsgCtr2McPosition();
 
@@ -85,10 +85,16 @@ class ClMsgCtr2McPosition : public ClMessage
      * @return rov_position rov follower current position
      */
     UWSMPosition* getRovPosition() const;
-    
+
+    /**
+     * Get the rov follower id
+     * @return rov_id rov follower id
+     */
+	int getRovId() const;
     
   private:
-    UWSMPosition* rov_position; /*< Rov follower current position */
+    UWSMPosition* rov_position; /**< Rov follower current position */
+	int rov_id; /**< Rov follower id */
 };
 
 /**
@@ -126,7 +132,7 @@ class ClMsgMc2CtrPosition : public ClMessage
     
     
   private:
-    UWSMPosition* rov_destination; /*< Rov follower new destination */
+    UWSMPosition* rov_destination; /**< Rov follower new destination */
 };
 
 /**
@@ -164,7 +170,7 @@ class ClMsgTrack2McPosition : public ClMessage
     
     
   private:
-    UWSMPosition* tracking_position; /*< Tracking position sent by the uwtracker addon */
+    UWSMPosition* tracking_position; /**< Tracking position sent by the uwtracker addon */
 };
 
 #endif /* UWSC_CLMSG_H */

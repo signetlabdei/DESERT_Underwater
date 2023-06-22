@@ -41,10 +41,11 @@
 
 ////////////////////////////////////////////////////////
 
-ClMsgCtr2McPosition::ClMsgCtr2McPosition(int dest_id)
+ClMsgCtr2McPosition::ClMsgCtr2McPosition(int source_id, int dest_id)
 	: ClMessage(CLMSG_CTR2MC_VERBOSITY,
 		CLMSG_CTR2MC_GETPOS, UNICAST, dest_id)
 	, rov_position(nullptr)
+	, rov_id(source_id)
 {
 }
 
@@ -68,6 +69,12 @@ UWSMPosition*
 ClMsgCtr2McPosition::getRovPosition() const
 {
 	return rov_position;
+}
+
+int
+ClMsgCtr2McPosition::getRovId() const
+{
+	return rov_id;
 }
 
 ////////////////////////////////////////////////////////
