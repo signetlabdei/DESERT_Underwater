@@ -85,7 +85,8 @@ UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p)
 
 UwMissionCoordinatorModule::~UwMissionCoordinatorModule() {}
 
-int UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
+int
+UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "getX") == 0) {
@@ -125,15 +126,17 @@ int UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwMissionCoordinatorModule::setPosition(UWSMPosition* p){
+void
+UwMissionCoordinatorModule::setPosition(UWSMPosition* p){
 	leader_position = p;
 }
 
-int UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
+int
+UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 {
 	if (m->type() == CLMSG_CTR2MC_GETPOS)
 	{
-		int id = ((ClMsgCtr2McPosition*)m)->getRovId();
+		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		UWSMPosition* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
 
 		follower_position[id] = p;

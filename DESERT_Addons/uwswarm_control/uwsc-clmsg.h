@@ -86,15 +86,8 @@ class ClMsgCtr2McPosition : public ClMessage
      */
     UWSMPosition* getRovPosition() const;
 
-    /**
-     * Get the rov follower id
-     * @return rov_id rov follower id
-     */
-	int getRovId() const;
-    
   private:
     UWSMPosition* rov_position; /**< Rov follower current position */
-	int rov_id; /**< Rov follower id */
 };
 
 /**
