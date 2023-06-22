@@ -37,8 +37,8 @@
 
 #ifndef UWMC_MODULE_H
 #define UWMC_MODULE_H
+#include "uwsc-clmsg.h"
 #include <uwcbr-module.h>
-#include <uwsmposition.h>
 #include <node-core.h>
 #include <vector>
 #include <fstream>
@@ -58,7 +58,7 @@ public:
 	/**
 	* Constructor with position setting of UwMissionCoordinatorVModule class.
 	*
-	* @param UWSMPosition* p Pointer to the ROV position
+	* @param UWSMPosition* p Pointer to the ROV leader position
 	*/
 	UwMissionCoordinatorModule(UWSMPosition* p);
 
@@ -112,7 +112,7 @@ public:
 protected:
 	UWSMPosition* leader_position; /**< ROV leader position */
 	std::vector<UWSMPosition*> follower_position; /**< ROV followers positions */
-	Position track_position; /**< Track positions */
+	UWSMPosition* track_position; /**< Track positions */
 
 	/**
 	 * Send the closest ROV follower to the last tracked position

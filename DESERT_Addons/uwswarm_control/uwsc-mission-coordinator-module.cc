@@ -65,26 +65,86 @@ public:
 
 UwMissionCoordinatorModule::UwMissionCoordinatorModule() 
 	: UwCbrModule()
-	, leader_position()
-	, track_position()
 	, follower_position()
 {
+	UWSMPosition lp = UWSMPosition();
+	leader_position=&lp;
+
+	UWSMPosition tp = UWSMPosition();
+	track_position=&tp;
 }
 
 UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p) 
 	: UwCbrModule()
 	, leader_position(p)
-	, track_position()
 	, follower_position()
 {
+	UWSMPosition tp = UWSMPosition();
+	track_position=&tp;
 }
 
 UwMissionCoordinatorModule::~UwMissionCoordinatorModule() {}
 
 int UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
+	Tcl& tcl = Tcl::instance();
+	if (argc == 2) {
+		if (strcasecmp(argv[1], "getX") == 0) {
+			tcl.resultf("%f", leader_position->getX());
+			return TCL_OK;
+		}
+		else if (strcasecmp(argv[1], "getY") == 0) {
+			tcl.resultf("%f", leader_position->getY());
+			return TCL_OK;
+		}
+		else if (strcasecmp(argv[1], "getZ") == 0) {
+			tcl.resultf("%f", leader_position->getZ());
+			return TCL_OK;
+		}
+	}
+	else if(argc == 3){
+		if (strcasecmp(argv[1], "setPosition") == 0) {
+			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			leader_position = p;
+			tcl.resultf("%s", "position Setted\n");
+			return TCL_OK;
+		}
+	}
+	else if(argc == 5){
+		if (strcasecmp(argv[1], "setdest") == 0) {
+			leader_position->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+			return TCL_OK;
+		}
+	}
+	else if(argc == 6){
+		if (strcasecmp(argv[1], "setdest") == 0) {
+			leader_position->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),
+				atof(argv[5]));
+			return TCL_OK;
+		}
+	}
 	return UwCbrModule::command(argc,argv);
 }
 
 void UwMissionCoordinatorModule::setPosition(UWSMPosition* p){
 	leader_position = p;
+}
+
+int UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
+{
+	if (m->type() == CLMSG_CTR2MC_GETPOS)
+	{
+		int id = ((ClMsgCtr2McPosition*)m)->getRovId();
+		UWSMPosition* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
+
+		follower_position[id] = p;
+
+		return 0;
+	}
+	if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
+	{
+		track_position = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
+
+		return 0;
+	}
+	return UwCbrModule::recvSyncClMsg(m);
 }
