@@ -169,7 +169,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 				auv_follower[i].busy = true;
 
 				ClMsgMc2CtrPosition msg(auv_follower[i].ctr_id);
-				msg.setRovDestination((Position*)p);
+				msg.setRovDestination(p);
 				sendSyncClMsg(&msg);
 
 				return 0;

@@ -84,7 +84,7 @@ typedef struct AUV_stats
 		, n_mines(0)
 		, busy(false)
 	{
-		Position p = UWSMPosition();
+		Position p = Position();
 		rov_position = &p;
 	}
 

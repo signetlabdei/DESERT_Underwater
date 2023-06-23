@@ -68,31 +68,30 @@ UwSCROVCtrModule::UwSCROVCtrModule()
 
 UwSCROVCtrModule::~UwSCROVCtrModule() {}
 
-int UwROVCtrModule::command(int argc, const char*const* argv) {
+int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if (argc == 3){
-		if (strcasecmp(argv[1], "setPosition") == 0) {
-			Position* p = dynamic_cast<Position*> (tcl.lookup(argv[2]));
-			posit = *p;
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
-			speed = atof(argv[2]);
+		if (strcasecmp(argv[1], "setLeaderId") == 0) {
+			leader_id = atoi(argv[2]);
+			tcl.resultf("%s", "leader_id Setted\n");
 			return TCL_OK;
 		}
 	}
+
+	return UwROVCtrModule::command(argc,argv);
 }
 
 void
 UwSCROVCtrModule::recv(Packet* p) {
 	UwROVCtrModule::recv(p);
 
-	Position posit = Position();
-	posit.setX(x_rov);
-	posit.setY(y_rov);
-	posit.setZ(z_rov);
+	Position rov_position = Position();
+	rov_position.setX(x_rov);
+	rov_position.setY(y_rov);
+	rov_position.setZ(z_rov);
 
 	ClMsgCtr2McPosition m(leader_id);
-	m.setRovPosition(&posit);
+	m.setRovPosition(&rov_position);
 	sendSyncClMsg(&m);
 }
 

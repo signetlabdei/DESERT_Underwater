@@ -93,6 +93,8 @@ UwSCTrackerModule::command(int argc, const char*const* argv) {
 
 void
 UwSCTrackerModule::recv(Packet* p) {
+	mine_position = (Position*) track_position;
+
 	ClMsgTrack2McPosition m (leader_id);
 	m.setTrackPosition(mine_position);
 
