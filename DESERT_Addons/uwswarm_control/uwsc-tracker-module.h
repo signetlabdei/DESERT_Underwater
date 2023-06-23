@@ -30,13 +30,14 @@
 * @author Filippo Campagnaro, Vincenzo Cimino
 * @version 1.0.0
 *
-* \brief Provides the definition of the class <i>UWROV</i>.
+* \brief Provides the definition of the class <i>UWSCTRACKER</i>.
 *
 */
 
 #ifndef UWSCTRACK_MODULE_H
 #define UWSCTRACK_MODULE_H
 #include <uwtracker-module.h>
+#include "uwsc-clmsg.h"
 
 
 /**
@@ -49,13 +50,6 @@ public:
 	 * Default Constructor of UwSCTrackerModule class.
 	 */
 	UwSCTrackerModule();
-
-	/**
-	 * Constructor with position setting of UwSCTrackerModule class.
-	 *
-	 * @param UWSMPosition* p Pointer to the track position
-	 */
-	UwSCTrackerModule(UWSMPosition* p);
 
 	/**
 	 * Destructor of UwSCTrackerModule class.
@@ -72,20 +66,17 @@ public:
 	 */
 	virtual int command(int argc, const char*const* argv);
 
-	/**
-	 * Initializes a monitoring data packet passed as argument with the default values.
-	 * 
-	 * @param Packet* Pointer to a packet already allocated to fill with the right values.
-	 */
-	virtual void initPkt(Packet* p);
 
 	/**
-	 * recv syncronous cross layer messages to require an operation from another module
+	 * Performs the reception of packets from upper and lower layers.
 	 *
-	 * @param m Pointer cross layer message
-	 *
+	 * @param Packet* Pointer to the packet will be received.
 	 */
-	int recvSyncClMsg(ClMessage* m);
+	virtual void recv(Packet *);
+
+protected:
+	Position* mine_position;
+	int leader_id;
 };
 
 #endif // UWSCTRACK_MODULE_H

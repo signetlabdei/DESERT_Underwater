@@ -47,6 +47,7 @@
 #ifndef UWSCROV_CTR_MODULE_H
 #define UWSCROV_CTR_MODULE_H
 #include <uwrovctr-module.h>
+#include "uwsc-clmsg.h"
 
 class UwSCROVCtrModule : public UwROVCtrModule {
 public:
@@ -71,39 +72,12 @@ public:
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-   * Initializes a control data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
-	virtual void initPkt(Packet* p) ;
-
-
-	/**
 	* Performs the reception of packets from upper and lower layers.
 	*
 	* @param Packet* Pointer to the packet will be received.
 	*/
 	virtual void recv(Packet*);
 
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
-
-	/**
-	* Creates and transmits a packet.
-	*
-	* @see UwCbrModule::sendPkt()
-	*/
-	virtual void transmit();
-
-	/**
-	* Start the controller.
-	*/
-	virtual void start();
 
 	/**
 	 * recv syncronous cross layer messages to require an operation from another module
@@ -112,6 +86,9 @@ public:
 	 *
 	 */
 	int recvSyncClMsg(ClMessage* m);
+
+protected:
+	int leader_id;
 };
 
 #endif // UWSCROVCtr_MODULE_H

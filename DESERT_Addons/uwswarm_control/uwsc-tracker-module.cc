@@ -61,6 +61,42 @@ public:
 UwSCTrackerModule::UwSCTrackerModule() 
 	: UwTrackerModule()
 {
+	bind("leader_id", (int*) &leader_id);
 }
 
+
 UwSCTrackerModule::~UwSCTrackerModule() {}
+
+int
+UwSCTrackerModule::command(int argc, const char*const* argv) {
+	Tcl& tcl = Tcl::instance();
+	if(argc == 3){
+		if (strcasecmp(argv[1], "setTrack") == 0) {
+			Position* p = dynamic_cast<Position*> (tcl.lookup(argv[2]));
+			mine_position = p;
+			tcl.resultf("%s", "position Setted\n");
+			return TCL_OK;
+		}
+		if (strcasecmp(argv[1], "setMaxTrackDistance") == 0) {
+			max_tracking_distance = atof(argv[2]);
+			tcl.resultf("%s", "max_tracking_distance Setted\n");
+			return TCL_OK;
+		}
+		if (strcasecmp(argv[1], "setLeaderId") == 0) {
+			leader_id = atoi(argv[2]);
+			tcl.resultf("%s", "leader_id Setted\n");
+			return TCL_OK;
+		}
+	}
+	return UwTrackerModule::command(argc,argv);
+}
+
+void
+UwSCTrackerModule::recv(Packet* p) {
+	ClMsgTrack2McPosition m (leader_id);
+	m.setTrackPosition(mine_position);
+
+	sendSyncClMsg(&m);
+
+	UwCbrModule::recv(p);
+}

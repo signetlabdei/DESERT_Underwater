@@ -63,6 +63,53 @@ public:
 UwSCROVCtrModule::UwSCROVCtrModule() 
 	: UwROVCtrModule()
 {
+	bind("leader_id", (int*) &leader_id);
 }
 
 UwSCROVCtrModule::~UwSCROVCtrModule() {}
+
+int UwROVCtrModule::command(int argc, const char*const* argv) {
+	Tcl& tcl = Tcl::instance();
+	if (argc == 3){
+		if (strcasecmp(argv[1], "setPosition") == 0) {
+			Position* p = dynamic_cast<Position*> (tcl.lookup(argv[2]));
+			posit = *p;
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
+			speed = atof(argv[2]);
+			return TCL_OK;
+		}
+	}
+}
+
+void
+UwSCROVCtrModule::recv(Packet* p) {
+	UwROVCtrModule::recv(p);
+
+	Position posit = Position();
+	posit.setX(x_rov);
+	posit.setY(y_rov);
+	posit.setZ(z_rov);
+
+	ClMsgCtr2McPosition m(leader_id);
+	m.setRovPosition(&posit);
+	sendSyncClMsg(&m);
+}
+
+int
+UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
+{
+	if (m->type() == CLMSG_MC2CTR_SETPOS)
+	{
+		Position* p = ((ClMsgMc2CtrPosition*)m)->getRovDestination();
+		newX = p->getX();
+		newY = p->getY();
+		newZ = p->getZ();
+
+		UwROVCtrModule::reset_retx();
+		UwROVCtrModule::transmit();
+
+		return 0;
+	}
+	return UwCbrModule::recvSyncClMsg(m);
+}

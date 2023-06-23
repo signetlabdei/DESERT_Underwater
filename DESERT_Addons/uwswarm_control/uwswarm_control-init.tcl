@@ -30,6 +30,9 @@
 # @author Filippo Campagnaro, Vincenzo Cimino
 # @version 1.0.0
 
+Module/UW/SC/CTR set leader_id 0
+
+Module/UW/SC/TRACKER set leader_id 0
 
 Position/UWSM set debug_ 0
 
