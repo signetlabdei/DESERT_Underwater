@@ -56,6 +56,23 @@
 #define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
 #define pi (4 * atan(1.0))
 
+class UWSMEPosition;
+
+/**
+* UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
+*/
+/*class UwDstReachedTimer : public TimerHandler 
+{
+public:
+	UwDstReachedTimer(UWSMEPosition *m) : TimerHandler() { 
+		module = m;
+	}
+protected:
+	virtual void expire(Event *e);
+	UWSMEPosition *module;
+};*/
+
+
 class UWSMEPosition : public UWSMPosition
 {
 public:
@@ -68,44 +85,7 @@ public:
 	*/
 	virtual ~UWSMEPosition();
 	/**
-	* Method that return the current projection of the node on the x-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-	//virtual double getX();
-	/**
-	* Method that return the current projection of the node on the y-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-//	virtual double getY();
-
-	/**
-	* Method that return the current projection of the node on the z-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-	//virtual double getZ();
-
-	/**
-	* Method that return the x cooridnate of the destination point.
-	*/
-	//virtual double getXdest() const;
-
-	/**
-	* Method that return the y cooridnate of the destination point.
-	*/
-	//virtual double getYdest() const;
-
-	/**
-	* Method that return the z cooridnate of the destination point.
-	*/
-	//virtual double getZdest() const;
-
-	/**
-	* Method that return the actual speed.
-	*/
-	//double getSpeed() const;
+	
 
 	/**
 	* TCL command interpreter
@@ -129,17 +109,19 @@ public:
 	*
 	**/
 	virtual int command(int argc, const char *const *argv);
+
 	virtual void setdest(
 			double x_dest, double y_dest, double z_dest, double spead);
+
 	virtual void adddest(
 			double x_dest, double y_dest, double z_dest, double spead);
+
 	virtual void setdest(double x_dest, double y_dest, double z_dest);
+
 	virtual void adddest(double x_dest, double y_dest, double z_dest);
-	/*
-	virtual void setX(double x);
-	virtual void setY(double y);
-	virtual void setZ(double z);*/
+	
 	virtual void setAlarm(bool alarm);
+
 
 protected:
 	/**
@@ -149,25 +131,10 @@ protected:
 
 private:
 	
-
-	/*double trgTime_; /// time in which the TCL command <i>setdest</i> is invoked
-	double lastUpdateTime_; /// time last updated of the coordinates was
-							/// computed
-	double Xdest_; /// position on the x-axis of the destination point
-	double Ydest_; /// position on the y-axis of the destination point
-	double Zdest_; /// position on the z-axis of the destination point
-	double Xsorg_; /// position on the x-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double Ysorg_; /// position on the y-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double Zsorg_; /// position on the z-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double speed_; /// speed of the node
-	*/
-	std::vector<std::vector<double>> waypoints;
+	std::vector<std::vector<double>> waypoints; 
 	int debug_;
-
-	bool alarm_mode;
+	bool alarm_mode;				//alarm_mode true block all the application from updating the destination
 };
+
 
 #endif
