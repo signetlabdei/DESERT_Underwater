@@ -41,7 +41,7 @@
 #define UWSC_CLMSG_H
 
 #include <clmessage.h>
-#include <uwsmposition.h>
+#include <node-core.h>
 
 #define CLMSG_MC2CTR_VERBOSITY 3
 #define CLMSG_CTR2MC_VERBOSITY 3
@@ -64,7 +64,7 @@ class ClMsgCtr2McPosition : public ClMessage
 	 * Class constructor
      * @param dest_id: id of the destination module
 	 */
-    ClMsgCtr2McPosition(int source_id, int dest_id);
+    ClMsgCtr2McPosition(int dest_id);
         
     virtual ~ClMsgCtr2McPosition();
 
@@ -78,16 +78,16 @@ class ClMsgCtr2McPosition : public ClMessage
      * Sets the rov follower destination
      * @param position rov follower current position
      */
-    void setRovPosition(UWSMPosition* position);
+    void setRovPosition(Position* position);
 
     /**
      * Get the rov follower position
      * @return rov_position rov follower current position
      */
-    UWSMPosition* getRovPosition() const;
+    Position* getRovPosition() const;
 
   private:
-    UWSMPosition* rov_position; /**< Rov follower current position */
+    Position* rov_position; /**< Rov follower current position */
 };
 
 /**
@@ -115,17 +115,17 @@ class ClMsgMc2CtrPosition : public ClMessage
      * Sets the rov follower destination
      * @param destination rov follower destination
      */
-    void setRovDestination(UWSMPosition* destination);
+    void setRovDestination(Position* destination);
 
     /**
      * Get the rov follower destination
      * @return rov_destination rov follower destination
      */
-    UWSMPosition* getRovDestination() const;
+    Position* getRovDestination() const;
     
     
   private:
-    UWSMPosition* rov_destination; /**< Rov follower new destination */
+    Position* rov_destination; /**< Rov follower new destination */
 };
 
 /**
@@ -153,17 +153,17 @@ class ClMsgTrack2McPosition : public ClMessage
      * Sets the tracking position received from uwtracker
      * @param track_position Tracked position from uwtracker
      */
-    void setTrackPosition(UWSMPosition* position);
+    void setTrackPosition(Position* position);
 
     /**
      * Get the tracking position received from uwtracker
      * @return track_position Tracked position from uwtracker
      */
-    UWSMPosition* getTrackPosition() const;
+    Position* getTrackPosition() const;
     
     
   private:
-    UWSMPosition* tracking_position; /**< Tracking position sent by the uwtracker addon */
+    Position* track_position; /**< Tracking position sent by the uwtracker addon */
 };
 
 #endif /* UWSC_CLMSG_H */

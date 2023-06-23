@@ -41,7 +41,7 @@
 
 ////////////////////////////////////////////////////////
 
-ClMsgCtr2McPosition::ClMsgCtr2McPosition(int source_id, int dest_id)
+ClMsgCtr2McPosition::ClMsgCtr2McPosition(int dest_id)
 	: ClMessage(CLMSG_CTR2MC_VERBOSITY,
 		CLMSG_CTR2MC_GETPOS, UNICAST, dest_id)
 	, rov_position(nullptr)
@@ -59,12 +59,12 @@ ClMsgCtr2McPosition::copy()
 }
 
 void
-ClMsgCtr2McPosition::setRovPosition(UWSMPosition* position)
+ClMsgCtr2McPosition::setRovPosition(Position* position)
 {
 	rov_position = position;
 }
 
-UWSMPosition*
+Position*
 ClMsgCtr2McPosition::getRovPosition() const
 {
 	return rov_position;
@@ -90,12 +90,12 @@ ClMsgMc2CtrPosition::copy()
 }
 
 void
-ClMsgMc2CtrPosition::setRovDestination(UWSMPosition* destination)
+ClMsgMc2CtrPosition::setRovDestination(Position* destination)
 {
 	rov_destination = destination;
 }
 
-UWSMPosition*
+Position*
 ClMsgMc2CtrPosition::getRovDestination() const
 {
 	return rov_destination;
@@ -105,7 +105,7 @@ ClMsgMc2CtrPosition::getRovDestination() const
 ClMsgTrack2McPosition::ClMsgTrack2McPosition(int dest_id)
 	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
 		CLMSG_TRACK2MC_TRACKPOS, UNICAST, dest_id)
-	, tracking_position(nullptr)
+	, track_position(nullptr)
 {
 }
 
@@ -120,13 +120,13 @@ ClMsgTrack2McPosition::copy()
 }
 
 void
-ClMsgTrack2McPosition::setTrackPosition(UWSMPosition* position)
+ClMsgTrack2McPosition::setTrackPosition(Position* position)
 {
-	tracking_position = position;
+	track_position = position;
 }
 
-UWSMPosition*
+Position*
 ClMsgTrack2McPosition::getTrackPosition() const
 {
-	return tracking_position;
+	return track_position;
 }
