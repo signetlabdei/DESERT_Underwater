@@ -38,8 +38,6 @@
 
 #include "uwsc-mission-coordinator-module.h"
 #include <iostream>
-#include <rng.h>
-#include <stdint.h>
 
 /**
 * Class that represents the binding with the tcl configuration script 
@@ -64,23 +62,18 @@ public:
 
 
 UwMissionCoordinatorModule::UwMissionCoordinatorModule() 
-	: UwCbrModule()
-	, follower_position()
+	: PlugIn()
+	, auv_follower()
 {
 	UWSMPosition lp = UWSMPosition();
 	leader_position=&lp;
-
-	UWSMPosition tp = UWSMPosition();
-	track_position=&tp;
 }
 
 UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p) 
-	: UwCbrModule()
+	: PlugIn()
 	, leader_position(p)
-	, follower_position()
+	, auv_follower()
 {
-	UWSMPosition tp = UWSMPosition();
-	track_position=&tp;
 }
 
 UwMissionCoordinatorModule::~UwMissionCoordinatorModule() {}
@@ -108,6 +101,12 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 			leader_position = p;
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
+		} else if (strcasecmp(argv[1], "setAUVId") == 0) {
+			auv_follower.emplace_back(atoi(argv[2]));
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "removeMine") == 0) {
+			// TODO: implement remove mine method
+			// remove last mine detected by the rov specified by its id
 		}
 	}
 	else if(argc == 5){
@@ -123,7 +122,7 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 			return TCL_OK;
 		}
 	}
-	return UwCbrModule::command(argc,argv);
+	return PlugIn::command(argc,argv);
 }
 
 void
@@ -137,17 +136,47 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 	if (m->type() == CLMSG_CTR2MC_GETPOS)
 	{
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
-		UWSMPosition* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
+		Position* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
 
-		follower_position[id] = p;
+		for (int i = 0 ; i < auv_follower.size() ; i++)
+		{
+			if (auv_follower[i].ctr_id == id)
+			{
+				auv_follower[i].rov_position = p;
 
-		return 0;
+				int n = auv_follower[i].n_mines;
+				if (auv_follower[i].busy &&
+						auv_follower[i].rov_mine[n-1].state == MINE_TRACKED)
+				{
+					auv_follower[i].rov_mine[n-1].state = MINE_DETECTED;
+				}
+				return 0;
+			}
+		}
+		// error if auv not found
 	}
 	if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
 	{
-		track_position = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
+		int id = ((ClMsgCtr2McPosition*)m)->getSource();
+		Position* p = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
 
-		return 0;
+		for (int i = 0 ; i < auv_follower.size() ; i++)
+		{
+			if (auv_follower[i].ctr_id == id)
+			{
+				auv_follower[i].rov_mine.emplace_back(p, MINE_TRACKED);
+				auv_follower[i].n_mines++;
+				auv_follower[i].busy = true;
+
+				ClMsgMc2CtrPosition msg(auv_follower[i].ctr_id);
+				msg.setRovDestination((Position*)p);
+				sendSyncClMsg(&msg);
+
+				return 0;
+			}
+		}
+
+		// error if auv not found
 	}
-	return UwCbrModule::recvSyncClMsg(m);
+	return PlugIn::recvSyncClMsg(m);
 }

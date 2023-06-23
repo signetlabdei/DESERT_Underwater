@@ -38,16 +38,62 @@
 #ifndef UWMC_MODULE_H
 #define UWMC_MODULE_H
 #include "uwsc-clmsg.h"
-#include <uwcbr-module.h>
-#include <node-core.h>
+#include <uwsmposition.h>
+#include <module.h>
+#include <tclcl.h>
 #include <vector>
-#include <fstream>
-
 
 /**
-* UwMissionCoordinatorModule class is used to manage <i>UWROV</i> packets and to collect statistics about them.
+ * MineState list all the possible state of a mine
+ */
+enum MineState
+{
+	MINE_TRACKED, /**< Mine tracked.*/
+	MINE_DETECTED,/**< Mine found and started the removing process */
+	MINE_REMOVED /**< Mine removed */
+};
+
+/**
+ * Mines describes a mine entry
+ */
+typedef struct Mines
+{
+	Position* track_position;	/**< Mine tracked position*/
+	MineState state;	/**< Mine state */
+
+	Mines(Position* p, MineState s)
+		: track_position(p)
+		, state(s)
+	{
+	}
+} Mines;
+
+/**
+ * AUV_stats describe an AUV controlled by the leader
+ */
+typedef struct AUV_stats
+{
+	int ctr_id;	/**< Id of the ROV Ctr */
+	Position* rov_position;		/**< Position of the ROV follower */
+	std::vector<Mines> rov_mine;	/** Mines found by this ROV */
+	int n_mines;	/** Number of mines found by this ROV */
+	bool busy;	/** Status of the ROV **/
+
+	AUV_stats(int id)
+		: ctr_id(id)
+		, n_mines(0)
+		, busy(false)
+	{
+		Position p = UWSMPosition();
+		rov_position = &p;
+	}
+
+} AUV_stats;
+
+/**
+* UwMissionCoordinatorModule class is used to manage AUV followers and to collect statistics about them.
 */
-class UwMissionCoordinatorModule : public UwCbrModule {
+class UwMissionCoordinatorModule : public PlugIn {
 public:
 
 	/**
@@ -79,14 +125,6 @@ public:
 
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p);
-
-	/**
 	* Set the position of the ROV leader
 	*
 	* @param Position * p Pointer to the ROV leader position
@@ -110,15 +148,10 @@ public:
 
 
 protected:
-	UWSMPosition* leader_position; /**< ROV leader position */
-	std::vector<UWSMPosition*> follower_position; /**< ROV followers positions */
-	UWSMPosition* track_position; /**< Track positions */
+	UWSMPosition* leader_position;	/**< ROV leader position */
+	std::vector<AUV_stats> auv_follower;	/**< ROV followers info */
 
-	/**
-	 * Send the closest ROV follower to the last tracked position
-	 *
-	 */
-	void setFollowerPosition();	
+	void removeMine();
 };
 
 #endif // UWMC_MODULE_H
