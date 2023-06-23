@@ -28,7 +28,7 @@
 // 
 /**
 * @file uwauvctr-module.h
-* @author Filippo Campagnaro
+* @author Filippo Campagnaro, Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUV</i>.
@@ -200,23 +200,24 @@ protected:
 	int drop_old_waypoints;
 	float x_auv; /**< X of the last AUV position with an error.*/
 	float y_auv; /**< Y of the last AUV position with an error.*/
-	float z_auv; /**< Z of the last AUV position with an error.*/
-	float speed; /**< Moving speed sent to the AUV.*/
 	int period;
 	
 	Packet* p;
 	int log_flag;
-	std::ofstream pos_log;
-	std::ofstream err_log;	
 	int ackTimeout;	
-	static bool alarm_mode;
 	float x_sorg;
 	float y_sorg;
-	
-	//bool alarm_mode;
+	double speed;
+
+	static bool alarm_mode;
+	static vector<vector<float>> alarm_queue;
+
+	std::ofstream pos_log;
+	std::ofstream err_log;	
 
 };
 
 bool UwAUVCtrErModule::alarm_mode = false;
+vector<vector<float>>  UwAUVCtrErModule::alarm_queue = {};
 
 #endif // UWAUVCtr_MODULE_H

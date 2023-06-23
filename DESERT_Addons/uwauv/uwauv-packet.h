@@ -135,6 +135,7 @@ typedef struct hdr_uwAUV_error {
     float speed_;
     double ack_; // ack piggybacked of a ctr message. If =0 is not ack, if =b>0 is cumulative ack untill b, if c<0 is cumulative ack untill c-1 and NACK c.
     double sn_;
+    float error_;
     
 
     static int offset_; /**< Required by the PacketHeaderManager. */
@@ -170,5 +171,8 @@ typedef struct hdr_uwAUV_error {
     }
     inline float& speed() {
         return speed_;
+    }
+    inline float& error() {
+        return error_;
     }
 } hdr_uwAUV_error;

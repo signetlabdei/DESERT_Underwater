@@ -78,19 +78,18 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p)
 	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	, pos_log(0)
-	//, alarm_mode(false)
 	, period(60)
+	, speed(4)
 {
 	posit=p;
-	speed=5;
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
-	//alarm_mode = false;
+
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
+
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -106,19 +105,16 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	//, out_file_stats(0)
-	//, alarm_mode(false) 
 	, period(60)
+	, speed(4)
 
 {
 	p = NULL;
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
-	x_sorg = 0;
-	y_sorg = 0;
-	//posit = Position();
-	speed = 5;
-	//alarm_mode = false;
+	x_sorg = posit->getX();
+	y_sorg = posit->getY();
+
 	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -171,28 +167,6 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 			return TCL_OK;
 		} 
 	}
-	/*else if(argc == 4){
-		/**if (strcasecmp(argv[1], "sendPosition") == 0) {
-			newX = atof(argv[2]);
-			newY = atof(argv[3]);
-			newZ = atof(argv[4]);
-			this->reset_retx();
-			this->transmit();
-			tcl.resultf("%s", "position Setted");
-			return TCL_OK;
-		}
-	}else if(argc == 6){
-		if (strcasecmp(argv[1], "sendPosition") == 0) {
-			newX = atof(argv[2]);
-			newY = atof(argv[3]);
-			newZ = atof(argv[4]);
-			speed = atof(argv[5]);
-			this->reset_retx();
-			this->transmit();
-			tcl.resultf("%s", "position Setted");
-			return TCL_OK;
-		}
-	}*/
 
 	return UwCbrModule::command(argc,argv);
 }
@@ -200,11 +174,15 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 void UwAUVCtrErModule::start() {}
 
 void UwAUVCtrErModule::setPosition(UWSMEPosition* p){
+
 	posit = p;
+	x_sorg = posit->getX();
+	y_sorg = posit->getY();
 
 }
 
 void UwAUVCtrErModule::transmit() {
+
 	sendPkt();
 
 	if (debug_) {
@@ -217,9 +195,11 @@ void UwAUVCtrErModule::transmit() {
 }
 
 float UwAUVCtrErModule::getDistance(float x_s,float y_s,float x_d,float y_d){
+
 	float dx = x_s - x_d;
 	float dy = y_s - y_d;
 	return std::sqrt(dx*dx + dy*dy); 
+
 }
 
 void UwAUVCtrErModule::initPkt(Packet* p) {
@@ -228,37 +208,73 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	bool found = false;
 
+	uwAUVh->speed() = 0;
 	uwAUVh->ack() = ack;
 	ack = 0;
 
 	if(this->p == NULL){
 		 //TO FIX
 
-		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){ //If in the right position
+		if ((getDistance(posit->getX(),posit->getY(),x_auv,y_auv) == 0.0) && alarm_mode){ //If in the right position
 			found = true;
-		}
-		//if((getDistance(x_sorg,y_sorg,x_auv,y_auv) < getDistance(posit->getX(),posit->getY(),x_auv,y_auv)) && alarm_mode){ //if the right position
-		//																													// has been already passed
-		//	found = true;
-		//}
+			if (debug_) {
+					std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV reached the destination"<< std::endl;
+				}
 
+		}else if((getDistance(x_sorg,y_sorg,x_auv,y_auv) < getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg)) && alarm_mode){ //if the right position																													// has been already passed
+			found = true;
+			if (debug_) {
+					std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV have gone too far "<< std::endl;
+				}
+
+		}
 
 		if (found){
 			
-			uwAUVh->speed() = 100;
+			uwAUVh->speed() = -1;
 			alarm_mode = false;
 			uwAUVh->sn() = ++sn;
+			uwAUVh->x() = x_auv;
+			uwAUVh->y() = y_auv;
 			this->p = p;
 
-			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR SOLVED" 
-				<< std::endl;
-			}
-
 			if (log_flag == 1) {
+
 				err_log.open("error_log.csv",std::ios_base::app);
 				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
 				err_log.close();
+
+				pos_log.open("position_log.csv",std::ios_base::app);
+				pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+					<< ","<< posit->getZ() << std::endl;
+				pos_log.close();
+
+			}
+
+
+			if (! alarm_queue.empty()){ //take care of the next error
+
+				x_auv = alarm_queue[0][0];
+				y_auv = alarm_queue[0][1];
+
+				posit->setdest(x_auv,y_auv,posit->getZ(),speed);
+				alarm_mode = true;
+
+				alarm_queue.erase(alarm_queue.begin());
+
+				x_sorg = posit->getX();
+				y_sorg = posit->getY();
+				
+				if (debug_) {
+					std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV picked a new "
+					"error from the queue: X = " << x_auv << ", Y = " << y_auv<< std::endl;
+				}
+
+			}
+
+			if (debug_) {
+				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_auv << "," << y_auv << ") SOLVED" 
+				<< std::endl;
 			}
 
 		}
@@ -270,32 +286,43 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	//Retransmission
 	}else{
-		
-		if ((abs(posit->getX() - x_auv) < 1) && (abs(posit->getY() - y_auv ) < 1) && alarm_mode){ //If in the right position
-			found = true;
-		}
-		//if((getDistance(x_sorg,y_sorg,x_auv,y_auv) < getDistance(posit->getX(),posit->getY(),x_auv,y_auv)) && alarm_mode){ //if the right position
-		//																													// has been already passed
-		//	found = true;
-		//}
-		
-		if (found){
 
-			uwAUVh->speed() = 100;
-			alarm_mode = false;
-			uwAUVh->sn() = sn;
+		uwAUVh->speed() = -1;
+		alarm_mode = false;
+		uwAUVh->sn() = sn;
+		uwAUVh->x() = x_auv;
+		uwAUVh->y() = y_auv;
+
+
+		if (log_flag == 1) {
+
+			pos_log.open("position_log.csv",std::ios_base::app);
+			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+				<< ","<< posit->getZ() << std::endl;
+			pos_log.close();
+
+		}
+
+		if (debug_) {
+		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR ERROR ("<< x_auv << "," << y_auv << ") SOLVED" 
+			<< std::endl;
+		}
+
+		if (! alarm_queue.empty()){
+			x_auv = alarm_queue[0][0];
+			y_auv = alarm_queue[0][1];
+			posit->setdest(x_auv,y_auv,posit->getZ(),speed);
+			alarm_mode = true;
+			x_sorg = posit->getX();
+			y_sorg = posit->getY();
+			alarm_queue.erase(alarm_queue.begin());
 
 			if (debug_) {
-			std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR SOLVED" 
-				<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV picked a new "
+				"error from the queue: X = " << x_auv << ", Y = " << y_auv<< std::endl;
 			}
-			
-			if (log_flag == 1) {
-				err_log.open("error_log.csv",std::ios_base::app);
-				err_log << NOW << "," << x_auv<<","<<y_auv<< std::endl;
-				err_log.close();
-			}
-		}
+		}	
+
 	}
 	
 	UwCbrModule::initPkt(p);
@@ -307,15 +334,13 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	if (log_flag == 1) {
 
-			pos_log.open("position_log.csv",std::ios_base::app);
-			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-				<< ","<< posit->getZ() << std::endl;
-			pos_log.close();
+		pos_log.open("position_log.csv",std::ios_base::app);
+		pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< ","<< posit->getZ() << std::endl;
+		pos_log.close();
 
 	}
 
-	x_sorg = posit->getX();
-	y_sorg = posit->getY();
 }
 
 void UwAUVCtrErModule::recv(Packet* p, Handler* h) {
@@ -328,7 +353,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 	
 
 	if(uwAUVh->ack() == sn + 1) { //ack received
-		//sendTmr_.force_cancel();
 		this->p = NULL;
 	}
 	
@@ -340,55 +364,85 @@ void UwAUVCtrErModule::recv(Packet* p) {
 		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
 			<<"received"<< std::endl;
 
-	if (!alarm_mode){
+	
 
-		if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
-			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
-					<< uwAUVh->sn() << " dropped " << std::endl;
-			}
-
-		} else { //packet in order
-			x_auv = uwAUVh->x();
-			y_auv = uwAUVh->y();
-			posit->setdest(x_auv,y_auv,posit->getZ(),1);
-			last_sn_confirmed = uwAUVh->sn();
-			alarm_mode = true;
-			x_sorg = posit->getX();
-			y_sorg = posit->getY();
-
-		}
-
-		ack = last_sn_confirmed+1;
-
-		if (log_flag == 1) {
-			pos_log.open("position_log.csv",std::ios_base::app);
-			pos_log<< NOW << ","<<posit->getX() << ","<< posit->getY() 
-				<< ","<< posit->getZ() << std::endl;
-			pos_log.close();
-		}
-
-
+	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 		if (debug_) {
-			std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV received new "
-				"error: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
-				<< ", Z = " << uwAUVh->z() << " speed "<< uwAUVh->speed()<< std::endl;
+			std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
+				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
 
-		UwCbrModule::recv(p);
+	} else { 
+		if (uwAUVh->error() == 5){//packet in order
 
+			if (!alarm_mode){// TO CLEAN
 
-		if (debug_)
-			cout << NOW << " ACK sent immediately with standard priority " 
-				<< std::endl;
+				if (alarm_queue.empty()){
+
+					x_auv = uwAUVh->x();
+					y_auv = uwAUVh->y();
+
+					posit->setdest(x_auv,y_auv,posit->getZ(),speed);
+
+					last_sn_confirmed = uwAUVh->sn();
+					alarm_mode = true;
+
+					x_sorg = posit->getX();
+					y_sorg = posit->getY();
+
+					if (debug_) {
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV received new "
+						"error: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
+						<< ", Z = " << uwAUVh->z() << " speed "<< uwAUVh->speed()<< std::endl;
+					}
+
+				}else{
+
+					x_auv = alarm_queue[0][0];
+					y_auv = alarm_queue[0][1];
+					posit->setdest(x_auv,y_auv,posit->getZ(),speed);
+
+					alarm_mode = true;
+
+					last_sn_confirmed = uwAUVh->sn();	
+					
+					x_sorg = posit->getX();
+					y_sorg = posit->getY();
+					alarm_queue.erase(alarm_queue.begin());
+					alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
+
+					if (debug_) {
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV picked a new "
+						"error from the queue: X = " << x_auv << ", Y = " << y_auv<< std::endl;
+					}
+
+				}
+			}else{
+
+				last_sn_confirmed = uwAUVh->sn();
+				alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
+
+				if (debug_) {
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV add new "
+						"error in the queue: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() << std::endl;
+					}
+			}
+		}
 	}
 
+	ack = last_sn_confirmed+1;
+
+	UwCbrModule::recv(p);
 	UwCbrModule::sendPkt();
 
-	if (debug_) 
-		std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) Packet dropped: "
-			<< "alarm mode "<< std::endl;
 		
+	if (log_flag == 1) {
+		pos_log.open("position_log.csv",std::ios_base::app);
+		pos_log<< NOW << ","<<posit->getX() << ","<< posit->getY() 
+			<< ","<< posit->getZ() << std::endl;
+		pos_log.close();
+	}
+
 
 }
 

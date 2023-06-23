@@ -86,12 +86,12 @@ UwAUVErrorModule::UwAUVErrorModule()
 	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	, out_file_stats(0)
 	, period(60)
 	, error_p(0.2)
+	, alarm_mode(false)
+	, speed(1)
 {
 	UWSMEPosition p = UWSMEPosition();
-	speed = 5;
 	posit=&p;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
@@ -117,12 +117,12 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
 	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
-	, out_file_stats(0)
 	, period(60)
-	, error_p(0.2)
+	, error_p(0.1)
+	, alarm_mode(false)
+	, speed(1)
 {
 	posit = p;
-	speed = 5;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -242,73 +242,79 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 
 	uwAUVh->ack() = ack;
 	ack = 0;
-
+	uwAUVh->error() = 0;
 
 	if(this->p == NULL){
 
 		random_device rd;
 		mt19937 generator(rd());
 		uniform_real_distribution<double> distrib(0.0, 1.0);
-
-
 		double randomValue = distrib(generator) ;
 
-		if(randomValue < error_p){
-
-			uwAUVh->x() = posit->getX();
-			uwAUVh->y() = posit->getY();
-			x_e = posit->getX();
-			y_e = posit->getY();
+		if((randomValue < error_p) && (!alarm_mode)){
 
 			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
 			posit->setAlarm(true);
+			alarm_mode = true;
 
+			x_e = posit->getX();
+			y_e = posit->getY();
+			
+			uwAUVh->x() = x_e;
+			uwAUVh->y() = y_e;
+			uwAUVh->error() = 5;
 			uwAUVh->sn() = ++sn;
-			this->p = p;
 
-			//TODO: stop devices when send the alarm
+			this->p = p;
 
 
 			if (debug_) { 
 			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "ERROR!"<<"(speed="<<posit->getSpeed()<<")" << std::endl;
+				<< "ERROR ("<< x_e <<","<< y_e <<"), alarm_mode = "<< alarm_mode << std::endl;
 			}
 
 			if (log_flag == 1) {
-				error_log.open("error_calling_log.csv",std::ios_base::app);
-				error_log << NOW << "," << posit->getX()<<","<<posit->getY()<< std::endl;
-				error_log.close();
+				err_log.open("error_calling_log.csv",std::ios_base::app);
+				err_log << NOW << "," << x_e <<","<< y_e << std::endl;
+				err_log.close();
+			}
+
+			if (log_flag == 1) {
+					out_file_stats.open("postion_log_a.csv",std::ios_base::app);
+					out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
+						<< "," << posit->getZ() << std::endl;
+					out_file_stats.close();
 			}
 
 		}
 	}
 	else{  //Retransmit
-		
 
-		//retrasmission of the point where the error was called
-		uwAUVh->x() = x_e;
-		uwAUVh->y() = y_e;
-		uwAUVh->sn() = sn;
+		if (alarm_mode){
+			//retrasmission of the point where the error was called
+			uwAUVh->x() = x_e;
+			uwAUVh->y() = y_e;
+			uwAUVh->sn() = sn;
+			uwAUVh->error() = 5;
 
-		if (debug_) { 
-			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "Retransmitting"<< std::endl;
-		}
+			if (debug_) { 
+				std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
+					<< "Retransmitting ERROR ("<< x_e <<","<< y_e <<")"<< std::endl;
+			}
+		}	
 	}
+
+	UwCbrModule::initPkt(p);
 
 	if (debug_){
 		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 		std::cout << NOW << " UwAUVErrorModule::initPkt(Packet *p) AUV current "
-			<< "position: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
-			<< ", Z = " << uwAUVh->z()<< std::endl;
+			<< "position: X = " << posit->getX() << ", Y = " << posit->getY() << std::endl;
 		}
-
-	//ackTimer_.force_cancel();
-	UwCbrModule::initPkt(p);
 
 	if (log_flag == 1) {
 			out_file_stats.open("postion_log_a.csv",std::ios_base::app);
-			out_file_stats << left << NOW << "," << posit->getX() << ","<< posit->getY() 
+			out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
 				<< "," << posit->getZ() << std::endl;
 			out_file_stats.close();
 	}
@@ -328,35 +334,44 @@ void UwAUVErrorModule::recv(Packet* p) {
 	}
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+
 			if (debug_) {
 				std::cout << NOW << " UwAUVErrModule::old error with sn " 
 					<< uwAUVh->sn() << " dropped " << std::endl;
 			}
 
 		} else { //packet in order
-			//TODO: When sv reaches the right position set speed > 0
-			if(uwAUVh->speed() == 100){
+
+			if(uwAUVh->speed() == -1 && uwAUVh->x() == x_e && uwAUVh->y() == y_e && alarm_mode){
 
 				posit->setAlarm(false);
-				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),1);
+				alarm_mode = false;
+				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
+				
 
 				if (debug_) {
-					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error solved "
+					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<") solved "
 					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;
-	}
+				}
+
+				if (log_flag == 1) {
+					err_solved_log.open("error_log_a.csv",std::ios_base::app);
+					err_solved_log << NOW << "," << posit->getX() <<","<< posit->getY() << "," << posit->getSpeed() << std::endl;
+					err_solved_log.close();
+				}
+
+				if (log_flag == 1) {
+						out_file_stats.open("postion_log_a.csv",std::ios_base::app);
+						out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
+							<< "," << posit->getZ() << std::endl;
+						out_file_stats.close();
+				}
 			}
+
 			last_sn_confirmed = uwAUVh->sn();
 	}
 
 	ack = last_sn_confirmed+1;
-
-	//to update 
-	if (log_flag == 1) {
-		out_file_stats.open("postion_log_a.csv",std::ios_base::app);
-		out_file_stats << left << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< "," << posit->getZ() << std::endl;
-		out_file_stats.close();
-	}
 
 	UwCbrModule::recv(p);
 
@@ -371,4 +386,11 @@ void UwAUVErrorModule::recv(Packet* p) {
 		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
 			<<"received"<< std::endl;
 		
+	if (log_flag == 1) {
+		out_file_stats.open("postion_log_a.csv",std::ios_base::app);
+		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< "," << posit->getZ() << std::endl;
+		out_file_stats.close();
+	}
+
 }

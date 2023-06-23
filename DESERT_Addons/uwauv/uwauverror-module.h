@@ -182,7 +182,6 @@ protected:
 	enum UWAUV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
 	UWSMEPosition* posit; /**< AUV position.*/
-	float speed;
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int sn; 
 	int ack;
@@ -205,10 +204,15 @@ protected:
 	Packet* p;
 	int period;
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
-	std::ofstream error_log;
+	std::ofstream err_log;
+	std::ofstream err_solved_log;
 	float x_e;
 	float y_e;
 	float error_p;
+	bool alarm_mode;
+
+private:
+	double speed;
 };
 
 #endif // UWAUVError_MODULE_H
