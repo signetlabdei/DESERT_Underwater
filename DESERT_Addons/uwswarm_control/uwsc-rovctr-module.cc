@@ -37,6 +37,7 @@
 */
 
 #include "uwsc-rovctr-module.h"
+#include "uwsc-clmsg.h"
 #include <iostream>
 
 /**
@@ -62,6 +63,8 @@ public:
 
 UwSCROVCtrModule::UwSCROVCtrModule() 
 	: UwROVCtrModule()
+	, leader_id(0)
+	, rov_detect(false)
 {
 	bind("leader_id", (int*) &leader_id);
 }
@@ -74,6 +77,33 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "setLeaderId") == 0) {
 			leader_id = atoi(argv[2]);
 			tcl.resultf("%s", "leader_id Setted\n");
+			return TCL_OK;
+		}
+	} else if(argc == 5){
+		if (strcasecmp(argv[1], "sendPosition") == 0) {
+			if (!rov_detect)
+			{
+				newX = atof(argv[2]);
+				newY = atof(argv[3]);
+				newZ = atof(argv[4]);
+				this->reset_retx();
+				this->transmit();
+				tcl.resultf("%s", "position Setted");
+			}
+			return TCL_OK;
+		}
+	} else if(argc == 6){
+		if (strcasecmp(argv[1], "sendPosition") == 0) {
+			if (!rov_detect)
+			{
+				newX = atof(argv[2]);
+				newY = atof(argv[3]);
+				newZ = atof(argv[4]);
+				speed = atof(argv[5]);
+				this->reset_retx();
+				this->transmit();
+				tcl.resultf("%s", "position Setted");
+			}
 			return TCL_OK;
 		}
 	}
@@ -93,6 +123,12 @@ UwSCROVCtrModule::recv(Packet* p) {
 	ClMsgCtr2McPosition m(leader_id);
 	m.setRovPosition(&rov_position);
 	sendSyncClMsg(&m);
+
+	if (debug_)
+		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) "
+			<< "sending rov " << m.getSource()
+			<< " position: X = " << x_rov << ", Y = " << y_rov 
+			<< ", Z = " << z_rov << std::endl;
 }
 
 int
@@ -105,10 +141,32 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 		newY = p->getY();
 		newZ = p->getZ();
 
+		rov_detect = true;
+
 		UwROVCtrModule::reset_retx();
 		UwROVCtrModule::transmit();
 
+		if (debug_)
+			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
+				<< "set new destination of rov " << m->getDest()
+				<< " to position: X = " << newX << ", Y = " << newY 
+				<< ", Z = " << newZ << std::endl;
+
 		return 0;
 	}
+	else if (m->type() == CLMSG_MC2CTR_SETSTATUS)
+	{
+		rov_detect = ((ClMsgMc2CtrStatus*)m)->getRovStatus();
+
+		if (debug_)
+			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
+				<< "mine detected by rov " << m->getDest()
+				<< " at position: X = " << x_rov << ", Y = " << y_rov 
+				<< ", Z = " << z_rov 
+				<< " has been removed " << std::endl;
+
+		return 0;
+	}
+
 	return UwCbrModule::recvSyncClMsg(m);
 }

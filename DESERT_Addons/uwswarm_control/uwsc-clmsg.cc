@@ -100,6 +100,38 @@ ClMsgMc2CtrPosition::getRovDestination() const
 {
 	return rov_destination;
 }
+
+////////////////////////////////////////////////////////
+
+ClMsgMc2CtrStatus::ClMsgMc2CtrStatus(int dest_id)
+	: ClMessage(CLMSG_MC2CTR_VERBOSITY,
+		CLMSG_MC2CTR_SETSTATUS, UNICAST, dest_id)
+	, rov_detect(false)
+{
+}
+
+ClMsgMc2CtrStatus::~ClMsgMc2CtrStatus()
+{
+}
+
+ClMsgMc2CtrStatus* 
+ClMsgMc2CtrStatus::copy()
+{
+  return new ClMsgMc2CtrStatus(*this);
+}
+
+void
+ClMsgMc2CtrStatus::setRovStatus(bool detect)
+{
+	rov_detect = detect;
+}
+
+bool
+ClMsgMc2CtrStatus::getRovStatus() const
+{
+	return rov_detect;
+}
+
 ////////////////////////////////////////////////////////
 
 ClMsgTrack2McPosition::ClMsgTrack2McPosition(int dest_id)

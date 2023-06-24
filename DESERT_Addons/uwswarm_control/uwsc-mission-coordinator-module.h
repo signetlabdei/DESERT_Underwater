@@ -81,6 +81,7 @@ typedef struct AUV_stats
 
 	AUV_stats(int id)
 		: ctr_id(id)
+		, rov_mine()
 		, n_mines(0)
 		, busy(false)
 	{
@@ -151,7 +152,13 @@ protected:
 	UWSMPosition* leader_position;	/**< ROV leader position */
 	std::vector<AUV_stats> auv_follower;	/**< ROV followers info */
 
-	void removeMine();
+	/**
+	 * Send a signal to a specific rov that the mine was removed
+	 *
+	 * @param int id of the rov sent to detect the mine
+	 *
+	 */
+	void removeMine(int id);
 };
 
 #endif // UWMC_MODULE_H

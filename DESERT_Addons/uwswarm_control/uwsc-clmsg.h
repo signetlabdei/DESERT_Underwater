@@ -48,6 +48,7 @@
 #define CLMSG_TRACK2MC_VERBOSITY 3
 
 extern ClMessage_t CLMSG_MC2CTR_SETPOS;
+extern ClMessage_t CLMSG_MC2CTR_SETSTATUS;
 extern ClMessage_t CLMSG_CTR2MC_GETPOS;
 extern ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
 
@@ -126,6 +127,44 @@ class ClMsgMc2CtrPosition : public ClMessage
     
   private:
     Position* rov_destination; /**< Rov follower new destination */
+};
+
+/**
+ * Message to set the rov follower status via uwrovctr module
+ */
+class ClMsgMc2CtrStatus : public ClMessage
+{
+  public:
+
+	/**
+	 * Class constructor
+     * @param dest_id: id of the destination module
+	 */
+    ClMsgMc2CtrStatus(int dest_id);
+        
+    virtual ~ClMsgMc2CtrStatus();
+
+    /**
+     * Creates a copy of the object
+     * @return Pointer to a copy of the object
+     */
+    ClMsgMc2CtrStatus* copy();
+
+    /**
+     * Sets the rov follower status
+     * @param rov_detect rov follower status
+     */
+    void setRovStatus(bool detect);
+
+    /**
+     * Get the rov follower status
+     * @return rov_detect rov follower status
+     */
+    bool getRovStatus() const;
+    
+    
+  private:
+    bool rov_detect; /**< Rov follower status (detecting or not) */
 };
 
 /**

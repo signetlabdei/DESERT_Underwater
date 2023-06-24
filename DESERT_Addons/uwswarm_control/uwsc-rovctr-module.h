@@ -31,16 +31,9 @@
 * @author Filippo Campagnaro, Vincenzo Cimino
 * @version 1.0.0
 *
-* \brief Provides the definition of the class <i>UWROV</i>.
+* \brief Provides the definition of the class <i>UWSCROVCTR</i>.
 *
-* Provides the definition of the class <i>UWROVCTR</i>, based on <i>UwCbr</i>.
-* <i>UWROVCTR</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWROVCTR</i> sends control packets containing the next waypoint that has to be
-* reach by a ROV. In addition it receives monitoring packets containing the current
-* ROV position and acks of the sent packets. Whether the ack is not received, the
-* control packet is resent, according to the priority. In particular, last waypoint
-* transmitted has the highest priority, whereas the others are forgotten.:
+* Provides the definition of the class <i>UWSCROVCTR</i>, based on <i>UWROVCTR</i>.
 */
 
 
@@ -88,7 +81,8 @@ public:
 	int recvSyncClMsg(ClMessage* m);
 
 protected:
-	int leader_id;
+	int leader_id; /**< id of the auv leader */
+	bool rov_detect; /** status of the rov follower (detecting a mine or not) */
 };
 
 #endif // UWSCROVCtr_MODULE_H

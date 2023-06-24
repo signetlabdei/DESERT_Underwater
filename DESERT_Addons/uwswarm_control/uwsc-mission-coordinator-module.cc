@@ -48,7 +48,7 @@ public:
 	/**
    * Constructor of the class
    */
-	UwMissionCoordinatorModuleClass() : TclClass("Module/UW/MC") {
+	UwMissionCoordinatorModuleClass() : TclClass("Module/UW/SC/MC") {
 	}
 
 	/**
@@ -102,11 +102,14 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setAUVId") == 0) {
-			auv_follower.emplace_back(atoi(argv[2]));
+			AUV_stats auv(atoi(argv[2]));
+			auv_follower.emplace_back(auv);
+			tcl.resultf("%d", "auv follower added\n");
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "removeMine") == 0) {
-			// TODO: implement remove mine method
-			// remove last mine detected by the rov specified by its id
+			removeMine(atoi(argv[2]));
+			tcl.resultf("%d", "mine removed\n");
+			return TCL_OK;
 		}
 	}
 	else if(argc == 5){
@@ -138,37 +141,51 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		Position* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
 
-		for (int i = 0 ; i < auv_follower.size() ; i++)
+		for (auto& auv : auv_follower)
 		{
-			if (auv_follower[i].ctr_id == id)
+			if (auv.ctr_id == id)
 			{
-				auv_follower[i].rov_position = p;
+				auv.rov_position = p;
 
-				int n = auv_follower[i].n_mines;
-				if (auv_follower[i].busy &&
-						auv_follower[i].rov_mine[n-1].state == MINE_TRACKED)
-				{
-					auv_follower[i].rov_mine[n-1].state = MINE_DETECTED;
-				}
+				int n = auv.n_mines;
+				if (auv.busy && auv.rov_mine[n-1].state == MINE_TRACKED)
+					auv.rov_mine[n-1].state = MINE_DETECTED;
+
+				if (debug_)
+					std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
+						<< " received rov " << auv.ctr_id
+						<< " new position: " << auv.rov_position 
+						<< " number of mine tracked: " << auv.n_mines
+						<< " detecting a mine: " << auv.busy << std::endl;
 				return 0;
 			}
 		}
-		// error if auv not found
+
+		if (debug_)
+			std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
+				<< " no rov found with id " << id << std::endl;
 	}
-	if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
+	else if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
 	{
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		Position* p = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
 
-		for (int i = 0 ; i < auv_follower.size() ; i++)
+		for (auto& auv : auv_follower)
 		{
-			if (auv_follower[i].ctr_id == id)
+			if (auv.ctr_id == id)
 			{
-				auv_follower[i].rov_mine.emplace_back(p, MINE_TRACKED);
-				auv_follower[i].n_mines++;
-				auv_follower[i].busy = true;
+				auv.rov_mine.emplace_back(p, MINE_TRACKED);
+				auv.n_mines++;
+				auv.busy = true;
 
-				ClMsgMc2CtrPosition msg(auv_follower[i].ctr_id);
+				if (debug_)
+					std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
+						<< " rov " << auv.ctr_id 
+						<< " tracked a mine at " << p
+						<< " number of mine tracked: " << auv.n_mines
+						<< " detecting a mine: " << auv.busy << std::endl;
+
+				ClMsgMc2CtrPosition msg(auv.ctr_id);
 				msg.setRovDestination(p);
 				sendSyncClMsg(&msg);
 
@@ -176,7 +193,40 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			}
 		}
 
-		// error if auv not found
+		if (debug_)
+			std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
+				<< " no rov found with id " << id << std::endl;
 	}
+
 	return PlugIn::recvSyncClMsg(m);
+}
+
+void
+UwMissionCoordinatorModule::removeMine(int id)
+{
+	for (auto& auv : auv_follower)
+	{
+		if (auv.ctr_id == id)
+		{
+			int n = auv.n_mines;
+			auv.rov_mine[n-1].state = MINE_REMOVED;
+			auv.busy = false;
+
+			ClMsgMc2CtrStatus msg(auv.ctr_id);
+			msg.setRovStatus(auv.busy);
+			sendSyncClMsg(&msg);
+
+			if (debug_)
+				std::cout << NOW << "  UwMissionCoordinatorModule:removeMine()"
+					<< " mine detected by rov " << auv.ctr_id
+					<< " at " << auv.rov_position
+					<< " has been removed " << std::endl;
+
+			break;
+		}
+	}
+
+	if (debug_)
+		std::cout << NOW << "  UwMissionCoordinatorModule:removeMine()"
+			<< " no rov found with id " << id << std::endl;
 }

@@ -60,8 +60,12 @@ public:
 
 UwSCTrackerModule::UwSCTrackerModule() 
 	: UwTrackerModule()
+	, leader_id(0)
 {
 	bind("leader_id", (int*) &leader_id);
+
+	Position mp = Position();
+	mine_position = &mp;
 }
 
 
@@ -99,6 +103,14 @@ UwSCTrackerModule::recv(Packet* p) {
 	m.setTrackPosition(mine_position);
 
 	sendSyncClMsg(&m);
+
+	if (debug_)
+		std::cout << NOW << "  UwSCTrackerModule:recv(Packet* p)"
+			<< " rov " << m.getSource() 
+			<< " tracked a mine at position: X = " << mine_position->getX()
+			<< "  , Y = " << mine_position->getY()
+			<< "  , Z = " << mine_position->getZ()
+			<< " sending it to the mission coordinator " << std::endl;
 
 	UwCbrModule::recv(p);
 }
