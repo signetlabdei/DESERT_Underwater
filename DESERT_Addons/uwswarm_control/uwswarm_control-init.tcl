@@ -31,12 +31,36 @@
 # @version 1.0.0
 
 Module/UW/SC/CTR set leader_id 0
-MODULE/UW/SC/CTR set debug_ 0
+Module/UW/SC/CTR set debug_ 0
+Module/UW/SC/CTR set packetSize_         500
+Module/UW/SC/CTR set period_             60
+Module/UW/SC/CTR set destPort_           0
+Module/UW/SC/CTR set destAddr_           0
+Module/UW/SC/CTR set debug_              0
+Module/UW/SC/CTR set PoissonTraffic_     1
+Module/UW/SC/CTR set drop_out_of_order_  0
+Module/UW/SC/CTR set adaptiveRTO_     	  0
+Module/UW/SC/CTR set traffic_type_		  0
+Module/UW/SC/CTR set tracefile_enabler_  0
+
+Module/UW/ROV set packetSize_         500
+Module/UW/ROV set period_             60
+Module/UW/ROV set destPort_           0
+Module/UW/ROV set destAddr_           0
+Module/UW/ROV set debug_              0
+Module/UW/ROV set PoissonTraffic_     1
+Module/UW/ROV set drop_out_of_order_  0
+Module/UW/ROV set ackTimeout_		  10
+Module/UW/ROV set ackPriority_ 		  0
+Module/UW/ROV set drop_old_waypoints_ 0
+Module/UW/ROV set log_flag_ 		  0
+Module/UW/ROV set traffic_type_		  0
+Module/UW/ROV set tracefile_enabler_  0
 
 Module/UW/SC/TRACKER set leader_id 0
-MODULE/UW/SC/TRACKER set debug_ 0
+Module/UW/SC/TRACKER set debug_ 0
 
-MODULE/UW/SC/MC set debug_ 0
+Module/UW/SC/MC set debug_ 0
 
 Position/UWSM set debug_ 0
 
