@@ -41,13 +41,16 @@
 #include "uwsc-clmsg.h"
 
 extern EmbeddedTcl Uwswarm_controlTclCode;
-extern ClMessage_t CLMSG_MC2CTR_SETPOS;
-extern ClMessage_t CLMSG_CTR2MC_GETPOS;
-extern ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
+
+ClMessage_t CLMSG_MC2CTR_SETPOS;
+ClMessage_t CLMSG_MC2CTR_SETSTATUS;
+ClMessage_t CLMSG_CTR2MC_GETPOS;
+ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
 
 extern "C" int 
 Uwswarm_control_Init() {
 	CLMSG_MC2CTR_SETPOS = ClMessage::addClMessage();
+	CLMSG_MC2CTR_SETSTATUS = ClMessage::addClMessage();
 	CLMSG_CTR2MC_GETPOS = ClMessage::addClMessage();
 	CLMSG_TRACK2MC_TRACKPOS = ClMessage::addClMessage();
 	Uwswarm_controlTclCode.load();

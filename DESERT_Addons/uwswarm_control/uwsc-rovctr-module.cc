@@ -86,8 +86,8 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 				newX = atof(argv[2]);
 				newY = atof(argv[3]);
 				newZ = atof(argv[4]);
-				this->reset_retx();
-				this->transmit();
+				UwROVCtrModule::reset_retx();
+				UwROVCtrModule::transmit();
 				tcl.resultf("%s", "position Setted");
 			}
 			return TCL_OK;
@@ -100,8 +100,8 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 				newY = atof(argv[3]);
 				newZ = atof(argv[4]);
 				speed = atof(argv[5]);
-				this->reset_retx();
-				this->transmit();
+				UwROVCtrModule::reset_retx();
+				UwROVCtrModule::transmit();
 				tcl.resultf("%s", "position Setted");
 			}
 			return TCL_OK;

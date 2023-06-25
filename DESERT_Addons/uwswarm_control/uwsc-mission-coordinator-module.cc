@@ -167,6 +167,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 	}
 	else if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
 	{
+		// what if multiple auv track the same mine?
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		Position* p = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
 

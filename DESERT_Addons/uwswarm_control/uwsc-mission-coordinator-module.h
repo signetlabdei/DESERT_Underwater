@@ -39,9 +39,11 @@
 #define UWMC_MODULE_H
 #include "uwsc-clmsg.h"
 #include <uwsmposition.h>
-#include <module.h>
+#include <plugin.h>
 #include <tclcl.h>
 #include <vector>
+
+class UwMissionCoordinatorModule;
 
 /**
  * MineState list all the possible state of a mine
