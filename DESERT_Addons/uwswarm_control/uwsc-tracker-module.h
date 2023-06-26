@@ -72,7 +72,7 @@ public:
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
-	virtual void recv(Packet *);
+	virtual void recv(Packet*);
 
 protected:
 	Position* mine_position;

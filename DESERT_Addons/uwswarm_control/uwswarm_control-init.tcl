@@ -30,7 +30,6 @@
 # @author Filippo Campagnaro, Vincenzo Cimino
 # @version 1.0.0
 
-Module/UW/SC/CTR set leader_id 0
 Module/UW/SC/CTR set debug_ 0
 Module/UW/SC/CTR set packetSize_         500
 Module/UW/SC/CTR set period_             60

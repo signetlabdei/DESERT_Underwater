@@ -66,7 +66,6 @@ UwSCROVCtrModule::UwSCROVCtrModule()
 	, leader_id(0)
 	, rov_detect(false)
 {
-	bind("leader_id", (int*) &leader_id);
 }
 
 UwSCROVCtrModule::~UwSCROVCtrModule() {}
@@ -126,8 +125,9 @@ UwSCROVCtrModule::recv(Packet* p) {
 
 	if (debug_)
 		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) "
-			<< "sending rov " << m.getSource()
-			<< " position: X = " << x_rov << ", Y = " << y_rov 
+			<< "sending from rov (" << m.getSource()
+			<< ") to mc (" << m.getDest()
+			<< ") position: X = " << x_rov << ", Y = " << y_rov
 			<< ", Z = " << z_rov << std::endl;
 }
 

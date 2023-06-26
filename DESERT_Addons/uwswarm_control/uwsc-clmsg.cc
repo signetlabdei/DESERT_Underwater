@@ -137,8 +137,9 @@ ClMsgMc2CtrStatus::getRovStatus() const
 ClMsgTrack2McPosition::ClMsgTrack2McPosition(int dest_id)
 	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
 		CLMSG_TRACK2MC_TRACKPOS, UNICAST, dest_id)
-	, track_position(nullptr)
 {
+	Position pos = Position();
+	track_position = &pos;
 }
 
 ClMsgTrack2McPosition::~ClMsgTrack2McPosition()

@@ -35,7 +35,10 @@
 *
 */
 #include "uwsc-tracker-module.h"
+#include <uwsmposition.h>
 #include <iostream>
+
+#define HDR_UWTRACK(p) (hdr_uwTracker::access(p))
 
 /**
 * Class that represents the binding with the tcl configuration script 
@@ -62,8 +65,6 @@ UwSCTrackerModule::UwSCTrackerModule()
 	: UwTrackerModule()
 	, leader_id(0)
 {
-	bind("leader_id", (int*) &leader_id);
-
 	Position mp = Position();
 	mine_position = &mp;
 }
@@ -75,17 +76,6 @@ int
 UwSCTrackerModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if(argc == 3){
-		if (strcasecmp(argv[1], "setTrack") == 0) {
-			Position* p = dynamic_cast<Position*> (tcl.lookup(argv[2]));
-			mine_position = p;
-			tcl.resultf("%s", "position Setted\n");
-			return TCL_OK;
-		}
-		if (strcasecmp(argv[1], "setMaxTrackDistance") == 0) {
-			max_tracking_distance = atof(argv[2]);
-			tcl.resultf("%s", "max_tracking_distance Setted\n");
-			return TCL_OK;
-		}
 		if (strcasecmp(argv[1], "setLeaderId") == 0) {
 			leader_id = atoi(argv[2]);
 			tcl.resultf("%s", "leader_id Setted\n");
@@ -95,22 +85,28 @@ UwSCTrackerModule::command(int argc, const char*const* argv) {
 	return UwTrackerModule::command(argc,argv);
 }
 
+
 void
 UwSCTrackerModule::recv(Packet* p) {
-	mine_position = (Position*) track_position;
+	hdr_uwTracker* uw_track_h = HDR_UWTRACK(p);
+	Position temp_position;
+	temp_position.setX(uw_track_h->x());
+	temp_position.setY(uw_track_h->y());
+	temp_position.setZ(uw_track_h->z());
+	mine_position = &temp_position;
 
 	ClMsgTrack2McPosition m (leader_id);
 	m.setTrackPosition(mine_position);
-
 	sendSyncClMsg(&m);
 
 	if (debug_)
-		std::cout << NOW << "  UwSCTrackerModule:recv(Packet* p)"
-			<< " rov " << m.getSource() 
-			<< " tracked a mine at position: X = " << mine_position->getX()
+		std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
+			<< " rov (" << m.getSource()
+			<< ") tracked a mine at position: X = " << mine_position->getX()
 			<< "  , Y = " << mine_position->getY()
 			<< "  , Z = " << mine_position->getZ()
-			<< " sending it to the mission coordinator " << std::endl;
+			<< " sending it to the mc ("<< m.getDest() << ")"
+			<< std::endl;
 
 	UwCbrModule::recv(p);
 }
