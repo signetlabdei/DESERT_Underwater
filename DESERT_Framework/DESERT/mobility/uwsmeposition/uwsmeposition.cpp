@@ -60,7 +60,7 @@ public:
 
 UWSMEPosition::UWSMEPosition()
 	: UWSMPosition()
-	, alarm_mode(false)
+	, alarm_mode(false) 
 {
 	bind("debug_", &debug_);
 }

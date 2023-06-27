@@ -144,20 +144,20 @@ set opt(ack_mode)           "setNoAckMode"
 set opt(txpower)            135.0 
 #set opt(txpower_hf)         135.0 
 
-set opt(tdma_frame) 20
-set opt(tdma_gard)  1
+#set opt(tdma_frame) 20
+#set opt(tdma_gard)  1
 
 set opt(pktsize)    125
 set opt(ctr_period) 60
 
-set opt(pktsize_monitoring) 50
-set opt(auv_period) 40
+set opt(pktsize_monitoring) 125
+set opt(auv_period) 60
 
 #set opt(pktsize_control) 100
 #set opt(cbr_period_control)  [expr $opt(cbr_period_monitoring)*4]
 
-set opt(pktsize_error) 1000
-set opt(auv_period_error)  [expr $opt(auv_period)*5]
+set opt(pktsize_error) 100
+set opt(auv_period_error) 60
 
 set opt(op_freq)              10000000
 set opt(op_bw)                100000
@@ -233,16 +233,16 @@ Module/UW/AUV set PoissonTraffic_      1
 Module/UW/AUV set debug_               0
 
 #UW/AUV/ERR
-Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
-Module/UW/AUV/ERR set period_              $opt(auv_period)
-Module/UW/AUV/ERR set PoissonTraffic_      1
-Module/UW/AUV/ERR set debug_               0
+#Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
+#Module/UW/AUV/ERR set period_              $opt(auv_period)
+#Module/UW/AUV/ERR set PoissonTraffic_      1
+#Module/UW/AUV/ERR set debug_               0
 
 #UW/AUV/CERR
-Module/UW/AUV/CER set packetSize_          $opt(pktsize)
-Module/UW/AUV/CER set period_              $opt(auv_period)
-Module/UW/AUV/CER set PoissonTraffic_      1
-Module/UW/AUV/CER set debug_               0
+#Module/UW/AUV/CER set packetSize_          $opt(pktsize)
+#Module/UW/AUV/CER set period_              $opt(auv_period)
+#Module/UW/AUV/CER set PoissonTraffic_      1
+#Module/UW/AUV/CER set debug_               1
 
 
 # BPSK              
@@ -264,10 +264,10 @@ Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  50
 Module/UW/CSMA_ALOHA set wait_costant_ 0.01
 Module/UW/CSMA_ALOHA set listen_time_ 0.01
 
-Module/UW/TDMA set frame_duration   $opt(tdma_frame)
-Module/UW/TDMA set fair_mode        1
-Module/UW/TDMA set guard_time       $opt(tdma_gard)
-Module/UW/TDMA set tot_slots        $opt(n_auv)
+#Module/UW/TDMA set frame_duration   $opt(tdma_frame)
+#Module/UW/TDMA set fair_mode        1
+#Module/UW/TDMA set guard_time       $opt(tdma_gard)
+#Module/UW/TDMA set tot_slots        $opt(n_auv)
 
 # PHY
 
@@ -477,28 +477,21 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
 #$ns at $opt(stoptime)     "$mac_op_asv stop"
 
 proc update_and_check {t} {
-    set outfile_auv0 [open "test_uwauv0_results.csv" "a"]
-    set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
+    set outfile_auv [open "test_uwauv0_results.csv" "a"]
+    #set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
     set outfile_asv [open "test_uwasv_results.csv" "a"]
     global position_auv position_asv auv_app asv_app opt n_auv auv_err asv_err
-    #for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
-    #    $position_auv($id1) update
-    #    $position_asv update
-    #    puts $outfile "positions AUV: x( $id1 ) = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
-    #    puts $outfile "positions AUV_ERR: x( $id1 ) = [$auv_err($id1) getX], y = [$auv_err($id1) getY], z =  [$auv_err($id1) getZ]"  
-    #}
+    for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
+        $position_auv($id1) update
+        puts $outfile_auv "positions AUV($id1): x = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
+    }
 
-    $position_auv(0) update
-    $position_auv(1) update
+
     $position_asv update
-
-    puts $outfile_auv0 "$t,[$auv_app(0) getX],[$auv_app(0) getY],[$auv_app(0) getZ]" 
-    puts $outfile_auv1 "$t,[$auv_app(1) getX],[$auv_app(1) getY],[$auv_app(1) getZ]" 
     puts $outfile_asv "$t,[$asv_app(0) getX],[$asv_app(0) getY],[$asv_app(0) getZ]"
       #puts "positions AUV: x = [$applicationAUV getX], y = [$applicationAUV getY], z =  [$applicationAUV getZ]"
     
-    close $outfile_auv0
-    close $outfile_auv1
+    close $outfile_auv
     close $outfile_asv
 
     

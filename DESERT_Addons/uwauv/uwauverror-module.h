@@ -48,6 +48,7 @@
 #include "uwsmeposition.h"
 #include <queue>
 #include <fstream>
+//#include <boost/math/special_functions/erf.hpp>
 #define UWAUVError_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -209,10 +210,18 @@ protected:
 	float x_e;
 	float y_e;
 	float error_p;
-	bool alarm_mode;
+	int alarm_mode;
 
 private:
+
 	double speed;
+	virtual double getErrorProb();
+	virtual double getErrorProb(double t_e);
+	//virtual double QFunction(double x);
+	double t_e;  // True error in that point
+	double sigma; // standard deviation
+	double th_ne; // if x < th_e NO error
+
 };
 
 #endif // UWAUVError_MODULE_H

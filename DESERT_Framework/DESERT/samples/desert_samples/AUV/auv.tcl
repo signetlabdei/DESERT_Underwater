@@ -28,8 +28,11 @@ proc createAUV { id } {
     Module/UW/AUV/ERR set period_              500
     Module/UW/AUV/ERR set PoissonTraffic_      1
     Module/UW/AUV/ERR set traffic_type_        3
-    Module/UW/AUV/ERR set debug_               0
+    Module/UW/AUV/ERR set debug_               1
     Module/UW/AUV/ERR set log_flag_            1
+    Module/UW/AUV/ERR set sigma_               0.01
+    Module/UW/AUV/ERR set th_ne_               0.99
+
     set auv_err($id)  [new Module/UW/AUV/ERR]
 
 
@@ -41,12 +44,12 @@ proc createAUV { id } {
     set ctr_auv($id)  [new Module/UW/MULTI_TRAFFIC_RANGE_CTR]
 
 
-    Module/UW/TDMA set frame_duration   $opt(tdma_frame)
-    Module/UW/TDMA set fair_mode        1   
-    Module/UW/TDMA set guard_time       $opt(tdma_gard)
-    Module/UW/TDMA set tot_slots        $opt(n_auv)
-    Module/UW/TDMA set debug_ 0
-    Module/UW/TDMA set queue_size_ 100
+    #Module/UW/TDMA set frame_duration   $opt(tdma_frame)
+    #Module/UW/TDMA set fair_mode        1   
+    #Module/UW/TDMA set guard_time       $opt(tdma_gard)
+    #Module/UW/TDMA set tot_slots        $opt(n_auv)
+    #Module/UW/TDMA set debug_ 0
+    #Module/UW/TDMA set queue_size_ 100
 
     Module/UW/CSMA_ALOHA set listen_time_          [expr 1.0e-12]
     Module/UW/CSMA_ALOHA set wait_costant_         [expr 1.0e-12]

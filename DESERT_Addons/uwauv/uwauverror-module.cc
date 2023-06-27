@@ -87,8 +87,8 @@ UwAUVErrorModule::UwAUVErrorModule()
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, error_p(0.2)
-	, alarm_mode(false)
+	, error_p(0)
+	, alarm_mode(0)
 	, speed(1)
 {
 	UWSMEPosition p = UWSMEPosition();
@@ -97,7 +97,8 @@ UwAUVErrorModule::UwAUVErrorModule()
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-	bind("error_p_", (int*) &error_p );
+	bind("sigma_", (double*) &sigma );
+	bind("th_ne_", (double*) &th_ne );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -118,8 +119,8 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, error_p(0.1)
-	, alarm_mode(false)
+	, error_p(0)
+	, alarm_mode(0)
 	, speed(1)
 {
 	posit = p;
@@ -127,7 +128,9 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-	bind("error_p_", (int*) &error_p );
+	bind("sigma_", (double*) &sigma);
+	bind("th_ne_", (double*) &th_ne );
+
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -244,38 +247,42 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 	ack = 0;
 	uwAUVh->error() = 0;
 
-	if(this->p == NULL){
+	if (alarm_mode != 2 ){
 
-		random_device rd;
-		mt19937 generator(rd());
-		uniform_real_distribution<double> distrib(0.0, 1.0);
-		double randomValue = distrib(generator) ;
+		if (alarm_mode == 1){
 
-		if((randomValue < error_p) && (!alarm_mode)){
+			error_p = getErrorProb(t_e);
+			
+		}else{
+			
+			error_p = getErrorProb();
+		}
 
-			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
+		
+
+		if (alarm_mode == 1){
+
+			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0); //STOP
 			posit->setAlarm(true);
-			alarm_mode = true;
+			//alarm_mode = true;
 
-			x_e = posit->getX();
+			x_e = posit->getX();													// Save error position
 			y_e = posit->getY();
 			
-			uwAUVh->x() = x_e;
+			uwAUVh->x() = x_e;                      
 			uwAUVh->y() = y_e;
-			uwAUVh->error() = 5;
-			uwAUVh->sn() = ++sn;
-
+			uwAUVh->error() = error_p;
 			this->p = p;
 
 
 			if (debug_) { 
 			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "ERROR ("<< x_e <<","<< y_e <<"), alarm_mode = "<< alarm_mode << std::endl;
+				<< "ERROR ("<< x_e <<","<< y_e << "," << error_p <<"), alarm_mode = "<< alarm_mode<<", true error= "<< t_e << std::endl;
 			}
 
 			if (log_flag == 1) {
 				err_log.open("error_calling_log.csv",std::ios_base::app);
-				err_log << NOW << "," << x_e <<","<< y_e << std::endl;
+				err_log << NOW << "," << x_e <<","<< y_e << "," << posit->getZ() << "," << error_p << std::endl;
 				err_log.close();
 			}
 
@@ -286,23 +293,17 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 					out_file_stats.close();
 			}
 
-		}
-	}
-	else{  //Retransmit
-
-		if (alarm_mode){
-			//retrasmission of the point where the error was called
-			uwAUVh->x() = x_e;
-			uwAUVh->y() = y_e;
-			uwAUVh->sn() = sn;
-			uwAUVh->error() = 5;
+		}else{
 
 			if (debug_) { 
-				std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-					<< "Retransmitting ERROR ("<< x_e <<","<< y_e <<")"<< std::endl;
+			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
+				<< "no error "<<" alarm_mode = " << alarm_mode << std::endl;
 			}
-		}	
+
+		}
 	}
+
+	uwAUVh->sn() = ++sn;
 
 	UwCbrModule::initPkt(p);
 
@@ -342,10 +343,18 @@ void UwAUVErrorModule::recv(Packet* p) {
 
 		} else { //packet in order
 
-			if(uwAUVh->speed() == -1 && uwAUVh->x() == x_e && uwAUVh->y() == y_e && alarm_mode){
+		/** 
+		 * error > 0 tx more data
+		 * error > 1 stop tx, Ctr is coming
+		 * error < 0 stop tx, there is no error
+		*/
+
+		if (alarm_mode && uwAUVh->x() == x_e && uwAUVh->y() == y_e){  //Valid pkt refering to my error
+
+			if (uwAUVh->error() < 0 ){
 
 				posit->setAlarm(false);
-				alarm_mode = false;
+				alarm_mode = 0;
 				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
 				
 
@@ -360,13 +369,24 @@ void UwAUVErrorModule::recv(Packet* p) {
 					err_solved_log.close();
 				}
 
-				if (log_flag == 1) {
-						out_file_stats.open("postion_log_a.csv",std::ios_base::app);
-						out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-							<< "," << posit->getZ() << std::endl;
-						out_file_stats.close();
-				}
+			} else if (uwAUVh->error() >= 1 ){
+
+				alarm_mode = 2;
+
+				if (debug_)
+					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<") solved "
+					"STOP until ctr arrival"<< std::endl;
+
+			}else{
+
+				alarm_mode = 1;
+
+				if (debug_)
+					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) MAYBE there is an error ("<< x_e <<","<< y_e <<") solved "
+					"continue tx"<< std::endl;
+
 			}
+		}
 
 			last_sn_confirmed = uwAUVh->sn();
 	}
@@ -394,3 +414,90 @@ void UwAUVErrorModule::recv(Packet* p) {
 	}
 
 }
+
+double UwAUVErrorModule::getErrorProb(){
+
+	std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> u_dis(0.0, 1.0);
+
+    // Generate a random value from the uniform distribution
+    t_e = u_dis(gen);
+
+	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
+
+    // Generate a random value from the Gaussian distribution
+    double noise = n_dis(gen);
+
+	double m = t_e + noise;
+
+	//double p_e = QFunction(m);
+
+	// Calculate the error probability
+    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of true error (t_e) greater than th_ne
+
+
+	//double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
+	
+	if (p_e >= 0.001){ //if p_e is small enough --> no error, otherwise gray zone
+		alarm_mode = 1;
+	}
+
+	return m;
+	
+
+}
+
+
+double UwAUVErrorModule::getErrorProb(double t_e){
+
+	std::random_device rd;
+    std::mt19937 gen(rd());
+
+	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
+
+    // Generate a random value from the Gaussian distribution
+    double noise = n_dis(gen);
+
+	double m = t_e + noise;
+
+	//double p_e = QFunction(m);
+
+	// Calculate the probability using std::erfc
+    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of t_e grater than th_ne
+
+
+	double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
+	
+	//if (p_e >= th_5sig){ //if p_e is small enough --> no error 
+	//	alarm_mode = 1;
+	//}
+
+	return m;
+	
+
+}
+
+/*double QFunction(double x) {
+
+	x = (th_ne - x)/ sigma;
+
+	if (x < 0.0) {
+        return 1.0 - QFunction(-x); // Q(-x) = 1 - Q(x)
+    }
+
+    double constant = 1.0 / std::sqrt(2.0 * M_PI);
+    double xSquared = x * x;
+    double xPower = x;
+    double qValue = 0.0;
+    double term = constant * std::exp(-0.5 * xSquared);
+
+    for (int i = 1; i <= 100; i++) {
+        qValue += term;
+        term *= -xSquared / i;
+    }
+
+    return qValue;
+}*/
+
+

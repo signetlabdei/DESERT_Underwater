@@ -198,9 +198,13 @@ protected:
 	int sn; /**Sequence number of the last control packet sent.*/
 	int ack;
 	int drop_old_waypoints;
-	float x_auv; /**< X of the last AUV position with an error.*/
-	float y_auv; /**< Y of the last AUV position with an error.*/
 	int period;
+
+	float x_err; /**< X of the last AUV position with an error.*/
+	float y_err; /**< Y of the last AUV position with an error.*/
+
+	float x_s; /**< X of the last AUV position with an error that has been solved.*/
+	float y_s; /**< Y of the last AUV position with an error that has been solved.*/
 	
 	Packet* p;
 	int log_flag;
@@ -209,15 +213,29 @@ protected:
 	float y_sorg;
 	double speed;
 
-	static bool alarm_mode;
+	static int alarm_mode;
+	bool error_released;   /*
+								* 0 no error
+								* 1 maybe an error --> wait more info
+								* 2 for sure an error -> go there
+							*/
 	static vector<vector<float>> alarm_queue;
+	static vector<vector<float>> gray_queue;
 
+private:
+
+
+	virtual int checkError(double m, int n_pkt); 
 	std::ofstream pos_log;
-	std::ofstream err_log;	
+	std::ofstream err_log;
+	double sigma; // standard deviation
+	double th_ne; // if x < th_e NO error
+
 
 };
 
-bool UwAUVCtrErModule::alarm_mode = false;
+int UwAUVCtrErModule::alarm_mode = 0;
 vector<vector<float>>  UwAUVCtrErModule::alarm_queue = {};
+vector<vector<float>>  UwAUVCtrErModule::gray_queue = {};
 
 #endif // UWAUVCtr_MODULE_H
