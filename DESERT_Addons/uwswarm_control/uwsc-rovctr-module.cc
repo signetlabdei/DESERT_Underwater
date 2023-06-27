@@ -40,6 +40,8 @@
 #include "uwsc-clmsg.h"
 #include <iostream>
 
+#define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
+
 /**
 * Class that represents the binding with the tcl configuration script 
 */
@@ -112,23 +114,24 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 
 void
 UwSCROVCtrModule::recv(Packet* p) {
-	UwROVCtrModule::recv(p);
-
-	Position rov_position = Position();
-	rov_position.setX(x_rov);
-	rov_position.setY(y_rov);
-	rov_position.setZ(z_rov);
+	hdr_uwROV_monitoring* monitoring = HDR_UWROV_MONITORING(p);
+	Position temp_rov_position = Position();
+	temp_rov_position.setX(monitoring->x());
+	temp_rov_position.setY(monitoring->y());
+	temp_rov_position.setZ(monitoring->z());
 
 	ClMsgCtr2McPosition m(leader_id);
-	m.setRovPosition(&rov_position);
+	m.setRovPosition(&temp_rov_position);
 	sendSyncClMsg(&m);
 
 	if (debug_)
-		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) "
-			<< "sending from rov (" << m.getSource()
-			<< ") to mc (" << m.getDest()
-			<< ") position: X = " << x_rov << ", Y = " << y_rov
-			<< ", Z = " << z_rov << std::endl;
+		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) ROV monitoring "
+			<< "(" << m.getSource() << ")"
+			<< " position: X = " << temp_rov_position.getX() 
+			<< ", Y = " << temp_rov_position.getY() 
+			<< ", Z = " << temp_rov_position.getZ() << std::endl;
+
+	UwROVCtrModule::recv(p);
 }
 
 int
