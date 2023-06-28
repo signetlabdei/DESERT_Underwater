@@ -167,9 +167,26 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 	}
 	else if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
 	{
-		// what if multiple auv track the same mine?
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		Position* p = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
+		
+		for (auto& auv : auv_follower)
+		{
+			if (auv.rov_position->getX() == p->getX() &&
+					auv.rov_position->getY() == p->getY() &&
+					auv.rov_position->getZ() == p->getZ())
+			{
+				if (debug_)
+					std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
+						<< " Mine at position X: " 
+						<< p->getX() << " Y: " << p->getY()
+						<< " Z: " << p->getZ()
+						<< " is already tracket by rov " << auv.ctr_id 
+						<< std::endl;
+
+				return 0;
+			}
+		}
 
 		for (auto& auv : auv_follower)
 		{
@@ -182,9 +199,11 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 				if (debug_)
 					std::cout << NOW << "  UwMissionCoordinatorModule:recvSyncClMsg()"
 						<< " rov " << auv.ctr_id 
-						<< " tracked a mine at " << p
-						<< " number of mine tracked: " << auv.n_mines
-						<< " detecting a mine: " << auv.busy << std::endl;
+						<< " tracked a mine at position X: " 
+						<< p->getX() << " Y: " << p->getY()
+						<< " Z: " << p->getZ()
+						<< " ,number of mine tracked: " << auv.n_mines
+						<< " ,detecting a mine: " << auv.busy << std::endl;
 
 				ClMsgMc2CtrPosition msg(auv.ctr_id);
 				msg.setRovDestination(p);
