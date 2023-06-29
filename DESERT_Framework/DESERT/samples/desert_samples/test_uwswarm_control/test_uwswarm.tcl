@@ -1,0 +1,425 @@
+#
+# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the University of Padova (SIGNET lab) nor the 
+#    names of its contributors may be used to endorse or promote products 
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+###########################################################################
+# This script is used to test uwswarm_controller. 
+# There is a swarm of three AUV, composed of one leader and two followers.
+# Each of them has a precomputed route to follow.
+# The two followers has a tracking system in order to find mines.
+# Everytime a follower find a mine the auv notifies it to the leader
+# which in turns sends the auv to the mines position.
+# The way-point list is imported by an external file. 
+###########################################################################
+# Author: Filippo Campagnaro, Vincenzo Cimino
+# Version: 1.0.0
+#
+#
+# Stack of the AUVs leader and followers
+#					 AUV Leader							  AUV follower 1			      AUV follower 2
+#   +--------------+-----------+---------------+   +------------+------------+   +------------+------------+
+#   |  7. UW/SC/MC | UW/SC/CTR | UW/SC/TRACKER |   |  7. UW/ROV | UW/TRACKER |   | 7. UW/ROV  | UW/TRACKER |
+#   +--------------+-----------+---------------+   +------------+------------+   +-------------+-----------+
+#   |  6. UW/UDP							   |   |  6. UW/UDP              |   |  6. UW/UDP              |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#   |  5. UW/STATICROUTING					   |   |  5. UW/STATICROUTING    |   |  5. UW/STATICROUTING    |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#   |  4. UW/IP								   |   |  4. UW/IP               |   |  4. UW/IP               |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#   |  3. UW/MLL							   |   |  3. UW/MLL              |   |  3. UW/MLL              |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#   |  2. UW/CSMA_ALOHA						   |   |  2. UW/CSMA_ALOHA       |   |  2. UW/CSMA_ALOHA       |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#   |  1. UW/PHYSICAL   					   |   |  1. UW/PHYSICAL         |   |  1. UW/PHYSICAL         |
+#   +------------------------------------------+   +-------------------------+   +-------------------------+
+#            |						  |                    |          |                   |			|       
+#   +------------------------------------------------------------------------------------------------------+
+#   |                                     UnderwaterChannel												   |
+#   +------------------------------------------------------------------------------------------------------+
+
+######################################
+# Flags to enable or disable options #
+######################################
+set opt(verbose) 		1
+set opt(trace_files)		0
+set opt(bash_parameters) 	0
+set opt(ACK_Active)         0
+
+#####################
+# Library Loading   #
+#####################
+load libMiracle.so
+load libMiracleBasicMovement.so
+load libuwip.so
+load libuwstaticrouting.so
+load libmphy.so
+load libmmac.so
+load libuwmll.so
+load libuwudp.so
+load libuwcbr.so
+load libuwrov.so
+load libuwsmposition.so
+load libuwtracker.so
+load libuwswarm_control.so
+load libuwinterference.so
+load libUwmStd.so
+load libuwstats_utilities.so
+load libuwmmac_clmsgs.so
+load libuwcsmaaloha.so
+load libUwmStdPhyBpskTracer.so
+load libuwphy_clmsgs.so
+load libuwphysical.so
+
+#############################
+# NS-Miracle initialization #
+#############################
+# You always need the following two lines to use the NS-Miracle simulator
+set ns [new Simulator]
+$ns use-Miracle
+
+##################
+# Tcl variables  #
+##################
+set opt(nn)				3 ;# Number of Nodes
+set opt(ROV_pktsize)    1000;#125  ;# Pkt size in byte
+set opt(CTR_pktsize)    1024;#125  ;# Pkt size in byte
+
+set opt(ROV_period) 	10
+
+set opt(starttime)      1	
+set opt(stoptime)       10000
+set opt(txduration)     [expr $opt(stoptime) - $opt(starttime)] ;# Duration of the simulation
+
+set opt(txpower)		185.08;#Power transmitted in dB re uPa
+
+set opt(propagation_speed) 1500;# m/s
+
+set opt(maxinterval_)     20.0
+set opt(freq)             25000.0 ;#Frequency used in Hz
+set opt(bw)               5000.0 ;#Bandwidth used in Hz
+set opt(bitrate)		  4800.3 ;#150000;#bitrate in bps
+set opt(ack_mode)         "setNoAckMode"
+
+set opt(pktsize)  32
+set opt(cbr_period)   10
+set opt(poisson_traffic) 0
+
+set opt(rngstream)	1
+if {$opt(ACK_Active)} {
+    set opt(ack_mode)           "setAckMode"    
+} else {
+    set opt(ack_mode)           "setNoAckMode"
+}
+
+set opt(waypoint_file)  "./rov_path.csv"
+#set opt(waypoint_file)  "./path_tg0_5s.csv"
+
+
+if {$opt(bash_parameters)} {
+    if {$argc != 2} {
+        puts "The script requires two inputs:"
+        puts "- the first for the Poisson ROV period"
+        puts "- the second for the rngstream"
+        puts "example: ns test_uw_rov.tcl 60 13"
+        puts "If you want to leave the default values, please set to 0"
+        puts "the value opt(bash_parameters) in the tcl script"
+        puts "Please try again."
+        return
+    } else {
+        set opt(ROV_period) [lindex $argv 0]
+        set opt(rngstream) [lindex $argv 1];
+    }   
+} 
+
+#random generator
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+	$defaultRNG next-substream
+}
+
+if {$opt(trace_files)} {
+	set opt(tracefilename) "./test_uwrovmovement.tr"
+	set opt(tracefile) [open $opt(tracefilename) w]
+	set opt(cltracefilename) "./test_uwrovmovement.cltr"
+	set opt(cltracefile) [open $opt(tracefilename) w]
+} else {
+	set opt(tracefilename) "/dev/null"
+	set opt(tracefile) [open $opt(tracefilename) w]
+	set opt(cltracefilename) "/dev/null"
+	set opt(cltracefile) [open $opt(cltracefilename) w]
+}
+
+#########################
+# Module Configuration  #
+#########################
+### APP ###
+Module/UW/CBR set packetSize_			$opt(pktsize)
+Module/UW/CBR set PoissonTraffic_		$opt(poisson_traffic)
+Module/UW/CBR set period_				$opt(cbr_period)
+Module/UW/CBR set debug_				0
+Module/UW/CBR set tracefile_enabler_	1
+
+Module/UW/TRACKER set max_tracking_distance_	50
+Module/UW/TRACKER set packetSize_				$opt(pktsize)
+Module/UW/TRACKER set PoissonTraffic_			$opt(poisson_traffic)
+Module/UW/TRACKER set period_					$opt(cbr_period)
+Module/UW/TRACKER set debug_					0
+Module/UW/TRACKER set tracefile_enabler_		1
+Module/UW/TRACKER set send_only_active_trace_	1
+
+Module/UW/ROV set packetSize_          $opt(ROV_pktsize)
+Module/UW/ROV set period_              $opt(ROV_period)
+Module/UW/ROV set debug_               0
+
+Module/UW/ROV/CTR set packetSize_			$opt(CTR_pktsize)
+Module/UW/ROV/CTR set debug_				1
+
+Module/UW/SC/CTR set debug_					1
+
+Module/UW/SC/TRACKER set debug_					1
+Module/UW/SC/TRACKER set tracefile_enabler_		1
+
+Plugin/UW/SC/MC set debug_ 1
+
+### Channel ###
+MPropagation/Underwater set practicalSpreading_	2
+MPropagation/Underwater set debug_				0
+MPropagation/Underwater set windspeed_			10
+MPropagation/Underwater set shipping_			1
+
+set channel [new Module/UnderwaterChannel]
+set propagation [new MPropagation/Underwater]
+set data_mask [new MSpectralMask/Rect]
+$data_mask setFreq				$opt(freq)
+$data_mask setBandwidth			$opt(bw)
+$data_mask setPropagationSpeed  $opt(propagation_speed)
+
+### MAC ###
+Module/UW/CSMA_ALOHA set listen_time_	1
+
+### PHY ###
+Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
+Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
+Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
+Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
+Module/UW/PHYSICAL  set MinTxSPL_dB_                10
+Module/UW/PHYSICAL  set MaxTxRange_                 3000
+Module/UW/PHYSICAL  set PER_target_                 0    
+Module/UW/PHYSICAL  set CentralFreqOptimization_    0
+Module/UW/PHYSICAL  set BandwidthOptimization_      0
+Module/UW/PHYSICAL  set SPLOptimization_            0
+Module/UW/PHYSICAL  set debug_                      0
+
+Position/UWSM set debug_ 0
+
+#################
+# Node Creation #
+#################
+source "node_leader.tcl"
+source "node_follower.tcl"
+
+set leader_id 0
+
+createNodeL $leader_id
+for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+	createNodeF $id1
+}
+
+set mine_position [new "Position/UWSM"]
+set opt(mine_file)   "mine_position.csv"
+set fp [open $opt(mine_file) r]
+set file_data [read $fp]
+set data [split $file_data "\n"]
+foreach line $data {
+	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
+		$ns at $t "$mine_position setX_ $x"
+		$ns at $t "$mine_position setY_ $y"
+		$ns at $t "$mine_position setZ_ $z"
+    }
+}
+
+################################
+# Inter-node module connection #
+################################
+proc connectNodes { id1 } {
+  global ipif ipr opt leader_id app_ctr app_trl app_rov app_trf
+  global portnum_ctr portnum_trl portnum_rov portnum_trf
+
+  $app_ctr($leader_id,$id1) set destAddr_ [$ipif($id1) addr]
+  $app_ctr($leader_id,$id1) set destPort_ $portnum_rov($id1)
+  
+  $app_rov($id1) set destAddr_ [$ipif($leader_id) addr]
+  $app_rov($id1) set destPort_ $portnum_ctr($leader_id,$id1)
+
+  $app_trl($leader_id,$id1) set destAddr_ [$ipif($id1) addr]
+  $app_trl($leader_id,$id1) set destPort_ $portnum_trf($id1)
+
+  $app_trf($id1,$leader_id) set destAddr_ [$ipif($leader_id) addr]
+  $app_trf($id1,$leader_id) set destPort_ $portnum_trl($leader_id,$id1)
+}
+
+##################
+# Setup flows  #
+##################
+for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+  connectNodes $id1
+}
+
+###################
+# Fill ARP tables #
+###################
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+  for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
+	   $mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
+  }
+}
+
+########################
+# Setup routing tables #
+########################
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+  for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
+    if {$id1 != $id2} {
+      $ipr($id1) addRoute [$ipif($id2) addr] [$ipif($id2) addr]
+    }
+  }
+}
+
+#####################
+# Start/Stop Timers #
+#####################
+set outfile [open "test_uwswarm_results.csv" "w"]
+close $outfile
+set fp [open $opt(waypoint_file) r]
+set file_data [read $fp]
+set data [split $file_data "\n"]
+foreach line $data {
+	if {[regexp {^(.*),(.*),(.*),(.*),(.*)$} $line -> t x y z s]} {
+		$ns at $t "update_and_check $t $leader_id"
+		$ns at $t "$position($leader_id) setdest $x $y $z $s"
+		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+			$ns at $t "update_and_check $t $id1"
+			if { [expr $id1 % 2] == 0 } {
+  			    set x1 [expr $x + 25]
+  			    set y1 [expr $y + 25]
+				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
+  			} else {
+  			    set x1 [expr $x - 25]
+  			    set y1 [expr $y - 25]
+				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
+  			}
+		}
+	}
+}
+
+for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+  $app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
+  $app_trf($id1,$leader_id) setTrack $mine_position
+
+  $ns at $opt(starttime)  "$app_rov($id1) start"
+  $ns at $opt(stoptime)   "$app_rov($id1) stop"
+
+  $ns at $opt(starttime)  "$app_trf($id1,$leader_id) start"
+  $ns at $opt(stoptime)   "$app_trf($id1,$leader_id) stop"
+}
+
+proc update_and_check { t id } {
+    global position app_rov app_ctr
+
+	$position($id) update
+    set outfile [open "test_uwswarm_results.csv" "a"]
+	if { $id == 0 } {
+		puts $outfile "$t: Rov L position ([$position($id) getX_],[$position($id) getY_], [$position($id) getZ_])"
+	} else {
+		puts $outfile "$t: Rov F ($id) position ([$app_rov($id) getX],[$app_rov($id) getY], [$app_rov($id) getZ])"
+	}
+    close $outfile
+}
+
+###################
+# Final Procedure #
+###################
+# Define here the procedure to call at the end of the simulation
+proc finish {} {
+  global ns opt outfile
+  global mac propagation channel propagation
+  global ipr ipif udp cbr phy 
+  if ($opt(verbose)) {
+    puts "-----------------------------------------------------------------"
+    puts "Simulation summary"
+    puts "-----------------------------------------------------------------"
+    puts "Total simulation time  : [expr $opt(stoptime)-$opt(starttime)] s"
+    puts "Number of nodes      : $opt(nn)"
+    puts "Packet size        : $opt(pktsize) byte(s)"
+    puts "Control CBR period         : $opt(cbr_period) s"
+    puts "-----------------------------------------------------------------"
+  }
+
+  set sum_cbr_throughput  0
+  set sum_mac_sent_pkts   0
+  set sum_mac_recv_pkts   0  
+  set sum_sent_pkts   0.0
+  set sum_recv_pkts   0.0  
+  set sum_pcks_in_buffer  0
+  set sum_upper_pcks_rx   0
+  set sum_mac_pcks_tx     0
+  set sent_pkts 0
+  set recv_pkts 0
+
+  for {set i 0} {$i < $opt(nn)} {incr i}  {
+
+  	set mac_sent_pkts    [$mac($i) getDataPktsTx]
+  	set mac_recv_pkts    [$mac($i) getDataPktsRx]
+
+    puts "MAC received Packets($i)   : $mac_recv_pkts"
+
+    set sum_mac_pcks_tx  [expr $sum_mac_pcks_tx + $mac_sent_pkts]
+    set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
+  }
+ 
+  if ($opt(verbose)) {
+    puts "MAC tot sent Packets     : $sum_mac_pcks_tx"
+    puts "MAC tot received Packets   : $sum_mac_recv_pkts"
+  }
+  
+  $ns flush-trace
+  close $opt(tracefile)
+}
+
+
+###################
+# start simulation
+###################
+if ($opt(verbose)) {
+  puts "\nStarting Simulation\n"
+}
+
+
+$ns at [expr $opt(stoptime) + 50.0]  "finish; $ns halt" 
+
+$ns run
