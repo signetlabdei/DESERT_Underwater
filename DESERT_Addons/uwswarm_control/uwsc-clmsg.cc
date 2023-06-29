@@ -106,7 +106,7 @@ ClMsgMc2CtrPosition::getRovDestination() const
 ClMsgMc2CtrStatus::ClMsgMc2CtrStatus(int dest_id)
 	: ClMessage(CLMSG_MC2CTR_VERBOSITY,
 		CLMSG_MC2CTR_SETSTATUS, UNICAST, dest_id)
-	, rov_detect(false)
+	, rov_status(false)
 {
 }
 
@@ -121,15 +121,15 @@ ClMsgMc2CtrStatus::copy()
 }
 
 void
-ClMsgMc2CtrStatus::setRovStatus(bool detect)
+ClMsgMc2CtrStatus::setRovStatus(bool status)
 {
-	rov_detect = detect;
+	rov_status = status;
 }
 
 bool
 ClMsgMc2CtrStatus::getRovStatus() const
 {
-	return rov_detect;
+	return rov_status;
 }
 
 ////////////////////////////////////////////////////////

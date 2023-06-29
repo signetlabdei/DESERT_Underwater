@@ -66,7 +66,7 @@ public:
 UwSCROVCtrModule::UwSCROVCtrModule() 
 	: UwROVCtrModule()
 	, leader_id(0)
-	, rov_detect(false)
+	, rov_status(false)
 {
 }
 
@@ -82,7 +82,7 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 		}
 	} else if(argc == 5){
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
-			if (!rov_detect)
+			if (!rov_status)
 			{
 				newX = atof(argv[2]);
 				newY = atof(argv[3]);
@@ -95,7 +95,7 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 		}
 	} else if(argc == 6){
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
-			if (!rov_detect)
+			if (!rov_status)
 			{
 				newX = atof(argv[2]);
 				newY = atof(argv[3]);
@@ -144,14 +144,14 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 		newY = p->getY();
 		newZ = p->getZ();
 
-		rov_detect = true;
+		rov_status = true;
 
 		UwROVCtrModule::reset_retx();
 		UwROVCtrModule::transmit();
 
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
-				<< "set new destination of rov " << m->getDest()
+				<< " Set new destination of ROV " << m->getDest()
 				<< " to position: X = " << newX << ", Y = " << newY 
 				<< ", Z = " << newZ << std::endl;
 
@@ -159,14 +159,13 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 	}
 	else if (m->type() == CLMSG_MC2CTR_SETSTATUS)
 	{
-		rov_detect = ((ClMsgMc2CtrStatus*)m)->getRovStatus();
+		rov_status = ((ClMsgMc2CtrStatus*)m)->getRovStatus();
 
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
-				<< "mine detected by rov " << m->getDest()
-				<< " at position: X = " << x_rov << ", Y = " << y_rov 
-				<< ", Z = " << z_rov 
-				<< " has been removed " << std::endl;
+				<< " Mine detected at position: X = " << x_rov 
+				<< ", Y = " << y_rov << ", Z = " << z_rov 
+				<< " is removed " << std::endl;
 
 		return 0;
 	}

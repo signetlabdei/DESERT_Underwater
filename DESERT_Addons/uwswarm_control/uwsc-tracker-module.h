@@ -75,8 +75,8 @@ public:
 	virtual void recv(Packet*);
 
 protected:
-	Position* mine_position;
-	int leader_id;
+	Position* mine_position; /** Position of the tracked mine */
+	int leader_id; /** Id of the tracker leader */
 };
 
 #endif // UWSCTRACK_MODULE_H

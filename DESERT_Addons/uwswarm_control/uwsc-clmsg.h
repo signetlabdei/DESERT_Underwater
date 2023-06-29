@@ -164,7 +164,7 @@ class ClMsgMc2CtrStatus : public ClMessage
     
     
   private:
-    bool rov_detect; /**< Rov follower status (detecting or not) */
+    bool rov_status; /**< Status of the rov follower, true if detected a mine */
 };
 
 /**
@@ -199,7 +199,6 @@ class ClMsgTrack2McPosition : public ClMessage
      * @return track_position Tracked position from uwtracker
      */
     Position* getTrackPosition() const;
-    
     
   private:
     Position* track_position; /**< Tracking position sent by the uwtracker addon */

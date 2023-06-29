@@ -82,7 +82,7 @@ public:
 
 protected:
 	int leader_id; /**< id of the auv leader */
-	bool rov_detect; /** status of the rov follower (detecting a mine or not) */
+	bool rov_status; /**< status of the rov follower, true if detected a mine */
 };
 
 #endif // UWSCROVCtr_MODULE_H

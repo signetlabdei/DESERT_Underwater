@@ -95,13 +95,13 @@ UwSCTrackerModule::recv(Packet* p) {
 	temp_position.setZ(uw_track_h->z());
 	mine_position = &temp_position;
 
-	ClMsgTrack2McPosition m (leader_id);
+	ClMsgTrack2McPosition m(leader_id);
 	m.setTrackPosition(mine_position);
 	sendSyncClMsg(&m);
 
 	if (debug_)
 		std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
-			<< " rov (" << m.getSource()
+			<< " ROV (" << m.getSource()
 			<< ") tracked a mine at position: X = " << mine_position->getX()
 			<< "  , Y = " << mine_position->getY()
 			<< "  , Z = " << mine_position->getZ()
