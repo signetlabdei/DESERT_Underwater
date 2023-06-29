@@ -60,10 +60,10 @@ enum MineState
  */
 typedef struct Mines
 {
-	Position* track_position;	/**< Mine tracked position*/
+	Position track_position;	/**< Mine tracked position*/
 	MineState state;	/**< Mine state */
 
-	Mines(Position* p, MineState s)
+	Mines(Position p, MineState s)
 		: track_position(p)
 		, state(s)
 	{
@@ -71,21 +71,25 @@ typedef struct Mines
 } Mines;
 
 /**
- * AUV_stats describe an AUV controlled by the leader
+ * AUV_stats describes statistics about AUV follower
+ * It also contains ids of respectively the ROV controller
+ * and Tracker receiver inside the AUV leader
  */
 typedef struct AUV_stats
 {
-	int ctr_id;	/**< Id of the ROV Ctr */
+	int ctr_id;	/**< Id of the CTR module */
+	int trk_id;	/**< Id of the Tracker module */
 	Position* rov_position;		/**< Position of the ROV follower */
 	std::vector<Mines> rov_mine;	/** Mines found by this ROV */
 	int n_mines;	/** Number of mines found by this ROV */
-	bool busy;	/** Status of the ROV **/
+	bool rov_status;	/** Status of the ROV, if true is detecting a mine */
 
-	AUV_stats(int id)
-		: ctr_id(id)
+	AUV_stats(int id_ctr, int id_trk)
+		: ctr_id(id_ctr)
+		, trk_id(id_trk)
 		, rov_mine()
 		, n_mines(0)
-		, busy(false)
+		, rov_status(false)
 	{
 		Position p = Position();
 		rov_position = &p;
@@ -128,21 +132,21 @@ public:
 
 
 	/**
-	* Set the position of the ROV leader
+	* Set the position of the AUV leader
 	*
-	* @param Position * p Pointer to the ROV leader position
+	* @param Position * p Pointer to the AUV leader position
 	*/
 	virtual void setPosition(UWSMPosition* p);
 
 	/**
-	* Returns the position of the ROV leader
+	* Returns the position of the AUV leader
 	*
-	* @return the current ROV leader position
+	* @return the current AUV leader position
 	*/
 	inline UWSMPosition* getPosition() { return leader_position;}
 
 	/**
-	 * recv syncronous cross layer messages to require an operation from another module
+	 * Recv syncronous cross layer messages to require an operation from another module
 	 *
 	 * @param m Pointer cross layer message
 	 *
@@ -155,12 +159,20 @@ protected:
 	std::vector<AUV_stats> auv_follower;	/**< ROV followers info */
 
 	/**
-	 * Send a signal to a specific rov that the mine was removed
+	 * Send a signal to a specific AUV that the mine is removed
 	 *
-	 * @param int id of the rov sent to detect the mine
+	 * @param int id of the ROV sent to detect the mine
 	 *
 	 */
 	void removeMine(int id);
+
+	/**
+	 * Check if the mine at received position is already tracked
+	 *
+	 * @return bool true if the mine is already tracked
+	 *
+	 */
+	bool isTracked(Position* p);
 };
 
 #endif // UWMC_MODULE_H

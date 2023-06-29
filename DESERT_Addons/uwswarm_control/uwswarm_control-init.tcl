@@ -59,7 +59,12 @@ Module/UW/ROV set tracefile_enabler_  0
 Module/UW/SC/TRACKER set leader_id 0
 Module/UW/SC/TRACKER set debug_ 0
 
-Module/UW/SC/MC set debug_ 0
+Plugin/UW/SC/MC set debug_ 0
+
+Plugin/UW/SC/MC instproc init {args} {
+    $self next $args
+    $self settag "UW/SC/MC"
+}
 
 Position/UWSM set debug_ 0
 
