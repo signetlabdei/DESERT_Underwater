@@ -39,7 +39,7 @@ proc createNodeF { id } {
   set position($id) [new "Position/UWSM"]
   $nodeF($id) addPosition $position($id)
   
-  # Setup positions
+  #Setup positions
   if { [expr $id % 2] == 0 } {
 	  $position($id) setX_ [expr $leader_id + 25*$id/2]
  	  $position($id) setY_ [expr $leader_id + 25*$id/2]

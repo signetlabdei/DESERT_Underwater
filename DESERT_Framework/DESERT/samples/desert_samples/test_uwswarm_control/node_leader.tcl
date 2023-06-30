@@ -52,7 +52,7 @@ proc createNodeL { id } {
     $app_ctr($id,$cnt) setLeaderId [$app_mc($id) Id_]
   }
 
-  # Setup positions
+  #Setup positions
   set position($id) [new "Position/UWSM"]
   $nodeL addPosition $position($id)
   

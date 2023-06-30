@@ -136,8 +136,6 @@ if {$opt(ACK_Active)} {
 }
 
 set opt(waypoint_file)  "./rov_path.csv"
-#set opt(waypoint_file)  "./path_tg0_5s.csv"
-
 
 if {$opt(bash_parameters)} {
     if {$argc != 2} {
@@ -196,14 +194,14 @@ Module/UW/ROV set period_              $opt(ROV_period)
 Module/UW/ROV set debug_               0
 
 Module/UW/ROV/CTR set packetSize_			$opt(CTR_pktsize)
-Module/UW/ROV/CTR set debug_				1
+Module/UW/ROV/CTR set debug_				0
 
-Module/UW/SC/CTR set debug_					1
+Module/UW/SC/CTR set debug_					0
 
-Module/UW/SC/TRACKER set debug_					1
+Module/UW/SC/TRACKER set debug_					0
 Module/UW/SC/TRACKER set tracefile_enabler_		1
 
-Plugin/UW/SC/MC set debug_ 1
+Plugin/UW/SC/MC set debug_ 0
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_	2
@@ -250,6 +248,7 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 	createNodeF $id1
 }
 
+# Place and remove mines
 set mine_position [new "Position/UWSM"]
 set opt(mine_file)   "mine_position.csv"
 set fp [open $opt(mine_file) r]
@@ -260,6 +259,10 @@ foreach line $data {
 		$ns at $t "$mine_position setX_ $x"
 		$ns at $t "$mine_position setY_ $y"
 		$ns at $t "$mine_position setZ_ $z"
+
+		if {$t == 1000 || $t == 2100} {
+			$ns at $t "$app_mc($leader_id) removeMine [$app_ctr($leader_id,1) Id_]"
+		}
     }
 }
 
@@ -313,8 +316,10 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 #####################
 # Start/Stop Timers #
 #####################
-set outfile [open "test_uwswarm_results.csv" "w"]
-close $outfile
+set outfile_auv [open "test_auv_results.csv" "w"]
+set outfile_mine [open "test_mine_results.csv" "w"]
+close $outfile_auv
+close $outfile_mine
 set fp [open $opt(waypoint_file) r]
 set file_data [read $fp]
 set data [split $file_data "\n"]
@@ -349,16 +354,22 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 proc update_and_check { t id } {
-    global position app_rov app_ctr
+    global position app_rov app_ctr mine_position
 
 	$position($id) update
-    set outfile [open "test_uwswarm_results.csv" "a"]
-	if { $id == 0 } {
-		puts $outfile "$t: Rov L position ([$position($id) getX_],[$position($id) getY_], [$position($id) getZ_])"
-	} else {
-		puts $outfile "$t: Rov F ($id) position ([$app_rov($id) getX],[$app_rov($id) getY], [$app_rov($id) getZ])"
+	# Auvs path output
+    set outfile_auv [open "test_auv_results.csv" "a"]
+	puts $outfile_auv "$t,$id,[$position($id) getX_],[$position($id) getY_],[$position($id) getZ_]"
+    close $outfile_auv
+
+	# Mines detected output
+	if {[expr abs([$position($id) getX_] - [$mine_position getX_])] < 0.1 &&
+		[expr abs([$position($id) getY_] - [$mine_position getY_])] < 0.1 &&
+		[expr abs([$position($id) getZ_] - [$mine_position getZ_])] < 0.1} {
+		set outfile_mine [open "test_mine_results.csv" "a"]
+		puts $outfile_mine "$t,$id,[$mine_position getX_],[$mine_position getY_],[$mine_position getZ_]"
+		close $outfile_mine
 	}
-    close $outfile
 }
 
 ###################
@@ -366,7 +377,7 @@ proc update_and_check { t id } {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-  global ns opt outfile
+  global ns opt outfile_auv outfile_mine
   global mac propagation channel propagation
   global ipr ipif udp cbr phy 
   if ($opt(verbose)) {
