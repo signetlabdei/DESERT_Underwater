@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
@@ -38,6 +37,7 @@
 
 #include "uwsc-mission-coordinator-module.h"
 #include <iostream>
+#include <algorithm>
 
 /**
 * Class that represents the binding with the tcl configuration script 
@@ -159,48 +159,52 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 		int id = ((ClMsgCtr2McPosition*)m)->getSource();
 		Position* p = ((ClMsgCtr2McPosition*)m)->getRovPosition();
 
-		for (auto& auv : auv_follower)
+		auto auv = std::find_if(auv_follower.begin(), auv_follower.end(),
+				[id](const AUV_stats& element) {
+						return element.ctr_id == id;
+				});
+
+		if (auv != auv_follower.end())
 		{
-			if (auv.ctr_id == id)
+			auv->rov_position = p;
+
+			if (auv->rov_status)
 			{
-				auv.rov_position = p;
+				auto mine = auv->rov_mine.end()-1;
+				
+				if (mine->state == MINE_TRACKED &&
+					mine->track_position.getX() == p->getX() &&
+					mine->track_position.getY() == p->getY() &&
+					mine->track_position.getZ() == p->getZ())
 
-				int n = auv.n_mines-1;
-				if (auv.rov_status && 
-						auv.rov_mine[n].state == MINE_TRACKED &&
-						auv.rov_mine[n].track_position.getX() == p->getX() &&
-						auv.rov_mine[n].track_position.getY() == p->getY() &&
-						auv.rov_mine[n].track_position.getZ() == p->getZ())
-				{
-					auv.rov_mine[n].state = MINE_DETECTED;
-				}
-
-				if (debug_)
-				{
-					std::cout << NOW 
-						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
-						<< " Received ROV (" << auv.ctr_id
-						<< ") updated position X: " << auv.rov_position->getX()
-						<< " Y: " << auv.rov_position->getY()
-						<< " Z: " << auv.rov_position->getZ()
-						<< " #mine tracked = " << auv.n_mines
-						<< " rov_status = " << auv.rov_status;
-
-					if (auv.rov_status)
-						std::cout << " mine status = " 
-							<< auv.rov_mine[auv.n_mines-1].state; 
-
-					std::cout << std::endl;
-				}
-
-				return 0;
+					mine->state = MINE_DETECTED;
 			}
+
+			if (debug_)
+			{
+				std::cout << NOW 
+						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
+						<< " Received ROV (" << auv->ctr_id
+						<< ") updated position X: " << auv->rov_position->getX()
+						<< " Y: " << auv->rov_position->getY()
+						<< " Z: " << auv->rov_position->getZ()
+						<< " #mine tracked = " << auv->n_mines
+						<< " rov_status = " << auv->rov_status;
+
+				if (auv->rov_status)
+					std::cout << " mine status = " 
+							<< auv->rov_mine[auv->n_mines-1].state; 
+
+				std::cout << std::endl;
+			}
+
+			return 0;
 		}
 
 		if (debug_)
 			std::cout << NOW << "  UwMissionCoordinatorModule::recvSyncClMsg()"
-				<< " no auv found with id (" << id << ")"
-				<< std::endl;
+					<< " no auv found with id (" << id << ")"
+					<< std::endl;
 
 	}
 	else if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
@@ -211,35 +215,37 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 		if (isTracked(p))
 			return 0;
 
-		for (auto& auv : auv_follower)
+		auto auv = std::find_if(auv_follower.begin(), auv_follower.end(),
+				[id](const AUV_stats& element) {
+						return element.trk_id == id;
+				});
+
+		if (auv != auv_follower.end())
 		{
-			if (auv.trk_id == id)
-			{
-				auv.rov_mine.emplace_back(*(p), MINE_TRACKED);
-				auv.n_mines++;
-				auv.rov_status = true;
+			auv->rov_mine.emplace_back(*(p), MINE_TRACKED);
+			auv->n_mines++;
+			auv->rov_status = true;
 
-				ClMsgMc2CtrPosition msg(auv.ctr_id);
-				msg.setRovDestination(p);
-				sendSyncClMsg(&msg);
+			ClMsgMc2CtrPosition msg(auv->ctr_id);
+			msg.setRovDestination(p);
+			sendSyncClMsg(&msg);
 
-				if (debug_)
-					std::cout << NOW 
+			if (debug_)
+				std::cout << NOW 
 						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
-						<< " Received ROV (" << auv.ctr_id
-						<< ") tracked mine position X: " << p->getX()
+						<< " ROV (" << auv->ctr_id
+						<< ") tracked mine at position X: " << p->getX()
 						<< " Y: " << p->getY() << " Z: " << p->getZ()
-						<< " #mine tracked = " << auv.n_mines
-						<< " rov_status = " << auv.rov_status << std::endl;
+						<< " #mine tracked = " << auv->n_mines
+						<< " rov_status = " << auv->rov_status << std::endl;
 
-				return 0;
-			}
+			return 0;
 		}
 
 		if (debug_)
 			std::cout << NOW << "  UwMissionCoordinatorModule::recvSyncClMsg()"
-				<< " no auv found with id (" << id << ")"
-				<< std::endl;
+					<< " no auv found with id (" << id << ")"
+					<< std::endl;
 	}
 
 	return PlugIn::recvSyncClMsg(m);
@@ -248,37 +254,40 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 void
 UwMissionCoordinatorModule::removeMine(int id)
 {
-	for (auto& auv : auv_follower)
+	auto auv = std::find_if(auv_follower.begin(), auv_follower.end(),
+			[id](const AUV_stats& element) {
+					return element.ctr_id == id;
+			});
+
+	if (auv != auv_follower.end() && auv->n_mines > 0)
 	{
-		if (auv.ctr_id == id)
+		auto mine = auv->rov_mine.end()-1;
+
+		if(mine->state != MINE_REMOVED)
 		{
-			if (auv.n_mines == 0)
-				return -1;
+			mine->state = MINE_REMOVED;
+			auv->rov_status = false;
 
-			auv.rov_mine[auv.n_mines-1].state = MINE_REMOVED;
-			auv.rov_status = false;
-
-			ClMsgMc2CtrStatus msg(auv.ctr_id);
-			msg.setRovStatus(auv.rov_status);
+			ClMsgMc2CtrStatus msg(auv->ctr_id);
+			msg.setRovStatus(auv->rov_status);
 			sendSyncClMsg(&msg);
 
 			if (debug_)
 				std::cout << NOW
-					<< "  UwMissionCoordinatorModule::removeMine()"
-					<< " Detected mine at position"
-					<< " X: " << auv.rov_position->getX()
-					<< " Y: " << auv.rov_position->getY()
-					<< " Z: " << auv.rov_position->getZ()
-					<< " removed " << std::endl;
-
-			return 0;
-		}
+						<< "  UwMissionCoordinatorModule::removeMine()"
+						<< " Removed mine at position"
+						<< " X: " << mine->track_position.getX()
+						<< " Y: " << mine->track_position.getY()
+						<< " Z: " << mine->track_position.getZ() << std::endl;
+			}
 	}
-
-	if (debug_)
-		std::cout << NOW << "  UwMissionCoordinatorModule::removeMine()"
-			<< " no auv found with id (" << id << ")"
-			<< std::endl;
+	else
+	{
+		if (debug_)
+			std::cout << NOW << "  UwMissionCoordinatorModule::removeMine()"
+					<< " Cannot remove mine detected by ROV (" << id << ")" 
+					<< std::endl;
+	}
 }
 
 bool 
@@ -286,23 +295,24 @@ UwMissionCoordinatorModule::isTracked(Position* p)
 {
 	for (auto& auv : auv_follower)
 	{
-		if (auv.rov_mine.size() > 0)
+		if (auv.n_mines > 0)
 		{
 			for(auto mine : auv.rov_mine)
 			{
 				if (mine.track_position.getX() == p->getX() &&
 						mine.track_position.getY() == p->getY() &&
-						mine.track_position.getZ() == p->getZ() &&)
+						mine.track_position.getZ() == p->getZ())
 				{
 
 					if (debug_)
 						std::cout << NOW
-							<< "  UwMissionCoordinatorModule:recvSyncClMsg()"
-							<< " Mine at position X: " 
-							<< p->getX() << " Y: " << p->getY()
-							<< " Z: " << p->getZ()
-							<< " is already tracked by ROV (" << auv.ctr_id 
-							<< ")" << std::endl;
+								<< "  UwMissionCoordinatorModule::isTracked()"
+								<< " Mine at position X: " 
+								<< p->getX() << " Y: " << p->getY()
+								<< " Z: " << p->getZ()
+								<< " is already tracked by ROV ("
+								<< auv.ctr_id << ")" 
+								<< std::endl;
 
 					return true;
 				}

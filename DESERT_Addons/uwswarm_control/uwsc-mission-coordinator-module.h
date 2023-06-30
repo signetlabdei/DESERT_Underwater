@@ -50,9 +50,9 @@ class UwMissionCoordinatorModule;
  */
 enum MineState
 {
-	MINE_TRACKED, /**< Mine tracked.*/
-	MINE_DETECTED,/**< Mine found and started the removing process */
-	MINE_REMOVED /**< Mine removed */
+	MINE_TRACKED,	/**< Mine tracked.*/
+	MINE_DETECTED,	/**< Mine found and started the removing process */
+	MINE_REMOVED	/**< Mine removed */
 };
 
 /**
@@ -73,15 +73,15 @@ typedef struct Mines
 /**
  * AUV_stats describes statistics about AUV follower
  * It also contains ids of respectively the ROV controller
- * and Tracker receiver inside the AUV leader
+ * and Tracker receiver module inside the AUV leader
  */
 typedef struct AUV_stats
 {
 	int ctr_id;	/**< Id of the CTR module */
 	int trk_id;	/**< Id of the Tracker module */
-	Position* rov_position;		/**< Position of the ROV follower */
-	std::vector<Mines> rov_mine;	/** Mines found by this ROV */
-	int n_mines;	/** Number of mines found by this ROV */
+	Position* rov_position;		/**< Position of ROV follower */
+	std::vector<Mines> rov_mine;	/** Mines found by ROV follower */
+	int n_mines;	/** Number of mines found by ROV follower */
 	bool rov_status;	/** Status of the ROV, if true is detecting a mine */
 
 	AUV_stats(int id_ctr, int id_trk)
