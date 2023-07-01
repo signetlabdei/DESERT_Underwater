@@ -56,8 +56,8 @@ proc createNodeL { id } {
   set position($id) [new "Position/UWSM"]
   $nodeL addPosition $position($id)
   
-  $position($id) setX_ [expr $id*5]
-  $position($id) setY_ [expr $id*5]
+  $position($id) setX_ 100 
+  $position($id) setY_ 0
   $position($id) setZ_ -15
 
   for {set cnt 1} {$cnt < $opt(nn)} {incr cnt} {
