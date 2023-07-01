@@ -33,7 +33,7 @@
 *
 * \brief Provides the <i>UWROVCtr</i> class implementation.
 *
-* Provides the <i>UWROVCtr</i> class implementation.
+* Provides the UwROVCtr class implementation.
 */
 
 #include "uwsc-rovctr-module.h"
@@ -43,27 +43,27 @@
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
 
 /**
-* Class that represents the binding with the tcl configuration script 
+* Class that represents the binding with the tcl configuration script.
 */
 static class UwSCROVCtrModuleClass : public TclClass {
 public:
 
 	/**
-   * Constructor of the class
-   */
+	* Constructor of the class.
+	*/
 	UwSCROVCtrModuleClass() : TclClass("Module/UW/SC/CTR") {
 	}
 
 	/**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
+	* Creates the TCL object needed for the tcl language interpretation
+	* @return Pointer to an TclObject.
+	*/
 	TclObject* create(int, const char*const*) {
 		return (new UwSCROVCtrModule());
 	}
 } class_module_uwROV_ctr;
 
-UwSCROVCtrModule::UwSCROVCtrModule() 
+UwSCROVCtrModule::UwSCROVCtrModule()
 	: UwROVCtrModule()
 	, leader_id(0)
 	, rov_status(false)
@@ -127,8 +127,8 @@ UwSCROVCtrModule::recv(Packet* p) {
 	if (debug_)
 		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) ROV monitoring "
 			<< "(" << m.getSource() << ")"
-			<< " position: X = " << temp_rov_position.getX() 
-			<< ", Y = " << temp_rov_position.getY() 
+			<< " position: X = " << temp_rov_position.getX()
+			<< ", Y = " << temp_rov_position.getY()
 			<< ", Z = " << temp_rov_position.getZ() << std::endl;
 
 	UwROVCtrModule::recv(p);
@@ -152,7 +152,7 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
 				<< " Set new destination of ROV " << m->getDest()
-				<< " to position: X = " << newX << ", Y = " << newY 
+				<< " to position: X = " << newX << ", Y = " << newY
 				<< ", Z = " << newZ << std::endl;
 
 		return 0;
@@ -163,8 +163,8 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
-				<< " Mine detected at position: X = " << x_rov 
-				<< ", Y = " << y_rov << ", Z = " << z_rov 
+				<< " Mine detected at position: X = " << x_rov
+				<< ", Y = " << y_rov << ", Z = " << z_rov
 				<< " is removed " << std::endl;
 
 		return 0;

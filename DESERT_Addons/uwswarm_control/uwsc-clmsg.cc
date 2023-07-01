@@ -33,17 +33,13 @@
 *
 * \brief Provides the <i>UWSC-CLMSG</i> class implementation.
 *
-* Provides the <i>UWSC-CLMSG</i> class implementation.
 */
 
 #include "uwsc-clmsg.h"
 
 
-////////////////////////////////////////////////////////
-
 ClMsgCtr2McPosition::ClMsgCtr2McPosition(int dest_id)
-	: ClMessage(CLMSG_CTR2MC_VERBOSITY,
-		CLMSG_CTR2MC_GETPOS, UNICAST, dest_id)
+	: ClMessage(CLMSG_CTR2MC_VERBOSITY, CLMSG_CTR2MC_GETPOS, UNICAST, dest_id)
 	, rov_position(nullptr)
 {
 }
@@ -52,7 +48,7 @@ ClMsgCtr2McPosition::~ClMsgCtr2McPosition()
 {
 }
 
-ClMsgCtr2McPosition* 
+ClMsgCtr2McPosition*
 ClMsgCtr2McPosition::copy()
 {
   return new ClMsgCtr2McPosition(*this);
@@ -73,8 +69,7 @@ ClMsgCtr2McPosition::getRovPosition() const
 ////////////////////////////////////////////////////////
 
 ClMsgMc2CtrPosition::ClMsgMc2CtrPosition(int dest_id)
-	: ClMessage(CLMSG_MC2CTR_VERBOSITY,
-		CLMSG_MC2CTR_SETPOS, UNICAST, dest_id)
+	: ClMessage(CLMSG_MC2CTR_VERBOSITY, CLMSG_MC2CTR_SETPOS, UNICAST, dest_id)
 	, rov_destination(nullptr)
 {
 }
@@ -83,7 +78,7 @@ ClMsgMc2CtrPosition::~ClMsgMc2CtrPosition()
 {
 }
 
-ClMsgMc2CtrPosition* 
+ClMsgMc2CtrPosition*
 ClMsgMc2CtrPosition::copy()
 {
   return new ClMsgMc2CtrPosition(*this);
@@ -104,8 +99,7 @@ ClMsgMc2CtrPosition::getRovDestination() const
 ////////////////////////////////////////////////////////
 
 ClMsgMc2CtrStatus::ClMsgMc2CtrStatus(int dest_id)
-	: ClMessage(CLMSG_MC2CTR_VERBOSITY,
-		CLMSG_MC2CTR_SETSTATUS, UNICAST, dest_id)
+	: ClMessage(CLMSG_MC2CTR_VERBOSITY, CLMSG_MC2CTR_SETSTATUS, UNICAST, dest_id)
 	, rov_status(false)
 {
 }
@@ -114,7 +108,7 @@ ClMsgMc2CtrStatus::~ClMsgMc2CtrStatus()
 {
 }
 
-ClMsgMc2CtrStatus* 
+ClMsgMc2CtrStatus*
 ClMsgMc2CtrStatus::copy()
 {
   return new ClMsgMc2CtrStatus(*this);
@@ -146,7 +140,7 @@ ClMsgTrack2McPosition::~ClMsgTrack2McPosition()
 {
 }
 
-ClMsgTrack2McPosition* 
+ClMsgTrack2McPosition*
 ClMsgTrack2McPosition::copy()
 {
   return new ClMsgTrack2McPosition(*this);

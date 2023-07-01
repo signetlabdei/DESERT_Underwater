@@ -31,8 +31,9 @@
 * @author Filippo Campagnaro
 * @version 1.0.0
 *
-* \brief Provides the <i>UWTRACKER</i> class implementation.
+* \brief Provides the <i>UWSCTRACKER</i> class implementation.
 *
+* Provides the UwSCTracker class implementation.
 */
 #include "uwsc-tracker-module.h"
 #include <uwsmposition.h>
@@ -41,27 +42,27 @@
 #define HDR_UWTRACK(p) (hdr_uwTracker::access(p))
 
 /**
-* Class that represents the binding with the tcl configuration script 
+* Class that represents the binding with the tcl configuration script.
 */
 static class UwSCTrackerModuleClass : public TclClass {
 public:
 
 	/**
-   * Constructor of the class
-   */
+	* Constructor of the class
+	*/
 	UwSCTrackerModuleClass() : TclClass("Module/UW/SC/TRACKER") {
 	}
 
 	/**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
+	* Creates the TCL object needed for the tcl language interpretation.
+	* @return Pointer to an TclObject
+	*/
 	TclObject* create(int, const char*const*) {
 		return (new UwSCTrackerModule());
 	}
 } class_module_uwROV_ctr;
 
-UwSCTrackerModule::UwSCTrackerModule() 
+UwSCTrackerModule::UwSCTrackerModule()
 	: UwTrackerModule()
 	, leader_id(0)
 {

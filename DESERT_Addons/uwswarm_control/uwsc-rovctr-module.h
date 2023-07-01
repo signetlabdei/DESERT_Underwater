@@ -33,7 +33,7 @@
 *
 * \brief Provides the definition of the class <i>UWSCROVCTR</i>.
 *
-* Provides the definition of the class <i>UWSCROVCTR</i>, based on <i>UWROVCTR</i>.
+* Provides the definition of the class UwSCROVCtr.
 */
 
 
@@ -42,6 +42,10 @@
 #include <uwrovctr-module.h>
 #include "uwsc-clmsg.h"
 
+/**
+* UwSCROVCtrModule class adds to the UwROVCtrModule class the possibility
+* to receive and send cross layer messages.
+*/
 class UwSCROVCtrModule : public UwROVCtrModule {
 public:
 	/**
@@ -56,11 +60,11 @@ public:
 
 	/**
 	* TCL command interpreter. It implements the following OTcl methods:
-	* 
+	*
 	* @param argc Number of arguments in <i>argv</i>.
 	* @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
 	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	* 
+	*
 	**/
 	virtual int command(int argc, const char*const* argv);
 
@@ -73,7 +77,7 @@ public:
 
 
 	/**
-	 * recv syncronous cross layer messages to require an operation from another module
+	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
 	 * @param m Pointer cross layer message
 	 *
@@ -81,8 +85,8 @@ public:
 	int recvSyncClMsg(ClMessage* m);
 
 protected:
-	int leader_id; /**< id of the auv leader */
-	bool rov_status; /**< status of the rov follower, true if detected a mine */
+	int leader_id;		/**< Id of the Mission Coordinator module. */
+	bool rov_status;	/**< Status of the ROV follower, true if detected a mine */
 };
 
 #endif // UWSCROVCtr_MODULE_H

@@ -32,6 +32,7 @@
 *
 * \brief Provides the definition of the class <i>UWSCTRACKER</i>.
 *
+* Provides the definition of the class UwSCTracker.
 */
 
 #ifndef UWSCTRACK_MODULE_H
@@ -41,7 +42,8 @@
 
 
 /**
-* UwSCTrackerModule class is used to track mobile nodes via sonar and share tracking information via packets.
+* UwSCTrackerModule class adds to the UwSCTrackerModule class the possibility
+* to send cross layer messages.
 */
 class UwSCTrackerModule : public UwTrackerModule {
 public:
@@ -58,11 +60,11 @@ public:
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
-	 * 
+	 *
 	 * @param argc Number of arguments in <i>argv</i>.
 	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
 	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	 * 
+	 *
 	 */
 	virtual int command(int argc, const char*const* argv);
 
@@ -75,8 +77,8 @@ public:
 	virtual void recv(Packet*);
 
 protected:
-	Position* mine_position; /** Position of the tracked mine */
-	int leader_id; /** Id of the tracker leader */
+	Position* mine_position;	/**< Id of the Mission Coordinator module. */
+	int leader_id;				/** Id of the Tracker leader. */
 };
 
 #endif // UWSCTRACK_MODULE_H

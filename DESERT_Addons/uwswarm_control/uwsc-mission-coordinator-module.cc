@@ -40,28 +40,28 @@
 #include <algorithm>
 
 /**
-* Class that represents the binding with the tcl configuration script 
+* Class that represents the binding with the tcl configuration script.
 */
 static class UwMissionCoordinatorModuleClass : public TclClass {
 public:
 
 	/**
-   * Constructor of the class
-   */
+	* Constructor of the class.
+	*/
 	UwMissionCoordinatorModuleClass() : TclClass("Plugin/UW/SC/MC") {
 	}
 
 	/**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
+	* Creates the TCL object needed for the tcl language interpretation
+	* @return Pointer to an TclObject
+	*/
 	TclObject* create(int, const char*const*) {
 		return (new UwMissionCoordinatorModule());
 	}
 } class_module_uwMC;
 
 
-UwMissionCoordinatorModule::UwMissionCoordinatorModule() 
+UwMissionCoordinatorModule::UwMissionCoordinatorModule()
 	: PlugIn()
 	, auv_follower()
 {
@@ -69,7 +69,7 @@ UwMissionCoordinatorModule::UwMissionCoordinatorModule()
 	leader_position=&lp;
 }
 
-UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p) 
+UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p)
 	: PlugIn()
 	, leader_position(p)
 	, auv_follower()
@@ -88,12 +88,12 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 			tcl.resultf("%f", leader_position->getX());
 			return TCL_OK;
 		}
-		else if (strcasecmp(argv[1], "getY") == 0) 
+		else if (strcasecmp(argv[1], "getY") == 0)
 		{
 			tcl.resultf("%f", leader_position->getY());
 			return TCL_OK;
 		}
-		else if (strcasecmp(argv[1], "getZ") == 0) 
+		else if (strcasecmp(argv[1], "getZ") == 0)
 		{
 			tcl.resultf("%f", leader_position->getZ());
 			return TCL_OK;
@@ -101,14 +101,14 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	}
 	else if (argc == 3)
 	{
-		if (strcasecmp(argv[1], "setPosition") == 0) 
+		if (strcasecmp(argv[1], "setPosition") == 0)
 		{
 			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
 			leader_position = p;
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
-		} 
-		else if (strcasecmp(argv[1], "removeMine") == 0) 
+		}
+		else if (strcasecmp(argv[1], "removeMine") == 0)
 		{
 			removeMine(atoi(argv[2]));
 			tcl.resultf("%d", "mine removed\n");
@@ -117,17 +117,17 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	}
 	else if (argc == 4)
 	{
-		if (strcasecmp(argv[1], "addAUV") == 0) 
+		if (strcasecmp(argv[1], "addAUV") == 0)
 		{
 			AUV_stats auv(atoi(argv[2]),atoi(argv[3]));
 			auv_follower.emplace_back(auv);
 			tcl.resultf("%d", "auv follower added\n");
 			return TCL_OK;
-		} 
+		}
 	}
 	else if (argc == 5)
 	{
-		if (strcasecmp(argv[1], "setdest") == 0) 
+		if (strcasecmp(argv[1], "setdest") == 0)
 		{
 			leader_position->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
@@ -135,7 +135,7 @@ UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	}
 	else if (argc == 6)
 	{
-		if (strcasecmp(argv[1], "setdest") == 0) 
+		if (strcasecmp(argv[1], "setdest") == 0)
 		{
 			leader_position->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),
 				atof(argv[5]));
@@ -171,7 +171,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			if (auv->rov_status)
 			{
 				auto mine = auv->rov_mine.end()-1;
-				
+
 				if (mine->state == MINE_TRACKED &&
 					mine->track_position.getX() == p->getX() &&
 					mine->track_position.getY() == p->getY() &&
@@ -182,7 +182,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 
 			if (debug_)
 			{
-				std::cout << NOW 
+				std::cout << NOW
 						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
 						<< " Received ROV (" << auv->ctr_id
 						<< ") updated position X: " << auv->rov_position->getX()
@@ -192,8 +192,8 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 						<< " rov_status = " << auv->rov_status;
 
 				if (auv->rov_status)
-					std::cout << " mine status = " 
-							<< auv->rov_mine[auv->n_mines-1].state; 
+					std::cout << " mine status = "
+							<< auv->rov_mine[auv->n_mines-1].state;
 
 				std::cout << std::endl;
 			}
@@ -231,7 +231,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			sendSyncClMsg(&msg);
 
 			if (debug_)
-				std::cout << NOW 
+				std::cout << NOW
 						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
 						<< " ROV (" << auv->ctr_id
 						<< ") tracked mine at position X: " << p->getX()
@@ -279,18 +279,18 @@ UwMissionCoordinatorModule::removeMine(int id)
 						<< " X: " << mine->track_position.getX()
 						<< " Y: " << mine->track_position.getY()
 						<< " Z: " << mine->track_position.getZ() << std::endl;
-			}
+		}
 	}
 	else
 	{
 		if (debug_)
 			std::cout << NOW << "  UwMissionCoordinatorModule::removeMine()"
-					<< " Cannot remove mine detected by ROV (" << id << ")" 
+					<< " Cannot remove mine detected by ROV (" << id << ")"
 					<< std::endl;
 	}
 }
 
-bool 
+bool
 UwMissionCoordinatorModule::isTracked(Position* p)
 {
 	for (auto& auv : auv_follower)
@@ -307,11 +307,11 @@ UwMissionCoordinatorModule::isTracked(Position* p)
 					if (debug_)
 						std::cout << NOW
 								<< "  UwMissionCoordinatorModule::isTracked()"
-								<< " Mine at position X: " 
+								<< " Mine at position X: "
 								<< p->getX() << " Y: " << p->getY()
 								<< " Z: " << p->getZ()
 								<< " is already tracked by ROV ("
-								<< auv.ctr_id << ")" 
+								<< auv.ctr_id << ")"
 								<< std::endl;
 
 					return true;
