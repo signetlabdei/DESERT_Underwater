@@ -61,6 +61,7 @@ public:
 UWSMEPosition::UWSMEPosition()
 	: UWSMPosition()
 	, alarm_mode(false) 
+	, exist(false)
 {
 	bind("debug_", &debug_);
 }
@@ -127,6 +128,45 @@ UWSMEPosition::setdest(
 					z_dest);
 	}else{
 
+		if (!waypoints.empty()){
+
+			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && waypoints[0][2] == z_dest){
+
+					if (debug_)
+						printf("New dest next waypoint in the queue (%f,%f,%f)\n",
+						waypoints[0][0],
+						waypoints[0][1],
+						waypoints[0][2]);
+
+			}else{
+
+				waypoints.insert(waypoints.begin(),{x_dest,y_dest,z_dest,speed_setted});
+				if (debug_)
+					printf("New destionation (%f,%f,%f), skip the queue\n",
+					x_dest,
+					y_dest,
+					z_dest);
+
+			}
+
+		}else{
+
+			waypoints.push_back({x_dest,y_dest,z_dest,speed_setted});
+		}
+
+		if (debug_)
+			printf("Pos (%f,%f,%f), last dest(%f,%f,%f), new dest = (%f,%f,%f)\n",
+					x_,
+					y_,
+					z_,
+					Xdest_,
+					Ydest_,
+					Zdest_,
+					x_dest,
+					y_dest,
+					z_dest);
+
+		
 		UWSMPosition::setdest(x_dest,y_dest,z_dest,speed_setted);
 
 		if (debug_)
@@ -147,7 +187,6 @@ void
 UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
 {
 	if (alarm_mode){
-
 		if (debug_)
 			printf("Alarm_mode %f, dest(%f,%f,%f) not accepted\n",
 					alarm_mode,
@@ -156,7 +195,34 @@ UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
 					z_dest);
 	}else{
 
+		if (!waypoints.empty()){
+			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && waypoints[0][2] == z_dest){
+
+				if (debug_)
+					printf("New dest next waypoint in the queue (%f,%f,%f)\n",
+					waypoints[0][0],
+					waypoints[0][1],
+					waypoints[0][2]);
+
+			}else{
+
+				waypoints.insert(waypoints.begin(),{x_dest,y_dest,z_dest});
+				if (debug_)
+					printf("New destionation (%f,%f,%f), skip the queue\n",
+					x_dest,
+					y_dest,
+					z_dest);
+
+			}
+
+		}else{		
+
+			waypoints.push_back({x_dest,y_dest,z_dest});
+		}
+		
+		
 		UWSMPosition::setdest(x_dest,y_dest,z_dest);
+
 
 		if (debug_)
 			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
@@ -175,17 +241,29 @@ UWSMEPosition::adddest(
 {
 	if (!waypoints.empty()){
 
-		waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});
+		exist = false;
 
-		if (debug_)
-		printf("New waypoint (%f,%f,%f)\n",
-			x_dest,
-			y_dest,
-			z_dest);
+		for (const auto& vec : waypoints) {
+			// Controlla se le coordinate corrispondono
+			if (vec[0] == x_dest && vec[1] == y_dest && vec[2] == z_dest) {
+				exist = true;
+				break;
+			}
+		}
+
+		if (!exist){
+			waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});
+			if (debug_)
+				printf("New waypoint (%f,%f,%f)\n",
+					x_dest,
+					y_dest,
+					z_dest);
+		}
+		
 				
 	}else{
+		//waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});
 		UWSMEPosition::setdest(x_dest,y_dest,z_dest, speed_setted);
-
 		if (debug_)
 			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
 					x_,
@@ -196,6 +274,7 @@ UWSMEPosition::adddest(
 					Zdest_);
 	}
 
+	//waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});	
 
 	/*if (!waypoints.empty()){
 
@@ -239,15 +318,29 @@ UWSMEPosition::adddest(
 
 	if (!waypoints.empty()){
 
-		waypoints.push_back({x_dest,y_dest,z_dest});
+		exist = false;
 
-		if (debug_)
-		printf("New waypoint (%f,%f,%f)\n",
-			x_dest,
-			y_dest,
-			z_dest);
+		for (const auto& vec : waypoints) {
+			// Controlla se le coordinate corrispondono
+			if (vec[0] == x_dest && vec[1] == y_dest && vec[2] == z_dest) {
+				exist = true;
+				break;
+			}
+		}
+
+		if (!exist){
+			waypoints.push_back({x_dest,y_dest,z_dest});
+			if (debug_)
+				printf("New waypoint (%f,%f,%f)\n",
+					x_dest,
+					y_dest,
+					z_dest);
+		}
+		
 				
 	}else{
+
+		//waypoints.push_back({x_dest,y_dest,z_dest});
 		UWSMEPosition::setdest(x_dest,y_dest,z_dest);
 
 		if (debug_)
@@ -259,6 +352,8 @@ UWSMEPosition::adddest(
 					Ydest_,
 					Zdest_);
 	}
+
+	//waypoints.push_back({x_dest,y_dest,z_dest});
 
 	/*if (!waypoints.empty()){
 
@@ -308,22 +403,38 @@ UWSMEPosition::update(double now)
 		y_ = Ysorg_;
 		z_ = Zsorg_;
 
+
 		if (!waypoints.empty()){
 
-			if(waypoints[0].size()>3){
-				UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
-			}else{
-				UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+			if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ && waypoints[0][2] == Zdest_){
+				
+				if (debug_)
+						printf("Last waypoints erased (%f,%f,%f)\n",
+						waypoints[0][0],
+						waypoints[0][1],
+						waypoints[0][2]);
+
+				waypoints.erase(waypoints.begin());
+
+				if (!waypoints.empty()){
+
+					if(waypoints[0].size()>3){
+						UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+					}else{
+						UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+					}
+
+					if (debug_)
+						printf("New dest (%f,%f,%f) from waypoints list\n",
+						Xdest_,
+						Ydest_,
+						Zdest_);
+				}
 			}
-
-			waypoints.erase(waypoints.begin());
-
-			if (debug_)
-			printf("New dest (%f,%f,%f) from waypoints list\n",
-			Xdest_,
-			Ydest_,
-			Zdest_);
+				
 		}
+
+		
 
 	} else {
 
@@ -352,7 +463,59 @@ UWSMEPosition::update(double now)
 			y_ = Ydest_;
 			z_ = Zdest_;
 
+
+			if (debug_)
+					printf("Destination (%f,%f,%f) reached\n",
+					Xdest_,
+					Ydest_,
+					Zdest_);
+
 			if (!waypoints.empty()){
+
+				if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ && waypoints[0][2] == Zdest_){
+					
+					if (debug_)
+						printf("Last waypoints erased (%f,%f,%f)\n",
+						waypoints[0][0],
+						waypoints[0][1],
+						waypoints[0][2]);
+
+					waypoints.erase(waypoints.begin());
+				
+
+					if (!waypoints.empty()){
+
+						if (debug_)
+								printf("Next dest (%f,%f,%f)\n",
+								waypoints[0][0],
+								waypoints[0][1],
+								waypoints[0][2]);
+
+						if(waypoints[0].size()>3){
+							UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+						}else{
+							UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+						}
+
+						if (debug_)
+							printf("New dest (%f,%f,%f) from waypoints list\n",
+							Xdest_,
+							Ydest_,
+							Zdest_);
+					}
+				}
+			
+			}
+
+
+			
+			/*if (!waypoints.empty()){	
+
+				if (debug_)
+					printf("New destination (%f,%f,%f) setted\n",
+					waypoints[0][0],
+					waypoints[0][1],
+					waypoints[0][2]);		
 
 				if(waypoints[0].size()>3){
 
@@ -363,14 +526,12 @@ UWSMEPosition::update(double now)
 					UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
 				}
 
-				waypoints.erase(waypoints.begin());
-
 				if (debug_)
 					printf("New dest (%f,%f,%f) from waypoints list\n",
 					Xdest_,
 					Ydest_,
 					Zdest_);
-			}
+			}*/
 
 		}
 		if (debug_)

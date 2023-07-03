@@ -133,7 +133,8 @@ private:
 	
 	std::vector<std::vector<double>> waypoints; 
 	int debug_;
-	bool alarm_mode;				//alarm_mode true block all the application from updating the destination
+	bool alarm_mode; //alarm_mode true block all the application from updating the destination
+	bool exist;				
 };
 
 
