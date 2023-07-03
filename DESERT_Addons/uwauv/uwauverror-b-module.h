@@ -58,7 +58,7 @@
  
 using namespace std;
 
-class UwAUVErrorModule;
+class UwAUVErrorBModule;
 
 /**
 * UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
@@ -70,32 +70,32 @@ class UwAUVErrorSendTimer : public UwSendTimer {
    * Conscructor of UwSendTimer class 
    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
    */
-	UwAUVErrorSendTimer(UwAUVErrorModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	UwAUVErrorSendTimer(UwAUVErrorBModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
 
 /**
 * UwAUVModule class is used to manage <i>UWAUV</i> packets and to collect statistics about them.
 */
-class UwAUVErrorModule : public UwCbrModule {
+class UwAUVErrorBModule : public UwCbrModule {
 public:
 
 	/**
 	* Default Constructor of UwAUVModule class.
 	*/
-	UwAUVErrorModule();
+	UwAUVErrorBModule();
 
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
 	* @param UWSMEPosition* p Pointer to the AUV position
 	*/
-	UwAUVErrorModule(UWSMEPosition* p);
+	UwAUVErrorBModule(UWSMEPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
 	*/
-	virtual ~UwAUVErrorModule();
+	virtual ~UwAUVErrorBModule();
 
 	/**
    * TCL command interpreter. It implements the following OTcl methods:
@@ -209,19 +209,13 @@ protected:
 	std::ofstream t_err_log;
 	float x_e;
 	float y_e;
-	float error_m;
 	int alarm_mode;
 
 private:
 
 	double speed;
-	virtual double getErrorMeasure();
-	virtual double getErrorMeasure(double t_e);
-	//virtual double QFunction(double x);
-	double t_e;  // True error in that point
-	double sigma; // standard deviation
-	double th_ne; // if x < th_e NO error
-	double accuracy;
+	double error_p;
+
 
 };
 

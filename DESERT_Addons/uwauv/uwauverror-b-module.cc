@@ -35,7 +35,7 @@
 *
 */
 
-#include "uwauverror-module.h"
+#include "uwauverror-b-module.h"
 #include <iostream>
 #include <rng.h>
 #include <random>
@@ -44,8 +44,6 @@ extern packet_t PT_UWCBR;
 extern packet_t PT_UWAUV;
 extern packet_t PT_UWAUV_CTR;
 extern packet_t PT_UWAUV_ERROR;
-int hdr_uwAUV_error::offset_; /**< Offset used to access in 
-									<i>hdr_uwAUVError</i> packets header. */
 /**
 * Adds the header for <i>hdr_uwAUVError</i> packets in ns2.
 */
@@ -56,13 +54,13 @@ int hdr_uwAUV_error::offset_; /**< Offset used to access in
 /**
  * Class that represents the binding with the tcl configuration script 
  */
-static class UwAUVErrorModuleClass : public TclClass {
+static class UwAUVErrorBModuleClass : public TclClass {
 public: 
 
 	/**
    * Constructor of the class
    */
-	UwAUVErrorModuleClass() : TclClass("Module/UW/AUV/ERR") {
+	UwAUVErrorBModuleClass() : TclClass("Module/UW/AUV/ERB") {
 	}
 
 	/**
@@ -70,13 +68,13 @@ public:
    * @return Pointer to an TclObject
    */
 	TclObject* create(int, const char*const*) {
-		return (new UwAUVErrorModule());
+		return (new UwAUVErrorBModule());
 	}
 } class_module_uwAUV;
 
 
 
-UwAUVErrorModule::UwAUVErrorModule() 
+UwAUVErrorBModule::UwAUVErrorBModule() 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -87,10 +85,9 @@ UwAUVErrorModule::UwAUVErrorModule()
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, error_m(0)
+	, error_p(0.001)
 	, alarm_mode(0)
 	, speed(1)
-	, accuracy(0.001)
 {
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
@@ -98,9 +95,7 @@ UwAUVErrorModule::UwAUVErrorModule()
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-	bind("sigma_", (double*) &sigma );
-	bind("th_ne_", (double*) &th_ne );
-	bind("accuracy_ne_", (double*) &accuracy );
+	bind("error_p_", (int*) &error_p );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -110,7 +105,7 @@ UwAUVErrorModule::UwAUVErrorModule()
 
 }
 
-UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p) 
+UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -121,19 +116,16 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, error_m(0)
+	, error_p(0.001)
 	, alarm_mode(0)
-	, speed(1)
-	, accuracy(0.001)
+	, speed(1)	
 {
 	posit = p;
     bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-	bind("sigma_", (double*) &sigma);
-	bind("th_ne_", (double*) &th_ne );
-	bind("accuracy_ne_", (double*) &accuracy );
+	bind("error_p_", (int*) &error_p );
 
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
@@ -145,13 +137,13 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
 
 }
 
-UwAUVErrorModule::~UwAUVErrorModule() {}
+UwAUVErrorBModule::~UwAUVErrorBModule() {}
 
-void UwAUVErrorModule::setPosition(UWSMEPosition* p){
+void UwAUVErrorBModule::setPosition(UWSMEPosition* p){
 	posit = p;
 }
 
-int UwAUVErrorModule::command(int argc, const char*const* argv) {
+int UwAUVErrorBModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if(argc == 2){
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
@@ -230,11 +222,11 @@ int UwAUVErrorModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVErrorModule::transmit() {
+void UwAUVErrorBModule::transmit() {
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVErrorModule::Sending pkt with period:  " << period 
+		std::cout << NOW << " UwAUVErrorBModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
 
@@ -242,7 +234,7 @@ void UwAUVErrorModule::transmit() {
 	sendTmr_.resched(period);
 }
 
-void UwAUVErrorModule::initPkt(Packet* p) {
+void UwAUVErrorBModule::initPkt(Packet* p) {
 		
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
@@ -251,72 +243,39 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 	ack = 0;
 	uwAUVh->error() = 0;
 
-	if (alarm_mode != 2 ){
+	if (!alarm_mode){
 
-		if (alarm_mode == 1){
+		std::random_device rd;
+		std::mt19937 generator(rd());
+		std::uniform_real_distribution<double> distrib(0.0, 1.0);
 
-			error_m = getErrorMeasure(t_e);
+		double randomValue = distrib(generator) ;
 
-			if (debug_) { 
-				std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-					<< "Gray Zone error, new measure: "<< error_m <<", true error: "<< t_e << std::endl;
-			}
-			
-		}else{
+		if(randomValue < error_p){
 
-			//if(posit->getX() != x_e or posit->getY() != y_e ){
-				error_m = getErrorMeasure();
-				if (debug_) { 
-					std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-						<< "New error, measure: "<< error_m <<", true error: "<< t_e << std::endl;
-				}
-
-				if(alarm_mode == 1){
-					if (log_flag == 1) {
-						err_log.open("log/error_log.csv",std::ios_base::app);
-						err_log << "G,"<< NOW << "," << posit->getX() <<","<< posit->getY() <<", ON"<< std::endl;
-						err_log.close();
-					}
-
-				}
-			//}
-		}
-
-		
-
-		if (alarm_mode == 1){
-
-			x_e = posit->getX();													// Save error position
+			x_e = posit->getX();
 			y_e = posit->getY();
 
-			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0); //STOP
+			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
 			posit->setAlarm(true);
-			//alarm_mode = true;
-			
-			uwAUVh->x() = x_e;                      
+			alarm_mode = true;
+
+			uwAUVh->x() = x_e;
 			uwAUVh->y() = y_e;
-			uwAUVh->error() = error_m;
-			this->p = p;
+			uwAUVh->error() = 1;
 
-
-			if (debug_) { 
-			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "ERROR ("<< x_e <<","<< y_e << "," << error_m <<"), alarm_mode = "<< alarm_mode<<", true error= "<< t_e << std::endl;
+			if (log_flag == 1) {
+				err_log.open("log/error_log.csv",std::ios_base::app);
+				err_log << "E,"<< NOW << "," << x_e <<","<< y_e <<", ON"<< std::endl;
+				err_log.close();
 			}
-
-		}else{
-
-			if (debug_) { 
-			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-				<< "no error "<<" alarm_mode = " << alarm_mode << std::endl;
-			}
-
 		}
 		
 	}else{
+
 		uwAUVh->x() = x_e;                      
 		uwAUVh->y() = y_e;
-		uwAUVh->error() = error_m;
+		uwAUVh->error() = 1;
 		this->p = p;
 	}
 
@@ -324,26 +283,20 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 
 	UwCbrModule::initPkt(p);
 
-	/*if (debug_){
-		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
-		std::cout << NOW << " UwAUVErrorModule::initPkt(Packet *p) AUV current "
-			<< "position: X = " << posit->getX() << ", Y = " << posit->getY() << std::endl;
-		}*/
-
 	if (log_flag == 1) {
-			out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
-			out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-				<< "," << posit->getZ() << ", " << posit->getSpeed()<< std::endl;
-			out_file_stats.close();
+		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
+		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< "," << posit->getZ() << ", " << posit->getSpeed()<< std::endl;
+		out_file_stats.close();
 	}
 
 }
 
-void UwAUVErrorModule::recv(Packet* p, Handler* h) {
+void UwAUVErrorBModule::recv(Packet* p, Handler* h) {
 	recv(p);
 }
 
-void UwAUVErrorModule::recv(Packet* p) {
+void UwAUVErrorBModule::recv(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
@@ -353,18 +306,12 @@ void UwAUVErrorModule::recv(Packet* p) {
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 
-			if (debug_) {
-				std::cout << NOW << " UwAUVErrModule::old error with sn " 
-					<< uwAUVh->sn() << " dropped " << std::endl;
-			}
+		if (debug_) {
+			std::cout << NOW << " UwAUVErrModule::old error with sn " 
+				<< uwAUVh->sn() << " dropped " << std::endl;
+		}
 
-		} else { //packet in order
-
-		/** 
-		 * error > 0 tx more data
-		 * error > 1 stop tx, Ctr is coming
-		 * error < 0 stop tx, there is no error
-		*/
+	} else { //packet in order
 
 		if (alarm_mode && uwAUVh->x() == x_e && uwAUVh->y() == y_e){  //Valid pkt refering to my error
 
@@ -378,53 +325,39 @@ void UwAUVErrorModule::recv(Packet* p) {
 
 				if (log_flag == 1) {
 					err_log.open("log/error_log.csv",std::ios_base::app);
-					err_log << "W,"<< NOW << "," << x_e <<","<< y_e <<", ON"<< std::endl;
+					err_log << "E,"<< NOW << "," << x_e <<","<< y_e <<", OFF"<< std::endl;
 					err_log.close();
 				}
-
-
-				
 
 				if (debug_) {
 					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<") solved "
 					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;
 				}
 
-			} else if (uwAUVh->error() >= 1 ){
+			} else if (uwAUVh->error() == 1 ){
 
-				alarm_mode = 2;
+				alarm_mode = true;
 
 				if (debug_)
 					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
 					"STOP until ctr arrival"<< std::endl;
 
-			}else{
-
-				alarm_mode = 1;
-
-				if (debug_)
-					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) MAYBE there is an error ("<< x_e <<","<< y_e <<")"<<
-					"continue tx"<< std::endl;
-
 			}
 		}
 
-			last_sn_confirmed = uwAUVh->sn();
+		last_sn_confirmed = uwAUVh->sn();
 	}
 
 	ack = last_sn_confirmed+1;
 
 	UwCbrModule::recv(p);
-
-
 	UwCbrModule::sendPkt();
 	
-
 	if(uwAUVh->ack() > 0 && debug_) 
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error ACK "
+		std::cout << NOW << " UwAUVErrorBModule::recv(Packet *p) error ACK "
 			<< "received " << uwAUVh->ack()<< std::endl;
 	else if((uwAUVh->ack())<0 && debug_)
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
+		std::cout << NOW << " UwAUVErrorBModule::recv(Packet *p) error NACK " 
 			<<"received"<< std::endl;
 		
 	if (log_flag == 1) {
@@ -435,106 +368,4 @@ void UwAUVErrorModule::recv(Packet* p) {
 	}
 
 }
-
-double UwAUVErrorModule::getErrorMeasure(){
-
-	std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> u_dis(0.0, 1.0);
-
-    // Generate a random value from the uniform distribution
-    t_e = u_dis(gen);
-
-	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
-
-    // Generate a random value from the Gaussian distribution
-    double noise = n_dis(gen);
-
-	double m = t_e + noise;
-
-	//double p_e = QFunction(m);
-
-	// Calculate the error probability
-    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of true error (t_e) greater than th_ne
-
-
-	//double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
-	
-	if (p_e >= accuracy){ //if p_e is small enough --> no error, otherwise gray zone
-		alarm_mode = 1;
-	}
-
-	if (t_e > th_ne){
-		if (log_flag == 1) {
-			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-			t_err_log << NOW << "," << x_e <<","<< y_e <<","<< 1 << std::endl;
-			t_err_log.close();
-		}
-	}else{
-		if (log_flag == 1) {
-			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-			t_err_log << NOW << "," << x_e <<","<< y_e <<","<< 0 << std::endl;
-			t_err_log.close();
-		}
-	}
-
-	
-
-	return m;
-	
-
-}
-
-
-double UwAUVErrorModule::getErrorMeasure(double t_e){
-
-	std::random_device rd;
-    std::mt19937 gen(rd());
-
-	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
-
-    // Generate a random value from the Gaussian distribution
-    double noise = n_dis(gen);
-
-	double m = t_e + noise;
-
-	//double p_e = QFunction(m);
-
-	// Calculate the probability using std::erfc
-    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of t_e grater than th_ne
-
-
-	double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
-	
-	//if (p_e >= th_5sig){ //if p_e is small enough --> no error 
-	//	alarm_mode = 1;
-	//}
-
-	return m;
-	
-
-}
-
-/*double QFunction(double x) {
-
-	x = (th_ne - x)/ sigma;
-
-	if (x < 0.0) {
-        return 1.0 - QFunction(-x); // Q(-x) = 1 - Q(x)
-    }
-
-    double constant = 1.0 / std::sqrt(2.0 * M_PI);
-    double xSquared = x * x;
-    double xPower = x;
-    double qValue = 0.0;
-    double term = constant * std::exp(-0.5 * xSquared);
-
-    for (int i = 1; i <= 100; i++) {
-        qValue += term;
-        term *= -xSquared / i;
-    }
-
-    return qValue;
-}*/
-
 

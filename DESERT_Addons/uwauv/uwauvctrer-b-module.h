@@ -58,7 +58,7 @@
 #define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
 #define HDR_UWAUV_ERROR(p) (hdr_uwAUV_error::access(p))
 using namespace std;
-class UwAUVCtrErModule;
+class UwAUVCtrErBModule;
 
 /**
 * UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
@@ -70,7 +70,7 @@ class UwAUVErrorSendTimer : public UwSendTimer {
    * Conscructor of UwSendTimer class 
    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
    */
-	UwAUVErrorSendTimer(UwAUVCtrErModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	UwAUVErrorSendTimer(UwAUVCtrErBModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
 
@@ -78,23 +78,23 @@ class UwAUVErrorSendTimer : public UwSendTimer {
 /**
 * UwAUVCtrModule class is used to manage <i>UWAUVCtr</i> packets and to collect statistics about them.
 */
-class UwAUVCtrErModule : public UwCbrModule {
+class UwAUVCtrErBModule : public UwCbrModule {
 public:
 
 	/**
 	* Constructor of UwAUVCtrModule class.
 	*/
-	UwAUVCtrErModule();
+	UwAUVCtrErBModule();
 
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrErModule(UWSMEPosition* p);
+	UwAUVCtrErBModule(UWSMEPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
 	*/
-	virtual ~UwAUVCtrErModule();
+	virtual ~UwAUVCtrErBModule();
 
 	/**
 	* TCL command interpreter. It implements the following OTcl methods:
@@ -214,30 +214,17 @@ protected:
 	double speed;
 
 	static int alarm_mode;
-	bool error_released;   /*
-								* 0 no error
-								* 1 maybe an error --> wait more info
-								* 2 for sure an error -> go there
-							*/
 	static vector<vector<float>> alarm_queue;
-	static vector<vector<float>> gray_queue;
 
 private:
-
-
-	virtual int checkError(double m, int n_pkt, float x, float y); 
+ 
 	std::ofstream pos_log;
 	std::ofstream err_log;
 	std::ofstream t_err_log;
-	double sigma; // standard deviation
-	double th_ne; // if x < th_e NO error
-	double accuracy;
-
 
 };
 
-int UwAUVCtrErModule::alarm_mode = 0;
-vector<vector<float>>  UwAUVCtrErModule::alarm_queue = {};
-vector<vector<float>>  UwAUVCtrErModule::gray_queue = {};
+int UwAUVCtrErBModule::alarm_mode = 0;
+vector<vector<float>>  UwAUVCtrErBModule::alarm_queue = {};
 
 #endif // UWAUVCtr_MODULE_H
