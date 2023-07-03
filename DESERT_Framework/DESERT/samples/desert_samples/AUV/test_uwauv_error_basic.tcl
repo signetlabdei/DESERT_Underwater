@@ -125,11 +125,11 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(n_auv)                 2 ;# Number of Nodes
+set opt(n_auv)              2 ;# Number of Nodes
 set opt(starttime)          1
 set opt(stoptime)           15000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
-set opt(rngstream)            1
+set opt(rngstream)            3
 
 set opt(maxinterval_)       20.0
 set opt(freq)               25000.0
@@ -174,26 +174,34 @@ set opt(il)                [expr 1.0e-6]
 set opt(shuntRes)          [expr 1.49e9]
 set opt(sensitivity)       0.26
 set opt(LUTpath)           "..dbs/optical_noise/LUT.txt"
-set opt(rngstream) 13
+set opt(rngstream)          13
+set opt(accuracy)          0.001
+set opt(variance)          0.01
+set opt(e_prob)            0.01
+
 #set opt(ctr_period) 60
 
 if {$opt(bash_parameters)} {
-    if {$argc != 2} {
+    if {$argc != 4} {
         puts "The script requires two inputs:"
-        puts "- the first for the Poisson CBR period"
-        puts "- the second for the rngstream"
-        puts "example: ns test_uw_rov.tcl 60 13"
+        puts "- the first for accuracy"
+        puts "- the second for variance"
+        puts "- the third error probability"
+        puts "- the fourth for the rngstream"
+        puts "example: ns test_uwmultitraffic_auv.tcl 0.001 0.01 0.01 5"
         puts "If you want to leave the default values, please set to 0"
         puts "the value opt(bash_parameters) in the tcl script"
         puts "Please try again."
         return
     } else {
-        set opt(ctr_period) [lindex $argv 0]
-        set opt(rngstream) [lindex $argv 1];
+        set opt(accuracy) [lindex $argv 0]
+        set opt(variance) [lindex $argv 1]
+        set opt(e_prob) [lindex $argv 2]
+        set opt(rngstream) [lindex $argv 3];
     }   
 } 
 
-set opt(waypoint_file)  "../dbs/wp_path/rov_path.csv"
+set opt(waypoint_file)  "../dbs/wp_path/rov_path_square.csv"
 
 #random generator
 global defaultRNG
@@ -219,10 +227,6 @@ set data_mask [new MSpectralMask/Rect]
 $data_mask setFreq       $opt(freq)
 $data_mask setBandwidth  $opt(bw)
 
-#set data_mask_hf [new MSpectralMask/Rect]
-#$data_mask_hf setFreq       $opt(freq_hf)
-#$data_mask_hf setBandwidth  $opt(bw_hf)
-
 #########################
 # Module Configuration  #
 #########################
@@ -231,19 +235,6 @@ Module/UW/AUV set packetSize_          $opt(pktsize)
 Module/UW/AUV set period_              $opt(auv_period)
 Module/UW/AUV set PoissonTraffic_      1
 Module/UW/AUV set debug_               0
-
-#UW/AUV/ERR
-#Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
-#Module/UW/AUV/ERR set period_              $opt(auv_period)
-#Module/UW/AUV/ERR set PoissonTraffic_      1
-#Module/UW/AUV/ERR set debug_               0
-
-#UW/AUV/CERR
-#Module/UW/AUV/CER set packetSize_          $opt(pktsize)
-#Module/UW/AUV/CER set period_              $opt(auv_period)
-#Module/UW/AUV/CER set PoissonTraffic_      1
-#Module/UW/AUV/CER set debug_               1
-
 
 # BPSK              
 Module/MPhy/BPSK  set BitRate_          $opt(bitrate)
@@ -263,11 +254,6 @@ Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  50
 
 Module/UW/CSMA_ALOHA set wait_costant_ 0.01
 Module/UW/CSMA_ALOHA set listen_time_ 0.01
-
-#Module/UW/TDMA set frame_duration   $opt(tdma_frame)
-#Module/UW/TDMA set fair_mode        1
-#Module/UW/TDMA set guard_time       $opt(tdma_gard)
-#Module/UW/TDMA set tot_slots        $opt(n_auv)
 
 # PHY
 
@@ -303,6 +289,7 @@ Module/UW/OPTICAL/Propagation set At_       $opt(txArea)
 Module/UW/OPTICAL/Propagation set c_        $opt(c)
 Module/UW/OPTICAL/Propagation set theta_    $opt(theta)
 Module/UW/OPTICAL/Propagation set debug_    0
+
 set propagation_op [new Module/UW/OPTICAL/Propagation]
 $propagation_op setOmnidirectional
 set channel_op [new Module/UW/Optical/Channel]
@@ -314,14 +301,13 @@ $data_mask_op setBandwidth  $opt(op_bw)
 # Procedure(s) to create node_leaders #
 ################################
 
-source "auv.tcl"
-source "asv.tcl"
+source "auv_basic.tcl"
+source "asv_basic.tcl"
 
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     createAUV $id1
 }
 createASV $opt(n_auv) 
-#createROV [expr $opt(n_auv) + 1]
 
 ################################
 # Inter-node_leader module connection #
@@ -348,55 +334,35 @@ proc connectNodes {id1} {
 # Setup flows
 
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
-    #for {set id2 0} {$id2 < $opt(n_auv)} {incr id2}  {
-    #    if {$id1 != $id2} {
-            connectNodes $id1
-    #    }
-    #}
+    connectNodes $id1
 }
 
 # Fill ARP tables
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
-    #for {set id2 0} {$id2 < $opt(n_auv)} {incr id2}  {
-    #  $mll_auv($id1) addentry [$ipif_auv($id2) addr] [$mac_auv($id2) addr]
-    #  $mll_op_auv($id1) addentry [$ipif_auv($id2) addr] [$mac_op_auv($id2) addr]
-    #}   
+  
     $mll_auv($id1) addentry [$ipif_asv addr] [$mac_asv addr]
-    # $mll_diver($id1) addentry [$ipif_rov addr] [$mac_rov addr]
     $mll_op_auv($id1) addentry [$ipif_asv addr] [$mac_op_asv addr]
-    # $mll_hf_diver($id1) addentry [$ipif_rov addr] [$mac_rov addr]
     $mll_asv addentry [$ipif_auv($id1) addr] [$mac_auv($id1) addr]
     $mll_op_asv addentry [$ipif_auv($id1) addr] [$mac_op_auv($id1) addr]
 }
 
-#$mll_asv addentry [$ipif_rov addr] [$mac_rov addr]
-#$mll_op_asv addentry [$ipif_rov addr] [$mac_op_rov addr]
-
-#$mll_rov addentry [$ipif_leader addr] [$mac_leader addr]
-#$mll_op_rov addentry [$ipif_leader addr] [$mac_op_leader addr]
 Position/UWSME debug_ 1
+
 # Setup positions
 set position_asv [new "Position/UWSME"]
 $position_asv setX_ 0
 $position_asv setY_ 0
 $position_asv setZ_ -1
 
-#$position_rov setX_ 0
-#$position_rov setY_ 10
-#$position_rov setZ_ -1000
-
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
-    #$cbr_asv($id) setPosition $position_asv
     $asv_app($id) setPosition $position_asv 
     $asv_err($id) setPosition $position_asv 
 
     Position/UWSME debug_ 1
 
     set position_auv($id) [new "Position/UWSME"]
-    #$position_auv($id) setX_ [expr -50 * (1 + $id % $opt(n_auv)/2) - 25 + 50 * rand()]
     $position_auv($id) setX_ 0
-    #$position_auv($id) setY_ [expr -50 + 100 * ($id%2) - 25 + 50 * rand()]
     $position_auv($id) setY_  0
     $position_auv($id) setZ_ -1000
 
@@ -411,12 +377,7 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
 for {set id 0} {$id < $opt(n_auv)} {incr id}  {
     $ipr_auv($id) addRoute [$ipif_asv addr] [$ipif_asv addr]
     $ipr_asv addRoute [$ipif_auv($id) addr] [$ipif_auv($id) addr]
-
-    # $ipr2_diver($id) addRoute [$ipif2_rov addr] [$ipif2_leader addr]
-    # $ipr2_leader addRoute [$ipif2_diver($id) addr] [$ipif2_diver($id) addr]
 }
-#$ipr_leader addRoute [$ipif_rov addr] [$ipif_rov addr]
-
 
 #####################  
 # Start/Stop Timers #
@@ -433,52 +394,38 @@ foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
         $ns at $t "update_and_check $t"
         for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
-		    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(-2))+$x] [expr $y*($id*(-2))+$y] [expr $z]"
+		    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(2))-$x] [expr $y*($id*(-2))+$y] [expr $z]"
         }
     }
 }
 
-
-#$ns at $opt(starttime)    "$cbr3_asv($opt(n_auv)) start"
-#$ns at $opt(stoptime)     "$cbr3_asv($opt(n_auv)) stop"
+set min 0
+set max 100
 
 for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
-    #$ns at $opt(starttime)    "$cbr_asv($id1) start"
-    #$ns at $opt(stoptime)     "$cbr_asv($id1) stop"
 
-    $ns at $opt(starttime)    "$asv_app($id1) start"
+    set time_ [new RandomVariable/Uniform]
+    $time_ set min_ 0
+    $time_ set max_ 100
+    $time_ use-rng $defaultRNG
+
+    $ns at [expr $opt(starttime) + [$time_ value]]    "$asv_app($id1) start"
     $ns at $opt(stoptime)     "$asv_app($id1) stop"
 
-    $ns at $opt(starttime)    "$auv_app($id1) start"
+    $ns at [expr $opt(starttime) + [$time_ value]]   "$auv_app($id1) start"
     $ns at $opt(stoptime)     "$auv_app($id1) stop"
 
-    $ns at $opt(starttime)    "$auv_err($id1) start"
+    $ns at [expr $opt(starttime) + [$time_ value]]   "$auv_err($id1) start"
     $ns at $opt(stoptime)     "$auv_err($id1) stop"
 
-    $ns at $opt(starttime)    "$asv_err($id1) start"
+    $ns at [expr $opt(starttime) + [$time_ value]]    "$asv_err($id1) start"
     $ns at $opt(stoptime)     "$asv_err($id1) stop"
-
-    #$ns at $opt(starttime)    "$cbr3_auv($id1) start"
-    #$ns at $opt(stoptime)     "$cbr3_auv($id1) stop"
-    
-    #$ns at $opt(starttime)    "$mac_auv($id1) start"
-    #$ns at $opt(stoptime)     "$mac_auv($id1) stop"
-
-    #$ns at $opt(starttime)    "$mac_op_auv($id1) start"
-    #$ns at $opt(stoptime)     "$mac_op_auv($id1) stop"
-
     
 }
 
-#$ns at $opt(starttime)    "$mac_asv start"
-#$ns at $opt(stoptime)     "$mac_asv stop"
-
-#$ns at $opt(starttime)    "$mac_op_asv start"
-#$ns at $opt(stoptime)     "$mac_op_asv stop"
-
 proc update_and_check {t} {
     set outfile_auv [open "test_uwauv0_results.csv" "a"]
-    #set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
+    set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
     set outfile_asv [open "test_uwasv_results.csv" "a"]
     global position_auv position_asv auv_app asv_app opt n_auv auv_err asv_err
     for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  { 
@@ -553,10 +500,6 @@ proc finish {} {
         set cbr_sent_pkts4        [$auv_err($i) getsentpkts]
         set cbr_rcv_pkts4           [$asv_err($i) getrecvpkts]
 
-        #set cbr_throughput3           [$cbr3_asv($i) getthr]
-        #set cbr_sent_pkts3        [$cbr3_auv($i) getsentpkts]
-        #set cbr_rcv_pkts3           [$cbr3_asv($i) getrecvpkts]
-
         set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
         set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
         set sum_cbr_rcv_pkts   [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
@@ -569,19 +512,6 @@ proc finish {} {
         set sum_cbr_sent_pkts4  [expr $sum_cbr_sent_pkts4 + $cbr_sent_pkts4]
         set sum_cbr_rcv_pkts4   [expr $sum_cbr_rcv_pkts4 + $cbr_rcv_pkts4]
     }
-
-    #set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + [$cbr_asv($opt(n_auv)) getsentpkts]]
-    #set sum_cbr_sent_pkts3 [expr $sum_cbr_sent_pkts3 + [$cbr3_asv getsentpkts]]
-
-    #set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + [$cbr_asv($opt(n_auv)) getrecvpkts]]
-    #set sum_cbr_rcv_pkts3  [expr $sum_cbr_rcv_pkts3 + [$cbr3_asv($opt(n_auv)) getrecvpkts]]
-
-    #set sum_cbr_throughput  [expr $sum_cbr_throughput + [$cbr_asv($opt(n_auv)) getthr]]
-    #set sum_cbr_throughput3  [expr $sum_cbr_throughput3 + [$cbr3_asv($opt(n_auv)) getthr]]
-
-    #set sum_cbr_throughput2       [expr [$cbr2_asv(0) getthr] + $sum_cbr_throughput2]
-    #set sum_cbr_rcv_pkts2         [expr [$cbr2_asv(0) getrecvpkts] + $sum_cbr_rcv_pkts2]
-    #set sum_cbr_sent_pkts2        [expr $sum_cbr_sent_pkts2 + [$cbr2_asv($opt(n_auv)) getsentpkts]]
 
     set ipheadersize        [$ipif_asv getipheadersize]
     set udpheadersize       [$udp_asv getudpheadersize]
@@ -609,13 +539,6 @@ proc finish {} {
     puts "Sent Packets             : $sum_cbr_sent_pkts4"
     puts "Received Packets         : $sum_cbr_rcv_pkts4"
     puts "Packet Delivery Ratio    : [expr $sum_cbr_rcv_pkts4 / $sum_cbr_sent_pkts4 * 100]"
-
-
-    #puts "Traffic 3 ---------------------------------------------"
-    #puts "Mean Throughput          : [expr ($sum_cbr_throughput3/(1+$opt(n_diver)))]"
-    #puts "Sent Packets             : $sum_cbr_sent_pkts3"
-    #puts "Received Packets         : $sum_cbr_rcv_pkts3"
-    #puts "Packet Delivery Ratio    : [expr $sum_cbr_rcv_pkts3 / $sum_cbr_sent_pkts3 * 100]"
 
     $ns flush-trace
     close $opt(tracefile)

@@ -16,17 +16,15 @@ proc createAUV { id } {
 
     # TRAFFICO 3: ERROR AUV --> ASV
     set node_auv($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
-    Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
-    Module/UW/AUV/ERR set period_              60
-    Module/UW/AUV/ERR set PoissonTraffic_      0
-    Module/UW/AUV/ERR set traffic_type_        3
-    Module/UW/AUV/ERR set debug_               0
-    Module/UW/AUV/ERR set log_flag_            1
-    Module/UW/AUV/ERR set sigma_               $opt(variance)
-    Module/UW/AUV/ERR set th_ne_               [expr 1 - $opt(e_prob)]
-    Module/UW/AUV/ERR set accuracy_ne_         $opt(accuracy)
+    Module/UW/AUV/ERB set packetSize_          $opt(pktsize)
+    Module/UW/AUV/ERB set period_              60
+    Module/UW/AUV/ERB set PoissonTraffic_      0
+    Module/UW/AUV/ERB set traffic_type_        3
+    Module/UW/AUV/ERB set debug_               0
+    Module/UW/AUV/ERB set log_flag_            1
+    Module/UW/AUV/ERB set errrop_              0.01
 
-    set auv_err($id)  [new Module/UW/AUV/ERR]
+    set auv_err($id)  [new Module/UW/AUV/ERB]
 
 
     set udp_auv($id)  [new Module/UW/UDP]
