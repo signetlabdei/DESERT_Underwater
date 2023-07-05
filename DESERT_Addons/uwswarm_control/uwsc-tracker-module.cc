@@ -64,10 +64,9 @@ public:
 
 UwSCTrackerModule::UwSCTrackerModule()
 	: UwTrackerModule()
+	, mine_position(nullptr)
 	, leader_id(0)
 {
-	Position mp = Position();
-	mine_position = &mp;
 }
 
 

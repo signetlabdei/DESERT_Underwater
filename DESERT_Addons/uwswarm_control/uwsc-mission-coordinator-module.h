@@ -91,12 +91,11 @@ typedef struct AUV_stats
 	AUV_stats(int id_ctr, int id_trk)
 		: ctr_id(id_ctr)
 		, trk_id(id_trk)
+		, rov_position(nullptr)
 		, rov_mine()
 		, n_mines(0)
 		, rov_status(false)
 	{
-		Position p = Position();
-		rov_position = &p;
 	}
 
 } AUV_stats;
