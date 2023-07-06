@@ -113,13 +113,6 @@ public:
 	UwMissionCoordinatorModule();
 
 	/**
-	* Constructor with position setting of UwMissionCoordinatorVModule class.
-	*
-	* @param UWSMPosition* p Pointer to the ROV leader position
-	*/
-	UwMissionCoordinatorModule(UWSMPosition* p);
-
-	/**
 	* Destructor of UwMissionCoordinatorModule class.
 	*/
 	virtual ~UwMissionCoordinatorModule();
@@ -136,20 +129,6 @@ public:
 
 
 	/**
-	* Set the position of the AUV leader.
-	*
-	* @param Position * p Pointer to the AUV leader position
-	*/
-	virtual void setPosition(UWSMPosition* p);
-
-	/**
-	* Returns the position of the AUV leader.
-	*
-	* @return the current AUV leader position
-	*/
-	inline UWSMPosition* getPosition() { return leader_position;}
-
-	/**
 	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
 	 * @param m Pointer cross layer message
@@ -159,7 +138,6 @@ public:
 
 
 protected:
-	UWSMPosition* leader_position;			/**< ROV leader position. */
 	std::vector<AUV_stats> auv_follower;	/**< ROV followers info. */
 
 	/**
