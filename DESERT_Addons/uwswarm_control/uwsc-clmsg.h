@@ -50,6 +50,7 @@ extern ClMessage_t CLMSG_MC2CTR_SETPOS;
 extern ClMessage_t CLMSG_MC2CTR_SETSTATUS;
 extern ClMessage_t CLMSG_CTR2MC_GETPOS;
 extern ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
+extern ClMessage_t CLMSG_TRACK2MC_GETSTATUS;
 
 class ClSAP;
 
@@ -205,6 +206,45 @@ class ClMsgTrack2McPosition : public ClMessage
  
   private:
     Position* track_position; /**< Track position received from UwTracker module */
+};
+
+/**
+ * Class that manages cross layer messages that require the status of
+ * the ROV follower.
+ */
+class ClMsgTrack2McStatus : public ClMessage
+{
+  public:
+
+	/**
+	 * Class constructor.
+     * @param dest_id id of the destination module
+	 */
+    ClMsgTrack2McStatus(int dest_id);
+       
+    virtual ~ClMsgTrack2McStatus();
+
+    /**
+     * Creates a copy of the object.
+     * @return Pointer to a copy of the object
+     */
+    ClMsgTrack2McStatus* copy();
+
+    /**
+     * Sets the rov follower status.
+     * @param rov_detect rov follower status
+     */
+    void setMineStatus(bool remove);
+
+    /**
+     * Get the rov follower status.
+     * @return rov_detect rov follower status
+     */
+    bool getMineStatus() const;
+
+   
+  private:
+    bool mine_status; /**< Status of the rov follower, true if detected a mine. */
 };
 
 #endif /* UWSC_CLMSG_H */

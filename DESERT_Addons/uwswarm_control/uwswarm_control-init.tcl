@@ -30,6 +30,8 @@
 # @author Filippo Campagnaro, Vincenzo Cimino
 # @version 1.0.0
 
+PacketHeaderManager set tab_(PacketHeader/UWSCFTRACK) 1
+
 Module/UW/SC/CTR set debug_ 0
 Module/UW/SC/CTR set packetSize_         500
 Module/UW/SC/CTR set period_             60
@@ -58,6 +60,14 @@ Module/UW/ROV set tracefile_enabler_  0
 
 Module/UW/SC/TRACKER set leader_id 0
 Module/UW/SC/TRACKER set debug_ 0
+
+Module/UW/SC/TRACKERF set demine_period_ 250
+Module/UW/SC/TRACKERF set period_ 60
+Module/UW/SC/TRACKERF set send_only_active_trace_ 0
+Module/UW/SC/TRACKERF set max_tracking_distance_ 200
+Module/UW/SC/TRACKERF set tracking_period_ 6.7
+Module/UW/SC/TRACKERF set track_my_position_ 0
+Module/UW/SC/TRACKERF set debug_ 0
 
 Plugin/UW/SC/MC set debug_ 0
 

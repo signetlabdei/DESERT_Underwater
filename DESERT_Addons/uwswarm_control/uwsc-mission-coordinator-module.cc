@@ -65,8 +65,6 @@ UwMissionCoordinatorModule::UwMissionCoordinatorModule()
 	: PlugIn()
 	, auv_follower()
 {
-	UWSMPosition lp = UWSMPosition();
-	leader_position=&lp;
 }
 
 UwMissionCoordinatorModule::UwMissionCoordinatorModule(UWSMPosition* p)
@@ -209,7 +207,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 	}
 	else if (m->type() == CLMSG_TRACK2MC_TRACKPOS)
 	{
-		int id = ((ClMsgCtr2McPosition*)m)->getSource();
+		int id = ((ClMsgTrack2McPosition*)m)->getSource();
 		Position* p = ((ClMsgTrack2McPosition*)m)->getTrackPosition();
 
 		if (isTracked(p))
@@ -246,6 +244,23 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			std::cout << NOW << "  UwMissionCoordinatorModule::recvSyncClMsg()"
 					<< " no auv found with id (" << id << ")"
 					<< std::endl;
+	}
+	else if(m->type() == CLMSG_TRACK2MC_GETSTATUS)
+	{
+		int id = ((ClMsgTrack2McStatus*)m)->getSource();
+		bool remove = ((ClMsgTrack2McStatus*)m)->getMineStatus();
+
+		auto auv = std::find_if(auv_follower.begin(), auv_follower.end(),
+				[id](const AUV_stats& element) {
+						return element.trk_id == id;
+				});
+
+		if (auv != auv_follower.end() && remove)
+		{
+			removeMine(auv->ctr_id);
+
+			return 0;
+		}
 	}
 
 	return PlugIn::recvSyncClMsg(m);

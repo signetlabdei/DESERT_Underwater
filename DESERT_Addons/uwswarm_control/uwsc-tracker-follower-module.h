@@ -1,3 +1,4 @@
+//
 // Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
@@ -26,7 +27,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-tracker-module.h
+* @file uwsc-tracker-follower-module.h
 * @author Filippo Campagnaro, Vincenzo Cimino
 * @version 1.0.0
 *
@@ -35,50 +36,80 @@
 * Provides the definition of the class UwSCTracker.
 */
 
-#ifndef UWSCTRACK_MODULE_H
-#define UWSCTRACK_MODULE_H
+#ifndef UWTRACKF_MODULE_H
+#define UWTRACKF_MODULE_H
 #include <uwtracker-module.h>
 #include <uwsc-tracker-follower-packet.h>
-#include "uwsc-clmsg.h"
+#include <node-core.h>
 
+#define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
+
+class UwSCFTrackerModule; // forward declaration
+
+class UwUpdateMineStatus : public TimerHandler
+{
+public:
+	UwUpdateMineStatus(UwSCFTrackerModule *m)
+		: TimerHandler()
+		, module(m)
+	{
+	}
+
+protected:
+	virtual void expire(Event *e);
+	UwSCFTrackerModule *module;
+};
 
 /**
-* UwSCTrackerModule class adds to the UwTrackerModule class the possibility
-* to send cross layer messages.
+* UwTrackerModule class is used to track mobile nodes via sonar and share tracking information via packets.
 */
-class UwSCTrackerModule : public UwTrackerModule {
+class UwSCFTrackerModule : public UwTrackerModule {
+	friend class UwUpdateMineStatus;
 public:
 
 	/**
-	 * Default Constructor of UwSCTrackerModule class.
+	 * Default Constructor of UwSCFTrackerModule class.
 	 */
-	UwSCTrackerModule();
-
-	/**
-	 * Destructor of UwSCTrackerModule class.
-	 */
-	virtual ~UwSCTrackerModule();
-
-	/**
-	 * TCL command interpreter. It implements the following OTcl methods:
-	 *
-	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	 *
-	 */
-	virtual int command(int argc, const char*const* argv);
+	UwSCFTrackerModule();
 
 
 	/**
-	 * Performs the reception of packets from upper and lower layers.
-	 *
-	 * @param Packet* Pointer to the packet will be received.
+	 * Destructor of UwSCFTrackerModule class.
 	 */
-	virtual void recv(Packet*);
+	virtual ~UwSCFTrackerModule();
+
+
+	/**
+	* Initializes a monitoring data packet passed as argument with the default values.
+	* 
+	* @param Packet* Pointer to a packet already allocated to fill with the right values.
+	*/
+	virtual void initPkt(Packet* p) ;
 
 protected:
-	int leader_id;				/** Id of the Tracker leader. */
+	Position auv_position;
+	double demine_period;
+	hdr_uwSCFTracker mine_measure;
+	UwUpdateMineStatus mine_timer; /**< timer to schedule tracking measurements*/
+
+	/**
+	* Allocates, initialize and sends a packet with the default priority flag
+	* set from tcl.
+	*
+	*/
+	void sendPkt();
+
+	void updateMineRemove();
+
+	/**
+	 * Start to send packets.
+	 */
+	virtual void start();
+
+	/**
+	 * Stop to send packets.
+	 */
+	virtual void stop();
 };
 
-#endif // UWSCTRACK_MODULE_H
+#endif // UWTRACKF_MODULE_H

@@ -36,10 +36,11 @@
 * Provides the UwSCTracker class implementation.
 */
 #include "uwsc-tracker-module.h"
-#include <uwsmposition.h>
+#include "uwsc-tracker-follower-packet.h"
 #include <iostream>
 
 #define HDR_UWTRACK(p) (hdr_uwTracker::access(p))
+#define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
 
 /**
 * Class that represents the binding with the tcl configuration script.
@@ -60,11 +61,10 @@ public:
 	TclObject* create(int, const char*const*) {
 		return (new UwSCTrackerModule());
 	}
-} class_module_uwROV_ctr;
+} class_module_uwSCTracker;
 
 UwSCTrackerModule::UwSCTrackerModule()
 	: UwTrackerModule()
-	, mine_position(nullptr)
 	, leader_id(0)
 {
 }
@@ -89,24 +89,42 @@ UwSCTrackerModule::command(int argc, const char*const* argv) {
 void
 UwSCTrackerModule::recv(Packet* p) {
 	hdr_uwTracker* uw_track_h = HDR_UWTRACK(p);
-	Position temp_position;
-	temp_position.setX(uw_track_h->x());
-	temp_position.setY(uw_track_h->y());
-	temp_position.setZ(uw_track_h->z());
-	mine_position = &temp_position;
+	hdr_uwSCFTracker* uwscf_track_h = HDR_UWSCFTRACK(p);
 
-	ClMsgTrack2McPosition m(leader_id);
-	m.setTrackPosition(mine_position);
-	sendSyncClMsg(&m);
+	if (uwscf_track_h->mine_remove())
+	{
+		ClMsgTrack2McStatus m(leader_id);
+		m.setMineStatus(uwscf_track_h->mine_remove());
+		sendSyncClMsg(&m);
 
-	if (debug_)
-		std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
-			<< " ROV (" << m.getSource()
-			<< ") tracked a mine at position: X = " << mine_position->getX()
-			<< "  , Y = " << mine_position->getY()
-			<< "  , Z = " << mine_position->getZ()
-			<< " sending it to the mc ("<< m.getDest() << ")"
-			<< std::endl;
+		if (debug_)
+			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
+				<< " ROV (" << m.getSource()
+				<< ") removed a mine at position"
+				<< " sending it to the mc ("<< m.getDest() << ")"
+				<< std::endl;
+
+	}
+	else
+	{
+		Position mine_position;
+		mine_position.setX(uw_track_h->x());
+		mine_position.setY(uw_track_h->y());
+		mine_position.setZ(uw_track_h->z());
+
+		ClMsgTrack2McPosition m(leader_id);
+		m.setTrackPosition(&mine_position);
+		sendSyncClMsg(&m);
+
+		if (debug_)
+			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
+				<< " ROV (" << m.getSource()
+				<< ") tracked a mine at position: X = " << mine_position.getX()
+				<< "  , Y = " << mine_position.getY()
+				<< "  , Z = " << mine_position.getZ()
+				<< " sending it to the mc ("<< m.getDest() << ")"
+				<< std::endl;
+	}
 
 	UwCbrModule::recv(p);
 }

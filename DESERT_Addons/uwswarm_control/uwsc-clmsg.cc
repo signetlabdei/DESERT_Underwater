@@ -156,3 +156,34 @@ ClMsgTrack2McPosition::getTrackPosition() const
 {
 	return track_position;
 }
+
+////////////////////////////////////////////////////////
+
+ClMsgTrack2McStatus::ClMsgTrack2McStatus(int dest_id)
+	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
+		CLMSG_TRACK2MC_GETSTATUS, UNICAST, dest_id)
+	, mine_status(false)
+{
+}
+
+ClMsgTrack2McStatus::~ClMsgTrack2McStatus()
+{
+}
+
+ClMsgTrack2McStatus*
+ClMsgTrack2McStatus::copy()
+{
+  return new ClMsgTrack2McStatus(*this);
+}
+
+void
+ClMsgTrack2McStatus::setMineStatus(bool remove)
+{
+	mine_status = remove;
+}
+
+bool
+ClMsgTrack2McStatus::getMineStatus() const
+{
+	return mine_status;
+}

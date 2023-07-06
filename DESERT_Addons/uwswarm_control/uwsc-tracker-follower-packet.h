@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -25,52 +25,59 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
 
 /**
- * @file   initlib.cc
+ * @file   uwtracker-packet.h
  * @author Filippo Campagnaro, Vincenzo Cimino
  * @version 1.0.0
- *
- * \brief Provides the initialization of uwswarm_control libraries.
- *
- * Provides the initialization of uwswarm_control libraries.
  * 
+ * \brief Provides both <i>UWROV</i> monitoring and control packets header description.
+ * 
+ * Provides both <i>UWROV</i> monitoring and control packets header description, in 
+ * particular the header structure.
  */
 
-#include <tclcl.h>
-#include "uwsc-clmsg.h"
-#include "uwsc-tracker-follower-packet.h"
+#ifndef UWSCFTRACKER_HDR_H
+#define UWSCFTRACKER_HDR_H
 
-extern EmbeddedTcl Uwswarm_controlTclCode;
-
-packet_t PT_UWSCFTRACKER;
-
-ClMessage_t CLMSG_MC2CTR_SETPOS;
-ClMessage_t CLMSG_MC2CTR_SETSTATUS;
-ClMessage_t CLMSG_CTR2MC_GETPOS;
-ClMessage_t CLMSG_TRACK2MC_TRACKPOS;
-ClMessage_t CLMSG_TRACK2MC_GETSTATUS;
+extern packet_t PT_UWSCFTRACK;
 
 /**
- * Adds the header for <i>hdr_uwTRACK</i> packets in ns2.
+ * <i>hdr_uwROV_ctr</i> describes <i>UWROV_ctr</i> packets for controlling the ROV.
  */
-static class UwSCFTrackPktClass : public PacketHeaderClass {
-public:
+typedef struct hdr_uwSCFTracker {
+    float timestamp_; /**<timestamp when the target was tracked*/
+	bool mine_remove_;
 
-    UwSCFTrackPktClass() : PacketHeaderClass("PacketHeader/UWSCFTRACK", sizeof (hdr_uwSCFTracker)) {
-        this->bind();
-        bind_offset(&hdr_uwSCFTracker::offset_);
+    static int offset_; /**< Required by the PacketHeaderManager. */
+
+    /**
+     * Reference to the offset_ variable.
+     */
+    inline static int& offset() {
+        return offset_;
     }
-} class_uwSCFTRACK_pkt;
+    /**
+     * static method to access the packet header
+     */
+    inline static struct hdr_uwSCFTracker * access(const Packet * p) {
+        return (struct hdr_uwSCFTracker*) p->access(offset_);
+    }
+    /**
+     * Reference to the timestamp variable.
+     */
+    inline float& timestamp() {
+        return timestamp_;
+    }
 
-extern "C" int 
-Uwswarm_control_Init() {
-    PT_UWSCFTRACKER = p_info::addPacket("UWSCFTRACK");
-	CLMSG_MC2CTR_SETPOS = ClMessage::addClMessage();
-	CLMSG_MC2CTR_SETSTATUS = ClMessage::addClMessage();
-	CLMSG_CTR2MC_GETPOS = ClMessage::addClMessage();
-	CLMSG_TRACK2MC_TRACKPOS = ClMessage::addClMessage();
-	CLMSG_TRACK2MC_GETSTATUS = ClMessage::addClMessage();
-	Uwswarm_controlTclCode.load();
-	return 0;
-}
+    /**
+     * Reference to the speed variable.
+     */
+    inline bool& mine_remove() {
+        return mine_remove_;
+    }
+} hdr_uwSCFTracker;
+
+
+#endif // UWROV_MODULE_H
