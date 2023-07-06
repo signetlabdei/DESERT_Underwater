@@ -250,7 +250,7 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 
 # Place and remove mines
 set mine_position [new "Position/UWSM"]
-set opt(mine_file)   "mine_position.csv"
+set opt(mine_file)   "mine_position5.csv"
 set fp [open $opt(mine_file) r]
 set file_data [read $fp]
 set data [split $file_data "\n"]
@@ -260,8 +260,8 @@ foreach line $data {
 		$ns at $t "$mine_position setY_ $y"
 		$ns at $t "$mine_position setZ_ $z"
 
-		if {$t == 1000 || $t == 2100} {
-			$ns at $t "$app_mc($leader_id) removeMine [$app_ctr($leader_id,1) Id_]"
+		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+			$ns at [expr $t + 250] "$app_mc($leader_id) removeMine [$app_ctr($leader_id,$id1) Id_]"
 		}
     }
 }
@@ -331,7 +331,7 @@ foreach line $data {
 			$ns at $t "update_and_check $t $id1"
 			if { [expr $id1 % 2] == 0 } {
   			    set x1 [expr $x + 25]
-  			    set y1 [expr $y + 25]
+  			    set y1 [expr $y - 25]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			} else {
   			    set x1 [expr $x - 25]
@@ -343,7 +343,7 @@ foreach line $data {
 }
 
 for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-  $app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
+#  $app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
   $app_trf($id1,$leader_id) setTrack $mine_position
 
   $ns at $opt(starttime)  "$app_rov($id1) start"
@@ -369,6 +369,7 @@ proc update_and_check { t id } {
 		set outfile_mine [open "test_mine_results.csv" "a"]
 		puts $outfile_mine "$t,$id,[$mine_position getX_],[$mine_position getY_],[$mine_position getZ_]"
 		close $outfile_mine
+		# Remove the mine here and update track
 	}
 }
 

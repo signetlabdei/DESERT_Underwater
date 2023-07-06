@@ -41,11 +41,11 @@ proc createNodeF { id } {
   
   #Setup positions
   if { [expr $id % 2] == 0 } {
-	  $position($id) setX_ [expr $leader_id + 25*$id/2]
- 	  $position($id) setY_ [expr $leader_id + 25*$id/2]
+	  $position($id) setX_ [expr [$position($leader_id) getX_] + 25*$id/2]
+ 	  $position($id) setY_ [expr [$position($leader_id) getY_] - 25*$id/2]
   } else {
-	  $position($id) setX_ [expr $leader_id - 25*($id+1)/2]
- 	  $position($id) setY_ [expr $leader_id - 25*($id+1)/2]
+	  $position($id) setX_ [expr [$position($leader_id) getX_] - 25*($id+1)/2]
+ 	  $position($id) setY_ [expr [$position($leader_id) getY_] - 25*($id+1)/2]
   }
   $position($id) setZ_ -15
 
