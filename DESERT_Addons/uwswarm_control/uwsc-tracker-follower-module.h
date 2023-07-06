@@ -42,6 +42,9 @@
 #include <uwsc-tracker-follower-packet.h>
 #include <node-core.h>
 
+#include <vector>
+#include <algorithm>
+
 #define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
 
 class UwSCFTrackerModule; // forward declaration
@@ -84,6 +87,16 @@ public:
 
 
 	/**
+	* TCL command interpreter. It implements the following OTcl methods:
+	* 
+	* @param argc Number of arguments in <i>argv</i>.
+	* @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	* 
+	*/
+	virtual int command(int argc, const char*const* argv);
+
+	/**
 	* Initializes a monitoring data packet passed as argument with the default values.
 	* 
 	* @param Packet* Pointer to a packet already allocated to fill with the right values.
@@ -91,6 +104,7 @@ public:
 	virtual void initPkt(Packet* p) ;
 
 protected:
+	std::vector<UWSMPosition*> mine_positions;
 	Position auv_position;	/**< Current position of the tracker. */
 	double demine_period;	/**< Timer to schedule packets transmission.*/
 	hdr_uwSCFTracker mine_measure; /**< Detected mine packets. */
@@ -107,6 +121,8 @@ protected:
 	* Update the mine measure
 	*/
 	void updateMineRemove();
+
+	UWSMPosition* updateTrackPosition();
 
 	/**
 	* Start to send packets.

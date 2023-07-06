@@ -100,8 +100,7 @@ UwSCTrackerModule::recv(Packet* p) {
 		if (debug_)
 			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
 				<< " ROV (" << m.getSource()
-				<< ") removed a mine at position"
-				<< " sending it to the mc ("<< m.getDest() << ")"
+				<< ") removed current detected mine"
 				<< std::endl;
 
 	}
@@ -122,7 +121,6 @@ UwSCTrackerModule::recv(Packet* p) {
 				<< ") tracked a mine at position: X = " << mine_position.getX()
 				<< "  , Y = " << mine_position.getY()
 				<< "  , Z = " << mine_position.getZ()
-				<< " sending it to the mc ("<< m.getDest() << ")"
 				<< std::endl;
 	}
 

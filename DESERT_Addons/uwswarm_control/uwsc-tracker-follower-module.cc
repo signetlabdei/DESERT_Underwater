@@ -37,6 +37,7 @@
 */
 
 #include "uwsc-tracker-follower-module.h"
+#include <uwsmposition.h>
 #include <iostream>
 
 extern packet_t PT_UWSCFTRACK;
@@ -66,6 +67,7 @@ public:
 
 UwSCFTrackerModule::UwSCFTrackerModule()
 	: UwTrackerModule()
+	, mine_positions()
 	, auv_position()
 	, demine_period(0)
 	, mine_measure{false}
@@ -77,6 +79,23 @@ UwSCFTrackerModule::UwSCFTrackerModule()
 
 UwSCFTrackerModule::~UwSCFTrackerModule() {}
 
+int UwSCFTrackerModule::command(int argc, const char*const* argv) {
+	Tcl& tcl = Tcl::instance();
+
+	if(argc == 3){
+		if (strcasecmp(argv[1], "setTrack") == 0) {
+			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			mine_positions.emplace_back(p);
+			track_position = p;
+			tcl.resultf("%s", "position Setted\n");
+			return TCL_OK;
+		}
+	}
+
+	return UwTrackerModule::command(argc,argv);
+}
+
+
 void
 UwSCFTrackerModule::sendPkt()
 {
@@ -86,6 +105,7 @@ UwSCFTrackerModule::sendPkt()
 	UwCbrModule::sendPkt();
 
 	mine_measure.mine_remove() = false;
+	mine_timer.resched(tracking_period);
 }
 
 void
@@ -128,8 +148,39 @@ UwSCFTrackerModule::updateMineRemove()
 	auv_position.setY(getPosition()->getY());
 	auv_position.setZ(getPosition()->getZ());
 
+
 	if(!mine_measure.mine_remove())
+	{
+		if (!mine_positions.empty())
+			track_position = updateTrackPosition();
+
 		mine_timer.resched(tracking_period);
+	}
+}
+
+UWSMPosition* 
+UwSCFTrackerModule::updateTrackPosition()
+{
+	UWSMPosition* new_track_position (track_position);
+	float min_distance = new_track_position->getDist(&auv_position);
+
+	for (auto& pos : mine_positions)
+	{
+		float distance = pos->getDist(&auv_position);
+		if(distance < min_distance)
+		{
+			min_distance = distance;
+			new_track_position = pos;
+		}
+	}
+
+	std::cout << NOW << " UwSCFTrackerModule::updateTrackPosition()"
+			<< "New track position: X = " << new_track_position->getX()
+			<< " Y = " << new_track_position->getY()
+			<< " Z = " << new_track_position->getZ()
+			<< std::endl;
+
+	return new_track_position;
 }
 
 void
