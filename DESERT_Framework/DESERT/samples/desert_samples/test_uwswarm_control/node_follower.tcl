@@ -7,7 +7,7 @@ proc createNodeF { id } {
   set nodeF($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 
   set app_rov($id)				[new Module/UW/ROV]
-  set app_trf($id,$leader_id)   [new Module/UW/TRACKER] 
+  set app_trf($id,$leader_id)   [new Module/UW/SC/TRACKERF] 
   set udp($id)  				[new Module/UW/UDP]
   set ipr($id)  				[new Module/UW/StaticRouting]
   set ipif($id) 				[new Module/UW/IP]

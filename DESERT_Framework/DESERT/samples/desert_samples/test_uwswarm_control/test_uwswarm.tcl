@@ -181,13 +181,18 @@ Module/UW/CBR set period_				$opt(cbr_period)
 Module/UW/CBR set debug_				0
 Module/UW/CBR set tracefile_enabler_	1
 
-Module/UW/TRACKER set max_tracking_distance_	50
-Module/UW/TRACKER set packetSize_				$opt(pktsize)
-Module/UW/TRACKER set PoissonTraffic_			$opt(poisson_traffic)
-Module/UW/TRACKER set period_					$opt(cbr_period)
 Module/UW/TRACKER set debug_					0
-Module/UW/TRACKER set tracefile_enabler_		1
-Module/UW/TRACKER set send_only_active_trace_	1
+
+Module/UW/SC/TRACKERF set max_tracking_distance_	50
+Module/UW/SC/TRACKERF set packetSize_				$opt(pktsize)
+Module/UW/SC/TRACKERF set PoissonTraffic_			$opt(poisson_traffic)
+Module/UW/SC/TRACKERF set period_					$opt(cbr_period)
+Module/UW/SC/TRACKERF set debug_					1
+Module/UW/SC/TRACKERF set tracefile_enabler_		1
+Module/UW/SC/TRACKERF set send_only_active_trace_	1
+
+Module/UW/SC/TRACKER set debug_					1
+Module/UW/SC/TRACKER set tracefile_enabler_		1
 
 Module/UW/ROV set packetSize_          $opt(ROV_pktsize)
 Module/UW/ROV set period_              $opt(ROV_period)
@@ -198,10 +203,7 @@ Module/UW/ROV/CTR set debug_				0
 
 Module/UW/SC/CTR set debug_					0
 
-Module/UW/SC/TRACKER set debug_					0
-Module/UW/SC/TRACKER set tracefile_enabler_		1
-
-Plugin/UW/SC/MC set debug_ 0
+Plugin/UW/SC/MC set debug_ 1
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_	2
@@ -246,24 +248,6 @@ set leader_id 0
 createNodeL $leader_id
 for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 	createNodeF $id1
-}
-
-# Place and remove mines
-set mine_position [new "Position/UWSM"]
-set opt(mine_file)   "mine_position5.csv"
-set fp [open $opt(mine_file) r]
-set file_data [read $fp]
-set data [split $file_data "\n"]
-foreach line $data {
-	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
-		$ns at $t "$mine_position setX_ $x"
-		$ns at $t "$mine_position setY_ $y"
-		$ns at $t "$mine_position setZ_ $z"
-
-		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-			$ns at [expr $t + 250] "$app_mc($leader_id) removeMine [$app_ctr($leader_id,$id1) Id_]"
-		}
-    }
 }
 
 ################################
@@ -342,9 +326,28 @@ foreach line $data {
 	}
 }
 
+# Place and remove mines
+set opt(mine_file)   "mine_position5.csv"
+set fp [open $opt(mine_file) r]
+set file_data [read $fp]
+set data [split $file_data "\n"]
+set mine_count 0
+foreach line $data {
+	if {[regexp {^(.*),(.*),(.*)$} $line -> x y z]} {
+		set mine_position($mine_count) [new "Position/UWSM"]
+		$mine_position($mine_count) setX_ $x"
+		$mine_position($mine_count) setY_ $y
+		$mine_position($mine_count) setZ_ $z
+
+		incr mine_count
+    }
+}
+
 for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-#  $app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
-  $app_trf($id1,$leader_id) setTrack $mine_position
+	for {set cnt 0} {$cnt < $mine_count} {incr cnt}  {
+		$app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
+		$app_trf($id1,$leader_id) setTrack $mine_position($cnt)
+	}
 
   $ns at $opt(starttime)  "$app_rov($id1) start"
   $ns at $opt(stoptime)   "$app_rov($id1) stop"
@@ -354,7 +357,8 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 proc update_and_check { t id } {
-    global position app_rov app_ctr mine_position
+    global ns opt position mine_count
+	global leader_id app_rov app_ctr app_mc mine_position 
 
 	$position($id) update
 	# Auvs path output
@@ -363,13 +367,16 @@ proc update_and_check { t id } {
     close $outfile_auv
 
 	# Mines detected output
-	if {[expr abs([$position($id) getX_] - [$mine_position getX_])] < 0.1 &&
-		[expr abs([$position($id) getY_] - [$mine_position getY_])] < 0.1 &&
-		[expr abs([$position($id) getZ_] - [$mine_position getZ_])] < 0.1} {
-		set outfile_mine [open "test_mine_results.csv" "a"]
-		puts $outfile_mine "$t,$id,[$mine_position getX_],[$mine_position getY_],[$mine_position getZ_]"
-		close $outfile_mine
-		# Remove the mine here and update track
+	if {$id > 0} {
+		for {set cnt 0} {$cnt < $mine_count} {incr cnt}  {
+			if {[expr abs([$position($id) getX_] - [$mine_position($cnt) getX_])] < 0.1 &&
+				[expr abs([$position($id) getY_] - [$mine_position($cnt) getY_])] < 0.1 &&
+				[expr abs([$position($id) getZ_] - [$mine_position($cnt) getZ_])] < 0.1} {
+				set outfile_mine [open "test_mine_results.csv" "a"]
+				puts $outfile_mine "$t,$id,[$mine_position($cnt) getX_],[$mine_position($cnt) getY_],[$mine_position($cnt) getZ_]"
+				close $outfile_mine
+			}
+		}
 	}
 }
 
