@@ -31,9 +31,9 @@
 * @author Filippo Campagnaro, Vincenzo Cimino
 * @version 1.0.0
 *
-* \brief Provides the definition of the class <i>UWSCTRACKER</i>.
+* \brief Provides the definition of the class <i>UWSCFTRACKER</i>.
 *
-* Provides the definition of the class UwSCTracker.
+* Provides the definition of the class UwSCFTracker.
 */
 
 #ifndef UWTRACKF_MODULE_H
@@ -46,6 +46,9 @@
 
 class UwSCFTrackerModule; // forward declaration
 
+/**
+* UwUpdateMineStatus class is used to handle the scheduling period of <i>UWSCFTRACKER</i> packets.
+*/
 class UwUpdateMineStatus : public TimerHandler
 {
 public:
@@ -61,7 +64,8 @@ protected:
 };
 
 /**
-* UwTrackerModule class is used to track mobile nodes via sonar and share tracking information via packets.
+* UwSCFTrackerModule class is used to track mines via sonar and share tracking information via packets.
+* After a given time a mine is detected, this module provides to remove it.
 */
 class UwSCFTrackerModule : public UwTrackerModule {
 	friend class UwUpdateMineStatus;
@@ -87,10 +91,10 @@ public:
 	virtual void initPkt(Packet* p) ;
 
 protected:
-	Position auv_position;
-	double demine_period;
-	hdr_uwSCFTracker mine_measure;
-	UwUpdateMineStatus mine_timer; /**< timer to schedule tracking measurements*/
+	Position auv_position;	/**< Current position of the tracker. */
+	double demine_period;	/**< Timer to schedule packets transmission.*/
+	hdr_uwSCFTracker mine_measure; /**< Detected mine packets. */
+	UwUpdateMineStatus mine_timer; /**< Timer to schedule detecting measurements*/
 
 	/**
 	* Allocates, initialize and sends a packet with the default priority flag
@@ -99,16 +103,19 @@ protected:
 	*/
 	void sendPkt();
 
+	/**
+	* Update the mine measure
+	*/
 	void updateMineRemove();
 
 	/**
-	 * Start to send packets.
-	 */
+	* Start to send packets.
+	*/
 	virtual void start();
 
 	/**
-	 * Stop to send packets.
-	 */
+	* Stop to send packets.
+	*/
 	virtual void stop();
 };
 

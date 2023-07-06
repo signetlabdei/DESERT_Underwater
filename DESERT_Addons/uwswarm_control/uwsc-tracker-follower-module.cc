@@ -28,12 +28,12 @@
 
 /**
 * @file uwsc-tracker-follower-module.cc
-* @author Filippo Campagnaro
+* @author Filippo Campagnaro, Vincenzo Cimino
 * @version 1.0.0
 *
-* \brief Provides the <i>UWSCTRACKER</i> class implementation.
+* \brief Provides the <i>UWSCFTRACKER</i> class implementation.
 *
-* Provides the UwSCTracker class implementation.
+* Provides the UwSFCTracker class implementation.
 */
 
 #include "uwsc-tracker-follower-module.h"
