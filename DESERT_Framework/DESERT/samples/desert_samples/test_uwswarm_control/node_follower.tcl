@@ -1,8 +1,7 @@
 proc createNodeF { id } {
   global channel ns position nodeF ipr ipif portnum_rov portnum_trf
-  global opt mll mac propagation data_mask interf_data udp
+  global opt mll mac propagation data_mask interf_data udp phy
   global app_trf app_rov leader_id
-#  global app_mc
   
   set nodeF($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 

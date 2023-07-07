@@ -128,7 +128,8 @@ set opt(pktsize)  32
 set opt(cbr_period)   10
 set opt(poisson_traffic) 0
 
-set opt(rngstream)	1
+set opt(rngstream)	155
+
 if {$opt(ACK_Active)} {
     set opt(ack_mode)           "setAckMode"    
 } else {
@@ -140,16 +141,16 @@ set opt(waypoint_file)  "./rov_path.csv"
 if {$opt(bash_parameters)} {
     if {$argc != 2} {
         puts "The script requires two inputs:"
-        puts "- the first for the Poisson ROV period"
+		puts "- the first for the number of nodes"
         puts "- the second for the rngstream"
-        puts "example: ns test_uw_rov.tcl 60 13"
+        puts "example: ns test_uw_rov.tcl 3 13"
         puts "If you want to leave the default values, please set to 0"
         puts "the value opt(bash_parameters) in the tcl script"
         puts "Please try again."
         return
     } else {
-        set opt(ROV_period) [lindex $argv 0]
-        set opt(rngstream) [lindex $argv 1];
+        set opt(nn)			[lindex $argv 0]
+        set opt(rngstream)	[lindex $argv 1];
     }   
 } 
 
@@ -187,11 +188,11 @@ Module/UW/SC/TRACKERF set max_tracking_distance_	50
 Module/UW/SC/TRACKERF set packetSize_				$opt(pktsize)
 Module/UW/SC/TRACKERF set PoissonTraffic_			$opt(poisson_traffic)
 Module/UW/SC/TRACKERF set period_					$opt(cbr_period)
-Module/UW/SC/TRACKERF set debug_					1
+Module/UW/SC/TRACKERF set debug_					0
 Module/UW/SC/TRACKERF set tracefile_enabler_		1
 Module/UW/SC/TRACKERF set send_only_active_trace_	1
 
-Module/UW/SC/TRACKER set debug_					1
+Module/UW/SC/TRACKER set debug_					0
 Module/UW/SC/TRACKER set tracefile_enabler_		1
 
 Module/UW/ROV set packetSize_          $opt(ROV_pktsize)
@@ -203,7 +204,7 @@ Module/UW/ROV/CTR set debug_				0
 
 Module/UW/SC/CTR set debug_					0
 
-Plugin/UW/SC/MC set debug_ 1
+Plugin/UW/SC/MC set debug_ 0
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_	2
@@ -314,12 +315,12 @@ foreach line $data {
 		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 			$ns at $t "update_and_check $t $id1"
 			if { [expr $id1 % 2] == 0 } {
-  			    set x1 [expr $x + 25]
-  			    set y1 [expr $y - 25]
+  			    set x1 [expr $x + 25*$id1/2]
+  			    set y1 [expr $y - 25*$id1/2]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			} else {
-  			    set x1 [expr $x - 25]
-  			    set y1 [expr $y - 25]
+  			    set x1 [expr $x - 25*($id1+1)/2]
+  			    set y1 [expr $y - 25*($id1+1)/2]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			}
 		}
@@ -327,7 +328,7 @@ foreach line $data {
 }
 
 # Place and remove mines
-set opt(mine_file)   "mine_position5.csv"
+set opt(mine_file)   "mine_position.csv"
 set fp [open $opt(mine_file) r]
 set file_data [read $fp]
 set data [split $file_data "\n"]
@@ -345,7 +346,7 @@ foreach line $data {
 
 for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 	for {set cnt 0} {$cnt < $mine_count} {incr cnt}  {
-		$app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
+#		$app_trl($leader_id,$id1) setLogSuffix "[expr $leader_id],[expr $id1]"
 		$app_trf($id1,$leader_id) setTrack $mine_position($cnt)
 	}
 
@@ -385,47 +386,95 @@ proc update_and_check { t id } {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-  global ns opt outfile_auv outfile_mine
-  global mac propagation channel propagation
-  global ipr ipif udp cbr phy 
+  global ns opt
+  global app_ctr app_trl app_rov app_trf leader_id
+  global mac propagation channel propagation phy
+
   if ($opt(verbose)) {
     puts "-----------------------------------------------------------------"
     puts "Simulation summary"
     puts "-----------------------------------------------------------------"
-    puts "Total simulation time  : [expr $opt(stoptime)-$opt(starttime)] s"
-    puts "Number of nodes      : $opt(nn)"
-    puts "Packet size        : $opt(pktsize) byte(s)"
-    puts "Control CBR period         : $opt(cbr_period) s"
+    puts "Simulation summary"
+    puts "number of nodes  : $opt(nn)"
+    puts "packet size      : $opt(pktsize) byte"
+    puts "cbr period       : $opt(cbr_period) s"
+    puts "number of nodes  : $opt(nn)"
+    puts "simulation length: $opt(txduration) s"
+    puts "tx frequency     : $opt(freq) Hz"
+    puts "tx bandwidth     : $opt(bw) Hz"
+    puts "bitrate          : $opt(bitrate) bps"
     puts "-----------------------------------------------------------------"
   }
 
-  set sum_cbr_throughput  0
-  set sum_mac_sent_pkts   0
-  set sum_mac_recv_pkts   0  
-  set sum_sent_pkts   0.0
-  set sum_recv_pkts   0.0  
-  set sum_pcks_in_buffer  0
-  set sum_upper_pcks_rx   0
-  set sum_mac_pcks_tx     0
-  set sent_pkts 0
-  set recv_pkts 0
+  set sum_throughput     0
+  set sum_sent_pkts      0.0
+  set sum_rcv_pkts       0.0    
 
-  for {set i 0} {$i < $opt(nn)} {incr i}  {
+  for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+    set ctr_throughput($id1)              [$app_ctr($leader_id,$id1) getthr]
+    set ctr_per($id1)                     [$app_ctr($leader_id,$id1) getper]
+    set ctr_sent_pkts($id1)               [$app_ctr($leader_id,$id1) getsentpkts]
+    set ctr_rcv_pkts($id1)                [$app_ctr($leader_id,$id1) getrecvpkts]
+    
+    set trl_throughput($id1)              [$app_trl($leader_id,$id1) getthr]
+    set trl_per($id1)                     [$app_trl($leader_id,$id1) getper]
+    set trl_sent_pkts($id1)               [$app_trl($leader_id,$id1) getsentpkts]
+    set trl_rcv_pkts($id1)                [$app_trl($leader_id,$id1) getrecvpkts]
 
-  	set mac_sent_pkts    [$mac($i) getDataPktsTx]
-  	set mac_recv_pkts    [$mac($i) getDataPktsRx]
+    set rov_throughput($id1)              [$app_rov($id1) getthr]
+    set rov_per($id1)                     [$app_rov($id1) getper]
+    set rov_sent_pkts($id1)               [$app_rov($id1) getsentpkts]
+    set rov_rcv_pkts($id1)                [$app_rov($id1) getrecvpkts]
 
-    puts "MAC received Packets($i)   : $mac_recv_pkts"
+    set trf_throughput($id1)              [$app_trf($id1,$leader_id) getthr]
+    set trf_per($id1)                     [$app_trf($id1,$leader_id) getper]
+    set trf_sent_pkts($id1)               [$app_trf($id1,$leader_id) getsentpkts]
+    set trf_rcv_pkts($id1)                [$app_trf($id1,$leader_id) getrecvpkts]
 
-    set sum_mac_pcks_tx  [expr $sum_mac_pcks_tx + $mac_sent_pkts]
-    set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
+	set sum_throughput [expr $sum_throughput + $ctr_throughput($id1) + $trl_throughput($id1) + $rov_throughput($id1) + $trf_throughput($id1)]
+	set sum_sent_pkts [expr $sum_sent_pkts + $ctr_sent_pkts($id1) + $trl_sent_pkts($id1) + $rov_sent_pkts($id1) + $trf_sent_pkts($id1)]
+	set sum_rcv_pkts [expr $sum_rcv_pkts + $ctr_rcv_pkts($id1) + $trl_rcv_pkts($id1) + $rov_rcv_pkts($id1) + $trf_rcv_pkts($id1)]
+
+	if ($opt(verbose)) {
+  	  puts "CTR ($id1) Throughput     : $ctr_throughput($id1)"
+  	  puts "TRL ($id1) Throughput     : $trl_throughput($id1)"
+  	  puts "ROV ($id1) Throughput     : $rov_throughput($id1)"
+  	  puts "TRF ($id1) Throughput     : $trf_throughput($id1)"
+  	  puts "-------------------------------------------"
+  	}
   }
- 
+
   if ($opt(verbose)) {
-    puts "MAC tot sent Packets     : $sum_mac_pcks_tx"
-    puts "MAC tot received Packets   : $sum_mac_recv_pkts"
+    puts "Mean Throughput           : [expr ($sum_throughput/(($opt(nn))))]"
+    puts "---------------------------------------------------------------------"
+    puts "Sent Packets	: $sum_sent_pkts"
+    puts "Received	: $sum_rcv_pkts"
+    puts "Packet Delivery Ratio	: [expr $sum_rcv_pkts / $sum_sent_pkts * 100]"
+      puts "---------------------------------------------------------------------"
+
+    set NL_packet_lost             [$phy($leader_id) getTotPktsLost]
+    set packet_lost                $NL_packet_lost
+    for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+		set NF_packet_lost($id1)       [$phy($id1) getTotPktsLost]
+		set packet_lost                [expr $packet_lost + $NF_packet_lost($id1)]
+    }
+
+    for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+      puts "- PHY layer statistics for the node Follower ($id1) -"
+      puts "Tot. pkts lost            : $NF_packet_lost($id1)"
+      puts "Tot. CTRL pkts lost due to Interference   : [$phy($id1) getErrorCtrlPktsInterf]"
+      puts "---------------------------------------------------------------------"
+	}
+
+    puts "- PHY layer statistics for the node Leader -"
+    puts "Tot. pkts lost            : $NL_packet_lost"
+    puts "Tot. CTRL pkts lost due to Interference   : [$phy($leader_id) getErrorCtrlPktsInterf]"
+    puts "---------------------------------------------------------------------"
+    puts "- Global situation -"
+    puts "Tot. pkts lost            : $packet_lost"
+    puts "done!"
   }
-  
+
   $ns flush-trace
   close $opt(tracefile)
 }

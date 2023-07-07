@@ -174,11 +174,12 @@ UwSCFTrackerModule::updateTrackPosition()
 		}
 	}
 
-	std::cout << NOW << " UwSCFTrackerModule::updateTrackPosition()"
-			<< "New track position: X = " << new_track_position->getX()
-			<< " Y = " << new_track_position->getY()
-			<< " Z = " << new_track_position->getZ()
-			<< std::endl;
+	if (debug_)
+		std::cout << NOW << " UwSCFTrackerModule::updateTrackPosition()"
+				<< "New track position: X = " << new_track_position->getX()
+				<< " Y = " << new_track_position->getY()
+				<< " Z = " << new_track_position->getZ()
+				<< std::endl;
 
 	return new_track_position;
 }
