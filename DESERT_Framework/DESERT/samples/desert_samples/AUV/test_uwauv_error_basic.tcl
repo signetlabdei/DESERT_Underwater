@@ -74,7 +74,7 @@
 # Flags to enable or disable options #
 ######################################
 set opt(trace_files)        0
-set opt(bash_parameters)    0
+set opt(bash_parameters)    1
 
 #####################
 # Library Loading   #
@@ -127,7 +127,7 @@ $ns use-Miracle
 ##################
 set opt(n_auv)              2 ;# Number of Nodes
 set opt(starttime)          1
-set opt(stoptime)           15000
+set opt(stoptime)           150000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            3
 
@@ -186,7 +186,7 @@ if {$opt(bash_parameters)} {
         puts "The script requires two inputs:"
         puts "- the first for accuracy"
         puts "- the second for variance"
-        puts "- the third error probability"
+        puts "- the third for error probability"
         puts "- the fourth for the rngstream"
         puts "example: ns test_uwmultitraffic_auv.tcl 0.001 0.01 0.01 5"
         puts "If you want to leave the default values, please set to 0"
@@ -362,8 +362,8 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
     Position/UWSME debug_ 1
 
     set position_auv($id) [new "Position/UWSME"]
-    $position_auv($id) setX_ 0
-    $position_auv($id) setY_  0
+    $position_auv($id) setX_ 1*($id*(2))-1
+    $position_auv($id) setY_  1*($id*(-2))-1
     $position_auv($id) setZ_ -1000
 
     $auv_app($id) setPosition $position_auv($id) 
@@ -424,6 +424,8 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
 }
 
 proc update_and_check {t} {
+
+    global ns
     set outfile_auv [open "test_uwauv0_results.csv" "a"]
     set outfile_auv1 [open "test_uwauv1_results.csv" "a"]
     set outfile_asv [open "test_uwasv_results.csv" "a"]
@@ -433,6 +435,7 @@ proc update_and_check {t} {
         puts $outfile_auv "positions AUV($id1): x = [$auv_app($id1) getX], y = [$auv_app($id1) getY], z =  [$auv_app($id1) getZ]" 
     }
 
+    
 
     $position_asv update
     puts $outfile_asv "$t,[$asv_app(0) getX],[$asv_app(0) getY],[$asv_app(0) getZ]"
@@ -440,8 +443,6 @@ proc update_and_check {t} {
     
     close $outfile_auv
     close $outfile_asv
-
-    
 }
 ###
 

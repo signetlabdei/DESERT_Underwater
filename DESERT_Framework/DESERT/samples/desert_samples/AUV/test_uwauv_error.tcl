@@ -127,7 +127,7 @@ $ns use-Miracle
 ##################
 set opt(n_auv)              2 ;# Number of Nodes
 set opt(starttime)          1
-set opt(stoptime)           15000
+set opt(stoptime)           150000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
@@ -362,8 +362,8 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
     Position/UWSME debug_ 1
 
     set position_auv($id) [new "Position/UWSME"]
-    $position_auv($id) setX_ 0
-    $position_auv($id) setY_  0
+    $position_auv($id) setX_ 1*($id*(2))-1
+    $position_auv($id) setY_  1*($id*(-2))-1
     $position_auv($id) setZ_ -1000
 
     $auv_app($id) setPosition $position_auv($id) 
@@ -440,6 +440,11 @@ proc update_and_check {t} {
     
     close $outfile_auv
     close $outfile_asv
+
+    if {[$auv_app(0) getX] == -510.0 && [$auv_app(0) getY] == 510.0 && [$auv_app(1) getX] == 510.0 && [$auv_app(1) getY] == -510.0} {
+        puts "STOP"
+        ns "finish; $ns halt"
+    }
 
     
 }
