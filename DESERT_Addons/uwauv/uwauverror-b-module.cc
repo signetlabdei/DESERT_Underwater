@@ -88,6 +88,7 @@ UwAUVErrorBModule::UwAUVErrorBModule()
 	, error_p(0.001)
 	, alarm_mode(0)
 	, speed(1)
+	, accuracy(0.01)
 {
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
@@ -96,6 +97,8 @@ UwAUVErrorBModule::UwAUVErrorBModule()
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
+	bind("sigma_", (double*) &sigma);
+	bind("accuracy_",(double*) &accuracy);
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -116,9 +119,10 @@ UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, error_p(0.001)
+	, error_p(0.01)
 	, alarm_mode(0)
 	, speed(1)	
+	, accuracy(0.01)
 {
 	posit = p;
     bind("ackTimeout_", (int*) &ackTimeout);
@@ -126,6 +130,8 @@ UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p)
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
+	bind("sigma_", (double*) &sigma);
+	bind("accuracy_",(double*) &accuracy);
 
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
@@ -249,9 +255,26 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 		std::mt19937 generator(rd());
 		std::uniform_real_distribution<double> distrib(0.0, 1.0);
 
-		double randomValue = distrib(generator) ;
+		double t_e = distrib(generator) ;
 
-		if(randomValue < error_p){
+		std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
+
+		// Generate a random value from the Gaussian distribution
+		double noise = n_dis(generator);
+
+		double m = t_e + noise;
+
+		double p_e = std::erfc((((1 - error_p) - m) / std::sqrt(2.0)) / sigma); // prob of true error (t_e) greater than th_ne
+
+		if (t_e > (1-error_p)){
+			if (log_flag == 1) {
+				t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+				t_err_log << NOW << "," << x_e <<","<< y_e <<",e" << std::endl;
+				t_err_log.close();
+			}
+		}
+	
+		if (p_e > accuracy){ //if p_e is small enough --> no error, otherwise gray zone
 
 			x_e = posit->getX();
 			y_e = posit->getY();
@@ -263,30 +286,58 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 			uwAUVh->x() = x_e;
 			uwAUVh->y() = y_e;
 			uwAUVh->error() = 1;
+			uwAUVh->sn() = ++sn;
 
 			if (log_flag == 1) {
-				err_log.open("log/error_log.csv",std::ios_base::app);
-				err_log << "E,"<< NOW << "," << x_e <<","<< y_e <<", ON"<< std::endl;
-				err_log.close();
+					err_log.open("log/error_log.csv",std::ios_base::app);
+					err_log << "ON,"<< NOW << "," << x_e <<","<< y_e << std::endl;
+					err_log.close();
+			}
+
+			if (log_flag == 1) {
+				if(t_e > (1-error_p)){
+					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+					t_err_log << NOW << "," << x_e <<","<< y_e <<",tp" << std::endl;
+					t_err_log.close();
+				}else{
+					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+					t_err_log << NOW << "," << x_e <<","<< y_e <<",fp" << std::endl;
+					t_err_log.close();
+				}
+			}
+		}else{
+
+			if (log_flag == 1) {
+				if(t_e <= (1-error_p)){
+					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+					t_err_log << NOW << "," << x_e <<","<< y_e <<",tn" << std::endl;
+					t_err_log.close();
+				}else{
+					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+					t_err_log << NOW << "," << x_e <<","<< y_e <<",fn" << std::endl;
+					t_err_log.close();
+				}
 			}
 		}
 		
+
 	}else{
 
 		uwAUVh->x() = x_e;                      
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = 1;
 		this->p = p;
+		uwAUVh->sn() = sn;
 	}
 
-	uwAUVh->sn() = ++sn;
+	
 
 	UwCbrModule::initPkt(p);
 
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< "," << posit->getZ() << ", " << posit->getSpeed()<< std::endl;
+			<< "," << posit->getZ() << std::endl;
 		out_file_stats.close();
 	}
 
@@ -325,7 +376,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 
 				if (log_flag == 1) {
 					err_log.open("log/error_log.csv",std::ios_base::app);
-					err_log << "E,"<< NOW << "," << x_e <<","<< y_e <<", OFF"<< std::endl;
+					err_log << "OFF,"<< NOW << "," << x_e <<","<< y_e << std::endl;
 					err_log.close();
 				}
 

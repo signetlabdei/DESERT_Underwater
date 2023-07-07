@@ -215,6 +215,8 @@ private:
 
 	double speed;
 	double error_p;
+	double sigma;
+	double accuracy;
 
 
 };

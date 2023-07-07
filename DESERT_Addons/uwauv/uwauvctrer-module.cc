@@ -188,6 +188,13 @@ void UwAUVCtrErModule::setPosition(UWSMEPosition* p){
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
+	if (log_flag == 1) {
+		pos_log.open("log/position_log.csv",std::ios_base::app);
+		pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< ","<< posit->getZ() << std::endl;
+		pos_log.close();
+	}
+
 }
 
 void UwAUVCtrErModule::transmit() {
@@ -215,15 +222,11 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
-	bool found = false;
 
-	uwAUVh->speed() = 0;
+	bool found = false;
 	uwAUVh->ack() = ack;  
 	ack = 0;
 	uwAUVh->error() = 0;
-
-	//if(this->p == NULL){
-		 //TO FIX
 
 	if (error_released){
 
@@ -236,7 +239,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 		if (log_flag == 1) {
 
-			err_log.open("log/error_log.csv",std::ios_base::app);
+			err_log.open("log/error_log_t.csv",std::ios_base::app);
 			err_log << "G,"<< NOW << "," << x_s<<","<<y_s<<", OFF"<< std::endl;
 			err_log.close();
 
@@ -281,7 +284,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 			if (log_flag == 1) {
 
-				err_log.open("log/error_log.csv",std::ios_base::app);
+				err_log.open("log/error_log_t.csv",std::ios_base::app);
 				err_log << "R,"<< NOW << "," << x_s<<","<<y_s<<", OFF"<< std::endl;
 				err_log.close();
 
@@ -300,9 +303,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") SOLVED" 
 				<< std::endl;
 			}
-
-			/*  TO DO  */
-			/* CHECK ALL THE STATE OF THE ERROR IN THE QUEUE, IF ONE OF THEM IS 2 THEN GO THERE*/
 
 			if (!alarm_queue.empty()){ //take care of the next error
 
@@ -327,7 +327,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 		}else{
 
 			uwAUVh->error() = 1;
-			uwAUVh->sn() = ++sn;
+			uwAUVh->sn() = sn;
 			uwAUVh->x() = x_err;
 			uwAUVh->y() = y_err;
 			this->p = p;
@@ -338,7 +338,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			}
 
 		}
-
 	}
 	
 
@@ -346,21 +345,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ACK recv" 
 		<< std::endl;
 	}
-
-	//Retransmission
-	/*}else{
-
-		uwAUVh->error() = -1;
-		uwAUVh->sn() = sn;
-		uwAUVh->x() = x_s;
-		uwAUVh->y() = y_s;
-
-
-		if (debug_) {
-		std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  Retransmission ERROR ("<< x_s << "," << y_s << ") solved" 
-			<< std::endl;
-		}
-	}*/
 	
 	UwCbrModule::initPkt(p);
 
@@ -391,7 +375,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 	else if((uwAUVh->ack())<0 && debug_)
 		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
 			<<"received"<< std::endl;
-
 	
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
@@ -445,19 +428,11 @@ void UwAUVCtrErModule::recv(Packet* p) {
 			if (status == 1){
 
 				if(!exists){
-
 					gray_queue.push_back({uwAUVh->x(), uwAUVh->y(), uwAUVh->error(),1});
 					if (debug_){
 						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) new error added to gray_queue, error = " << uwAUVh->error() << std::endl;
 						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) Next gray error = " << (gray_queue[0][2]/gray_queue[0][3]) << std::endl;
 					}
-					//if (log_flag == 1) {
-					//	err_log.open("log/error_log.csv",std::ios_base::app);
-					//	err_log << "G,"<< NOW << "," << uwAUVh->x() <<","<<uwAUVh->y()<<", ON"<< std::endl;
-					//	err_log.close();
-					//}
-
-
 				}
 
 
@@ -493,7 +468,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 						}
 
 						if (log_flag == 1) {
-							err_log.open("log/error_log.csv",std::ios_base::app);
+							err_log.open("log/error_log_t.csv",std::ios_base::app);
 							err_log << "R,"<< NOW << "," << x_err <<","<<y_err<<", ON"<< std::endl;
 							err_log.close();
 						}
@@ -522,7 +497,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 						if (!exists){
 							alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
 							if (log_flag == 1) {
-								err_log.open("log/error_log.csv",std::ios_base::app);
+								err_log.open("log/error_log_t.csv",std::ios_base::app);
 								err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<< uwAUVh->y() <<", ON"<< std::endl;
 								err_log.close();
 							}
@@ -561,7 +536,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 					if (!exists){
 						alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
 						if (log_flag == 1) {
-							err_log.open("log/error_log.csv",std::ios_base::app);
+							err_log.open("log/error_log_t.csv",std::ios_base::app);
 							err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<<uwAUVh->y()<<", ON"<< std::endl;
 							err_log.close();
 						}
@@ -575,14 +550,13 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 			}else{
 
-
 				//delete point in gray_queue
 				error_released = true;
 				x_s = uwAUVh->x();
 				y_s = uwAUVh->y();
 
 				if (log_flag == 1) {
-						err_log.open("log/error_log.csv",std::ios_base::app);
+						err_log.open("log/error_log_t.csv",std::ios_base::app);
 						err_log << "G,"<< NOW << "," << x_s <<","<< y_s <<", OFF"<< std::endl;
 						err_log.close();
 				}
@@ -612,21 +586,21 @@ int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){
 	
 	if (p_e <= accuracy){ //if p_e is small enough --> no error 
 		// 	NO ERROR
-		if (log_flag == 1) {
+		/*if (log_flag == 1) {
 			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 			t_err_log << NOW << "," << x <<","<< y <<","<< 0 << std::endl;
 			t_err_log.close();
-		}
+		}*/
 		status = 0;
-	}else if (p_e >= (1-accuracy)){
+	}else if (p_e > (1-accuracy)){
 		// FOR SURE ERROR
 		status = 2;
 
-		if (log_flag == 1) {
+		/*if (log_flag == 1) {
 			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 			t_err_log << NOW << "," << x <<","<< y <<","<< 1 << std::endl;
 			t_err_log.close();
-		}
+		}*/
 
 	}else{
 		//I NEED MORE DATA

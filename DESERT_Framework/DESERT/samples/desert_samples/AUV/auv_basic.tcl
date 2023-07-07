@@ -22,7 +22,9 @@ proc createAUV { id } {
     Module/UW/AUV/ERB set traffic_type_        3
     Module/UW/AUV/ERB set debug_               0
     Module/UW/AUV/ERB set log_flag_            1
-    Module/UW/AUV/ERB set errrop_              0.01
+    Module/UW/AUV/ERB set errrop_              $opt(e_prob)
+    Module/UW/AUV/ERB set sigma_               $opt(variance)
+    Module/UW/AUV/ERB set accuracy_            $opt(accuracy)
 
     set auv_err($id)  [new Module/UW/AUV/ERB]
 

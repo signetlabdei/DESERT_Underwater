@@ -264,25 +264,26 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 			
 		}else{
 
-			//if(posit->getX() != x_e or posit->getY() != y_e ){
-				error_m = getErrorMeasure();
-				if (debug_) { 
-					std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
-						<< "New error, measure: "<< error_m <<", true error: "<< t_e << std::endl;
-				}
+			error_m = getErrorMeasure();
+
+			if (debug_) { 
+				std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
+					<< "New error, measure: "<< error_m <<", true error: "<< t_e << std::endl;
+			}
 
 				if(alarm_mode == 1){
 					if (log_flag == 1) {
-						err_log.open("log/error_log.csv",std::ios_base::app);
+						err_log.open("log/error_log_t.csv",std::ios_base::app);
 						err_log << "G,"<< NOW << "," << posit->getX() <<","<< posit->getY() <<", ON"<< std::endl;
+						err_log.close();
+
+						err_log.open("log/error_log.csv",std::ios_base::app);
+						err_log << "ON,"<< NOW << "," << x_e <<","<< y_e << std::endl;
 						err_log.close();
 					}
 
 				}
-			//}
 		}
-
-		
 
 		if (alarm_mode == 1){
 
@@ -296,8 +297,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 			uwAUVh->x() = x_e;                      
 			uwAUVh->y() = y_e;
 			uwAUVh->error() = error_m;
-			this->p = p;
-
+			this->p = p;	
 
 			if (debug_) { 
 			std::cout << NOW << " UwAUVErroModule::initPkt(Packet *p) " 
@@ -312,23 +312,21 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 			}
 
 		}
+
+		uwAUVh->sn() = ++sn;
 		
 	}else{
+
 		uwAUVh->x() = x_e;                      
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = error_m;
 		this->p = p;
+		uwAUVh->sn() = sn;
 	}
 
-	uwAUVh->sn() = ++sn;
+	
 
 	UwCbrModule::initPkt(p);
-
-	/*if (debug_){
-		hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
-		std::cout << NOW << " UwAUVErrorModule::initPkt(Packet *p) AUV current "
-			<< "position: X = " << posit->getX() << ", Y = " << posit->getY() << std::endl;
-		}*/
 
 	if (log_flag == 1) {
 			out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
@@ -377,12 +375,25 @@ void UwAUVErrorModule::recv(Packet* p) {
 				sendTmr_.resched(period);
 
 				if (log_flag == 1) {
-					err_log.open("log/error_log.csv",std::ios_base::app);
+
+					err_log.open("log/error_log_t.csv",std::ios_base::app);
 					err_log << "W,"<< NOW << "," << x_e <<","<< y_e <<", ON"<< std::endl;
 					err_log.close();
+
+					err_log.open("log/error_log.csv",std::ios_base::app);
+					err_log << "OFF,"<< NOW << "," << x_e <<","<< y_e << std::endl;
+					err_log.close();
+
+					if(t_e <= th_ne){
+						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+						t_err_log << NOW << "," << x_e <<","<< y_e <<",tn" << std::endl;
+						t_err_log.close();
+					}else{
+						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+						t_err_log << NOW << "," << x_e <<","<< y_e <<",fn" << std::endl;
+						t_err_log.close();
+					}
 				}
-
-
 				
 
 				if (debug_) {
@@ -393,6 +404,23 @@ void UwAUVErrorModule::recv(Packet* p) {
 			} else if (uwAUVh->error() >= 1 ){
 
 				alarm_mode = 2;
+
+				if (log_flag == 1) {
+
+					if(t_e > th_ne){
+						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+						t_err_log << NOW << "," << x_e <<","<< y_e <<",tp" << std::endl;
+						t_err_log.close();
+
+					}else{
+
+						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+						t_err_log << NOW << "," << x_e <<","<< y_e <<",fp" << std::endl;
+						t_err_log.close();
+
+					}
+
+				}
 
 				if (debug_)
 					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
@@ -460,24 +488,18 @@ double UwAUVErrorModule::getErrorMeasure(){
 
 	//double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
 	
-	if (p_e >= accuracy){ //if p_e is small enough --> no error, otherwise gray zone
+	if (p_e > accuracy){ //if p_e is small enough --> no error, otherwise gray zone
 		alarm_mode = 1;
 	}
 
 	if (t_e > th_ne){
+
 		if (log_flag == 1) {
 			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-			t_err_log << NOW << "," << x_e <<","<< y_e <<","<< 1 << std::endl;
-			t_err_log.close();
-		}
-	}else{
-		if (log_flag == 1) {
-			t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-			t_err_log << NOW << "," << x_e <<","<< y_e <<","<< 0 << std::endl;
+			t_err_log << NOW << "," << x_e <<","<< y_e <<",e"<< std::endl;
 			t_err_log.close();
 		}
 	}
-
 	
 
 	return m;

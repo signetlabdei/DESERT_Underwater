@@ -27,7 +27,9 @@ proc createASV { id } {
     Module/UW/AUV/CEB set traffic_type_        3
     Module/UW/AUV/CEB set debug_               0
     Module/UW/AUV/CEB set log_flag_            1
-    Module/UW/AUV/CEB set errorp_              0.01
+    Module/UW/AUV/CEB set errrop_              $opt(e_prob)
+    Module/UW/AUV/CEB set sigma_               $opt(variance)
+    Module/UW/AUV/CEB set accuracy_             $opt(accuracy)
 
 
     for {set id1 0} {$id1 <= $opt(n_auv)} {incr id1} {

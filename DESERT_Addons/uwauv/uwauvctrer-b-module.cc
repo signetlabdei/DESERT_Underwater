@@ -261,9 +261,6 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 				<< std::endl;
 			}
 
-			/*  TO DO  */
-			/* CHECK ALL THE STATE OF THE ERROR IN THE QUEUE, IF ONE OF THEM IS 2 THEN GO THERE*/
-
 			if (!alarm_queue.empty()){ //take care of the next error
 
 				x_err = alarm_queue[0][0];
@@ -286,7 +283,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 		}else{
 
 			uwAUVh->error() = 1;
-			uwAUVh->sn() = ++sn;
+			uwAUVh->sn() = sn;
 			uwAUVh->x() = x_err;
 			uwAUVh->y() = y_err;
 			this->p = p;
@@ -297,6 +294,15 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 			}
 
 		}
+
+	}
+
+	if (log_flag == 1) {
+
+		pos_log.open("log/position_log.csv",std::ios_base::app);
+		pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+			<< ","<< posit->getZ() << std::endl;
+		pos_log.close();
 
 	}
 	
