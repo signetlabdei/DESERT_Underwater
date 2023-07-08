@@ -136,14 +136,15 @@ if {$opt(ACK_Active)} {
     set opt(ack_mode)           "setNoAckMode"
 }
 
-set opt(waypoint_file)  "./rov_path.csv"
+set opt(waypoint_file)  "./sin_path.csv"
 
 if {$opt(bash_parameters)} {
-    if {$argc != 2} {
+    if {$argc != 3} {
         puts "The script requires two inputs:"
 		puts "- the first for the number of nodes"
         puts "- the second for the rngstream"
-        puts "example: ns test_uw_rov.tcl 3 13"
+        puts "- the third for the path"
+        puts "example: ns test_uw_rov.tcl 3 13 rov_path.csv"
         puts "If you want to leave the default values, please set to 0"
         puts "the value opt(bash_parameters) in the tcl script"
         puts "Please try again."
@@ -151,6 +152,7 @@ if {$opt(bash_parameters)} {
     } else {
         set opt(nn)			[lindex $argv 0]
         set opt(rngstream)	[lindex $argv 1];
+		set opt(waypoint_file)  [lindex $argv 2]
     }   
 } 
 
@@ -315,8 +317,8 @@ foreach line $data {
 		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 			$ns at $t "update_and_check $t $id1"
 			if { [expr $id1 % 2] == 0 } {
-  			    set x1 [expr $x + 25*$id1/2]
-  			    set y1 [expr $y - 25*$id1/2]
+  			    set x1 [expr $x - 25*$id1/2]
+  			    set y1 [expr $y + 25*$id1/2]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			} else {
   			    set x1 [expr $x - 25*($id1+1)/2]
@@ -358,7 +360,7 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 proc update_and_check { t id } {
-    global ns opt position mine_count
+    global ns opt position mine_count time_demine
 	global leader_id app_rov app_ctr mine_position 
 
 	$position($id) update
@@ -370,12 +372,14 @@ proc update_and_check { t id } {
 	# Mines detected output
 	if {$id > 0} {
 		for {set cnt 0} {$cnt < $mine_count} {incr cnt}  {
-			if {[expr abs([$position($id) getX_] - [$mine_position($cnt) getX_])] < 0.1 &&
+		if {[expr abs([$position($id) getX_] - [$mine_position($cnt) getX_])] < 0.1 &&
 				[expr abs([$position($id) getY_] - [$mine_position($cnt) getY_])] < 0.1 &&
 				[expr abs([$position($id) getZ_] - [$mine_position($cnt) getZ_])] < 0.1} {
 				set outfile_mine [open "test_mine_results.csv" "a"]
 				puts $outfile_mine "$t,$id,[$mine_position($cnt) getX_],[$mine_position($cnt) getY_],[$mine_position($cnt) getZ_]"
 				close $outfile_mine
+
+				set time_demine $t
 			}
 		}
 	}
@@ -386,9 +390,9 @@ proc update_and_check { t id } {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-  global ns opt mine_count
+  global ns opt mine_count time_demine
   global app_ctr app_trl app_rov app_trf app_mc leader_id
-  global mac propagation channel propagation phy
+  global phy
 
   if ($opt(verbose)) {
     puts "-----------------------------------------------------------------"
@@ -406,8 +410,10 @@ proc finish {} {
     puts "-----------------------------------------------------------------"
   }
   if ($opt(verbose)) {
-    puts "no. mines		: [expr $mine_count+1]"
-	puts "no. mines removed		: [$app_mc($leader_id) getremovedmines]"
+    puts "no. mines		: [expr $mine_count]"
+	puts "no. mines removed	: [$app_mc($leader_id) getremovedmines]"
+	puts "demine time		: $time_demine"
+    puts "-----------------------------------------------------------------"
   }
 
   set sum_throughput     0

@@ -56,9 +56,9 @@ proc createNodeL { id } {
   set position($id) [new "Position/UWSM"]
   $nodeL addPosition $position($id)
   
-  $position($id) setX_ 100 
-  $position($id) setY_ 0
-  $position($id) setZ_ -15
+  $position($id) setX_ -100 
+  $position($id) setY_ 25
+  $position($id) setZ_ -20
 
   for {set cnt 1} {$cnt < $opt(nn)} {incr cnt} {
 	  $app_ctr($id,$cnt) setPosition $position($id)
