@@ -72,12 +72,27 @@ UwMissionCoordinatorModule::~UwMissionCoordinatorModule() {}
 int
 UwMissionCoordinatorModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
-	if (argc == 4)
+	if (argc == 2)
+	{
+		if (strcasecmp(argv[1], "getremovedmines") == 0)
+		{
+			int count = 0;
+
+			for (auto auv : auv_follower)
+				count += auv.n_mines;
+
+			tcl.resultf("%d", count);
+			return TCL_OK;
+		}
+	}
+	else if (argc == 4)
 	{
 		if (strcasecmp(argv[1], "addAUV") == 0)
 		{
 			AUV_stats auv(atoi(argv[2]),atoi(argv[3]));
+
 			auv_follower.emplace_back(auv);
+
 			tcl.resultf("%d", "auv follower added\n");
 			return TCL_OK;
 		}

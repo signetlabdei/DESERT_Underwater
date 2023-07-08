@@ -359,7 +359,7 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 
 proc update_and_check { t id } {
     global ns opt position mine_count
-	global leader_id app_rov app_ctr app_mc mine_position 
+	global leader_id app_rov app_ctr mine_position 
 
 	$position($id) update
 	# Auvs path output
@@ -386,8 +386,8 @@ proc update_and_check { t id } {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-  global ns opt
-  global app_ctr app_trl app_rov app_trf leader_id
+  global ns opt mine_count
+  global app_ctr app_trl app_rov app_trf app_mc leader_id
   global mac propagation channel propagation phy
 
   if ($opt(verbose)) {
@@ -404,6 +404,10 @@ proc finish {} {
     puts "tx bandwidth     : $opt(bw) Hz"
     puts "bitrate          : $opt(bitrate) bps"
     puts "-----------------------------------------------------------------"
+  }
+  if ($opt(verbose)) {
+    puts "no. mines		: [expr $mine_count+1]"
+	puts "no. mines removed		: [$app_mc($leader_id) getremovedmines]"
   }
 
   set sum_throughput     0
