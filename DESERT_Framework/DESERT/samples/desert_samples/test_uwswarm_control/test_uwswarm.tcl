@@ -66,7 +66,7 @@
 ######################################
 set opt(verbose) 		1
 set opt(trace_files)		0
-set opt(bash_parameters) 	0
+set opt(bash_parameters) 	1
 set opt(ACK_Active)         0
 
 #####################
@@ -114,7 +114,7 @@ set opt(starttime)      1
 set opt(stoptime)       10000
 set opt(txduration)     [expr $opt(stoptime) - $opt(starttime)] ;# Duration of the simulation
 
-set opt(txpower)		185.08;#Power transmitted in dB re uPa
+set opt(txpower)		145;#Power transmitted in dB re uPa
 
 set opt(propagation_speed) 1500;# m/s
 
@@ -211,7 +211,7 @@ Plugin/UW/SC/MC set debug_ 0
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_	2
 MPropagation/Underwater set debug_				0
-MPropagation/Underwater set windspeed_			10
+MPropagation/Underwater set windspeed_			20
 MPropagation/Underwater set shipping_			1
 
 set channel [new Module/UnderwaterChannel]
@@ -410,78 +410,11 @@ proc finish {} {
     puts "-----------------------------------------------------------------"
   }
   if ($opt(verbose)) {
-    puts "no. mines		: [expr $mine_count]"
+    puts "no. mines		: $mine_count"
 	puts "no. mines removed	: [$app_mc($leader_id) getremovedmines]"
-	puts "demine time		: $time_demine"
-    puts "-----------------------------------------------------------------"
-  }
-
-  set sum_throughput     0
-  set sum_sent_pkts      0.0
-  set sum_rcv_pkts       0.0    
-
-  for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-    set ctr_throughput($id1)              [$app_ctr($leader_id,$id1) getthr]
-    set ctr_per($id1)                     [$app_ctr($leader_id,$id1) getper]
-    set ctr_sent_pkts($id1)               [$app_ctr($leader_id,$id1) getsentpkts]
-    set ctr_rcv_pkts($id1)                [$app_ctr($leader_id,$id1) getrecvpkts]
-    
-    set trl_throughput($id1)              [$app_trl($leader_id,$id1) getthr]
-    set trl_per($id1)                     [$app_trl($leader_id,$id1) getper]
-    set trl_sent_pkts($id1)               [$app_trl($leader_id,$id1) getsentpkts]
-    set trl_rcv_pkts($id1)                [$app_trl($leader_id,$id1) getrecvpkts]
-
-    set rov_throughput($id1)              [$app_rov($id1) getthr]
-    set rov_per($id1)                     [$app_rov($id1) getper]
-    set rov_sent_pkts($id1)               [$app_rov($id1) getsentpkts]
-    set rov_rcv_pkts($id1)                [$app_rov($id1) getrecvpkts]
-
-    set trf_throughput($id1)              [$app_trf($id1,$leader_id) getthr]
-    set trf_per($id1)                     [$app_trf($id1,$leader_id) getper]
-    set trf_sent_pkts($id1)               [$app_trf($id1,$leader_id) getsentpkts]
-    set trf_rcv_pkts($id1)                [$app_trf($id1,$leader_id) getrecvpkts]
-
-	set sum_throughput [expr $sum_throughput + $ctr_throughput($id1) + $trl_throughput($id1) + $rov_throughput($id1) + $trf_throughput($id1)]
-	set sum_sent_pkts [expr $sum_sent_pkts + $ctr_sent_pkts($id1) + $trl_sent_pkts($id1) + $rov_sent_pkts($id1) + $trf_sent_pkts($id1)]
-	set sum_rcv_pkts [expr $sum_rcv_pkts + $ctr_rcv_pkts($id1) + $trl_rcv_pkts($id1) + $rov_rcv_pkts($id1) + $trf_rcv_pkts($id1)]
-
-	if ($opt(verbose)) {
-  	  puts "CTR ($id1) Throughput     : $ctr_throughput($id1)"
-  	  puts "TRL ($id1) Throughput     : $trl_throughput($id1)"
-  	  puts "ROV ($id1) Throughput     : $rov_throughput($id1)"
-  	  puts "TRF ($id1) Throughput     : $trf_throughput($id1)"
-  	  puts "-------------------------------------------"
-  	}
-  }
-
-  if ($opt(verbose)) {
-    puts "Mean Throughput           : [expr ($sum_throughput/(($opt(nn))))]"
+	puts "Removed mine ratio	: [expr double([$app_mc($leader_id) getremovedmines]) / $mine_count]"
+	puts "demine time(min)		: [expr double($time_demine)/60]"
     puts "---------------------------------------------------------------------"
-    puts "Sent Packets	: $sum_sent_pkts"
-    puts "Received	: $sum_rcv_pkts"
-    puts "Packet Delivery Ratio	: [expr $sum_rcv_pkts / $sum_sent_pkts * 100]"
-      puts "---------------------------------------------------------------------"
-
-    set NL_packet_lost             [$phy($leader_id) getTotPktsLost]
-    set packet_lost                $NL_packet_lost
-    for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-		set NF_packet_lost($id1)       [$phy($id1) getTotPktsLost]
-		set packet_lost                [expr $packet_lost + $NF_packet_lost($id1)]
-    }
-
-    for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
-      puts "- PHY layer statistics for the node Follower ($id1) -"
-      puts "Tot. pkts lost            : $NF_packet_lost($id1)"
-      puts "Tot. CTRL pkts lost due to Interference   : [$phy($id1) getErrorCtrlPktsInterf]"
-      puts "---------------------------------------------------------------------"
-	}
-
-    puts "- PHY layer statistics for the node Leader -"
-    puts "Tot. pkts lost            : $NL_packet_lost"
-    puts "Tot. CTRL pkts lost due to Interference   : [$phy($leader_id) getErrorCtrlPktsInterf]"
-    puts "---------------------------------------------------------------------"
-    puts "- Global situation -"
-    puts "Tot. pkts lost            : $packet_lost"
     puts "done!"
   }
 
