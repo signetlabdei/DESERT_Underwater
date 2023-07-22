@@ -28,15 +28,28 @@ def plot_auv_coordinates_log(file_path):
     pos = []
     auv_1 = []
     auv_2 = []
+    auv_3 = []
+    auv_4 = []
     with open(file_path, 'r') as file:        
         reader = csv.reader(file)
         for row in reader:
-            if (float(row[1]) < 0):
+            if (float(row[1]) < 0 and float(row[2]) > 0): #1Q -> auv_1
                 auv_1.append((float(row[1]),float(row[2])))
-            else:
+            elif (float(row[1]) > 0 and float(row[2]) > 0): #2Q -> auv_2
                 auv_2.append((float(row[1]),float(row[2])))
+            elif (float(row[1]) < 0 and float(row[2]) < 0): #3Q -> auv_3
+                auv_3.append((float(row[1]),float(row[2])))
+            else:                                           #4Q -> auv_3
+                auv_4.append((float(row[1]),float(row[2])))
 
-    return auv_1,auv_2
+    return auv_1,auv_2,auv_3,auv_4
+
+def tx_log(filename):
+    with open(filename, 'r') as file:
+        for line in file:
+            line = line.split(" ")
+        
+    return line
 
 def separate_rows(filename):
     error_g_on = []
@@ -152,18 +165,24 @@ if os.path.exists(log_position):
     total_distance = calculate_total_distance(pos_sv)
 
 if os.path.exists(log_position_a):
-    auv_1,auv_2 = plot_auv_coordinates_log(log_position_a)
+    auv_1,auv_2,auv_3,auv_4 = plot_auv_coordinates_log(log_position_a)
     x_1 = [a1[0] for a1 in auv_1]
     y_1 = [a1[1] for a1 in auv_1]
     x_2 = [a2[0] for a2 in auv_2]
     y_2 = [a2[1] for a2 in auv_2]
+    x_3 = [a3[0] for a3 in auv_3]
+    y_3 = [a3[1] for a3 in auv_3]
+    x_4 = [a4[0] for a4 in auv_4]
+    y_4 = [a4[1] for a4 in auv_4]
 
     # Calculate the total distance traveled
     total_distance_1 = calculate_total_distance(auv_1)
     total_distance_2 = calculate_total_distance(auv_2)
+    total_distance_3 = calculate_total_distance(auv_3)
+    total_distance_4 = calculate_total_distance(auv_4)
 
-
-print (arguments[0],';',arguments[1],';',arguments[2],';',arguments[3],';',sum(difference)/len(difference),';',total_distance,';',tp,';',fn,';',tn,';',fp,';',e,';',total_distance_1,';',total_distance_2,'\n') # time spent in error distance
+tx_data = tx_log('log.out')
+print (arguments[0],';',arguments[1],';',arguments[2],';',arguments[3],';',sum(difference)/len(difference),';',total_distance,';',tp,';',fn,';',tn,';',fp,';',e,';',total_distance_1,';',total_distance_2,';',total_distance_3,';',total_distance_4,';',tx_data[0],';',tx_data[1],';',tx_data[2],';',tx_data[3],';',tx_data[4],';',tx_data[5],';',tx_data[6],';',tx_data[7],'\n') # time spent in error distance
 
 
 

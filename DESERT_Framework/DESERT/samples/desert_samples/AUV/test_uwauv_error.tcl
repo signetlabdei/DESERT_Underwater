@@ -26,7 +26,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Giovanni Toso <tosogiov@dei.unipd.it>
+# Author: Alessia Ortile <alessia.ortile.1@studenti.unipd.it>
 # Version: 1.0.0
 # NOTE: tcl sample tested on Ubuntu 12.04, 64 bits OS
 #
@@ -125,39 +125,23 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(n_auv)              2 ;# Number of Nodes
+set opt(n_auv)              4 ;# Number of Nodes
 set opt(starttime)          1
 set opt(stoptime)           150000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
 set opt(maxinterval_)       20.0
-set opt(freq)               25000.0
-set opt(bw)                 5000.0
-#set opt(freq_hf)               60000.0
-#set opt(bw_hf)                 10000.0
+set opt(freq)               20000.0 
+set opt(bw)                 10000.0
 set opt(bitrate)            4800.0
-#set opt(bitrate_hf)            64000.0
 set opt(ack_mode)           "setNoAckMode"
 
 
-set opt(txpower)            135.0 
-#set opt(txpower_hf)         135.0 
-
-#set opt(tdma_frame) 20
-#set opt(tdma_gard)  1
-
+set opt(txpower)            175.0 
 set opt(pktsize)    125
-set opt(ctr_period) 60
-
-set opt(pktsize_monitoring) 125
-set opt(auv_period) 60
-
-#set opt(pktsize_control) 100
-#set opt(cbr_period_control)  [expr $opt(cbr_period_monitoring)*4]
-
-set opt(pktsize_error) 100
-set opt(auv_period_error) 60
+set opt(pktsize_monitoring) 5
+set opt(period) 60
 
 set opt(op_freq)              10000000
 set opt(op_bw)                100000
@@ -222,6 +206,12 @@ if {$opt(trace_files)} {
 }
 
 set channel [new Module/UnderwaterChannel]
+
+MPropagation/Underwater set shipping_ 1
+MPropagation/Underwater set windspeed_ 5
+MPropagation/Underwater set debug_ 0
+MPropagation/Underwater set practicalSpreading_ 1.5
+
 set propagation [new MPropagation/Underwater]
 set data_mask [new MSpectralMask/Rect]
 $data_mask setFreq       $opt(freq)
@@ -230,20 +220,6 @@ $data_mask setBandwidth  $opt(bw)
 #########################
 # Module Configuration  #
 #########################
-#UW/AUV
-Module/UW/AUV set packetSize_          $opt(pktsize)
-Module/UW/AUV set period_              $opt(auv_period)
-Module/UW/AUV set PoissonTraffic_      1
-Module/UW/AUV set debug_               0
-
-# BPSK              
-Module/MPhy/BPSK  set BitRate_          $opt(bitrate)
-Module/MPhy/BPSK  set TxPower_          $opt(txpower)
-
-#FLOODING
-Module/UW/FLOODING set ttl_                       2
-Module/UW/FLOODING set maximum_cache_time__time_  $opt(stoptime)
-
 
 Module/UW/IP set debug_                      0
 Module/UW/UDP set debug_                     0
@@ -358,18 +334,29 @@ for {set id 0} {$id < $opt(n_auv)} {incr id}  {
 
     $asv_app($id) setPosition $position_asv 
     $asv_err($id) setPosition $position_asv 
+}
 
-    Position/UWSME debug_ 1
+$position_auv(0) setX_ -1
+$position_auv(0) setY_  1
+
+$position_auv(1) setX_ 1
+$position_auv(1) setY_  -1
+
+$position_auv(2) setX_ 1
+$position_auv(2) setY_  1
+
+$position_auv(2) setX_ -1
+$position_auv(2) setY_  -1
+
+for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
     set position_auv($id) [new "Position/UWSME"]
-    $position_auv($id) setX_ 1*($id*(2))-1
-    $position_auv($id) setY_  1*($id*(-2))-1
     $position_auv($id) setZ_ -1000
 
     $auv_app($id) setPosition $position_auv($id) 
     $auv_err($id) setPosition $position_auv($id) 
 
-    puts "x = [$position_auv($id) getX_]; y = [$position_auv($id) getY_]; z = [$position_auv($id) getZ_]"
+    #puts "x = [$position_auv($id) getX_]; y = [$position_auv($id) getY_]; z = [$position_auv($id) getZ_]"
 }
 
 
@@ -393,9 +380,13 @@ set data [split $file_data "\n"]
 foreach line $data {
 	if {[regexp {^(.*),(.*),(.*),(.*)$} $line -> t x y z]} {
         $ns at $t "update_and_check $t"
-        for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
-		    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(2))-$x] [expr $y*($id*(-2))+$y] [expr $z]"
-        }
+        $ns at $t "$asv_app(0) sendPosition [expr -$x] [expr $y] [expr $z]"
+        $ns at $t "$asv_app(1) sendPosition [expr $x] [expr -$y] [expr $z]"
+        $ns at $t "$asv_app(2) sendPosition [expr $x] [expr $y] [expr $z]"
+        $ns at $t "$asv_app(3) sendPosition [expr -$x] [expr -$y] [expr $z]"
+        #for {set id 0} {$id < $opt(n_auv)} {incr id}  {  
+		#    $ns at $t "$asv_app($id) sendPosition [expr $x*($id*(2))-$x] [expr $y*($id*(-2))+$y] [expr $z]"
+        #}
     }
 }
 
@@ -441,10 +432,6 @@ proc update_and_check {t} {
     close $outfile_auv
     close $outfile_asv
 
-    if {[$auv_app(0) getX] == -510.0 && [$auv_app(0) getY] == 510.0 && [$auv_app(1) getX] == 510.0 && [$auv_app(1) getY] == -510.0} {
-        puts "STOP"
-        ns "finish; $ns halt"
-    }
 
     
 }
@@ -463,88 +450,60 @@ proc finish {} {
     global auv_app auv_err mac_auv
     global node_asv_stats tmp_node_asv_stats ipif_auv ipif_asv
 
+    set sum_asv_ctr_throughput     0
+    set sum_asv_ctr_sent_pkts      0.0
+    set sum_asv_ctr_rcv_pkts       0.0
 
-    puts "---------------------------------------------------------------------"
-    #puts "Simulation summary"
-    #puts "Leader addr = [$ipif_asv addr]"
-    #for {set i 0} {$i < $opt(n_auv)} {incr i}  {
-    #    puts "Diver addr = [$ipif_auv($i) addr]"
-    #    #puts "Packets in buffer [$mac_auv($i) get_buffer_size]"
-    #}
-    #puts "number of divers  : $opt(n_auv)"
-    #puts "simulation length: $opt(txduration) s"
-    #puts "---------------------------------------------------------------------"
+    set sum_auv_mon_throughput     0
+    set sum_auv_mon_sent_pkts      0.0
+    set sum_auv_mon_rcv_pkts       0.0   
 
-    set sum_cbr_throughput     0
-    set sum_cbr_sent_pkts      0.0
-    set sum_cbr_rcv_pkts       0.0
+    set sum_asv_err_throughput     0
+    set sum_asv_err_sent_pkts      0.0
+    set sum_asv_err_rcv_pkts       0.0
 
-    set sum_cbr_throughput2     0
-    set sum_cbr_sent_pkts2      0.0
-    set sum_cbr_rcv_pkts2       0.0   
-
-    set sum_cbr_throughput3     0
-    set sum_cbr_sent_pkts3      0.0
-    set sum_cbr_rcv_pkts3       0.0
-
-    set sum_cbr_throughput4     0
-    set sum_cbr_sent_pkts4      0.0
-    set sum_cbr_rcv_pkts4       0.0  
+    set sum_auv_err_throughput     0
+    set sum_auv_err_sent_pkts      0.0
+    set sum_auv_err_rcv_pkts       0.0  
 
 
     for {set i 0} {$i < $opt(n_auv)} {incr i}  {
-        set cbr_throughput           [$asv_app($i) getthr]
-        set cbr_sent_pkts        [$auv_app($i) getsentpkts]
-        set cbr_rcv_pkts           [$asv_app($i) getrecvpkts]
+        set asv_ctr_thr           [$asv_app($i) getthr]
+        set asv_ctr_sent_pkts        [$asv_app($i) getsentpkts]
+        set asv_ctr_rcv_pkts           [$asv_app($i) getrecvpkts]
 
-        set cbr_throughput2           [$auv_app($i) getthr]
-        set cbr_sent_pkts2        [$asv_app($i) getsentpkts]
-        set cbr_rcv_pkts2           [$auv_app($i) getrecvpkts]
+        set auv_mon_thr           [$auv_app($i) getthr]
+        set auv_mon_sent_pkts        [$auv_app($i) getsentpkts]
+        set auv_mon_rcv_pkts           [$auv_app($i) getrecvpkts]
 
-        set cbr_throughput4           [$asv_err($i) getthr]
-        set cbr_sent_pkts4        [$auv_err($i) getsentpkts]
-        set cbr_rcv_pkts4           [$asv_err($i) getrecvpkts]
+        set asv_err_thr           [$asv_err($i) getthr]
+        set asv_err_sent_pkts        [$asv_err($i) getsentpkts]
+        set asv_err_rcv_pkts           [$asv_err($i) getrecvpkts]
 
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_cbr_sent_pkts  [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
-        set sum_cbr_rcv_pkts   [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
+        set auv_err_thr           [$auv_err($i) getthr]
+        set auv_err_sent_pkts        [$auv_err($i) getsentpkts]
+        set auv_err_rcv_pkts           [$auv_err($i) getrecvpkts]
 
-        set sum_cbr_throughput2 [expr $sum_cbr_throughput2 + $cbr_throughput2]
-        set sum_cbr_sent_pkts2  [expr $sum_cbr_sent_pkts2 + $cbr_sent_pkts2]
-        set sum_cbr_rcv_pkts2   [expr $sum_cbr_rcv_pkts2 + $cbr_rcv_pkts2]
+        set sum_asv_ctr_throughput [expr $sum_asv_ctr_throughput + $asv_ctr_thr]
+        set sum_asv_ctr_sent_pkts  [expr $sum_asv_ctr_sent_pkts + $asv_ctr_sent_pkts]
+        set sum_asv_ctr_rcv_pkts   [expr $sum_asv_ctr_rcv_pkts + $asv_ctr_rcv_pkts]
 
-        set sum_cbr_throughput4 [expr $sum_cbr_throughput4 + $cbr_throughput4]
-        set sum_cbr_sent_pkts4  [expr $sum_cbr_sent_pkts4 + $cbr_sent_pkts4]
-        set sum_cbr_rcv_pkts4   [expr $sum_cbr_rcv_pkts4 + $cbr_rcv_pkts4]
+        set sum_auv_mon_throughput [expr $sum_auv_mon_throughput + $auv_mon_thr]
+        set sum_auv_mon_sent_pkts  [expr $sum_auv_mon_sent_pkts + $auv_mon_sent_pkts]
+        set sum_auv_mon_rcv_pkts   [expr $sum_auv_mon_rcv_pkts + $auv_mon_rcv_pkts]
+
+        set sum_asv_err_throughput [expr $sum_asv_err_throughput + $asv_err_thr]
+        set sum_asv_err_sent_pkts  [expr $sum_asv_err_sent_pkts + $asv_err_sent_pkts]
+        set sum_asv_err_rcv_pkts   [expr $sum_asv_err_rcv_pkts + $asv_err_rcv_pkts]
+
+        set sum_auv_err_throughput [expr $sum_auv_err_throughput + $auv_err_thr]
+        set sum_auv_err_sent_pkts  [expr $sum_auv_err_sent_pkts + $auv_err_sent_pkts]
+        set sum_auv_err_rcv_pkts   [expr $sum_auv_err_rcv_pkts + $auv_err_rcv_pkts]
     }
 
-    set ipheadersize        [$ipif_asv getipheadersize]
-    set udpheadersize       [$udp_asv getudpheadersize]
-    set cbrheadersize       [$asv_app(0) getcbrheadersize]
-
-
-    #puts "IP Pkt Header Size       : $ipheadersize"
-    #puts "UDP Header Size          : $udpheadersize"
-    #puts "CBR Header Size          : $cbrheadersize"
+    puts "$sum_asv_ctr_sent_pkts $sum_asv_ctr_rcv_pkts $sum_auv_mon_sent_pkts $sum_auv_mon_rcv_pkts $sum_asv_err_sent_pkts $sum_asv_err_rcv_pkts $sum_auv_err_sent_pkts $sum_auv_err_rcv_pkts"
     
-    #puts "Traffic MONITORING ---------------------------------------------"
-    #puts "Mean Throughput          : [expr ($sum_cbr_throughput/(1+$opt(n_auv)))]"
-    #puts "Sent Packets             : $sum_cbr_sent_pkts"
-    #puts "Received Packets         : $sum_cbr_rcv_pkts"
-    #puts "Packet Delivery Ratio    : [expr $sum_cbr_rcv_pkts / $sum_cbr_sent_pkts * 100]"
-
-    #puts "Traffic CONTROL ---------------------------------------------"
-    #puts "Mean Throughput          : [expr ($sum_cbr_throughput2/($opt(n_auv)))]"
-    #puts "Sent Packets             : $sum_cbr_sent_pkts2"
-    #puts "Received Packets         : $sum_cbr_rcv_pkts2"
-    #puts "Packet Delivery Ratio    : [expr $sum_cbr_rcv_pkts2 / $sum_cbr_sent_pkts2 * 100]"
-
-    #puts "Traffic ERROR  ---------------------------------------------"
-    #puts "Mean Throughput          : [expr ($sum_cbr_throughput4/($opt(n_auv)))]"
-    #puts "Sent Packets             : $sum_cbr_sent_pkts4"
-    #puts "Received Packets         : $sum_cbr_rcv_pkts4"
-    #puts "Packet Delivery Ratio    : [expr $sum_cbr_rcv_pkts4 / $sum_cbr_sent_pkts4 * 100]"
-
+    
     $ns flush-trace
     close $opt(tracefile)
 }

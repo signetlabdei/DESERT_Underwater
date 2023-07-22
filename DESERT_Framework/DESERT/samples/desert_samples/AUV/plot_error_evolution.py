@@ -99,6 +99,8 @@ r_off_t = [float(row[1])  for row in error_r_off]
 r_on_ax= [float(row[2])  for row in error_r_on]
 r_off_ax= [float(row[2]) for row in error_r_off]
 
+print(r_on_ax)
+
 g_on_t = [float(row[1])  for row in error_g_on]
 g_off_t = [float(row[1])  for row in error_g_off]
 g_on_ax= [float(row[2]) for row in error_g_on]
@@ -127,7 +129,7 @@ ax.plot(w_t,w_ax,'^',color='orange', label='error_off')
 ax.legend()
 plt.show()
 
-error_g, error_r = separate_rows(log_error)
+error_g, error_r,error_w = separate_rows(log_error)
 error_g_on = [row for row in error_g if row[-1] == 1]
 error_g_off = [row for row in error_g if row[-1] == 0]
 
@@ -152,12 +154,13 @@ g_off_y= [float(row[3]) for row in error_g_off]
 
 fig = plt.figure()
 ax = plt.subplot()
-ax.plot(x_c, y_c,'g--', label='sv')
-ax.plot(x_a, y_a,'m.', label='sv')
-ax.plot(g_on_x, g_on_y,'ko', label='g_error_on')
-ax.plot(g_off_x, g_off_y,'kx', label='g_error_off')
-ax.plot(r_on_x, r_on_y,'ro', label='r_error_on')
-ax.plot(r_off_x,r_off_y,'rx', label='r_error_off')
+ax.plot(x_c, y_c,t,'g--', label='sv')
+ax.plot(x_a, y_a,t_a,'m.', label='sv')
+ax.plot(g_on_x, g_on_y,g_on_t,'ko', label='g_error_on')
+ax.plot(g_off_x, g_off_y,g_off_t,'kx', label='g_error_off')
+ax.plot(r_on_x, r_on_y,'ro',r_on_t, label='r_error_on')
+ax.plot(r_off_x,r_off_y,'rx',r_off_t, label='r_error_off')
+
 
 ax.legend()
 plt.show()
