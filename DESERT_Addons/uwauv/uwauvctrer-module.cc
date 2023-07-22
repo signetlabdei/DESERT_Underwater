@@ -72,21 +72,18 @@ public:
 
 UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p) 
 	: UwCbrModule()
-	, ack(0)
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, speed(4)
+	, speed(1.5)
 	, accuracy(0.001)
 {
 	posit=p;
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
@@ -94,23 +91,16 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p)
 	bind("th_ne_", (double*) &th_ne );
 	bind("accuracy_ne_", (double*) &accuracy );
 
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
 }
 
 UwAUVCtrErModule::UwAUVCtrErModule() 
 	: UwCbrModule()
-	, ack(0)
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, speed(4)
+	, speed(1.5)
 	, accuracy(0.001)
 
 {
@@ -120,19 +110,12 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma);
 	bind("th_ne_", (double*) &th_ne );
 	bind("accuracy_ne_", (double*) &accuracy );
-	
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
 	
 }
 
@@ -180,7 +163,6 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVCtrErModule::start() {}
 
 void UwAUVCtrErModule::setPosition(UWSMEPosition* p){
 
@@ -205,7 +187,6 @@ void UwAUVCtrErModule::transmit() {
 		std::cout << NOW << " UwAUVCtrErModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
-
 	
 	sendTmr_.resched(period);
 }
@@ -224,8 +205,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
 	bool found = false;
-	uwAUVh->ack() = ack;  
-	ack = 0;
 	uwAUVh->error() = 0;
 
 	if (error_released){
@@ -362,20 +341,7 @@ void UwAUVCtrErModule::recv(Packet* p, Handler* h) {
 void UwAUVCtrErModule::recv(Packet* p) {
 	
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
-	
-
-	if(uwAUVh->ack() == sn + 1) { //ack received
-		this->p = NULL;
-	}
-	
-
-	if(uwAUVh->ack() > 0 && debug_) 
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error ACK "
-			<< "received " << uwAUVh->ack()<< std::endl;
-	else if((uwAUVh->ack())<0 && debug_)
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
-			<<"received"<< std::endl;
-	
+		
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 		if (debug_) {
@@ -570,10 +536,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 		last_sn_confirmed = uwAUVh->sn();
 	}
 
-	ack = last_sn_confirmed+1;
-
 	UwCbrModule::recv(p);
-	UwCbrModule::sendPkt();
+	//transmit();
 }
 
 int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){

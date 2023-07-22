@@ -169,7 +169,6 @@ protected:
 	UWSMEPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int ack; /**< If not zero, contains the ACK to the last command Packete received.*/
-	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
 	std::queue<Packet*> buffer; /**< Packets buffer.*/
 	UWAUV_ACK_POLICY ackPolicy; /**< Flag to set the policy for ACK transimission,
 					ACK_PIGGYBACK:   ACK is always sent in piggyback,

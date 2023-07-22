@@ -114,11 +114,6 @@ public:
 	virtual void initPkt(Packet* p) ;
 
 	/**
-	* Reset retransmissions
-	*/
-	//inline void reset_retx() {p=NULL; sendTmr_.force_cancel();}
-
-	/**
 	* Set the position of the AUVCtr
 	*
 	* @param Position * p Pointer to the AUVCtr position
@@ -164,7 +159,7 @@ public:
 	/**
 	* Start the controller.
 	*/
-	virtual void start();
+	//virtual void start();
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -196,7 +191,6 @@ protected:
 	UWSMEPosition* posit; /**< Controller position.*/
 	int last_sn_confirmed; /**< Sequence number of the last command Packete received.*/
 	int sn; /**Sequence number of the last control packet sent.*/
-	int ack;
 	int drop_old_waypoints;
 	int period;
 
@@ -208,7 +202,6 @@ protected:
 	
 	Packet* p;
 	int log_flag;
-	int ackTimeout;	
 	float x_sorg;
 	float y_sorg;
 	double speed;

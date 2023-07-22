@@ -219,15 +219,13 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 }
 
 void UwAUVModule::initPkt(Packet* p) {
+
 	hdr_uwAUV_monitoring* uwAUVh = HDR_UWAUV_MONITORING(p);
-	//hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwAUVh->x() = posit->getX();
 	uwAUVh->y() = posit->getY();
 	uwAUVh->z() = posit->getZ();
-	//uwAUVh->speed() = 200;
-
-	//uwAUVh->ack() = ack;
 	
 	ack=0;
 
@@ -243,6 +241,7 @@ void UwAUVModule::initPkt(Packet* p) {
 		std::cout << NOW << " UwAUVModule::sending packet with priority " 
 			<< (int)uwcbrh->priority() << std::endl;
 	}
+
 	priority_ = 0;
 }
 
@@ -255,14 +254,17 @@ void UwAUVModule::recv(Packet* p) {
 	hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+
 		if (debug_) {
 			std::cout << NOW << " UwAUVModule::old waypoint with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
 
 	} else { //packet in order
+
 		posit->adddest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
 		last_sn_confirmed = uwAUVh->sn();
+
 	}
 
 	ack = last_sn_confirmed+1;
@@ -277,12 +279,13 @@ void UwAUVModule::recv(Packet* p) {
 	}
 
 
-	if (debug_) {
+	if (debug_)
 		std::cout << NOW << " UwAUVModule::recv(Packet *p) AUV received new "
 			"way point: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
 			<< ", Z = " << uwAUVh->z()<< std::endl;
-	}
+	
 	UwCbrModule::recv(p);
+
 	if (ackPolicy == ACK_IMMEDIATELY) {
 			
 		if (ackPriority == 0) {
@@ -304,6 +307,7 @@ void UwAUVModule::recv(Packet* p) {
 }
 
 void UwAUVModule::sendAck() {
+
 	ackNotPgbk++;
 	if (ackPriority == 0) {
 		UwCbrModule::sendPkt();
@@ -316,4 +320,5 @@ void UwAUVModule::sendAck() {
 			cout << NOW << " ACK timeout expired, ACK sent with high priority " 
 				<< std::endl;
 	}
+	
 }

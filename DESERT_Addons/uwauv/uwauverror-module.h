@@ -180,23 +180,10 @@ public:
 
 protected:
 
-	enum UWAUV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
-
 	UWSMEPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int sn; 
-	int ack;
-	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
 	std::queue<Packet*> buffer; /**< Packets buffer.*/
-	UWAUV_ACK_POLICY ackPolicy; /**< Flag to set the policy for ACK transimission,
-					ACK_PIGGYBACK:   ACK is always sent in piggyback,
-					ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated 
-									 packet after the reception of CTR packet
-					ACK_PGBK_OR_TO:  ACK is sent in piggyback if a AUV packet is generated 
-									 before a ackTimeout otherwise ACK is sent with a 
-									 dedicated packet after the acKTimeout.*/
-	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
-	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
 	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
 								lower or equal than last_sn_confirmed.*/
 

@@ -44,12 +44,7 @@ extern packet_t PT_UWCBR;
 extern packet_t PT_UWAUV;
 extern packet_t PT_UWAUV_CTR;
 extern packet_t PT_UWAUV_ERROR;
-/**
-* Adds the header for <i>hdr_uwAUVError</i> packets in ns2.
-*/
-/**
-* Adds the module for UwAUVModuleClass in ns2.
-*/
+
 
 /**
  * Class that represents the binding with the tcl configuration script 
@@ -78,33 +73,22 @@ UwAUVErrorBModule::UwAUVErrorBModule()
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ack(0)
-	, ackPolicy(ACK_PIGGYBACK)
-	, ackTimeout(10)
-	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
 	, error_p(0.001)
 	, alarm_mode(0)
-	, speed(1)
+	, speed(0.5)
 	, accuracy(0.01)
 {
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
-    bind("ackTimeout_", (int*) &ackTimeout);
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);
 	bind("accuracy_",(double*) &accuracy);
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
-
 
 }
 
@@ -112,34 +96,21 @@ UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p)
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ack(0)
-	, ackPolicy(ACK_PIGGYBACK)
-	, ackTimeout(10)
-	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
 	, error_p(0.01)
 	, alarm_mode(0)
-	, speed(1)	
+	, speed(0.5)	
 	, accuracy(0.01)
 {
 	posit = p;
-    bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);
 	bind("accuracy_",(double*) &accuracy);
-
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
-	
-
 
 }
 
@@ -175,34 +146,12 @@ int UwAUVErrorBModule::command(int argc, const char*const* argv) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
 		}
-		else if(strcasecmp(argv[1], "getAckNotPgbk") == 0) {
-			tcl.resultf("%d", ackNotPgbk);
-			return TCL_OK;
-		}
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit=p;
 			tcl.resultf("%s", "position Setted\n");
-			return TCL_OK;
-		}
-		if (strcasecmp(argv[1], "setAckPolicy") == 0) {
-			if (atof(argv[2]) == 1) {
-				ackPolicy = ACK_PIGGYBACK;
-				return TCL_OK;
-			}
-			if (atof(argv[2]) == 2) {
-				ackPolicy = ACK_IMMEDIATELY;
-				return TCL_OK;
-			}
-			if (atof(argv[2]) == 3) {
-				ackPolicy = ACK_PGBK_OR_TO;
-				return TCL_OK;
-			}
-		}
-		if (strcasecmp(argv[1], "setAckTimeout") == 0) {
-			ackTimeout = atof(argv[2]);
 			return TCL_OK;
 		}
 	}
@@ -245,8 +194,6 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
-	uwAUVh->ack() = ack;
-	ack = 0;
 	uwAUVh->error() = 0;
 
 	if (!alarm_mode){
@@ -257,9 +204,9 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 
 		double t_e = distrib(generator) ;
 
-		std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
+		std::normal_distribution<> n_dis(0.0, sigma);  
 
-		// Generate a random value from the Gaussian distribution
+
 		double noise = n_dis(generator);
 
 		double m = t_e + noise;
@@ -337,7 +284,7 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< "," << posit->getZ() << std::endl;
+			<< "," << posit->getZ() << ',' << posit->getSpeed() << std::endl;
 		out_file_stats.close();
 	}
 
@@ -350,15 +297,11 @@ void UwAUVErrorBModule::recv(Packet* p, Handler* h) {
 void UwAUVErrorBModule::recv(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
-
-	if(uwAUVh->ack() == sn + 1) {
-		this->p = NULL;	
-	}
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 
 		if (debug_) {
-			std::cout << NOW << " UwAUVErrModule::old error with sn " 
+			std::cout << NOW << " UwAUVErrBModule::old error with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
 
@@ -371,6 +314,8 @@ void UwAUVErrorBModule::recv(Packet* p) {
 				posit->setAlarm(false);
 				alarm_mode = 0;
 				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
+
+				//wait an entire period before sending a new img
 				sendTmr_.force_cancel();
 				sendTmr_.resched(period);
 
@@ -381,7 +326,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 				}
 
 				if (debug_) {
-					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<") solved "
+					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<") solved "
 					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;
 				}
 
@@ -390,7 +335,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 				alarm_mode = true;
 
 				if (debug_)
-					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
+					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
 					"STOP until ctr arrival"<< std::endl;
 
 			}
@@ -399,10 +344,8 @@ void UwAUVErrorBModule::recv(Packet* p) {
 		last_sn_confirmed = uwAUVh->sn();
 	}
 
-	ack = last_sn_confirmed+1;
 
 	UwCbrModule::recv(p);
-	UwCbrModule::sendPkt();
 	
 	if(uwAUVh->ack() > 0 && debug_) 
 		std::cout << NOW << " UwAUVErrorBModule::recv(Packet *p) error ACK "
@@ -414,7 +357,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< "," << posit->getZ() << std::endl;
+			<< "," << posit->getZ() << ',' << posit->getSpeed() << std::endl;
 		out_file_stats.close();
 	}
 

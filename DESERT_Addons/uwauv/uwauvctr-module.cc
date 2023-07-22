@@ -28,7 +28,7 @@
 
 /**
 * @file uwauvctr-module.cc
-* @author Filippo Campagnaro
+* @author Filippo Campagnaro, Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUVCtr</i> class implementation.
@@ -74,11 +74,9 @@ UwAUVCtrModule::UwAUVCtrModule(UWSMEPosition* p)
 	, sn(0)
 	, adaptiveRTO(0)
 	, adaptiveRTO_parameter(0.5)
-	//, sumrttAck(0)
-	//, rttAcksamples(0)
 {
 	posit=p;
-	speed=1;
+	speed=0.5;
 	bind("adaptiveRTO_", (int *) &adaptiveRTO);
 	if (adaptiveRTO == 1) {
 		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);
@@ -95,14 +93,12 @@ UwAUVCtrModule::UwAUVCtrModule()
 	, sn(0) 
 	, adaptiveRTO(0)
 	, adaptiveRTO_parameter(0.5)
-	//, sumrttAck(0)
-	//, rttAcksamples(0)
 {
 	p = NULL;
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
 	//posit = Position();
-	speed = 1;
+	speed = 0.5;
 	bind("adaptiveRTO_", (int *) &adaptiveRTO);
 	if (adaptiveRTO == 1) {
 		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);	
@@ -253,6 +249,7 @@ void UwAUVCtrModule::recv(Packet* p) {
 	
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_cmn *ch = hdr_cmn::access(p);
+	
 	if(monitoring->ack() == sn + 1) {
 		sendTmr_.force_cancel();
 		this->p = NULL;

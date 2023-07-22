@@ -72,41 +72,30 @@ public:
 
 UwAUVCtrErBModule::UwAUVCtrErBModule(UWSMEPosition* p) 
 	: UwCbrModule()
-	, ack(0)
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, speed(4)
+	, speed(1.5)
 {
 	posit=p;
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
 }
 
 UwAUVCtrErBModule::UwAUVCtrErBModule() 
 	: UwCbrModule()
-	, ack(0)
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ackTimeout(10)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
-	, speed(4)
+	, speed(1.5)
 
 {
 	p = NULL;
@@ -115,16 +104,9 @@ UwAUVCtrErBModule::UwAUVCtrErBModule()
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-	bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
-	
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
 	
 }
 
@@ -172,8 +154,6 @@ int UwAUVCtrErBModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVCtrErBModule::start() {}
-
 void UwAUVCtrErBModule::setPosition(UWSMEPosition* p){
 
 	posit = p;
@@ -208,11 +188,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	bool found = false;
 
-	uwAUVh->ack() = ack;  
-	ack = 0;
 	uwAUVh->error() = 0;
-
-
 
 	if (alarm_mode){
 
@@ -275,7 +251,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 				y_sorg = posit->getY();
 				
 				if (debug_) {
-					std::cout << NOW << " UwAUVCtrErrModule::initPkt(Packet *p) SV picked a new "
+					std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p) SV picked a new "
 					"error from the queue: X = " << x_err << ", Y = " << y_err<< std::endl;
 				}
 			}
@@ -307,18 +283,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 	}
 	
 
-	if (debug_) {
-	std::cout << NOW << " UwAUVCtrErBModule::initPkt(Packet *p)  ACK recv" 
-		<< std::endl;
-	}
-
 	UwCbrModule::initPkt(p);
-
-	if (debug_) {
-		std::cout << NOW << " UwAUVCtrErBModule::initPkt(Packet *p)  setting last ack" 
-			<< std::endl;
-	}
-
 }
 
 void UwAUVCtrErBModule::recv(Packet* p, Handler* h) {
@@ -331,23 +296,9 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 	bool exist = false;
 	
 
-	if(uwAUVh->ack() == sn + 1) { //ack received
-		this->p = NULL;
-	}
-	
-
-	if(uwAUVh->ack() > 0 && debug_) 
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error ACK "
-			<< "received " << uwAUVh->ack()<< std::endl;
-	else if((uwAUVh->ack())<0 && debug_)
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
-			<<"received"<< std::endl;
-
-	
-
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 		if (debug_) {
-			std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
+			std::cout << NOW << " UwAUVCtrErBModule::old error with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
 
@@ -356,7 +307,7 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 		if (uwAUVh->error() == 0){// AUV MARKED IT AS NO ERROR
 
 			if (debug_)
-				std::cout << NOW << " UwAUVCtrErrModule:: no error" << std::endl;
+				std::cout << NOW << " UwAUVCtrErBModule:: no error" << std::endl;
 
 		}else{ // error 
 
@@ -401,7 +352,6 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 					exist = false;
 
 					for (const auto& vec : alarm_queue) {
-						// Controlla se le coordinate corrispondono
 						if (vec[0] == uwAUVh->x() && vec[1] == uwAUVh->y()) {
 							exist = true;
 							break;
@@ -457,10 +407,8 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 		last_sn_confirmed = uwAUVh->sn();
 	}
 
-	ack = last_sn_confirmed+1;
-
 	UwCbrModule::recv(p);
-	UwCbrModule::sendPkt();
+	//transmit();
 }
 
 

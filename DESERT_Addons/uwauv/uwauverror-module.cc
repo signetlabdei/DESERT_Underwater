@@ -80,33 +80,22 @@ UwAUVErrorModule::UwAUVErrorModule()
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ack(0)
-	, ackPolicy(ACK_PIGGYBACK)
-	, ackTimeout(10)
-	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
 	, error_m(0)
 	, alarm_mode(0)
-	, speed(1)
+	, speed(0.5)
 	, accuracy(0.001)
 {
 	UWSMEPosition p = UWSMEPosition();
 	posit=&p;
-    bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma );
 	bind("th_ne_", (double*) &th_ne );
 	bind("accuracy_ne_", (double*) &accuracy );
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
-
 
 }
 
@@ -114,34 +103,21 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMEPosition* p)
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
-	, ack(0)
-	, ackPolicy(ACK_PIGGYBACK)
-	, ackTimeout(10)
-	, ackNotPgbk(0)
 	, drop_old_waypoints(1)
 	, log_flag(0)
 	, period(60)
 	, error_m(0)
 	, alarm_mode(0)
-	, speed(1)
+	, speed(0.5)
 	, accuracy(0.001)
 {
 	posit = p;
-    bind("ackTimeout_", (int*) &ackTimeout);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma);
 	bind("th_ne_", (double*) &th_ne );
 	bind("accuracy_ne_", (double*) &accuracy );
-
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
-	
-
 
 }
 
@@ -177,34 +153,12 @@ int UwAUVErrorModule::command(int argc, const char*const* argv) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
 		}
-		else if(strcasecmp(argv[1], "getAckNotPgbk") == 0) {
-			tcl.resultf("%d", ackNotPgbk);
-			return TCL_OK;
-		}
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
 			posit=p;
 			tcl.resultf("%s", "position Setted\n");
-			return TCL_OK;
-		}
-		if (strcasecmp(argv[1], "setAckPolicy") == 0) {
-			if (atof(argv[2]) == 1) {
-				ackPolicy = ACK_PIGGYBACK;
-				return TCL_OK;
-			}
-			if (atof(argv[2]) == 2) {
-				ackPolicy = ACK_IMMEDIATELY;
-				return TCL_OK;
-			}
-			if (atof(argv[2]) == 3) {
-				ackPolicy = ACK_PGBK_OR_TO;
-				return TCL_OK;
-			}
-		}
-		if (strcasecmp(argv[1], "setAckTimeout") == 0) {
-			ackTimeout = atof(argv[2]);
 			return TCL_OK;
 		}
 	}
@@ -237,8 +191,6 @@ void UwAUVErrorModule::transmit() {
 		std::cout << NOW << " UwAUVErrorModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
-
-	
 	sendTmr_.resched(period);
 }
 
@@ -247,8 +199,6 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
-	uwAUVh->ack() = ack;
-	ack = 0;
 	uwAUVh->error() = 0;
 
 	if (alarm_mode != 2 ){
@@ -271,28 +221,27 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 					<< "New error, measure: "<< error_m <<", true error: "<< t_e << std::endl;
 			}
 
-				if(alarm_mode == 1){
-					if (log_flag == 1) {
-						err_log.open("log/error_log_t.csv",std::ios_base::app);
-						err_log << "G,"<< NOW << "," << posit->getX() <<","<< posit->getY() <<", ON"<< std::endl;
-						err_log.close();
+			if(alarm_mode == 1){
+				if (log_flag == 1) {
+					err_log.open("log/error_log_t.csv",std::ios_base::app);
+					err_log << "G,"<< NOW << "," << posit->getX() <<","<< posit->getY() <<", ON"<< std::endl;
+					err_log.close();
 
-						err_log.open("log/error_log.csv",std::ios_base::app);
-						err_log << "ON,"<< NOW << "," << x_e <<","<< y_e << std::endl;
-						err_log.close();
-					}
-
+					err_log.open("log/error_log.csv",std::ios_base::app);
+					err_log << "ON,"<< NOW << "," << x_e <<","<< y_e << std::endl;
+					err_log.close();
 				}
+
+			}
 		}
 
 		if (alarm_mode == 1){
 
-			x_e = posit->getX();													// Save error position
+			x_e = posit->getX();						// Save error position
 			y_e = posit->getY();
 
 			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0); //STOP
 			posit->setAlarm(true);
-			//alarm_mode = true;
 			
 			uwAUVh->x() = x_e;                      
 			uwAUVh->y() = y_e;
@@ -345,9 +294,6 @@ void UwAUVErrorModule::recv(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
-	if(uwAUVh->ack() == sn + 1) {
-		this->p = NULL;	
-	}
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 
@@ -440,25 +386,15 @@ void UwAUVErrorModule::recv(Packet* p) {
 			last_sn_confirmed = uwAUVh->sn();
 	}
 
-	ack = last_sn_confirmed+1;
-
 	UwCbrModule::recv(p);
 
 
-	UwCbrModule::sendPkt();
-	
-
-	if(uwAUVh->ack() > 0 && debug_) 
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error ACK "
-			<< "received " << uwAUVh->ack()<< std::endl;
-	else if((uwAUVh->ack())<0 && debug_)
-		std::cout << NOW << " UwAUVErrorModule::recv(Packet *p) error NACK " 
-			<<"received"<< std::endl;
+	//UwCbrModule::sendPkt();
 		
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< "," << posit->getZ() << std::endl;
+			<< "," << posit->getZ() << ',' << posit->getSpeed() << std::endl;
 		out_file_stats.close();
 	}
 
@@ -520,43 +456,9 @@ double UwAUVErrorModule::getErrorMeasure(double t_e){
 
 	double m = t_e + noise;
 
-	//double p_e = QFunction(m);
-
-	// Calculate the probability using std::erfc
-    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of t_e grater than th_ne
-
-
-	double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
-	
-	//if (p_e >= th_5sig){ //if p_e is small enough --> no error 
-	//	alarm_mode = 1;
-	//}
-
-	return m;
-	
+	return m;	
 
 }
 
-/*double QFunction(double x) {
-
-	x = (th_ne - x)/ sigma;
-
-	if (x < 0.0) {
-        return 1.0 - QFunction(-x); // Q(-x) = 1 - Q(x)
-    }
-
-    double constant = 1.0 / std::sqrt(2.0 * M_PI);
-    double xSquared = x * x;
-    double xPower = x;
-    double qValue = 0.0;
-    double term = constant * std::exp(-0.5 * xSquared);
-
-    for (int i = 1; i <= 100; i++) {
-        qValue += term;
-        term *= -xSquared / i;
-    }
-
-    return qValue;
-}*/
 
 
