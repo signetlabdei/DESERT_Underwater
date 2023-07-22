@@ -11,7 +11,7 @@ proc createASV { id } {
 
     # TRAFFICO 2: CONTROL: ASV --> AUV
     Module/UW/AUV/CTR set packetSize_          $opt(pktsize)
-    Module/UW/AUV/CTR set period_              $opt(ctr_period)
+    Module/UW/AUV/CTR set period_              60
     Module/UW/AUV/CTR set PoissonTraffic_      0
     Module/UW/AUV/CTR set traffic_type_        2
     Module/UW/AUV/CTR set debug_               0

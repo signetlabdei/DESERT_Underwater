@@ -8,7 +8,7 @@ proc createAUV { id } {
     # TRAFFICO 1: MONITORING AUV --> ASV
     set node_auv($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
     Module/UW/AUV set packetSize_          $opt(pktsize_monitoring)
-    Module/UW/AUV set period_              $opt(auv_period)
+    Module/UW/AUV set period_              $opt(period)
     Module/UW/AUV set PoissonTraffic_      0
     Module/UW/AUV set traffic_type_        1
     Module/UW/AUV set debug_               0
@@ -17,10 +17,10 @@ proc createAUV { id } {
     # TRAFFICO 3: ERROR AUV --> ASV
     set node_auv($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
     Module/UW/AUV/ERR set packetSize_          $opt(pktsize)
-    Module/UW/AUV/ERR set period_              60
+    Module/UW/AUV/ERR set period_              $opt(period)
     Module/UW/AUV/ERR set PoissonTraffic_      0
     Module/UW/AUV/ERR set traffic_type_        3
-    Module/UW/AUV/ERR set debug_               0
+    Module/UW/AUV/ERR set debug_               1
     Module/UW/AUV/ERR set log_flag_            1
     Module/UW/AUV/ERR set sigma_               $opt(variance)
     Module/UW/AUV/ERR set th_ne_               [expr 1 - $opt(e_prob)]

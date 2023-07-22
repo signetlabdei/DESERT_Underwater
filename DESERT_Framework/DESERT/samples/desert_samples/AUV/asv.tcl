@@ -10,8 +10,8 @@ proc createASV { id } {
     set node_asv [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
 
     # TRAFFICO 2: CONTROL: ASV --> AUV
-    Module/UW/AUV/CTR set packetSize_          $opt(pktsize)
-    Module/UW/AUV/CTR set period_              $opt(ctr_period)
+    Module/UW/AUV/CTR set packetSize_          $opt(pktsize_monitoring)
+    Module/UW/AUV/CTR set period_              $opt(period)
     Module/UW/AUV/CTR set PoissonTraffic_      0
     Module/UW/AUV/CTR set traffic_type_        2
     Module/UW/AUV/CTR set debug_               0
@@ -20,16 +20,17 @@ proc createASV { id } {
         set asv_app($id1)  [new Module/UW/AUV/CTR]
     }
 
-    # TRAFFICO 3: ERROR: AUV --> ASV
-    Module/UW/AUV/CER set packetSize_          $opt(pktsize)
-    Module/UW/AUV/CER set period_              60
+    # TRAFFICO 3: ERROR: ASV --> AUV
+    Module/UW/AUV/CER set packetSize_          $opt(pktsize_monitoring)
+    Module/UW/AUV/CER set period_              $opt(period)
     Module/UW/AUV/CER set PoissonTraffic_      0
     Module/UW/AUV/CER set traffic_type_        3
-    Module/UW/AUV/CER set debug_               0
+    Module/UW/AUV/CER set debug_               1
     Module/UW/AUV/CER set log_flag_            1
     Module/UW/AUV/CER set sigma_               $opt(variance)
     Module/UW/AUV/CER set th_ne_               [expr 1 - $opt(e_prob)]
     Module/UW/AUV/CER set accuracy_ne_         $opt(accuracy)
+    Module/UW/AUV/CER set debug_               0
 
 
     for {set id1 0} {$id1 <= $opt(n_auv)} {incr id1} {
