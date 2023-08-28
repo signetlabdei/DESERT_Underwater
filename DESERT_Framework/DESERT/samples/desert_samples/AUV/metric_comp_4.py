@@ -108,6 +108,9 @@ if os.path.exists(log_error):
         position = (row[1], row[2])
         if position in time_ne:
             difference.append(time_ne[position] -time_e[position])
+        else:
+            difference.append(150000-time_e[position])
+
 else:
     difference.append(0)
 

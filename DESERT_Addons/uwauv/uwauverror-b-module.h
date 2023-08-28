@@ -185,7 +185,6 @@ protected:
 	UWSMEPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int sn; 
-	std::queue<Packet*> buffer; /**< Packets buffer.*/
 	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
 								lower or equal than last_sn_confirmed.*/
 

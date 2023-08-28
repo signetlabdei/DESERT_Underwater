@@ -220,6 +220,8 @@ private:
 	double th_ne; // if x < th_e NO error
 	double accuracy;
 
+	vector<vector<float>> rcv_queue;
+
 
 };
 

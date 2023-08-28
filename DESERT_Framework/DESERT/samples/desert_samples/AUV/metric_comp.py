@@ -39,7 +39,7 @@ def plot_auv_coordinates_log(file_path):
                 auv_2.append((float(row[1]),float(row[2])))
             elif (float(row[1]) < 0 and float(row[2]) < 0): #3Q -> auv_3
                 auv_3.append((float(row[1]),float(row[2])))
-            else:                                           #4Q -> auv_3
+            else:                                           #4Q -> auv_4
                 auv_4.append((float(row[1]),float(row[2])))
 
     return auv_1,auv_2,auv_3,auv_4
@@ -116,6 +116,8 @@ if os.path.exists(log_error):
         position = (row[1], row[2])
         if position in time_w:
             difference.append(time_w[position] - row[0])
+        else:
+            difference.append(150000-row[0])
 else:
     difference.append(0)
 

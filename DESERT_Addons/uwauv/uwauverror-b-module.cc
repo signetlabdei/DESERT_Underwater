@@ -202,16 +202,14 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 		std::mt19937 generator(rd());
 		std::uniform_real_distribution<double> distrib(0.0, 1.0);
 
-		double t_e = distrib(generator) ;
+		double t_e = distrib(generator); //true error
 
 		std::normal_distribution<> n_dis(0.0, sigma);  
-
-
 		double noise = n_dis(generator);
 
 		double m = t_e + noise;
 
-		double p_e = std::erfc((((1 - error_p) - m) / std::sqrt(2.0)) / sigma); // prob of true error (t_e) greater than th_ne
+		double p_e = std::erfc((((1 - error_p) - m) / std::sqrt(2.0)) / sigma)/2; // prob of true error (t_e) greater than th_ne
 
 		if (t_e > (1-error_p)){
 			if (log_flag == 1) {
@@ -221,7 +219,7 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 			}
 		}
 	
-		if (p_e > accuracy){ //if p_e is small enough --> no error, otherwise gray zone
+		if (p_e > accuracy){ //if p_e is small enough --> no error, otherwise error
 
 			x_e = posit->getX();
 			y_e = posit->getY();
@@ -274,10 +272,9 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = 1;
 		this->p = p;
-		uwAUVh->sn() = sn;
+		uwAUVh->sn() = ++sn;
 	}
 
-	
 
 	UwCbrModule::initPkt(p);
 
@@ -335,7 +332,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 				alarm_mode = true;
 
 				if (debug_)
-					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
+					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<")"
 					"STOP until ctr arrival"<< std::endl;
 
 			}
@@ -346,13 +343,6 @@ void UwAUVErrorBModule::recv(Packet* p) {
 
 
 	UwCbrModule::recv(p);
-	
-	if(uwAUVh->ack() > 0 && debug_) 
-		std::cout << NOW << " UwAUVErrorBModule::recv(Packet *p) error ACK "
-			<< "received " << uwAUVh->ack()<< std::endl;
-	else if((uwAUVh->ack())<0 && debug_)
-		std::cout << NOW << " UwAUVErrorBModule::recv(Packet *p) error NACK " 
-			<<"received"<< std::endl;
 		
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);

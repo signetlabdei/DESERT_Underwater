@@ -195,15 +195,15 @@ void UwAUVErrorModule::transmit() {
 }
 
 void UwAUVErrorModule::initPkt(Packet* p) {
-		
+		 
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
 
 	uwAUVh->error() = 0;
 
-	if (alarm_mode != 2 ){
+	if (alarm_mode != 2 ){ //if not in alarm mode
 
-		if (alarm_mode == 1){
+		if (alarm_mode == 1){ //gray zone
 
 			error_m = getErrorMeasure(t_e);
 
@@ -221,7 +221,8 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 					<< "New error, measure: "<< error_m <<", true error: "<< t_e << std::endl;
 			}
 
-			if(alarm_mode == 1){
+			if(alarm_mode == 1){ // start error timer
+				
 				if (log_flag == 1) {
 					err_log.open("log/error_log_t.csv",std::ios_base::app);
 					err_log << "G,"<< NOW << "," << posit->getX() <<","<< posit->getY() <<", ON"<< std::endl;
@@ -270,7 +271,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = error_m;
 		this->p = p;
-		uwAUVh->sn() = sn;
+		uwAUVh->sn() = ++sn; //++ or no?
 	}
 
 	
@@ -315,8 +316,8 @@ void UwAUVErrorModule::recv(Packet* p) {
 			if (uwAUVh->error() < 0 ){
 
 				posit->setAlarm(false);
-				alarm_mode = 0;
 				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
+				
 				sendTmr_.force_cancel();
 				sendTmr_.resched(period);
 
@@ -329,17 +330,27 @@ void UwAUVErrorModule::recv(Packet* p) {
 					err_log.open("log/error_log.csv",std::ios_base::app);
 					err_log << "OFF,"<< NOW << "," << x_e <<","<< y_e << std::endl;
 					err_log.close();
+					
+					if (uwAUVh->error() == -1){
+						
+						if(t_e <= th_ne){
 
-					if(t_e <= th_ne){
-						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-						t_err_log << NOW << "," << x_e <<","<< y_e <<",tn" << std::endl;
-						t_err_log.close();
-					}else{
-						t_err_log.open("log/true_error_log.csv",std::ios_base::app);
-						t_err_log << NOW << "," << x_e <<","<< y_e <<",fn" << std::endl;
-						t_err_log.close();
+							t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+							t_err_log << NOW << "," << x_e <<","<< y_e <<",tn" << std::endl;
+							t_err_log.close();
+
+						}else{
+
+							t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+							t_err_log << NOW << "," << x_e <<","<< y_e <<",fn" << std::endl;
+							t_err_log.close();
+
+						}
 					}
+					
 				}
+
+				alarm_mode = 0;
 				
 
 				if (debug_) {
@@ -372,7 +383,7 @@ void UwAUVErrorModule::recv(Packet* p) {
 					std::cout << NOW << " UwAUVErrModule::recv(Packet *p) for SURE there is an error ("<< x_e <<","<< y_e <<")"
 					"STOP until ctr arrival"<< std::endl;
 
-			}else{
+			}else{// ->error=0
 
 				alarm_mode = 1;
 
@@ -387,9 +398,6 @@ void UwAUVErrorModule::recv(Packet* p) {
 	}
 
 	UwCbrModule::recv(p);
-
-
-	//UwCbrModule::sendPkt();
 		
 	if (log_flag == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
@@ -409,23 +417,25 @@ double UwAUVErrorModule::getErrorMeasure(){
     // Generate a random value from the uniform distribution
     t_e = u_dis(gen);
 
-	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
+	std::normal_distribution<> n_dis(0.0, sigma); 
 
     // Generate a random value from the Gaussian distribution
     double noise = n_dis(gen);
-
 	double m = t_e + noise;
 
-	//double p_e = QFunction(m);
-
 	// Calculate the error probability
-    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma); // prob of true error (t_e) greater than th_ne
-
-
-	//double th_5sig = std::erfc((5*sigma) / std::sqrt(2)) / 2; 
+    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma)/2; // prob of true error (t_e) greater than th_ne
 	
 	if (p_e > accuracy){ //if p_e is small enough --> no error, otherwise gray zone
 		alarm_mode = 1;
+	}else{
+		if (t_e > th_ne){
+			if (log_flag == 1) {
+				t_err_log.open("log/true_error_log.csv",std::ios_base::app);
+				t_err_log << NOW << "," << x_e <<","<< y_e <<",fn"<< std::endl;
+				t_err_log.close();
+			}
+		}
 	}
 
 	if (t_e > th_ne){
@@ -449,8 +459,7 @@ double UwAUVErrorModule::getErrorMeasure(double t_e){
 	std::random_device rd;
     std::mt19937 gen(rd());
 
-	std::normal_distribution<> n_dis(0.0, sigma);  // Adjust the standard deviation using the variance
-
+	std::normal_distribution<> n_dis(0.0, sigma);  
     // Generate a random value from the Gaussian distribution
     double noise = n_dis(gen);
 
