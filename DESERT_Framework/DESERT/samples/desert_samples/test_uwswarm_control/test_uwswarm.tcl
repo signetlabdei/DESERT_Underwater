@@ -93,6 +93,7 @@ load libuwcsmaaloha.so
 load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwphysical.so
+load libuwahoi_phy.so
 
 #############################
 # NS-Miracle initialization #
@@ -105,27 +106,26 @@ $ns use-Miracle
 # Tcl variables  #
 ##################
 set opt(nn)				3 ;# Number of Nodes
-set opt(ROV_pktsize)    1000;#125  ;# Pkt size in byte
-set opt(CTR_pktsize)    1024;#125  ;# Pkt size in byte
+set opt(ROV_pktsize)    32;#125  ;# Pkt size in byte
+set opt(CTR_pktsize)    32;#125  ;# Pkt size in byte
 
-set opt(ROV_period) 	10
+set opt(ROV_period) 	60
+set opt(CTR_period) 	60
 
 set opt(starttime)      1	
 set opt(stoptime)       10000
 set opt(txduration)     [expr $opt(stoptime) - $opt(starttime)] ;# Duration of the simulation
 
-set opt(txpower)		145;#Power transmitted in dB re uPa
+set opt(txpower)		156;#Power transmitted in dB re uPa
 
-set opt(propagation_speed) 1500;# m/s
-
-set opt(maxinterval_)     20.0
-set opt(freq)             25000.0 ;#Frequency used in Hz
-set opt(bw)               5000.0 ;#Bandwidth used in Hz
-set opt(bitrate)		  4800.3 ;#150000;#bitrate in bps
+set opt(maxinterval_)     200.0
+set opt(freq)             65200.0 ;#Frequency used in Hz
+set opt(bw)               25000.0 ;#Bandwidth used in Hz
+set opt(bitrate)		  200 ;#bitrate in bps
 set opt(ack_mode)         "setNoAckMode"
 
 set opt(pktsize)  32
-set opt(cbr_period)   10
+set opt(cbr_period)   60
 set opt(poisson_traffic) 0
 
 set opt(rngstream)	155
@@ -201,42 +201,52 @@ Module/UW/ROV set packetSize_          $opt(ROV_pktsize)
 Module/UW/ROV set period_              $opt(ROV_period)
 Module/UW/ROV set debug_               0
 
-Module/UW/ROV/CTR set packetSize_			$opt(CTR_pktsize)
-Module/UW/ROV/CTR set debug_				0
-
-Module/UW/SC/CTR set debug_					0
+Module/UW/SC/CTR set packetSize_      $opt(CTR_pktsize)
+Module/UW/SC/CTR set period_          $opt(CTR_period)
+Module/UW/SC/CTR set debug_			  0
 
 Plugin/UW/SC/MC set debug_ 0
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_	2
 MPropagation/Underwater set debug_				0
-MPropagation/Underwater set windspeed_			20
-MPropagation/Underwater set shipping_			1
+MPropagation/Underwater set windspeed_			1
 
 set channel [new Module/UnderwaterChannel]
 set propagation [new MPropagation/Underwater]
 set data_mask [new MSpectralMask/Rect]
 $data_mask setFreq				$opt(freq)
 $data_mask setBandwidth			$opt(bw)
-$data_mask setPropagationSpeed  $opt(propagation_speed)
 
 ### MAC ###
 Module/UW/CSMA_ALOHA set listen_time_	1
 
 ### PHY ###
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    4.0 
+Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    5.0 
 Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
 Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
 Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
 Module/UW/PHYSICAL  set MinTxSPL_dB_                10
-Module/UW/PHYSICAL  set MaxTxRange_                 3000
+Module/UW/PHYSICAL  set MaxTxRange_                 200
 Module/UW/PHYSICAL  set PER_target_                 0    
 Module/UW/PHYSICAL  set CentralFreqOptimization_    0
 Module/UW/PHYSICAL  set BandwidthOptimization_      0
 Module/UW/PHYSICAL  set SPLOptimization_            0
 Module/UW/PHYSICAL  set debug_                      0
+
+Module/UW/AHOI/PHY  set BitRate_                    $opt(bitrate)
+Module/UW/AHOI/PHY  set AcquisitionThreshold_dB_    5.0 
+Module/UW/AHOI/PHY  set RxSnrPenalty_dB_            0
+Module/UW/AHOI/PHY  set TxSPLMargin_dB_             0
+Module/UW/AHOI/PHY  set MaxTxSPL_dB_                $opt(txpower)
+Module/UW/AHOI/PHY  set MinTxSPL_dB_                10
+Module/UW/AHOI/PHY  set MaxTxRange_                 200
+Module/UW/AHOI/PHY  set PER_target_                 0    
+Module/UW/AHOI/PHY  set CentralFreqOptimization_    0
+Module/UW/AHOI/PHY  set BandwidthOptimization_      0
+Module/UW/AHOI/PHY  set SPLOptimization_            0
+Module/UW/AHOI/PHY  set debug_                      0
 
 Position/UWSM set debug_ 0
 
@@ -317,12 +327,12 @@ foreach line $data {
 		for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 			$ns at $t "update_and_check $t $id1"
 			if { [expr $id1 % 2] == 0 } {
-  			    set x1 [expr $x - 25*$id1/2]
-  			    set y1 [expr $y + 25*$id1/2]
+  			    set x1 [expr $x - 12.5*$id1/2]
+  			    set y1 [expr $y + 12.5*$id1/2]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			} else {
-  			    set x1 [expr $x - 25*($id1+1)/2]
-  			    set y1 [expr $y - 25*($id1+1)/2]
+  			    set x1 [expr $x - 12.5*($id1+1)/2]
+  			    set y1 [expr $y - 12.5*($id1+1)/2]
 				$ns at $t "$app_ctr($leader_id,$id1) sendPosition $x1 $y1 $z $s"
   			}
 		}
@@ -334,7 +344,9 @@ set opt(mine_file)   "mine_position.csv"
 set fp [open $opt(mine_file) r]
 set file_data [read $fp]
 set data [split $file_data "\n"]
+set removed_mine 0
 set mine_count 0
+set time_demine 0
 foreach line $data {
 	if {[regexp {^(.*),(.*),(.*)$} $line -> x y z]} {
 		set mine_position($mine_count) [new "Position/UWSM"]
@@ -360,8 +372,8 @@ for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 proc update_and_check { t id } {
-    global ns opt position mine_count time_demine
-	global leader_id app_rov app_ctr mine_position 
+    global ns opt position mine_count time_demine removed_mine
+	global leader_id app_rov app_ctr mine_position app_mc
 
 	$position($id) update
 	# Auvs path output
@@ -378,10 +390,14 @@ proc update_and_check { t id } {
 				set outfile_mine [open "test_mine_results.csv" "a"]
 				puts $outfile_mine "$t,$id,[$mine_position($cnt) getX_],[$mine_position($cnt) getY_],[$mine_position($cnt) getZ_]"
 				close $outfile_mine
-
-				set time_demine $t
 			}
 		}
+	}
+
+	set temp_mine [$app_mc($leader_id) getremovedmines]
+	if {$temp_mine != $removed_mine} {
+		set removed_mine [$app_mc($leader_id) getremovedmines]
+		set time_demine $t
 	}
 }
 
@@ -398,11 +414,9 @@ proc finish {} {
     puts "-----------------------------------------------------------------"
     puts "Simulation summary"
     puts "-----------------------------------------------------------------"
-    puts "Simulation summary"
     puts "number of nodes  : $opt(nn)"
     puts "packet size      : $opt(pktsize) byte"
     puts "cbr period       : $opt(cbr_period) s"
-    puts "number of nodes  : $opt(nn)"
     puts "simulation length: $opt(txduration) s"
     puts "tx frequency     : $opt(freq) Hz"
     puts "tx bandwidth     : $opt(bw) Hz"
@@ -410,10 +424,44 @@ proc finish {} {
     puts "-----------------------------------------------------------------"
   }
   if ($opt(verbose)) {
+	# 1kWh for 24 h at 1m/s (Remus 100):
+	# P = 1 kWh / 22 h = 0.04167 kW = 41.67 W
+	# AHOI: P_tx = 5 W; P_rx = 0.3 W
+	# Ping 360 sonar: P = 5 W
     puts "no. mines		: $mine_count"
 	puts "no. mines removed	: [$app_mc($leader_id) getremovedmines]"
 	puts "Removed mine ratio	: [expr double([$app_mc($leader_id) getremovedmines]) / $mine_count]"
-	puts "demine time(min)		: [expr double($time_demine)/60]"
+	puts "demine time		: [expr double($time_demine)/60]"
+    puts "-----------------------------------------------------------------"
+
+	set packet_duration [expr double($opt(pktsize)*8)/double($opt(bitrate))]
+    for {set id1 1} {$id1 < $opt(nn)} {incr id1}  {
+	  set rov_sent [expr 0.0 + [$app_rov($id1) getsentpkts]]
+	  set rov_recv [expr 0.0 + [$app_rov($id1) getrecvpkts]]
+
+	  set trf_sent [expr 0.0 + [$app_trf($id1,$leader_id) getsentpkts]]
+	  set trf_recv [expr 0.0 + [$app_trf($id1,$leader_id) getrecvpkts]]
+
+	  set trl_sent [expr 0.0 + [$app_trl($leader_id,$id1) getsentpkts]]
+	  set trl_recv [expr 0.0 + [$app_trl($leader_id,$id1) getrecvpkts]]
+
+	  set ctr_sent [expr 0.0 + [$app_ctr($leader_id,$id1) getsentpkts]]
+	  set ctr_recv [expr 0.0 + [$app_ctr($leader_id,$id1) getrecvpkts]]
+
+	  set sum_sent [expr $rov_sent + $ctr_sent + $trf_sent + $trl_sent]
+	  set sum_recv [expr $rov_recv + $ctr_recv + $trf_recv + $trl_recv]
+
+	  set energy_tx($id1) [expr $sum_sent*5*$packet_duration]
+	  set energy_rx($id1) [expr $sum_recv*0.3*$packet_duration]
+
+	  set per($id1) [expr (1 - $sum_recv/$sum_sent) * 100]
+
+	  puts "sent packets $id1		: $sum_sent"
+	  puts "received packets $id1 	: $sum_recv"
+	  puts "node $id1 PER		: $per($id1)"
+	  puts "---------------------------------------------------------------------"
+	}
+	puts "energy consumption	: [expr (41.67 + 5)*$time_demine + $energy_tx(1) + $energy_rx(1)]"
     puts "---------------------------------------------------------------------"
     puts "done!"
   }
