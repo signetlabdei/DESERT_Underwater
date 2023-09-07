@@ -28,7 +28,7 @@
 //
 /**
 * @file uwsc-rovctr-module.h
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWSCROVCTR</i>.
@@ -80,6 +80,7 @@ public:
 	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
 	 * @param m Pointer cross layer message
+	 * @return zero if successful
 	 *
 	 */
 	int recvSyncClMsg(ClMessage* m);

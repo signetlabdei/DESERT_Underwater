@@ -27,8 +27,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwtracker-module.cc
-* @author Filippo Campagnaro
+* @file uwsc-tracker-module.cc
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the <i>UWSCTRACKER</i> class implementation.

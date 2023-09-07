@@ -28,7 +28,7 @@
 
 /**
 * @file uwsc-rovctr-module.cc
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the <i>UWROVCtr</i> class implementation.

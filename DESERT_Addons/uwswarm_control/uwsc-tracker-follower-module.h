@@ -50,8 +50,8 @@
 class UwSCFTrackerModule; // forward declaration
 
 /**
-* UwUpdateMineStatus class is used to handle the scheduling period of <i>UWSCFTRACKER</i> packets.
-*/
+ * UwUpdateMineStatus class is used to handle the scheduling period of <i>UWSCFTRACKER</i> packets.
+ */
 class UwUpdateMineStatus : public TimerHandler
 {
 public:
@@ -67,9 +67,9 @@ protected:
 };
 
 /**
-* UwSCFTrackerModule class is used to track mines via sonar and share tracking information via packets.
-* After a given time a mine is detected, this module provides to remove it.
-*/
+ * UwSCFTrackerModule class is used to track mines via sonar and share tracking information via packets.
+ * After a given time a mine is detected, this module provides to remove it.
+ */
 class UwSCFTrackerModule : public UwTrackerModule {
 	friend class UwUpdateMineStatus;
 public:
@@ -87,51 +87,56 @@ public:
 
 
 	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	* 
-	* @param argc Number of arguments in <i>argv</i>.
-	* @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	* 
-	*/
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 * 
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	 * 
+	 */
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-	* Initializes a monitoring data packet passed as argument with the default values.
-	* 
-	* @param Packet* Pointer to a packet already allocated to fill with the right values.
-	*/
+	 * Initializes a monitoring data packet passed as argument with the default values.
+	 * 
+	 * @param Packet* Pointer to a packet already allocated to fill with the right values.
+	 *
+	 */
 	virtual void initPkt(Packet* p) ;
 
 protected:
-	std::vector<UWSMPosition*> mine_positions;
-	Position auv_position;	/**< Current position of the tracker. */
-	double demine_period;	/**< Timer to schedule packets transmission.*/
+	std::vector<UWSMPosition*> mine_positions; /**< Positions of the mines in the area. */
+	Position auv_position; /**< Current position of the tracker. */
+	double demine_period; /**< Timer to schedule packets transmission.*/
 	hdr_uwSCFTracker mine_measure; /**< Detected mine packets. */
 	UwUpdateMineStatus mine_timer; /**< Timer to schedule detecting measurements*/
 
 	/**
-	* Allocates, initialize and sends a packet with the default priority flag
-	* set from tcl.
-	*
-	*/
+	 * Allocates, initialize and sends a packet with the default priority flag
+	 * set from tcl.
+	 *
+	 */
 	void sendPkt();
 
 	/**
-	* Update the mine measure
-	*/
+	 * Update the mine measure
+	 */
 	void updateMineRemove();
 
+	/**
+	  * Update the current track position with the nearest mine position
+	  *
+	  */
 	UWSMPosition* updateTrackPosition();
 
 	/**
-	* Start to send packets.
-	*/
+	 * Start to send packets.
+	 */
 	virtual void start();
 
 	/**
-	* Stop to send packets.
-	*/
+	 * Stop to send packets.
+	 */
 	virtual void stop();
 };
 

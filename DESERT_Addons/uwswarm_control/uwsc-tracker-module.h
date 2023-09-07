@@ -27,7 +27,7 @@
 
 /**
 * @file uwsc-tracker-module.h
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWSCTRACKER</i>.

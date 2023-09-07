@@ -28,7 +28,7 @@
 
 /**
 * @file uwsc-tracker-follower-module.cc
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the <i>UWSCFTRACKER</i> class implementation.
