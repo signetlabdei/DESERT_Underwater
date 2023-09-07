@@ -34,6 +34,8 @@
 * \brief Provides the definition of the class <i>UWSCROVCTR</i>.
 *
 * Provides the definition of the class UwSCROVCtr.
+* UwSCROVCTR receives cross layer messages containing the next waypoint that has to be sent to the associated node follower. In addition it receives monitoring packets containing the current node folllower position.
+* SCROVCtr stands for Swarm control ROV Controller.
 */
 
 
@@ -45,6 +47,7 @@
 /**
 * UwSCROVCtrModule class adds to the UwROVCtrModule class the possibility
 * to receive and send cross layer messages.
+*
 */
 class UwSCROVCtrModule : public UwROVCtrModule {
 public:
