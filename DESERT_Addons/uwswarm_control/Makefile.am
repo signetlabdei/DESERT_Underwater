@@ -32,11 +32,11 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwswarm_control.la
 
-libuwswarm_control_la_SOURCES = uwsc-mission-coordinator-module.cc uwsc-mission-coordinator-module.h\
-uwsc-rovctr-module.cc uwsc-rovctr-module.h\
-uwsc-tracker-module.cc uwsc-tracker-module.h\
-uwsc-tracker-follower-module.cc uwsc-tracker-follower-module.h\
-uwsc-clmsg.cc uwsc-clmsg.h initlib.cc
+libuwswarm_control_la_SOURCES = uwsc-mission-coordinator-module.cc\
+uwsc-rovctr-module.cc\
+uwsc-tracker-module.cc\
+uwsc-tracker-follower-module.cc\
+uwsc-clmsg.cc initlib.cc
 
 libuwswarm_control_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwswarm_control_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@
