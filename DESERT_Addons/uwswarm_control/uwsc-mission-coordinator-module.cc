@@ -27,7 +27,7 @@
 
 /**
 * @file uwmc-module.cc
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the <i>UwMissionCoordinator</i> class implementation.
@@ -122,12 +122,12 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			{
 				auto mine = auv->rov_mine.end()-1;
 
-				if (mine->state == MINE_TRACKED &&
+				if (mine->state == Mine::MINE_TRACKED &&
 					mine->track_position.getX() == p->getX() &&
 					mine->track_position.getY() == p->getY() &&
 					mine->track_position.getZ() == p->getZ())
 
-					mine->state = MINE_DETECTED;
+					mine->state = Mine::MINE_DETECTED;
 			}
 
 			if (debug_)
@@ -172,7 +172,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 
 		if (auv != auv_follower.end())
 		{
-			auv->rov_mine.emplace_back(*(p), MINE_TRACKED);
+			auv->rov_mine.emplace_back(*(p), Mine::MINE_TRACKED);
 			auv->n_mines++;
 			auv->rov_status = true;
 
@@ -230,9 +230,9 @@ UwMissionCoordinatorModule::removeMine(int id)
 	{
 		auto mine = auv->rov_mine.end()-1;
 
-		if(mine->state != MINE_REMOVED)
+		if(mine->state != Mine::MINE_REMOVED)
 		{
-			mine->state = MINE_REMOVED;
+			mine->state = Mine::MINE_REMOVED;
 			auv->rov_status = false;
 
 			ClMsgMc2CtrStatus msg(auv->ctr_id);

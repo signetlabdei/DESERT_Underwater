@@ -28,7 +28,7 @@
 
 /**
 * @file uwmc-module.h
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author  Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UwMissionCooridnator</i>.
@@ -50,29 +50,29 @@
 class UwMissionCoordinatorModule;
 
 /**
- * MineState list all the possible state of a mine.
+ * Mine describes a mine by its position and state.
  */
-enum MineState
+typedef struct Mine
 {
-	MINE_TRACKED,	/**< Mine tracked.*/
-	MINE_DETECTED,	/**< Mine found and started the removing process */
-	MINE_REMOVED	/**< Mine removed */
-};
+	/**
+	 * MineState list all the possible state of a mine.
+	 */
+	enum MineState
+	{
+		MINE_TRACKED,	/**< Mine tracked.*/
+		MINE_DETECTED,	/**< Mine found and started the removing process */
+		MINE_REMOVED	/**< Mine removed */
+	};
 
-/**
- * Mines describes a mine by its position and state.
- */
-typedef struct Mines
-{
 	Position track_position;	/**< Mine tracked position*/
 	MineState state;			/**< Mine state */
 
-	Mines(Position p, MineState s)
+	Mine(Position p, MineState s)
 		: track_position(p)
 		, state(s)
 	{
 	}
-} Mines;
+} Mine;
 
 /**
  * AUV_stats describes statistics about the AUV follower.
@@ -84,10 +84,13 @@ typedef struct AUV_stats
 	int ctr_id;	/**< Id of the CTR module. */
 	int trk_id;	/**< Id of the Tracker module. */
 	Position* rov_position;			/**< Position of ROV follower. */
-	std::vector<Mines> rov_mine;	/** Mines found by ROV follower. */
+	std::vector<Mine> rov_mine;	/** Mines found by ROV follower. */
 	int n_mines;		/** Number of mines found by ROV follower. */
 	bool rov_status;	/** Status of the ROV, if true is detecting a mine. */
 
+	/**
+	* Constructor of AUV_stats struct.
+	*/
 	AUV_stats(int id_ctr, int id_trk)
 		: ctr_id(id_ctr)
 		, trk_id(id_trk)
@@ -108,30 +111,30 @@ class UwMissionCoordinatorModule : public PlugIn {
 public:
 
 	/**
-	* Default Constructor of UwMissionCoordinatorModule class.
-	*/
+	 * Default Constructor of UwMissionCoordinatorModule class.
+	 */
 	UwMissionCoordinatorModule();
 
 	/**
-	* Destructor of UwMissionCoordinatorModule class.
-	*/
+	 * Destructor of UwMissionCoordinatorModule class.
+	 */
 	virtual ~UwMissionCoordinatorModule();
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   *
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-   *
-   **/
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	 *
+	 **/
 	virtual int command(int argc, const char*const* argv);
 
 
 	/**
 	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
-	 * @param m Pointer cross layer message
+	 * @return m Pointer cross layer message
 	 *
 	 */
 	int recvSyncClMsg(ClMessage* m);
@@ -152,7 +155,7 @@ protected:
 	/**
 	 * Check if the mine at received position is already tracked.
 	 *
-	 * @return bool true if the mine is already tracked
+	 * @param bool true if the mine is already tracked
 	 *
 	 */
 	bool isTracked(Position* p);
