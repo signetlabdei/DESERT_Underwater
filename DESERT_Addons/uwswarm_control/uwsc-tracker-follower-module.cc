@@ -85,16 +85,20 @@ int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 	if(argc == 3){
 		if (strcasecmp(argv[1], "setTrack") == 0) {
 			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
-			mine_positions.emplace_back(p);
-			track_position = p;
-			tcl.resultf("%s", "position Setted\n");
+
+			if(p)
+			{
+				mine_positions.emplace_back(p);
+				track_position = p;
+				tcl.resultf("%s", "position Setted\n");
+			}
+
 			return TCL_OK;
 		}
 	}
 
 	return UwTrackerModule::command(argc,argv);
 }
-
 
 void
 UwSCFTrackerModule::sendPkt()
