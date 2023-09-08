@@ -67,8 +67,8 @@ typedef struct Mine
 	Position track_position;	/**< Mine tracked position*/
 	MineState state;			/**< Mine state */
 
-	Mine(Position p, MineState s)
-		: track_position(p)
+	Mine(Position* p, MineState s)
+		: track_position(*p)
 		, state(s)
 	{
 	}

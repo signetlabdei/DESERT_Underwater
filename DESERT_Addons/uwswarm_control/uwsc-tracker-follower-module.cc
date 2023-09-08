@@ -91,9 +91,11 @@ int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 				mine_positions.emplace_back(p);
 				track_position = p;
 				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
 			}
 
-			return TCL_OK;
+			tcl.resultf("%s", "position error\n");
+			return TCL_ERR;
 		}
 	}
 

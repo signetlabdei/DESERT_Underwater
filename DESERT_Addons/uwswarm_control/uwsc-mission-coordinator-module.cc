@@ -172,7 +172,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 
 		if (auv != auv_follower.end())
 		{
-			auv->rov_mine.emplace_back(*(p), Mine::MINE_TRACKED);
+			auv->rov_mine.emplace_back(p, Mine::MINE_TRACKED);
 			auv->n_mines++;
 			auv->rov_status = true;
 
