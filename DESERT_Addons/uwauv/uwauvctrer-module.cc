@@ -28,7 +28,7 @@
 
 /**
 * @file uwauvctrer-module.cc
-* @author Filippo Campagnaro, Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUVCtrEr</i> class implementation.
@@ -70,7 +70,7 @@ public:
 } class_module_uwAUV_error;
 
 
-UwAUVCtrErModule::UwAUVCtrErModule(UWSMEPosition* p) 
+UwAUVCtrErModule::UwAUVCtrErModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -104,9 +104,7 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	, accuracy(0.001)
 
 {
-	p = NULL;
-	UWSMEPosition p = UWSMEPosition();
-	posit=&p;
+	posit = new  UWSMWPPosition();
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
@@ -150,9 +148,15 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
-			posit = p;
-			return TCL_OK;
+			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
+			if(p){
+				posit=p;
+				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
+			}else{
+				tcl.resultf("%s", "Invalid position\n");
+				return TCL_ERROR;
+			}
 		} else
 		if (strcasecmp(argv[1], "setSpeed") == 0) {
 			speed = atof(argv[2]);
@@ -164,7 +168,7 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 }
 
 
-void UwAUVCtrErModule::setPosition(UWSMEPosition* p){
+void UwAUVCtrErModule::setPosition(UWSMWPPosition* p){
 
 	posit = p;
 	x_sorg = posit->getX();
@@ -275,30 +279,10 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 				<< std::endl;
 			}
 
-			/*if (!alarm_queue.empty()){ //take care of the next error
-
-				x_err = alarm_queue[0][0];
-				y_err = alarm_queue[0][1];
-
-				posit->setdest(x_err,y_err,posit->getZ(),speed);
-				alarm_mode = 2;
-
-				alarm_queue.erase(alarm_queue.begin());
-
-				x_sorg = posit->getX();
-				y_sorg = posit->getY();
-				
-				if (debug_) {
-					std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p) SV picked a new "
-					"error from the queue: X = " << x_err << ", Y = " << y_err<< std::endl;
-				}
-
-			}*/
-
 		}else{
 
 			uwAUVh->error() = 1;
-			uwAUVh->sn() = ++sn; //++ or no?
+			uwAUVh->sn() = ++sn; 
 			uwAUVh->x() = x_err;
 			uwAUVh->y() = y_err;
 			this->p = p;
@@ -313,10 +297,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	
 	UwCbrModule::initPkt(p);
 
-}
-
-void UwAUVCtrErModule::recv(Packet* p, Handler* h) {
-	recv(p);
 }
 
 void UwAUVCtrErModule::recv(Packet* p) {
@@ -404,7 +384,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 						x_sorg = posit->getX();
 						y_sorg = posit->getY();
 
-						posit->setdest(x_err,y_err,posit->getZ(),speed);
+						posit->setDest(x_err,y_err,posit->getZ(),speed);
 						alarm_mode = 2;
 
 						if (debug_) 
@@ -437,7 +417,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 							x_err = alarm_queue[0][0];
 							y_err = alarm_queue[0][1];
-							posit->setdest(x_err,y_err,posit->getZ(),speed);
+							posit->setDest(x_err,y_err,posit->getZ(),speed);
 							alarm_mode = 2;
 							
 							x_sorg = posit->getX();
@@ -544,7 +524,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 	}
 
 	UwCbrModule::recv(p);
-	//transmit();
 }
 
 int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){

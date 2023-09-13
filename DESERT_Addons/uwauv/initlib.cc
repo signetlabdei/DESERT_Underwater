@@ -28,7 +28,7 @@
 
 /**
  * @file   initlib.cc
- * @author Filippo Campagnaro, Alessia Ortile
+ * @author Alessia Ortile
  * @version 1.0.0
  *
  * \brief Provides the initialization of uwauv libraries.

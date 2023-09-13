@@ -27,8 +27,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwauv-module.h
-* @author Filippo Campagnaro Alessia Ortile
+* @file uwauverror-b-module.h
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUVError</i>.
@@ -45,10 +45,9 @@
 #define UWAUVError_MODULE_H
 #include <uwcbr-module.h>
 #include <uwauv-packet.h>
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 #include <queue>
 #include <fstream>
-//#include <boost/math/special_functions/erf.hpp>
 #define UWAUVError_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -67,9 +66,9 @@ class UwAUVErrorSendTimer : public UwSendTimer {
 	public:
 
 	/**
-   * Conscructor of UwSendTimer class 
-   * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
-   */
+    * Conscructor of UwSendTimer class 
+    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+    */
 	UwAUVErrorSendTimer(UwAUVErrorBModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
@@ -88,9 +87,9 @@ public:
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
-	* @param UWSMEPosition* p Pointer to the AUV position
+	* @param UWSMWPPosition* p Pointer to the AUV position
 	*/
-	UwAUVErrorBModule(UWSMEPosition* p);
+	UwAUVErrorBModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
@@ -98,20 +97,20 @@ public:
 	virtual ~UwAUVErrorBModule();
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   * 
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-   * 
-   **/
+    * TCL command interpreter. It implements the following OTcl methods:
+    * 
+    * @param argc Number of arguments in <i>argv</i>.
+    * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+    * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+    * 
+    **/
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-   * Initializes a monitoring data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
+    * Initializes a monitoring data packet passed as argument with the default values.
+    * 
+    * @param Packet* Pointer to a packet already allocated to fill with the right values.
+    */
 	virtual void initPkt(Packet* p) ;
 
 	/**
@@ -120,14 +119,6 @@ public:
 	* @param Packet* Pointer to the packet will be received.
 	*/
 	virtual void recv(Packet*);
-
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
 
 	/**
 	* Reset retransmissions
@@ -145,16 +136,16 @@ public:
 	/**
 	* Sets the position of the AUV
 	*
-	* @param UWSMEPosition * p Pointer to the AUV position
+	* @param UWSMWPPosition * p Pointer to the AUV position
 	*/
-	virtual void setPosition(UWSMEPosition* p);
+	virtual void setPosition(UWSMWPPosition* p);
 
 	/**
 	* Returns the position of the AUV
 	*
 	* @return the current AUV position
 	*/
-  inline UWSMEPosition* getPosition() { return posit; }
+    inline UWSMWPPosition* getPosition() const { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -182,7 +173,7 @@ protected:
 
 	enum UWAUV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
-	UWSMEPosition* posit; /**< AUV position.*/
+	UWSMWPPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int sn; 
 	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 

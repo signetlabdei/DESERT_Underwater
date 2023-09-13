@@ -28,7 +28,7 @@
 
 /**
 * @file uwauvctr-module.cc
-* @author Filippo Campagnaro, Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUVCtr</i> class implementation.
@@ -69,7 +69,7 @@ public:
 	}
 } class_module_uwAUV_ctr;
 
-UwAUVCtrModule::UwAUVCtrModule(UWSMEPosition* p) 
+UwAUVCtrModule::UwAUVCtrModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, sn(0)
 	, adaptiveRTO(0)
@@ -78,9 +78,8 @@ UwAUVCtrModule::UwAUVCtrModule(UWSMEPosition* p)
 	posit=p;
 	speed=0.5;
 	bind("adaptiveRTO_", (int *) &adaptiveRTO);
-	if (adaptiveRTO == 1) {
-		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);
-	}
+	bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);
+
 	if (adaptiveRTO_parameter < 0) {
 		cerr << NOW << "Invalid adaptive RTO parameter < 0, set to 0.5 " 
 			<< "by default " << std::endl;
@@ -94,15 +93,12 @@ UwAUVCtrModule::UwAUVCtrModule()
 	, adaptiveRTO(0)
 	, adaptiveRTO_parameter(0.5)
 {
-	p = NULL;
-	UWSMEPosition p = UWSMEPosition();
-	posit=&p;
-	//posit = Position();
+
+	posit= new UWSMWPPosition();
 	speed = 0.5;
 	bind("adaptiveRTO_", (int *) &adaptiveRTO);
-	if (adaptiveRTO == 1) {
-		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);	
-	}
+	bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);	
+
 	if (adaptiveRTO_parameter < 0) {
 		cerr << NOW << "Invalide adaptive RTO parameter < 0, set to 0.5 "
 			<< "by default " << std::endl;
@@ -140,9 +136,16 @@ int UwAUVCtrModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
-			posit = p;
-			return TCL_OK;
+			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
+			if(p){
+				posit=p;
+				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
+			}else{
+				tcl.resultf("%s", "Invalid position\n");
+				return TCL_ERROR;
+			}
+			
 		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
 			speed = atof(argv[2]);
 			return TCL_OK;
@@ -192,7 +195,7 @@ void UwAUVCtrModule::transmit() {
 
 void UwAUVCtrModule::start() {}
 
-void UwAUVCtrModule::setPosition(UWSMEPosition* p){
+void UwAUVCtrModule::setPosition(UWSMWPPosition* p){
 	posit = p;
 }
 
@@ -233,10 +236,6 @@ void UwAUVCtrModule::initPkt(Packet* p) {
 			<< " AUV way-point: X = "<< uwAUVh->x() <<", Y = " 
 			<< uwAUVh->y() << ", Z = " << uwAUVh->z()<< std::endl;
 	}
-}
-
-void UwAUVCtrModule::recv(Packet* p, Handler* h) {
-	recv(p);
 }
 
 void UwAUVCtrModule::recv(Packet* p) {

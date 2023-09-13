@@ -27,8 +27,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 /**
-* @file uwauvctr-module.h
-* @author Filippo Campagnaro, Alessia Ortile
+* @file uwauvctrer-module.h
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUV</i>.
@@ -47,7 +47,7 @@
 #define UWAUVError_MODULE_H
 #include <uwcbr-module.h>
 #include "uwauv-packet.h"
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 #include "node-core.h"
 #include <queue>
 #include <fstream>
@@ -89,7 +89,7 @@ public:
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrErModule(UWSMEPosition* p);
+	UwAUVCtrErModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
@@ -107,10 +107,10 @@ public:
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-   * Initializes a control data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
+    * Initializes a control data packet passed as argument with the default values.
+    * 
+    * @param Packet* Pointer to a packet already allocated to fill with the right values.
+    */
 	virtual void initPkt(Packet* p) ;
 
 	/**
@@ -123,14 +123,14 @@ public:
 	*
 	* @param Position * p Pointer to the AUVCtr position
 	*/
-	virtual void setPosition(UWSMEPosition* p);
+	virtual void setPosition(UWSMWPPosition* p);
 
 	/**
 	* Returns the position of the AUVCtr
 	*
 	* @return the current AUVCtr position
 	*/
-	inline UWSMEPosition* getPosition() { return posit;}
+	inline UWSMWPPosition* getPosition() const { return posit;}
 
 	/**
 	* Creates and transmits a packet.
@@ -146,14 +146,6 @@ public:
 	* @param Packet* Pointer to the packet will be received.
 	*/
 	virtual void recv(Packet*);
-
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -178,11 +170,9 @@ public:
 
 	float getDistance(float x_s,float y_s, float x_d, float y_d); 
 
-
-
 protected:
 
-	UWSMEPosition* posit; /**< Controller position.*/
+	UWSMWPPosition* posit; /**< Controller position.*/
 	int last_sn_confirmed; /**< Sequence number of the last command Packete received.*/
 	int sn; /**Sequence number of the last control packet sent.*/
 	int drop_old_waypoints;

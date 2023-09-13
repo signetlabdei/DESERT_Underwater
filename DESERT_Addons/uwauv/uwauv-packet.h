@@ -29,7 +29,7 @@
 
 /**
  * @file   uwauv-packet.h
- * @author Filippo Campagnaro
+ * @author Alessia Ortile
  * @version 1.0.0
  * 
  * \brief Provides both <i>UWAUV</i> monitoring and control packets header description.

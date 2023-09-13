@@ -125,6 +125,6 @@ Module/UW/AUV/ERB instproc init {args} {
 
 
 Position/UWSM set debug_ 0
-Position/UWSME set debug_ 0
+Position/UWSMWP set debug_ 0
 
 PlugIn/PositionDB set debug_ 0

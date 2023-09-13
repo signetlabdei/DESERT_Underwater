@@ -28,7 +28,7 @@
 //
 /**
 * @file uwauvctr-module.h
-* @author Filippo Campagnaro
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUV</i>.
@@ -47,7 +47,7 @@
 #define UWAUV_CTR_MODULE_H
 #include <uwcbr-module.h>
 #include "uwauv-packet.h"
-#include "uwsmeposition.h"
+#include <uwsmwpposition.h>
 #include "node-core.h"
 #include <queue>
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -65,9 +65,9 @@ class UwAUVCtrSendTimer : public UwSendTimer {
 	public:
 
 	/**
-   * Conscructor of UwSendTimer class 
-   * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
-   */
+    * Conscructor of UwSendTimer class 
+    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+    */
 	UwAUVCtrSendTimer(UwAUVCtrModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
@@ -86,7 +86,7 @@ public:
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrModule(UWSMEPosition* p);
+	UwAUVCtrModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
@@ -104,10 +104,10 @@ public:
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-   * Initializes a control data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
+    * Initializes a control data packet passed as argument with the default values.
+    * 
+    * @param Packet* Pointer to a packet already allocated to fill with the right values.
+    */
 	virtual void initPkt(Packet* p) ;
 
 	/**
@@ -120,14 +120,14 @@ public:
 	*
 	* @param Position * p Pointer to the AUVCtr position
 	*/
-	virtual void setPosition(UWSMEPosition* p);
+	virtual void setPosition(UWSMWPPosition* p);
 
 	/**
 	* Returns the position of the AUVCtr
 	*
 	* @return the current AUVCtr position
 	*/
-	inline UWSMEPosition* getPosition() { return posit;}
+	inline UWSMWPPosition* getPosition() const { return posit;}
 	
 	/**
 	* Returns the last AUV position monitored
@@ -148,14 +148,6 @@ public:
 	* @param Packet* Pointer to the packet will be received.
 	*/
 	virtual void recv(Packet*);
-
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
 
 	/**
 	* Creates and transmits a packet.
@@ -187,7 +179,7 @@ public:
 
 protected:
 
-	UWSMEPosition* posit; /**< Controller position.*/
+	UWSMWPPosition* posit; /**< Controller position.*/
 	float x_auv; /**< X of the last AUV position monitored.*/
 	float y_auv; /**< Y of the last AUV position monitored.*/
 	float z_auv; /**< Z of the last AUV position monitored.*/

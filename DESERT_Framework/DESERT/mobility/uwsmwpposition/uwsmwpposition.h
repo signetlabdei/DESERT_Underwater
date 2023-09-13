@@ -28,18 +28,18 @@
 //
 
 /**
- * @file   uwsmeposition.h
- * @author Filippo Campagnaro
+ * @file   uwsmwpposition.h
+ * @author Alessia Ortile
  * @version 1.0.0
  *
- * \brief Provides the definition of the class <i>UWSMEPosition</i>.
+ * \brief Provides the definition of the class <i>UWSMWPPosition</i>.
  *
- * Provides the definition of the class <i>UWSMEPosition</i>.
+ * Provides the definition of the class <i>UWSMWPPosition</i>.
  * This class implements the a simple movement behaviour: it is possible to
- *define
- * the direction and the speed of the linear movement thanks to a TCL command
- * in which the user has to define the destination point an the speed of the
- * movement required.
+ * define the direction and the speed of the linear movement thanks to a TCL 
+ * command in which the user has to define the destination point an the 
+ * speed of the movement required. Additionally, this class supports the 
+ * addition of a list of waypoints to reach sequentially.
  * NOTE: the destination point is used to define the direction od the node and
  * when it is reached the node will proceed for the same direction
  *
@@ -56,40 +56,25 @@
 #define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
 #define pi (4 * atan(1.0))
 
-class UWSMEPosition;
+class UWSMWPPosition;
 
-/**
-* UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
-*/
-/*class UwDstReachedTimer : public TimerHandler 
-{
-public:
-	UwDstReachedTimer(UWSMEPosition *m) : TimerHandler() { 
-		module = m;
-	}
-protected:
-	virtual void expire(Event *e);
-	UWSMEPosition *module;
-};*/
-
-
-class UWSMEPosition : public UWSMPosition
+class UWSMWPPosition : public UWSMPosition
 {
 public:
 	/**
 	* Constructor
 	*/
-	UWSMEPosition();
+	UWSMWPPosition();
 	/**
 	* Destructor
 	*/
-	virtual ~UWSMEPosition();
+	virtual ~UWSMWPPosition();
 	/**
 	
 
 	/**
 	* TCL command interpreter
-	*  <li><b>setdest &lt;<i>integer value</i>&gt;<i>integer
+	*  <li><b>setDest &lt;<i>integer value</i>&gt;<i>integer
 	*value</i>&gt;<i>integer value</i>&gt;</b>:
 	*  	set the movement pattern: the firts two values define the point to be
 	*reached (i.e., the
@@ -110,31 +95,73 @@ public:
 	**/
 	virtual int command(int argc, const char *const *argv);
 
-	virtual void setdest(
-			double x_dest, double y_dest, double z_dest, double spead);
 
-	virtual void adddest(
-			double x_dest, double y_dest, double z_dest, double spead);
+	/**
+ 	* Updates the next destination to reach.
+	*
+ 	* @param x_dest The x-coordinate of the destination.
+ 	* @param y_dest The y-coordinate of the destination.
+ 	* @param z_dest The z-coordinate of the destination.
+ 	* @param speed The speed of the vehicle.
+ 	*/
+	virtual void setDest(
+			double x_dest, double y_dest, double z_dest, double speed);
 
-	virtual void setdest(double x_dest, double y_dest, double z_dest);
+	/**
+ 	* Adds a new waypoint to the queue of destinations.
+	*
+ 	* @param x_dest The x-coordinate of the waypoint.
+ 	* @param y_dest The y-coordinate of the waypoint.
+ 	* @param z_dest The z-coordinate of the waypoint.
+ 	* @param speed The speed of the vehicle.
+ 	*/		
 
-	virtual void adddest(double x_dest, double y_dest, double z_dest);
+	virtual void addDest(
+			double x_dest, double y_dest, double z_dest, double speed);
+
+	/**
+ 	* Updates the next destination to reach.
+	*
+ 	* @param x_dest The x-coordinate of the destination.
+ 	* @param y_dest The y-coordinate of the destination.
+ 	* @param z_dest The z-coordinate of the destination.
+ 	*/
+
+	virtual void setDest(double x_dest, double y_dest, double z_dest);
+
+	/**
+ 	* Adds a new waypoint to the queue of destinations.
+	*
+ 	* @param x_dest The x-coordinate of the waypoint.
+ 	* @param y_dest The y-coordinate of the waypoint.
+ 	* @param z_dest The z-coordinate of the waypoint.
+ 	* @param speed The speed of the vehicle.
+ 	*/
+
+	virtual void addDest(double x_dest, double y_dest, double z_dest);
+
+	/**
+ 	* Updates the state of the vehicle. If the alarm mode is set to true, 
+ 	* new destinations cannot be set until it is turned off.
+	*
+ 	* @param  alarmStatus status of the alarm mode.
+ 	*/
 	
-	virtual void setAlarm(bool alarm);
+	virtual void setAlarm(bool alarmStatus);
 
 
 protected:
 	/**
 	* Method that updates both the position coordinates
+	* @param now time
 	*/
 	virtual void update(double now);
 
 private:
 	
-	std::vector<std::vector<double>> waypoints; 
-	int debug_;
-	bool alarm_mode; //alarm_mode true block all the application from updating the destination
-	bool exist;				
+	std::vector<std::vector<double>> waypoints; /**< queue of successive destination to reach*/
+	bool alarm_mode; /**< statuse of the alarm mode, if true block all the application from updating the destination*/	
+	int debug_;	
 };
 
 

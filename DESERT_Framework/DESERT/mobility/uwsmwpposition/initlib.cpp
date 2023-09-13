@@ -27,30 +27,30 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file   mobility/uwsmeposition/initlib.cpp
- * @author Filippo Campagnaro
+ * @file   mobility/uwsmwpposition/initlib.cpp
+ * @author Alessia Ortile
  * @version 1.0.0
  *
- * \brief Provides the initialization of uwsmeposition libraries.
+ * \brief Provides the initialization of uwsmwpposition libraries.
  *
- * Provides the initialization of uwsmeposition libraries.
+ * Provides the initialization of uwsmwpposition libraries.
  */
 
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 
 #include <tclcl.h>
 
-extern EmbeddedTcl UwSMEPositionTclCode;
+extern EmbeddedTcl UwSMWPPositionTclCode;
 
 extern "C" int
-Uwsmeposition_Init()
+Uwsmwpposition_Init()
 {
-	UwSMEPositionTclCode.load();
+	UwSMWPPositionTclCode.load();
 	return 0;
 }
 
 extern "C" int
 Cygsmposition_Init()
 {
-	Uwsmeposition_Init();
+	Uwsmwpposition_Init();
 }

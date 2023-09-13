@@ -28,7 +28,7 @@
 
 /**
 * @file uwauv-module.cc
-* @author Filippo Campagnaro, Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUV</i> class implementation.
@@ -92,9 +92,9 @@ UwAUVModule::UwAUVModule()
 	, log_flag(0)
 	, out_file_stats(0)
 {
-	UWSMEPosition p = UWSMEPosition();
+	UWSMWPPosition p = UWSMWPPosition();
 	posit=&p;
-    bind("ackTimeout_", (int*) &ackTimeout);
+    bind("ackTimeout_", (double*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -106,7 +106,7 @@ UwAUVModule::UwAUVModule()
 
 }
 
-UwAUVModule::UwAUVModule(UWSMEPosition* p) 
+UwAUVModule::UwAUVModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, ack(0)
@@ -120,7 +120,7 @@ UwAUVModule::UwAUVModule(UWSMEPosition* p)
 	, out_file_stats(0)
 {
 	posit = p;
-    bind("ackTimeout_", (int*) &ackTimeout);
+    bind("ackTimeout_", (double*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
@@ -135,7 +135,7 @@ UwAUVModule::UwAUVModule(UWSMEPosition* p)
 
 UwAUVModule::~UwAUVModule() {}
 
-void UwAUVModule::setPosition(UWSMEPosition* p){
+void UwAUVModule::setPosition(UWSMWPPosition* p){
 	posit = p;
 }
 
@@ -169,10 +169,18 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
-			posit=p;
-			tcl.resultf("%s", "position Setted\n");
-			return TCL_OK;
+
+			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
+
+			if(p){
+				posit=p;
+				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
+			}else{
+				tcl.resultf("%s", "Invalid position\n");
+				return TCL_ERROR;
+			}
+			
 		}
 		if (strcasecmp(argv[1], "setAckPolicy") == 0) {
 			if (atof(argv[2]) == 1) {
@@ -186,6 +194,9 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 			if (atof(argv[2]) == 3) {
 				ackPolicy = ACK_PGBK_OR_TO;
 				return TCL_OK;
+			}else{
+				cerr<<"Plicy not supported" << std::endl;
+				return TCL_ERROR;
 			}
 		}
 		if (strcasecmp(argv[1], "setAckTimeout") == 0) {
@@ -198,20 +209,20 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 		}
 	}
 	else if(argc == 5){
-		if (strcasecmp(argv[1], "setdest") == 0) {
-			posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+		if (strcasecmp(argv[1], "setDest") == 0) {
+			posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
-		}else if (strcasecmp(argv[1], "adddest") == 0) {
-			posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+		}else if (strcasecmp(argv[1], "addDest") == 0) {
+			posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
 		}
 	}
 	else if(argc == 6){
-	if (strcasecmp(argv[1], "setdest") == 0) {
-		posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+	if (strcasecmp(argv[1], "setDest") == 0) {
+		posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
-		} else if (strcasecmp(argv[1], "adddest") == 0) {
-		posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+		} else if (strcasecmp(argv[1], "addDest") == 0) {
+		posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
 		}
 	}
@@ -245,10 +256,6 @@ void UwAUVModule::initPkt(Packet* p) {
 	priority_ = 0;
 }
 
-void UwAUVModule::recv(Packet* p, Handler* h) {
-	recv(p);
-}
-
 void UwAUVModule::recv(Packet* p) {
 
 	hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
@@ -262,7 +269,7 @@ void UwAUVModule::recv(Packet* p) {
 
 	} else { //packet in order
 
-		posit->adddest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
+		posit->addDest(uwAUVh->x(),uwAUVh->y(),uwAUVh->z(),uwAUVh->speed());
 		last_sn_confirmed = uwAUVh->sn();
 
 	}

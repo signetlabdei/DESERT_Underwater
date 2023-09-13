@@ -28,7 +28,7 @@
 
 /**
 * @file uwauv-module.h
-* @author Filippo Campagnaro Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUVError</i>.
@@ -45,10 +45,9 @@
 #define UWAUVError_MODULE_H
 #include <uwcbr-module.h>
 #include <uwauv-packet.h>
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 #include <queue>
 #include <fstream>
-//#include <boost/math/special_functions/erf.hpp>
 #define UWAUVError_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -88,9 +87,9 @@ public:
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
-	* @param UWSMEPosition* p Pointer to the AUV position
+	* @param UWSMWPPosition* p Pointer to the AUV position
 	*/
-	UwAUVErrorModule(UWSMEPosition* p);
+	UwAUVErrorModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
@@ -122,14 +121,6 @@ public:
 	virtual void recv(Packet*);
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
-
-	/**
 	* Reset retransmissions
 	*/
 	inline void reset_retx() {p=NULL; sendTmr_.force_cancel();}
@@ -145,16 +136,16 @@ public:
 	/**
 	* Sets the position of the AUV
 	*
-	* @param UWSMEPosition * p Pointer to the AUV position
+	* @param UWSMWPPosition * p Pointer to the AUV position
 	*/
-	virtual void setPosition(UWSMEPosition* p);
+	virtual void setPosition(UWSMWPPosition* p);
 
 	/**
 	* Returns the position of the AUV
 	*
 	* @return the current AUV position
 	*/
-  inline UWSMEPosition* getPosition() { return posit; }
+  inline UWSMWPPosition* getPosition() const { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -180,7 +171,7 @@ public:
 
 protected:
 
-	UWSMEPosition* posit; /**< AUV position.*/
+	UWSMWPPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int sn; 
 	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 

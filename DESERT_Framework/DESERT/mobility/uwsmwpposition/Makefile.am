@@ -29,31 +29,31 @@
 
 AM_CXXFLAGS = -Wall -ggdb3
 
-lib_LTLIBRARIES = libuwsmeposition.la
+lib_LTLIBRARIES = libuwsmwpposition.la
 check_PROGRAMS = 
 
 SUBDIRS = 
 
 TESTS = 
 
-libuwsmeposition_la_SOURCES = initlib.cpp\
-    uwsmeposition-default.tcl\
-    uwsmeposition.cpp
+libuwsmwpposition_la_SOURCES = initlib.cpp\
+    uwsmwpposition-default.tcl\
+    uwsmwpposition.cpp
 
-libuwsmeposition_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libuwsmeposition_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwsmeposition_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwsmwpposition_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+libuwsmwpposition_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+libuwsmwpposition_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
-nodist_libuwsmeposition_la_SOURCES = InitTcl.cc
+nodist_libuwsmwpposition_la_SOURCES = InitTcl.cc
 
 
 BUILT_SOURCES = InitTcl.cc
 
 CLEANFILES = InitTcl.cc
 
-TCL_FILES = uwsmeposition-default.tcl
+TCL_FILES = uwsmwpposition-default.tcl
 
 InitTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwSMEPositionTclCode > InitTcl.cc
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwSMWPPositionTclCode > InitTcl.cc
 
 EXTRA_DIST = $(TCL_FILES)

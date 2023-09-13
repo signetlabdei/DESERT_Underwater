@@ -52,7 +52,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
                     network/uwip \
                     transport/uwudp \
                     mobility/uwsmposition \
-                    mobility/uwsmeposition 
+                    mobility/uwsmwpposition 
                 do
                     echo "considering dir \"$dir\""
                     DESERT_CPPFLAGS="$DESERT_CPPFLAGS -I${DESERT_PATH}/${dir}"
@@ -64,7 +64,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
                     uwip \
                     uwudp \
                     uwsmposition \
-                    uwsmeposition
+                    uwsmwpposition
                 do
                     DESERT_LIBADD="$DESERT_LIBADD -l${lib}"
                 done
@@ -104,7 +104,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
                         network/uwip \
                         transport/uwudp \
                         mobility/uwsmposition \
-                        mobility/uwsmeposition
+                        mobility/uwsmwpposition
                     do
                         echo "considering dir \"$dir\""
                         DESERT_LDFLAGS_BUILD="$DESERT_LDFLAGS_BUILD -L${DESERT_PATH_BUILD}/${dir}"

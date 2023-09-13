@@ -27,8 +27,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwauv-module.cc
-* @author Filippo Campagnaro, Alessia Ortile
+* @file uwauverror-b-module.cc
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUVError</i> class implementation.
@@ -81,8 +81,7 @@ UwAUVErrorBModule::UwAUVErrorBModule()
 	, speed(0.5)
 	, accuracy(0.01)
 {
-	UWSMEPosition p = UWSMEPosition();
-	posit=&p;
+	posit= new UWSMWPPosition();
 	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
     bind("log_flag_", (int*) &log_flag );
 	bind("period_", (int*) &period );
@@ -92,7 +91,7 @@ UwAUVErrorBModule::UwAUVErrorBModule()
 
 }
 
-UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p) 
+UwAUVErrorBModule::UwAUVErrorBModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -116,7 +115,7 @@ UwAUVErrorBModule::UwAUVErrorBModule(UWSMEPosition* p)
 
 UwAUVErrorBModule::~UwAUVErrorBModule() {}
 
-void UwAUVErrorBModule::setPosition(UWSMEPosition* p){
+void UwAUVErrorBModule::setPosition(UWSMWPPosition* p){
 	posit = p;
 }
 
@@ -149,27 +148,33 @@ int UwAUVErrorBModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
-			posit=p;
-			tcl.resultf("%s", "position Setted\n");
-			return TCL_OK;
+			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
+			if(p){
+				posit=p;
+				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
+			}else{
+				tcl.resultf("%s", "Invalid position\n");
+				return TCL_ERROR;
+			}
+			
 		}
 	}
 	else if(argc == 5){
-		if (strcasecmp(argv[1], "setdest") == 0) {
-			posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+		if (strcasecmp(argv[1], "setDest") == 0) {
+			posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
-		}else if (strcasecmp(argv[1], "adddest") == 0) {
-			posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
+		}else if (strcasecmp(argv[1], "addDest") == 0) {
+			posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
 		}
 	}
 	else if(argc == 6){
-	if (strcasecmp(argv[1], "setdest") == 0) {
-		posit->setdest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+	if (strcasecmp(argv[1], "setDest") == 0) {
+		posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
-		}else if (strcasecmp(argv[1], "adddest") == 0) {
-		posit->adddest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
+		}else if (strcasecmp(argv[1], "addDest") == 0) {
+		posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
 		}
 
@@ -224,7 +229,7 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 			x_e = posit->getX();
 			y_e = posit->getY();
 
-			posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
+			posit->setDest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0);
 			posit->setAlarm(true);
 			alarm_mode = true;
 
@@ -287,10 +292,6 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 
 }
 
-void UwAUVErrorBModule::recv(Packet* p, Handler* h) {
-	recv(p);
-}
-
 void UwAUVErrorBModule::recv(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
@@ -310,7 +311,7 @@ void UwAUVErrorBModule::recv(Packet* p) {
 
 				posit->setAlarm(false);
 				alarm_mode = 0;
-				posit->setdest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
+				posit->setDest(posit->getXdest(),posit->getYdest(),posit->getZdest(),speed);
 
 				//wait an entire period before sending a new img
 				sendTmr_.force_cancel();

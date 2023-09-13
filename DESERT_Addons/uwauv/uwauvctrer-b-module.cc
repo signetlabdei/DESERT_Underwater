@@ -28,7 +28,7 @@
 
 /**
 * @file uwauvctrer-b-module.cc
-* @author Filippo Campagnaro, Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the <i>UWAUVCtrEr</i> class implementation.
@@ -70,7 +70,7 @@ public:
 } class_module_uwAUV_error;
 
 
-UwAUVCtrErBModule::UwAUVCtrErBModule(UWSMEPosition* p) 
+UwAUVCtrErBModule::UwAUVCtrErBModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -98,9 +98,7 @@ UwAUVCtrErBModule::UwAUVCtrErBModule()
 	, speed(1.5)
 
 {
-	p = NULL;
-	UWSMEPosition p = UWSMEPosition();
-	posit=&p;
+	posit= new UWSMWPPosition();
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
@@ -141,9 +139,15 @@ int UwAUVCtrErBModule::command(int argc, const char*const* argv) {
 	}
 	else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
-			UWSMEPosition* p = dynamic_cast<UWSMEPosition*> (tcl.lookup(argv[2]));
-			posit = p;
-			return TCL_OK;
+			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
+			if(p){
+				posit=p;
+				tcl.resultf("%s", "position Setted\n");
+				return TCL_OK;
+			}else{
+				tcl.resultf("%s", "Invalid position\n");
+				return TCL_ERROR;
+			}
 		} else
 		if (strcasecmp(argv[1], "setSpeed") == 0) {
 			speed = atof(argv[2]);
@@ -154,7 +158,7 @@ int UwAUVCtrErBModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVCtrErBModule::setPosition(UWSMEPosition* p){
+void UwAUVCtrErBModule::setPosition(UWSMWPPosition* p){
 
 	posit = p;
 	x_sorg = posit->getX();
@@ -242,7 +246,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 				x_err = alarm_queue[0][0];
 				y_err = alarm_queue[0][1];
 
-				posit->setdest(x_err,y_err,posit->getZ(),speed);
+				posit->setDest(x_err,y_err,posit->getZ(),speed);
 				alarm_mode = true;
 
 				alarm_queue.erase(alarm_queue.begin());
@@ -286,10 +290,6 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 	UwCbrModule::initPkt(p);
 }
 
-void UwAUVCtrErBModule::recv(Packet* p, Handler* h) {
-	recv(p);
-}
-
 void UwAUVCtrErBModule::recv(Packet* p) {
 	
 	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
@@ -321,7 +321,7 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 					x_sorg = posit->getX();
 					y_sorg = posit->getY();
 
-					posit->setdest(x_err,y_err,posit->getZ(),speed);
+					posit->setDest(x_err,y_err,posit->getZ(),speed);
 
 					alarm_mode = true;
 
@@ -342,7 +342,7 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 
 					x_err = alarm_queue[0][0];
 					y_err = alarm_queue[0][1];
-					posit->setdest(x_err,y_err,posit->getZ(),speed);
+					posit->setDest(x_err,y_err,posit->getZ(),speed);
 
 					alarm_mode = true;
 					
@@ -408,7 +408,6 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 	}
 
 	UwCbrModule::recv(p);
-	//transmit();
 }
 
 

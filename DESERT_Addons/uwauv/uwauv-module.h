@@ -28,7 +28,7 @@
 
 /**
 * @file uwauv-module.h
-* @author Filippo Campagnaro Alessia Ortile
+* @author Alessia Ortile
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUV</i>.
@@ -45,7 +45,7 @@
 #define UWAUV_MODULE_H
 #include <uwcbr-module.h>
 #include <uwauv-packet.h>
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 #include <queue>
 #include <fstream>
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
@@ -87,9 +87,9 @@ public:
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
-	* @param UWSMEPosition* p Pointer to the AUV position
+	* @param UWSMWPPosition* p Pointer to the AUV position
 	*/
-	UwAUVModule(UWSMEPosition* p);
+	UwAUVModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
@@ -97,50 +97,42 @@ public:
 	virtual ~UwAUVModule();
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   * 
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-   * 
-   **/
+    * TCL command interpreter. It implements the following OTcl methods:
+    * 
+    * @param argc Number of arguments in <i>argv</i>.
+    * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+    * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+    * 
+    **/
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-   * Initializes a monitoring data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
+    * Initializes a monitoring data packet passed as argument with the default values.
+    * 
+    * @param Packet* Pointer to a packet already allocated to fill with the right values.
+    */
 	virtual void initPkt(Packet* p) ;
 
 	/**
 	* Performs the reception of packets from upper and lower layers.
 	*
 	* @param Packet* Pointer to the packet will be received.
-	*/
+	**/
 	virtual void recv(Packet*);
-
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
 
 	/**
 	* Sets the position of the AUV
 	*
-	* @param UWSMEPosition * p Pointer to the AUV position
+	* @param UWSMWPPosition * p Pointer to the AUV position
 	*/
-	virtual void setPosition(UWSMEPosition* p);
+	virtual void setPosition(UWSMWPPosition* p);
 
 	/**
 	* Returns the position of the AUV
 	*
 	* @return the current AUV position
 	*/
-  inline UWSMEPosition* getPosition() { return posit; }
+    inline UWSMWPPosition* getPosition() const { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
@@ -166,7 +158,7 @@ protected:
 
 	enum UWAUV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
-	UWSMEPosition* posit; /**< AUV position.*/
+	UWSMWPPosition* posit; /**< AUV position.*/
 	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
 	int ack; /**< If not zero, contains the ACK to the last command Packete received.*/
 	std::queue<Packet*> buffer; /**< Packets buffer.*/
@@ -177,7 +169,7 @@ protected:
 					ACK_PGBK_OR_TO:  ACK is sent in piggyback if a AUV packet is generated 
 									 before a ackTimeout otherwise ACK is sent with a 
 									 dedicated packet after the acKTimeout.*/
-	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
+	double ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
 	UwAUVSendAckTimer ackTimer_; /**<Timer to schedule ACK transmission.*/
 	int ackPriority; /** < Flag to give higher priority to ACK or not.*/
 	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
@@ -186,7 +178,6 @@ protected:
 
 
 	int log_flag; /**< Flag to enable log file writing.*/
-
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 };
 

@@ -26,8 +26,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# @file   uwsmeposition-defaults.tcl
-# @author Filippo Campagnaro
+# @file   uwsmwpposition-defaults.tcl
+# @author Alessia Ortile
 # @version 1.0.0
 
-Position/UWSME set debug_        0
+Position/UWSMWP set debug_        0

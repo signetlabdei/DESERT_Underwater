@@ -28,80 +28,79 @@
 //
 
 /**
-* @file   uwsmeposition.cpp
-* @author Filippo Campagnaro
+* @file   uwsmwpposition.cpp
+* @author Alessia Ortile
 * @version 1.0.0
 *
-* \brief Provides the <i>UWSMEPosition</i> class implementation.
+* \brief Provides the <i>UWSMWPPosition</i> class implementation.
 *
-* Provides the <i>UWSMEPosition</i> class implementation.
+* Provides the <i>UWSMWPPosition</i> class implementation.
 */
 
 #include <iostream>
-#include "uwsmeposition.h"
+#include "uwsmwpposition.h"
 
 /* ======================================================================
    TCL Hooks for the simulator
    ====================================================================== */
-static class UWSMEPositionClass : public TclClass
+static class UWSMWPPositionClass : public TclClass
 {
 public:
-	UWSMEPositionClass()
-		: TclClass("Position/UWSME")
+	UWSMWPPositionClass()
+		: TclClass("Position/UWSMWP")
 	{
 	}
 	TclObject *
 	create(int, const char *const *)
 	{
-		return (new UWSMEPosition());
+		return (new UWSMWPPosition());
 	}
-} class_uwsmeposition;
+} class_uwsmwpposition;
 
 
-UWSMEPosition::UWSMEPosition()
+UWSMWPPosition::UWSMWPPosition()
 	: UWSMPosition()
 	, alarm_mode(false) 
-	, exist(false)
 {
 	bind("debug_", &debug_);
 }
 
-UWSMEPosition::~UWSMEPosition()
+UWSMWPPosition::~UWSMWPPosition()
 {
 }
 
 int
-UWSMEPosition::command(int argc, const char *const *argv)
+UWSMWPPosition::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
 	if (argc == 6) {
-		if (strcasecmp(argv[1], "setdest") == 0) {
+		if (strcasecmp(argv[1], "setDest") == 0) {
 			if (debug_)
-				cerr << NOW << "UWSMEPosition::command(setdest, " << argv[2]
+				cerr << NOW << "UWSMWPPosition::command(setDest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ", " << argv[5]
 					 << ")" << endl;
-			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+			setDest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "adddest") == 0) {
+		} else if (strcasecmp(argv[1], "addDest") == 0) {
 			if (debug_)
-				cerr << NOW << "UWSMEPosition::command(adddest, " << argv[2]
+				cerr << NOW << "UWSMWPPosition::command(addDest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ", " << argv[5]
 					 << ")" << endl;
-			adddest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+			addDest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
 			return TCL_OK;
 		}
 	} else if (argc == 5) {
-		if (strcasecmp(argv[1], "setdest") == 0) {
+		if (strcasecmp(argv[1], "setDest") == 0) {
 			if (debug_)
-				cerr << NOW << "UWSMEPosition::command(setdest, " << argv[2]
+				cerr << NOW << "UWSMWPPosition::command(setDest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ")" << endl;
-			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
+			setDest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
 			return TCL_OK;
-		}else if (strcasecmp(argv[1], "adddest") == 0) {
+		}else if (strcasecmp(argv[1], "addDest") == 0) {
 			if (debug_)
-				cerr << NOW << "UWSMEPosition::command(adddest, " << argv[2]
+				cerr << NOW << "UWSMWPPosition::command(addDest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ")" << endl;
-			adddest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
+			addDest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
 			return TCL_OK;
 		}
 	} else if (argc == 2) {
@@ -115,7 +114,7 @@ UWSMEPosition::command(int argc, const char *const *argv)
 }
 
 void
-UWSMEPosition::setdest(
+UWSMWPPosition::setDest(
 		double x_dest, double y_dest, double z_dest, double speed_setted)
 {
 	if (alarm_mode){
@@ -142,7 +141,7 @@ UWSMEPosition::setdest(
 
 				waypoints.insert(waypoints.begin(),{x_dest,y_dest,z_dest,speed_setted});
 				if (debug_)
-					printf("New destionation (%f,%f,%f), skip the queue\n",
+					printf("New destination (%f,%f,%f), skip the queue\n",
 					x_dest,
 					y_dest,
 					z_dest);
@@ -184,7 +183,7 @@ UWSMEPosition::setdest(
 
 
 void
-UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
+UWSMWPPosition::setDest(double x_dest, double y_dest, double z_dest)
 {
 	if (alarm_mode){
 		if (debug_)
@@ -236,12 +235,12 @@ UWSMEPosition::setdest(double x_dest, double y_dest, double z_dest)
 }
 
 void
-UWSMEPosition::adddest(
+UWSMWPPosition::addDest(
 		double x_dest, double y_dest, double z_dest, double speed_setted)
 {
 	if (!waypoints.empty()){
 
-		exist = false;
+		bool exist = false;
 
 		for (const auto& vec : waypoints) {
 			// Controlla se le coordinate corrispondono
@@ -262,8 +261,7 @@ UWSMEPosition::adddest(
 		
 				
 	}else{
-		//waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});
-		UWSMEPosition::setdest(x_dest,y_dest,z_dest, speed_setted);
+		UWSMWPPosition::setDest(x_dest,y_dest,z_dest, speed_setted);
 		if (debug_)
 			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
 					x_,
@@ -272,56 +270,19 @@ UWSMEPosition::adddest(
 					Xdest_,
 					Ydest_,
 					Zdest_);
-	}
-
-	//waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});	
-
-	/*if (!waypoints.empty()){
-
-		waypoints.push_back({x_dest,y_dest,z_dest,speed_setted});
-
-		if (debug_)
-		printf("New waypoint (%f,%f,%f)\n",
-			x_dest,
-			y_dest,
-			z_dest);
-				
-	}else{
-
-		printf("trg time %f", trgTime_);
-		printf("dest %f %f %f", Xdest_, Ydest_, Zdest_);
-		printf("sorg %f %f %f", Xsorg_, Ysorg_, Zsorg_);
-		printf("now %f %f %f", x_, y_, z_);
-
-		waypoints.push_back({x_dest,y_dest,z_dest,speed_setted});
-
-		if (debug_)
-			printf("New waypoint (%f,%f,%f)\n",
-				x_dest,
-				y_dest,
-				z_dest);
-
-		double now = Scheduler::instance().clock();
-		update(now);
-
-
-
-	}*/
-
-		
+	}	
 }
 	
 void
-UWSMEPosition::adddest(
+UWSMWPPosition::addDest(
 		double x_dest, double y_dest, double z_dest)
 {
 
 	if (!waypoints.empty()){
 
-		exist = false;
+		bool exist = false;
 
 		for (const auto& vec : waypoints) {
-			// Controlla se le coordinate corrispondono
 			if (vec[0] == x_dest && vec[1] == y_dest && vec[2] == z_dest) {
 				exist = true;
 				break;
@@ -340,8 +301,7 @@ UWSMEPosition::adddest(
 				
 	}else{
 
-		//waypoints.push_back({x_dest,y_dest,z_dest});
-		UWSMEPosition::setdest(x_dest,y_dest,z_dest);
+		UWSMWPPosition::setDest(x_dest,y_dest,z_dest);
 
 		if (debug_)
 			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
@@ -352,42 +312,11 @@ UWSMEPosition::adddest(
 					Ydest_,
 					Zdest_);
 	}
-
-	//waypoints.push_back({x_dest,y_dest,z_dest});
-
-	/*if (!waypoints.empty()){
-
-		waypoints.push_back({x_dest,y_dest,z_dest});
-
-		if (debug_)
-		printf("New waypoint (%f,%f,%f)\n",
-			x_dest,
-			y_dest,
-			z_dest);
-				
-	}else{
-
-		printf("trg time %f", trgTime_);
-		printf("dest %f %f %f", Xdest_, Ydest_, Zdest_);
-		printf("sorg %f %f %f", Xsorg_, Ysorg_, Zsorg_);
-		printf("now %f %f %f", x_, y_, z_);
-
-		waypoints.push_back({x_dest,y_dest,z_dest});
-
-		if (debug_)
-			printf("New waypoint (%f,%f,%f)\n",
-				x_dest,
-				y_dest,
-				z_dest);
-
-		double now = Scheduler::instance().clock();
-		update(now);
-	}*/
 		
 }
 
 void
-UWSMEPosition::update(double now)
+UWSMWPPosition::update(double now)
 {
 	if ((trgTime_ < 0.) || (now < lastUpdateTime_ + 1e-6))
 		return;
@@ -419,9 +348,9 @@ UWSMEPosition::update(double now)
 				if (!waypoints.empty()){
 
 					if(waypoints[0].size()>3){
-						UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
 					}else{
-						UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
 					}
 
 					if (debug_)
@@ -492,9 +421,9 @@ UWSMEPosition::update(double now)
 								waypoints[0][2]);
 
 						if(waypoints[0].size()>3){
-							UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
 						}else{
-							UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
 						}
 
 						if (debug_)
@@ -506,32 +435,6 @@ UWSMEPosition::update(double now)
 				}
 			
 			}
-
-
-			
-			/*if (!waypoints.empty()){	
-
-				if (debug_)
-					printf("New destination (%f,%f,%f) setted\n",
-					waypoints[0][0],
-					waypoints[0][1],
-					waypoints[0][2]);		
-
-				if(waypoints[0].size()>3){
-
-					UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
-
-				}else{
-
-					UWSMEPosition::setdest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
-				}
-
-				if (debug_)
-					printf("New dest (%f,%f,%f) from waypoints list\n",
-					Xdest_,
-					Ydest_,
-					Zdest_);
-			}*/
 
 		}
 		if (debug_)
@@ -554,7 +457,7 @@ UWSMEPosition::update(double now)
 }
 
 void 
-UWSMEPosition::setAlarm(bool alarm)
+UWSMWPPosition::setAlarm(bool alarm)
 {
 	alarm_mode = alarm;
 }

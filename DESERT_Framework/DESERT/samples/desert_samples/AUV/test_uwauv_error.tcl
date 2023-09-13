@@ -44,10 +44,7 @@
 ##
 ########################################################################################
 # ----------------------------------------------------------------------------------
-# This script depicts a very simple but complete stack in which two node_leaders send data
-# to a common sink. The second node_leader is used by the first one as a relay to send data to the sink.
-# The routes are configured by using UW/STATICROUTING.
-# The application used to generate data is UW/CBR.
+# This script depicts ...TODO
 # ----------------------------------------------------------------------------------
 # Stack
 #             Node 1                         Node 2                        Sink
@@ -94,7 +91,7 @@ load libuwudp.so
 load libuwcbr.so
 load libuwtdma.so
 load libuwsmposition.so
-load libuwsmeposition.so
+load libuwsmwpposition.so
 load libuwinterference.so
 load libUwmStd.so
 load libUwmStdPhyBpskTracer.so
@@ -322,10 +319,10 @@ for {set id1 0} {$id1 < $opt(n_auv)} {incr id1}  {
     $mll_op_asv addentry [$ipif_auv($id1) addr] [$mac_op_auv($id1) addr]
 }
 
-Position/UWSME debug_ 1
+Position/UWSMWP debug_ 1
 
 # Setup positions
-set position_asv [new "Position/UWSME"]
+set position_asv [new "Position/UWSMWP"]
 $position_asv setX_ 0
 $position_asv setY_ 0
 $position_asv setZ_ -1
@@ -350,7 +347,7 @@ $position_auv(2) setY_  -1
 
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
-    set position_auv($id) [new "Position/UWSME"]
+    set position_auv($id) [new "Position/UWSMWP"]
     $position_auv($id) setZ_ -1000
 
     $auv_app($id) setPosition $position_auv($id) 
