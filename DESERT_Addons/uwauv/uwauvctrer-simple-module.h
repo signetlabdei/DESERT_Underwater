@@ -31,16 +31,8 @@
 * @author Alessia Ortile
 * @version 1.0.0
 *
-* \brief Provides the definition of the class <i>UWAUV</i>.
+* \brief Provides the definition of the class <i>UWAUVCtrErSimple</i>.
 *
-* Provides the definition of the class <i>UWAUVCTR</i>, based on <i>UwCbr</i>.
-* <i>UWAUVCTR</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWAUVCTR</i> sends control packets containing the next waypoint that has to be
-* reach by a AUV. In addition it receives monitoring packets containing the current
-* AUV position and acks of the sent packets. Whether the ack is not received, the
-* control packet is resent, according to the priority. In particular, last waypoint
-* transmitted has the highest priority, whereas the others are forgotten.:
 */
 
 #ifndef UWAUVError_MODULE_H
@@ -54,11 +46,8 @@
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
-#define HDR_UWAUV_MONITORING(p) (hdr_uwAUV_monitoring::access(p))
-#define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
-#define HDR_UWAUV_ERROR(p) (hdr_uwAUV_error::access(p))
 using namespace std;
-class UwAUVCtrErBModule;
+class UwAUVCtrErSimpleModule;
 
 /**
 * UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
@@ -70,7 +59,7 @@ class UwAUVErrorSendTimer : public UwSendTimer {
    * Conscructor of UwSendTimer class 
    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
    */
-	UwAUVErrorSendTimer(UwAUVCtrErBModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	UwAUVErrorSendTimer(UwAUVCtrErSimpleModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
 
@@ -78,23 +67,23 @@ class UwAUVErrorSendTimer : public UwSendTimer {
 /**
 * UwAUVCtrModule class is used to manage <i>UWAUVCtr</i> packets and to collect statistics about them.
 */
-class UwAUVCtrErBModule : public UwCbrModule {
+class UwAUVCtrErSimpleModule : public UwCbrModule {
 public:
 
 	/**
 	* Constructor of UwAUVCtrModule class.
 	*/
-	UwAUVCtrErBModule();
+	UwAUVCtrErSimpleModule();
 
 	/**
 	* Constructor of UwAUVCtrModule class with position setting.
 	*/
-	UwAUVCtrErBModule(UWSMWPPosition* p);
+	UwAUVCtrErSimpleModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVCtrModule class.
 	*/
-	virtual ~UwAUVCtrErBModule();
+	virtual ~UwAUVCtrErSimpleModule();
 
 	/**
 	* TCL command interpreter. It implements the following OTcl methods:
@@ -204,7 +193,7 @@ private:
 
 };
 
-int UwAUVCtrErBModule::alarm_mode = 0;
-vector<vector<float>>  UwAUVCtrErBModule::alarm_queue = {};
+int UwAUVCtrErSimpleModule::alarm_mode = 0;
+vector<vector<float>>  UwAUVCtrErSimpleModule::alarm_queue = {};
 
 #endif // UWAUVCtr_MODULE_H

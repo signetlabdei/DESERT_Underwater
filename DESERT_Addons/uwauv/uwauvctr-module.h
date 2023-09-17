@@ -33,14 +33,6 @@
 *
 * \brief Provides the definition of the class <i>UWAUV</i>.
 *
-* Provides the definition of the class <i>UWAUVCTR</i>, based on <i>UwCbr</i>.
-* <i>UWAUVCTR</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWAUVCTR</i> sends control packets containing the next waypoint that has to be
-* reach by a AUV. In addition it receives monitoring packets containing the current
-* AUV position and acks of the sent packets. Whether the ack is not received, the
-* control packet is resent, according to the priority. In particular, last waypoint
-* transmitted has the highest priority, whereas the others are forgotten.:
 */
 
 #ifndef UWAUV_CTR_MODULE_H
@@ -53,8 +45,6 @@
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
-#define HDR_UWAUV_MONITORING(p) (hdr_uwAUV_monitoring::access(p))
-#define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
 using namespace std;
 class UwAUVCtrModule;
 

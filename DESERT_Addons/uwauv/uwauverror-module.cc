@@ -49,9 +49,6 @@ int hdr_uwAUV_error::offset_; /**< Offset used to access in
 /**
 * Adds the header for <i>hdr_uwAUVError</i> packets in ns2.
 */
-/**
-* Adds the module for UwAUVModuleClass in ns2.
-*/
 
 /**
  * Class that represents the binding with the tcl configuration script 
@@ -202,7 +199,7 @@ void UwAUVErrorModule::transmit() {
 void UwAUVErrorModule::initPkt(Packet* p) {
 		 
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 
 	uwAUVh->error() = 0;
 
@@ -294,7 +291,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 
 void UwAUVErrorModule::recv(Packet* p) {
 
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets

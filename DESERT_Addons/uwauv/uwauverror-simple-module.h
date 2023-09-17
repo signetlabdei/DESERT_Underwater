@@ -31,14 +31,7 @@
 * @author Alessia Ortile
 * @version 1.0.0
 *
-* \brief Provides the definition of the class <i>UWAUVError</i>.
-*
-* Provides the definition of the class <i>UWAUVError</i>, based on <i>UwCbr</i>.
-* <i>UWAUVError</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWAUVError</i> sends periodically monitoring packets containing information about
-* the current position and acknowledges the last control packet received.
-* Each control packet contains the next waypoint that has to be reach.
+* \brief Provides the definition of the class <i>UWAUVErrorSimple</i>.
 */
 
 #ifndef UWAUVError_MODULE_H
@@ -51,13 +44,10 @@
 #define UWAUVError_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
-#define HDR_UWAUV_MONITORING(p) (hdr_uwAUV_monitoring::access(p))
-#define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
-#define HDR_UWAUV_ERROR(p) (hdr_uwAUV_error::access(p))
  
 using namespace std;
 
-class UwAUVErrorBModule;
+class UwAUVErrorSimpleModule;
 
 /**
 * UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
@@ -69,32 +59,32 @@ class UwAUVErrorSendTimer : public UwSendTimer {
     * Conscructor of UwSendTimer class 
     * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
     */
-	UwAUVErrorSendTimer(UwAUVErrorBModule *m) : UwSendTimer((UwCbrModule*)(m)){
+	UwAUVErrorSendTimer(UwAUVErrorSimpleModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
 
 /**
 * UwAUVModule class is used to manage <i>UWAUV</i> packets and to collect statistics about them.
 */
-class UwAUVErrorBModule : public UwCbrModule {
+class UwAUVErrorSimpleModule : public UwCbrModule {
 public:
 
 	/**
 	* Default Constructor of UwAUVModule class.
 	*/
-	UwAUVErrorBModule();
+	UwAUVErrorSimpleModule();
 
 	/**
 	* Constructor with position setting of UwAUVModule class.
 	*
 	* @param UWSMWPPosition* p Pointer to the AUV position
 	*/
-	UwAUVErrorBModule(UWSMWPPosition* p);
+	UwAUVErrorSimpleModule(UWSMWPPosition* p);
 
 	/**
 	* Destructor of UwAUVModule class.
 	*/
-	virtual ~UwAUVErrorBModule();
+	virtual ~UwAUVErrorSimpleModule();
 
 	/**
     * TCL command interpreter. It implements the following OTcl methods:

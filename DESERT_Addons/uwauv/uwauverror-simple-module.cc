@@ -27,15 +27,15 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwauverror-b-module.cc
+* @file uwauverror-simple-module.cc
 * @author Alessia Ortile
 * @version 1.0.0
 *
-* \brief Provides the <i>UWAUVError</i> class implementation.
+* \brief Provides the <i>UWAUVErrorSimple</i> class implementation.
 *
 */
 
-#include "uwauverror-b-module.h"
+#include "uwauverror-simple-module.h"
 #include <iostream>
 #include <rng.h>
 #include <random>
@@ -49,13 +49,13 @@ extern packet_t PT_UWAUV_ERROR;
 /**
  * Class that represents the binding with the tcl configuration script 
  */
-static class UwAUVErrorBModuleClass : public TclClass {
+static class UwAUVErrorSimpleModuleClass : public TclClass {
 public: 
 
 	/**
    * Constructor of the class
    */
-	UwAUVErrorBModuleClass() : TclClass("Module/UW/AUV/ERB") {
+	UwAUVErrorSimpleModuleClass() : TclClass("Module/UW/AUV/ERS") {
 	}
 
 	/**
@@ -63,13 +63,13 @@ public:
    * @return Pointer to an TclObject
    */
 	TclObject* create(int, const char*const*) {
-		return (new UwAUVErrorBModule());
+		return (new UwAUVErrorSimpleModule());
 	}
 } class_module_uwAUV;
 
 
 
-UwAUVErrorBModule::UwAUVErrorBModule() 
+UwAUVErrorSimpleModule::UwAUVErrorSimpleModule() 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -91,7 +91,7 @@ UwAUVErrorBModule::UwAUVErrorBModule()
 
 }
 
-UwAUVErrorBModule::UwAUVErrorBModule(UWSMWPPosition* p) 
+UwAUVErrorSimpleModule::UwAUVErrorSimpleModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -113,13 +113,13 @@ UwAUVErrorBModule::UwAUVErrorBModule(UWSMWPPosition* p)
 
 }
 
-UwAUVErrorBModule::~UwAUVErrorBModule() {}
+UwAUVErrorSimpleModule::~UwAUVErrorSimpleModule() {}
 
-void UwAUVErrorBModule::setPosition(UWSMWPPosition* p){
+void UwAUVErrorSimpleModule::setPosition(UWSMWPPosition* p){
 	posit = p;
 }
 
-int UwAUVErrorBModule::command(int argc, const char*const* argv) {
+int UwAUVErrorSimpleModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if(argc == 2){
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
@@ -182,11 +182,11 @@ int UwAUVErrorBModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVErrorBModule::transmit() {
+void UwAUVErrorSimpleModule::transmit() {
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVErrorBModule::Sending pkt with period:  " << period 
+		std::cout << NOW << " UwAUVErrorSimpleModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
 
@@ -194,10 +194,10 @@ void UwAUVErrorBModule::transmit() {
 	sendTmr_.resched(period);
 }
 
-void UwAUVErrorBModule::initPkt(Packet* p) {
+void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 		
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 
 	uwAUVh->error() = 0;
 
@@ -292,9 +292,9 @@ void UwAUVErrorBModule::initPkt(Packet* p) {
 
 }
 
-void UwAUVErrorBModule::recv(Packet* p) {
+void UwAUVErrorSimpleModule::recv(Packet* p) {
 
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 	
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 

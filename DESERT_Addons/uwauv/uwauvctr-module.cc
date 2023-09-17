@@ -201,7 +201,7 @@ void UwAUVCtrModule::setPosition(UWSMWPPosition* p){
 
 void UwAUVCtrModule::initPkt(Packet* p) {
 	if(this->p == NULL){
-		hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+		hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 		uwAUVh -> x() = newX;
 		uwAUVh->y() = newY;
 		uwAUVh->z() = newZ;
@@ -210,7 +210,7 @@ void UwAUVCtrModule::initPkt(Packet* p) {
 		this->p = p;
 	}
 	else{
-		hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+		hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 		uwAUVh->x() = newX;
 		uwAUVh->y() = newY;
 		uwAUVh->z() = newZ;
@@ -231,7 +231,7 @@ void UwAUVCtrModule::initPkt(Packet* p) {
 
 	UwCbrModule::initPkt(p);
 	if (debug_) {
-		hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+		hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 		std::cout << NOW << " UwAUVCtrModule::initPkt(Packet *p)  setting new" 
 			<< " AUV way-point: X = "<< uwAUVh->x() <<", Y = " 
 			<< uwAUVh->y() << ", Z = " << uwAUVh->z()<< std::endl;
@@ -240,7 +240,7 @@ void UwAUVCtrModule::initPkt(Packet* p) {
 
 void UwAUVCtrModule::recv(Packet* p) {
 	
-	hdr_uwAUV_monitoring* monitoring = HDR_UWAUV_MONITORING(p);
+	hdr_uwAUV_monitoring* monitoring = hdr_uwAUV_monitoring::access(p);
 	x_auv = monitoring->x();
 	y_auv = monitoring->y();
 	z_auv = monitoring->z();

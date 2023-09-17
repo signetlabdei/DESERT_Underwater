@@ -31,7 +31,7 @@ AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwauv.la
 
-libuwauv_la_SOURCES = uwauv-module.cc uwauverror-module.cc uwauverror-b-module.cc uwauvctr-module.cc uwauvctrer-module.cc uwauvctrer-b-module.cc uwauv-packet.h initlib.cc
+libuwauv_la_SOURCES = uwauv-module.cc uwauverror-module.cc uwauverror-simple-module.cc uwauvctr-module.cc uwauvctrer-module.cc uwauvctrer-simple-module.cc uwauv-packet.h initlib.cc
 
 libuwauv_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwauv_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@

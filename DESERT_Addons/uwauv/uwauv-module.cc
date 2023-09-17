@@ -92,8 +92,7 @@ UwAUVModule::UwAUVModule()
 	, log_flag(0)
 	, out_file_stats(0)
 {
-	UWSMWPPosition p = UWSMWPPosition();
-	posit=&p;
+	posit= new UWSMWPPosition();
     bind("ackTimeout_", (double*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
@@ -231,7 +230,7 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 
 void UwAUVModule::initPkt(Packet* p) {
 
-	hdr_uwAUV_monitoring* uwAUVh = HDR_UWAUV_MONITORING(p);
+	hdr_uwAUV_monitoring* uwAUVh = hdr_uwAUV_monitoring::access(p);
 
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwAUVh->x() = posit->getX();
@@ -258,7 +257,7 @@ void UwAUVModule::initPkt(Packet* p) {
 
 void UwAUVModule::recv(Packet* p) {
 
-	hdr_uwAUV_ctr* uwAUVh = HDR_UWAUV_CTR(p);
+	hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 

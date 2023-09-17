@@ -32,13 +32,6 @@
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWAUVError</i>.
-*
-* Provides the definition of the class <i>UWAUVError</i>, based on <i>UwCbr</i>.
-* <i>UWAUVError</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWAUVError</i> sends periodically monitoring packets containing information about
-* the current position and acknowledges the last control packet received.
-* Each control packet contains the next waypoint that has to be reach.
 */
 
 #ifndef UWAUVError_MODULE_H
@@ -51,9 +44,6 @@
 #define UWAUVError_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUVError_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
-#define HDR_UWAUV_MONITORING(p) (hdr_uwAUV_monitoring::access(p))
-#define HDR_UWAUV_CTR(p) (hdr_uwAUV_ctr::access(p))
-#define HDR_UWAUV_ERROR(p) (hdr_uwAUV_error::access(p))
  
 using namespace std;
 

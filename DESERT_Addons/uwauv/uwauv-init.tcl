@@ -94,32 +94,32 @@ Module/UW/AUV/CER instproc init {args} {
     $self settag "UW/AUV/CER"
 }
 
-Module/UW/AUV/CEB set packetSize_         100
-Module/UW/AUV/CEB set period_             60
-Module/UW/AUV/CEB set destPort_           0
-Module/UW/AUV/CEB set destAddr_           0
-Module/UW/AUV/CEB set debug_              0
-Module/UW/AUV/CEB set PoissonTraffic_     0
-Module/UW/AUV/CEB set drop_out_of_order_  1
-Module/UW/AUV/CEB set adaptiveRTO_        0
+Module/UW/AUV/CES set packetSize_         100
+Module/UW/AUV/CES set period_             60
+Module/UW/AUV/CES set destPort_           0
+Module/UW/AUV/CES set destAddr_           0
+Module/UW/AUV/CES set debug_              0
+Module/UW/AUV/CES set PoissonTraffic_     0
+Module/UW/AUV/CES set drop_out_of_order_  1
+Module/UW/AUV/CES set adaptiveRTO_        0
 
-Module/UW/AUV/CEB instproc init {args} {
+Module/UW/AUV/CES instproc init {args} {
     $self next $args
-    $self settag "UW/AUV/CEB"
+    $self settag "UW/AUV/CES"
 }
 
-Module/UW/AUV/ERB set packetSize_         100
-Module/UW/AUV/ERB set period_             60
-Module/UW/AUV/ERB set destPort_           0
-Module/UW/AUV/ERB set destAddr_           0
-Module/UW/AUV/ERB set debug_              0
-Module/UW/AUV/ERB set PoissonTraffic_     0
-Module/UW/AUV/ERB set drop_out_of_order_  1
-Module/UW/AUV/ERB set adaptiveRTO_     	  0
+Module/UW/AUV/ERS set packetSize_         100
+Module/UW/AUV/ERS set period_             60
+Module/UW/AUV/ERS set destPort_           0
+Module/UW/AUV/ERS set destAddr_           0
+Module/UW/AUV/ERS set debug_              0
+Module/UW/AUV/ERS set PoissonTraffic_     0
+Module/UW/AUV/ERS set drop_out_of_order_  1
+Module/UW/AUV/ERS set adaptiveRTO_     	  0
 
-Module/UW/AUV/ERB instproc init {args} {
+Module/UW/AUV/ERS instproc init {args} {
     $self next $args
-    $self settag "UW/AUV/ERB"
+    $self settag "UW/AUV/ERS"
 }
 
 

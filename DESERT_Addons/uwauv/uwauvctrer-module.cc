@@ -44,9 +44,7 @@ extern packet_t PT_UWCBR;
 extern packet_t PT_UWAUV;
 extern packet_t PT_UWAUV_CTR;
 extern packet_t PT_UWAUV_ERROR;
-/**
-* Adds the module for UwAUVModuleClass in ns2.
-*/
+
 
 /**
 * Class that represents the binding with the tcl configuration script 
@@ -205,7 +203,7 @@ float UwAUVCtrErModule::getDistance(float x_s,float y_s,float x_d,float y_d){
 
 void UwAUVCtrErModule::initPkt(Packet* p) {
 
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
 	bool found = false;
@@ -301,7 +299,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 void UwAUVCtrErModule::recv(Packet* p) {
 	
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 		if (debug_) {

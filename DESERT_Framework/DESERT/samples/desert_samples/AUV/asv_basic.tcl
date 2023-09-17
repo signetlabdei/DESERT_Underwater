@@ -21,19 +21,19 @@ proc createASV { id } {
     }
 
     # TRAFFICO 3: ERROR: AUV --> ASV
-    Module/UW/AUV/CEB set packetSize_          $opt(pktsize)
-    Module/UW/AUV/CEB set period_              60
-    Module/UW/AUV/CEB set PoissonTraffic_      0
-    Module/UW/AUV/CEB set traffic_type_        3
-    Module/UW/AUV/CEB set debug_               0
-    Module/UW/AUV/CEB set log_flag_            1
-    Module/UW/AUV/CEB set errrop_              $opt(e_prob)
-    Module/UW/AUV/CEB set sigma_               $opt(variance)
-    Module/UW/AUV/CEB set accuracy_             $opt(accuracy)
+    Module/UW/AUV/CES set packetSize_          $opt(pktsize)
+    Module/UW/AUV/CES set period_              60
+    Module/UW/AUV/CES set PoissonTraffic_      0
+    Module/UW/AUV/CES set traffic_type_        3
+    Module/UW/AUV/CES set debug_               0
+    Module/UW/AUV/CES set log_flag_            1
+    Module/UW/AUV/CES set errrop_              $opt(e_prob)
+    Module/UW/AUV/CES set sigma_               $opt(variance)
+    Module/UW/AUV/CES set accuracy_             $opt(accuracy)
 
 
     for {set id1 0} {$id1 <= $opt(n_auv)} {incr id1} {
-        set asv_err($id1)  [new Module/UW/AUV/CEB]
+        set asv_err($id1)  [new Module/UW/AUV/CES]
     }
 
     set udp_asv  [new Module/UW/UDP]

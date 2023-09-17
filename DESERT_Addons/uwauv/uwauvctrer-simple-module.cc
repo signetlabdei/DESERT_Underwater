@@ -27,16 +27,16 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwauvctrer-b-module.cc
+* @file uwauvctrer-simple-module.cc
 * @author Alessia Ortile
 * @version 1.0.0
 *
-* \brief Provides the <i>UWAUVCtrEr</i> class implementation.
+* \brief Provides the <i>UWAUVCtrErSimple</i> class implementation.
 *
-* Provides the <i>UWAUVCtrEr</i> class implementation.
+* Provides the <i>UWAUVCtrErSimple</i> class implementation.
 */
 
-#include "uwauvctrer-b-module.h"
+#include "uwauvctrer-simple-module.h"
 #include <iostream>
 #include <rng.h>
 #include <stdint.h>
@@ -45,19 +45,15 @@ extern packet_t PT_UWAUV;
 extern packet_t PT_UWAUV_CTR;
 extern packet_t PT_UWAUV_ERROR;
 /**
-* Adds the module for UwAUVModuleClass in ns2.
-*/
-
-/**
 * Class that represents the binding with the tcl configuration script 
 */
-static class UwAUVCtrErBModuleClass : public TclClass {
+static class UwAUVCtrErSimpleModuleClass : public TclClass {
 public:
 
 	/**
    * Constructor of the class
    */
-	UwAUVCtrErBModuleClass() : TclClass("Module/UW/AUV/CEB") {
+	UwAUVCtrErSimpleModuleClass() : TclClass("Module/UW/AUV/CES") {
 	}
 
 	/**
@@ -65,12 +61,12 @@ public:
    * @return Pointer to an TclObject
    */
 	TclObject* create(int, const char*const*) {
-		return (new UwAUVCtrErBModule());
+		return (new UwAUVCtrErSimpleModule());
 	}
 } class_module_uwAUV_error;
 
 
-UwAUVCtrErBModule::UwAUVCtrErBModule(UWSMWPPosition* p) 
+UwAUVCtrErSimpleModule::UwAUVCtrErSimpleModule(UWSMWPPosition* p) 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -88,7 +84,7 @@ UwAUVCtrErBModule::UwAUVCtrErBModule(UWSMWPPosition* p)
 	bind("period_", (int*) &period );
 }
 
-UwAUVCtrErBModule::UwAUVCtrErBModule() 
+UwAUVCtrErSimpleModule::UwAUVCtrErSimpleModule() 
 	: UwCbrModule()
 	, last_sn_confirmed(0)
 	, sn(0)
@@ -108,9 +104,9 @@ UwAUVCtrErBModule::UwAUVCtrErBModule()
 	
 }
 
-UwAUVCtrErBModule::~UwAUVCtrErBModule() {}
+UwAUVCtrErSimpleModule::~UwAUVCtrErSimpleModule() {}
 
-int UwAUVCtrErBModule::command(int argc, const char*const* argv) {
+int UwAUVCtrErSimpleModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if(argc == 2){
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
@@ -158,7 +154,7 @@ int UwAUVCtrErBModule::command(int argc, const char*const* argv) {
 	return UwCbrModule::command(argc,argv);
 }
 
-void UwAUVCtrErBModule::setPosition(UWSMWPPosition* p){
+void UwAUVCtrErSimpleModule::setPosition(UWSMWPPosition* p){
 
 	posit = p;
 	x_sorg = posit->getX();
@@ -166,19 +162,19 @@ void UwAUVCtrErBModule::setPosition(UWSMWPPosition* p){
 
 }
 
-void UwAUVCtrErBModule::transmit() {
+void UwAUVCtrErSimpleModule::transmit() {
 
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVCtrErBModule::Sending pkt with period:  " << period 
+		std::cout << NOW << " UwAUVCtrErSimpleModule::Sending pkt with period:  " << period 
 			<< std::endl;
 	}
 	
 	sendTmr_.resched(period);
 }
 
-float UwAUVCtrErBModule::getDistance(float x_s,float y_s,float x_d,float y_d){
+float UwAUVCtrErSimpleModule::getDistance(float x_s,float y_s,float x_d,float y_d){
 
 	float dx = x_s - x_d;
 	float dy = y_s - y_d;
@@ -186,9 +182,9 @@ float UwAUVCtrErBModule::getDistance(float x_s,float y_s,float x_d,float y_d){
 
 }
 
-void UwAUVCtrErBModule::initPkt(Packet* p) {
+void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	bool found = false;
 
@@ -237,7 +233,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 			}
 
 			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErBModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") SOLVED" 
+				std::cout << NOW << " UwAUVCtrErSimpleModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") SOLVED" 
 				<< std::endl;
 			}
 
@@ -269,7 +265,7 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 			this->p = p;
 
 			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErBModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") still to solve" 
+				std::cout << NOW << " UwAUVCtrErSimpleModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") still to solve" 
 				<< std::endl;
 			}
 
@@ -290,15 +286,15 @@ void UwAUVCtrErBModule::initPkt(Packet* p) {
 	UwCbrModule::initPkt(p);
 }
 
-void UwAUVCtrErBModule::recv(Packet* p) {
+void UwAUVCtrErSimpleModule::recv(Packet* p) {
 	
-	hdr_uwAUV_error* uwAUVh = HDR_UWAUV_ERROR(p);
+	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 	bool exist = false;
 	
 
 	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
 		if (debug_) {
-			std::cout << NOW << " UwAUVCtrErBModule::old error with sn " 
+			std::cout << NOW << " UwAUVCtrErSimpleModule::old error with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
 
@@ -307,7 +303,7 @@ void UwAUVCtrErBModule::recv(Packet* p) {
 		if (uwAUVh->error() == 0){// AUV MARKED IT AS NO ERROR
 
 			if (debug_)
-				std::cout << NOW << " UwAUVCtrErBModule:: no error" << std::endl;
+				std::cout << NOW << " UwAUVCtrErSimpleModule:: no error" << std::endl;
 
 		}else{ // error 
 

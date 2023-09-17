@@ -20,7 +20,7 @@ proc createAUV { id } {
     Module/UW/AUV/ERR set period_              $opt(period)
     Module/UW/AUV/ERR set PoissonTraffic_      0
     Module/UW/AUV/ERR set traffic_type_        3
-    Module/UW/AUV/ERR set debug_               1
+    Module/UW/AUV/ERR set debug_               0
     Module/UW/AUV/ERR set log_flag_            1
     Module/UW/AUV/ERR set sigma_               $opt(variance)
     Module/UW/AUV/ERR set th_ne_               [expr 1 - $opt(e_prob)]
