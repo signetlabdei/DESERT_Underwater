@@ -15,6 +15,8 @@ proc createNodeL { id } {
   set mll($id)  [new Module/UW/MLL] 
   set mac($id)  [new Module/UW/CSMA_ALOHA]
   set phy($id)  [new Module/UW/PHYSICAL]
+#  set phy($id)  				[new Module/UW/PHYSICAL]
+  set phy($id)  				[new Module/UW/AHOI/PHY]
 	
   for {set cnt 1} {$cnt < $opt(nn)} {incr cnt} {
 	$nodeL addModule 7 $app_ctr($id,$cnt)   1  "ROV"
@@ -87,4 +89,7 @@ proc createNodeL { id } {
   $phy($id) setSpectralMask $data_mask
   $phy($id) setInterference $interf_data($id)
   $phy($id) setInterferenceModel "MEANPOWER"
+  $phy($id) setRangePDRFileName "../dbs/ahoi/default_pdr.csv"
+  $phy($id) setSIRFileName "../dbs/ahoi/default_sir.csv"
+  $phy($id) initLUT
 }

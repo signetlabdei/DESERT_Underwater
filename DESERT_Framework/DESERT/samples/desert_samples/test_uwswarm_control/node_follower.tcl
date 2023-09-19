@@ -12,7 +12,8 @@ proc createNodeF { id } {
   set ipif($id) 				[new Module/UW/IP]
   set mll($id)  				[new Module/UW/MLL] 
   set mac($id)  				[new Module/UW/CSMA_ALOHA]
-  set phy($id)  				[new Module/UW/PHYSICAL]
+  #set phy($id)  				[new Module/UW/PHYSICAL]
+  set phy($id)  				[new Module/UW/AHOI/PHY]
 	
   $nodeF($id) addModule 7 $app_rov($id)				  1  "CBR"
   $nodeF($id) addModule 7 $app_trf($id,$leader_id)    1  "CBR"
@@ -40,11 +41,11 @@ proc createNodeF { id } {
   
   #Setup positions
   if { [expr $id % 2] == 0 } {
-	  $position($id) setX_ [expr [$position($leader_id) getX_] - 25*$id/2]
- 	  $position($id) setY_ [expr [$position($leader_id) getY_] + 25*$id/2]
+	  $position($id) setX_ [expr [$position($leader_id) getX_] - 12.5*$id/2]
+	  $position($id) setY_ [expr [$position($leader_id) getY_] + 12.5*$id/2]
   } else {
-	  $position($id) setX_ [expr [$position($leader_id) getX_] - 25*($id+1)/2]
- 	  $position($id) setY_ [expr [$position($leader_id) getY_] - 25*($id+1)/2]
+	  $position($id) setX_ [expr [$position($leader_id) getX_] - 12.5*($id+1)/2]
+	  $position($id) setY_ [expr [$position($leader_id) getY_] - 12.5*($id+1)/2]
   }
   $position($id) setZ_ -15
 
@@ -68,4 +69,7 @@ proc createNodeF { id } {
   $phy($id) setSpectralMask $data_mask
   $phy($id) setInterference $interf_data($id)
   $phy($id) setInterferenceModel "MEANPOWER"
+  $phy($id) setRangePDRFileName "../dbs/ahoi/default_pdr.csv"
+  $phy($id) setSIRFileName "../dbs/ahoi/default_sir.csv"
+  $phy($id) initLUT
 }

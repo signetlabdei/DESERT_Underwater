@@ -144,7 +144,7 @@ if {$opt(bash_parameters)} {
 		puts "- the first for the number of nodes"
         puts "- the second for the rngstream"
         puts "- the third for the path"
-        puts "example: ns test_uw_rov.tcl 3 13 rov_path.csv"
+        puts "example: ns test_uwswarm.tcl 3 13 rov_path.csv"
         puts "If you want to leave the default values, please set to 0"
         puts "the value opt(bash_parameters) in the tcl script"
         puts "Please try again."
@@ -222,18 +222,18 @@ $data_mask setBandwidth			$opt(bw)
 Module/UW/CSMA_ALOHA set listen_time_	1
 
 ### PHY ###
-Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    5.0 
-Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
-Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
-Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
-Module/UW/PHYSICAL  set MinTxSPL_dB_                10
-Module/UW/PHYSICAL  set MaxTxRange_                 200
-Module/UW/PHYSICAL  set PER_target_                 0    
-Module/UW/PHYSICAL  set CentralFreqOptimization_    0
-Module/UW/PHYSICAL  set BandwidthOptimization_      0
-Module/UW/PHYSICAL  set SPLOptimization_            0
-Module/UW/PHYSICAL  set debug_                      0
+#Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
+#Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    5.0
+#Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
+#Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
+#Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
+#Module/UW/PHYSICAL  set MinTxSPL_dB_                10
+#Module/UW/PHYSICAL  set MaxTxRange_                 200
+#Module/UW/PHYSICAL  set PER_target_                 0
+#Module/UW/PHYSICAL  set CentralFreqOptimization_    0
+#Module/UW/PHYSICAL  set BandwidthOptimization_      0
+#Module/UW/PHYSICAL  set SPLOptimization_            0
+#Module/UW/PHYSICAL  set debug_                      0
 
 Module/UW/AHOI/PHY  set BitRate_                    $opt(bitrate)
 Module/UW/AHOI/PHY  set AcquisitionThreshold_dB_    5.0 
@@ -406,7 +406,7 @@ proc update_and_check { t id } {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-  global ns opt mine_count time_demine
+  global ns opt mine_count time_demine removed_mine
   global app_ctr app_trl app_rov app_trf app_mc leader_id
   global phy
 
@@ -429,8 +429,8 @@ proc finish {} {
 	# AHOI: P_tx = 5 W; P_rx = 0.3 W
 	# Ping 360 sonar: P = 5 W
     puts "no. mines		: $mine_count"
-	puts "no. mines removed	: [$app_mc($leader_id) getremovedmines]"
-	puts "Removed mine ratio	: [expr double([$app_mc($leader_id) getremovedmines]) / $mine_count]"
+	puts "no. mines removed	: $removed_mine"
+	puts "Removed mine ratio	: [expr double($removed_mine) / $mine_count]"
 	puts "demine time		: [expr double($time_demine)/60]"
     puts "-----------------------------------------------------------------"
 
