@@ -170,7 +170,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 						return element.trk_id == id;
 				});
 
-		if (auv != auv_follower.end())
+		if (auv != auv_follower.end() && !auv->rov_status)
 		{
 			auv->rov_mine.emplace_back(p, Mine::MINE_TRACKED);
 			auv->n_mines++;
@@ -194,7 +194,8 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 
 		if (debug_)
 			std::cout << NOW << "  UwMissionCoordinatorModule::recvSyncClMsg()"
-					<< " no auv found with id (" << id << ")"
+					<< " can't track mine at position X: " << p->getX()
+					<< " Y: " << p->getY() << " Z: " << p->getZ()
 					<< std::endl;
 	}
 	else if(m->type() == CLMSG_TRACK2MC_GETSTATUS)
