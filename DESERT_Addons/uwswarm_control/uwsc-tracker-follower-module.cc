@@ -70,7 +70,7 @@ UwSCFTrackerModule::UwSCFTrackerModule()
 	, mine_positions()
 	, auv_position()
 	, demine_period(0)
-	, mine_measure{false}
+	, mine_measure{0}
 	, mine_timer(this)
 {
 	bind("demine_period_", (double*) &demine_period);
@@ -95,7 +95,7 @@ int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 			}
 
 			tcl.resultf("%s", "position error\n");
-			return TCL_ERR;
+			return TCL_ERROR;
 		}
 	}
 
@@ -105,24 +105,23 @@ int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 void
 UwSCFTrackerModule::sendPkt()
 {
-	if (!mine_measure.mine_remove())
-		return UwTrackerModule::sendPkt();
-
-	UwCbrModule::sendPkt();
+	UwTrackerModule::sendPkt();
 
 	mine_measure.mine_remove() = false;
 	mine_timer.resched(tracking_period);
 }
 
 void
-UwSCFTrackerModule::initPkt(Packet* p) {
-	if (!mine_measure.mine_remove())
-		return UwTrackerModule::initPkt(p);
+UwSCFTrackerModule::initPkt(Packet* p)
+{
+	mine_measure.x() = track_measure.x();
+	mine_measure.y() = track_measure.y();
+	mine_measure.z() = track_measure.z();
 
 	hdr_uwSCFTracker* uwscf_track_h = HDR_UWSCFTRACK(p);
 	*uwscf_track_h = mine_measure;
 
-	UwCbrModule::initPkt(p);
+	UwTrackerModule::initPkt(p);
 }
 
 void
@@ -169,6 +168,8 @@ UwSCFTrackerModule::updateTrackPosition()
 {
 	UWSMPosition* new_track_position (track_position);
 	float min_distance = new_track_position->getDist(&auv_position);
+
+	mine_measure.timestamp() = NOW;
 
 	for (auto& pos : mine_positions)
 	{

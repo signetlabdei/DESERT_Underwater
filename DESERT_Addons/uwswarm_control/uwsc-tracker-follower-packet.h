@@ -43,10 +43,13 @@
 extern packet_t PT_UWSCFTRACK;
 
 /**
- * <i>hdr_uwSCFTracker</i> describes the status of the current detected mine.
+ * <i>hdr_uwSCFTracker</i> describes the position and status of the current detected mine.
  */
 typedef struct hdr_uwSCFTracker {
     float timestamp_; /**< Timestamp when the target was detected. */
+    float x_; /**<x*/
+    float y_; /**<y*/
+    float z_; /**<z*/
 	bool mine_remove_; /**< Check whether mine is removed or not. */
 
     static int offset_; /**< Required by the PacketHeaderManager. */
@@ -68,6 +71,27 @@ typedef struct hdr_uwSCFTracker {
      */
     inline float& timestamp() {
         return timestamp_;
+    }
+
+    /**
+     * Reference to the x variable.
+     */
+    inline float& x() {
+        return x_;
+    }
+
+    /**
+     * Reference to the y variable.
+     */
+    inline float& y() {
+        return y_;
+    }
+
+    /**
+     * Reference to the z variable.
+     */
+    inline float& z() {
+        return z_;
     }
 
     /**
