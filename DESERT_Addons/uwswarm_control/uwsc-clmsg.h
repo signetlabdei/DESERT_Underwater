@@ -229,7 +229,7 @@ class ClMsgTrack2McStatus : public ClMessage
 
 	/**
 	 * Class constructor.
-     * @param dest_id id of the destination module
+	 * @param dest_id id of the destination module
 	 */
     ClMsgTrack2McStatus(int dest_id);
        
