@@ -123,10 +123,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 				auto mine = auv->rov_mine.end()-1;
 
 				if (mine->state == Mine::MINE_TRACKED &&
-					mine->track_position.getX() == p->getX() &&
-					mine->track_position.getY() == p->getY() &&
-					mine->track_position.getZ() == p->getZ())
-
+					mine->track_position->getDist(p))
 					mine->state = Mine::MINE_DETECTED;
 			}
 
@@ -183,7 +180,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 			if (debug_)
 				std::cout << NOW
 						<< "  UwMissionCoordinatorModule::recvSyncClMsg()"
-						<< " ROV (" << auv->ctr_id
+						<< " ROV (" << auv->trk_id
 						<< ") tracked mine at position X: " << p->getX()
 						<< " Y: " << p->getY() << " Z: " << p->getZ()
 						<< " #mine tracked = " << auv->n_mines
@@ -244,9 +241,9 @@ UwMissionCoordinatorModule::removeMine(int id)
 				std::cout << NOW
 						<< "  UwMissionCoordinatorModule::removeMine()"
 						<< " Removed mine at position"
-						<< " X: " << mine->track_position.getX()
-						<< " Y: " << mine->track_position.getY()
-						<< " Z: " << mine->track_position.getZ() << std::endl;
+						<< " X: " << mine->track_position->getX()
+						<< " Y: " << mine->track_position->getY()
+						<< " Z: " << mine->track_position->getZ() << std::endl;
 		}
 	}
 	else
@@ -263,27 +260,21 @@ UwMissionCoordinatorModule::isTracked(Position* p)
 {
 	for (auto& auv : auv_follower)
 	{
-		if (auv.n_mines > 0)
+		for(auto mine : auv.rov_mine)
 		{
-			for(auto mine : auv.rov_mine)
+			if (mine.track_position->getDist(p) == 0)
 			{
-				if (mine.track_position.getX() == p->getX() &&
-						mine.track_position.getY() == p->getY() &&
-						mine.track_position.getZ() == p->getZ())
-				{
+				if (debug_)
+					std::cout << NOW
+							<< "  UwMissionCoordinatorModule::isTracked()"
+							<< " Mine at position X: "
+							<< p->getX() << " Y: " << p->getY()
+							<< " Z: " << p->getZ()
+							<< " is already tracked by ROV ("
+							<< auv.trk_id << ")"
+							<< std::endl;
 
-					if (debug_)
-						std::cout << NOW
-								<< "  UwMissionCoordinatorModule::isTracked()"
-								<< " Mine at position X: "
-								<< p->getX() << " Y: " << p->getY()
-								<< " Z: " << p->getZ()
-								<< " is already tracked by ROV ("
-								<< auv.ctr_id << ")"
-								<< std::endl;
-
-					return true;
-				}
+				return true;
 			}
 		}
 	}

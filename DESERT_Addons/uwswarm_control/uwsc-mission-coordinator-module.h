@@ -64,11 +64,11 @@ typedef struct Mine
 		MINE_REMOVED	/**< Mine removed */
 	};
 
-	Position track_position;	/**< Mine tracked position*/
+	Position* track_position;	/**< Mine tracked position*/
 	MineState state;			/**< Mine state */
 
 	Mine(Position* p, MineState s)
-		: track_position(*p)
+		: track_position(p)
 		, state(s)
 	{
 	}
