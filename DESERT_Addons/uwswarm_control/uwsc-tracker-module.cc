@@ -66,6 +66,7 @@ public:
 UwSCTrackerModule::UwSCTrackerModule()
 	: UwTrackerModule()
 	, leader_id(0)
+	, tracked_mines()
 {
 }
 
@@ -88,7 +89,6 @@ UwSCTrackerModule::command(int argc, const char*const* argv) {
 
 void
 UwSCTrackerModule::recv(Packet* p) {
-	hdr_uwTracker* uw_track_h = HDR_UWTRACK(p);
 	hdr_uwSCFTracker* uwscf_track_h = HDR_UWSCFTRACK(p);
 
 	if (uwscf_track_h->mine_remove())
@@ -101,18 +101,27 @@ UwSCTrackerModule::recv(Packet* p) {
 			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
 				<< " ROV (" << m.getSource()
 				<< ") removed current detected mine"
+				<< " at position X = " << uwscf_track_h->x()
+				<< " Y = " << uwscf_track_h->y()
+				<< " Z = " << uwscf_track_h->z()
 				<< std::endl;
 
 	}
 	else
 	{
 		Position mine_position;
-		mine_position.setX(uw_track_h->x());
-		mine_position.setY(uw_track_h->y());
-		mine_position.setZ(uw_track_h->z());
+		mine_position.setX(uwscf_track_h->x());
+		mine_position.setY(uwscf_track_h->y());
+		mine_position.setZ(uwscf_track_h->z());
+
+		for (auto& mine : tracked_mines)
+			if (mine.getDist(&mine_position) == 0)
+				return;
+
+		tracked_mines.emplace_back(mine_position);
 
 		ClMsgTrack2McPosition m(leader_id);
-		m.setTrackPosition(&mine_position);
+		m.setTrackPosition(&tracked_mines.back());
 		sendSyncClMsg(&m);
 
 		if (debug_)

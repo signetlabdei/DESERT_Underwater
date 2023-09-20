@@ -40,6 +40,7 @@
 #include <uwtracker-module.h>
 #include <uwsc-tracker-follower-packet.h>
 #include "uwsc-clmsg.h"
+#include <list>
 
 
 /**
@@ -79,6 +80,7 @@ public:
 
 protected:
 	int leader_id;				/** Id of the Tracker leader. */
+	std::list<Position> tracked_mines;	/**< Positions of the mines tracked by the follower. */
 };
 
 #endif // UWSCTRACK_MODULE_H
