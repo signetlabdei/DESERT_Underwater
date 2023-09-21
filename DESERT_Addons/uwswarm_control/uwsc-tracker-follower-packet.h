@@ -28,7 +28,7 @@
 
 /**
  * @file   uwtracker-packet.h
- * @author Filippo Campagnaro, Vincenzo Cimino
+ * @author Vincenzo Cimino
  * @version 1.0.0
  * 
  * \brief Provides <i>UWSCFTRACK</i> packets header description.
@@ -46,60 +46,61 @@ extern packet_t PT_UWSCFTRACK;
  * <i>hdr_uwSCFTracker</i> describes the position and status of the current detected mine.
  */
 typedef struct hdr_uwSCFTracker {
-    float timestamp_; /**< Timestamp when the target was detected. */
-    float x_; /**<x*/
-    float y_; /**<y*/
-    float z_; /**<z*/
+	float timestamp_; /**< Timestamp when the target was detected. */
+	float x_; /**< X coordinate of the mine. */
+	float y_; /**< Y coordinate of the mine. */
+	float z_; /**< Z coordinate of the mine. */
 	bool mine_remove_; /**< Check whether mine is removed or not. */
 
-    static int offset_; /**< Required by the PacketHeaderManager. */
+	static int offset_; /**< Required by the PacketHeaderManager. */
 
-    /**
-     * Reference to the offset_ variable.
-     */
-    inline static int& offset() {
-        return offset_;
-    }
-    /**
-     * static method to access the packet header
-     */
-    inline static struct hdr_uwSCFTracker * access(const Packet * p) {
-        return (struct hdr_uwSCFTracker*) p->access(offset_);
-    }
-    /**
-     * Reference to the timestamp variable.
-     */
-    inline float& timestamp() {
-        return timestamp_;
-    }
+	/**
+	 * Reference to the offset_ variable.
+	 */
+	inline static int& offset() {
+		return offset_;
+	}
 
-    /**
-     * Reference to the x variable.
-     */
-    inline float& x() {
-        return x_;
-    }
+	/**
+	 * static method to access the packet header
+	 */
+	inline static struct hdr_uwSCFTracker * access(const Packet * p) {
+		return (struct hdr_uwSCFTracker*) p->access(offset_);
+	}
+	/**
+	 * Reference to the timestamp variable.
+	 */
+	inline float& timestamp() {
+		return timestamp_;
+	}
 
-    /**
-     * Reference to the y variable.
-     */
-    inline float& y() {
-        return y_;
-    }
+	/**
+	 * Reference to the x variable.
+	 */
+	inline float& x() {
+		return x_;
+	}
 
-    /**
-     * Reference to the z variable.
-     */
-    inline float& z() {
-        return z_;
-    }
+	/**
+	 * Reference to the y variable.
+	 */
+	inline float& y() {
+		return y_;
+	}
 
-    /**
-     * Reference to the speed variable.
-     */
-    inline bool& mine_remove() {
-        return mine_remove_;
-    }
+	/**
+	 * Reference to the z variable.
+	 */
+	inline float& z() {
+		return z_;
+	}
+
+	/**
+	 * Reference to the speed variable.
+	 */
+	inline bool& mine_remove() {
+		return mine_remove_;
+	}
 } hdr_uwSCFTracker;
 
 

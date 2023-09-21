@@ -134,7 +134,8 @@ public:
 	/**
 	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
-	 * @return m Pointer cross layer message
+	 * @param m Pointer cross layer message
+	 * @return zero if successful
 	 *
 	 */
 	int recvSyncClMsg(ClMessage* m);
@@ -155,7 +156,8 @@ protected:
 	/**
 	 * Check if the mine at received position is already tracked.
 	 *
-	 * @param bool true if the mine is already tracked
+	 * @param p Pointer to mine position
+	 * @return bool true if the mine is already tracked false otherwise
 	 *
 	 */
 	bool isTracked(Position* p);

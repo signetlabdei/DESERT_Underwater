@@ -28,7 +28,7 @@
 
 /**
 * @file uwsc-tracker-follower-module.h
-* @author Filippo Campagnaro, Vincenzo Cimino
+* @author Vincenzo Cimino
 * @version 1.0.0
 *
 * \brief Provides the definition of the class <i>UWSCFTRACKER</i>.
@@ -126,6 +126,7 @@ protected:
 	/**
 	  * Update the current track position with the nearest mine position
 	  *
+	  * @return UWSMPosition Pointer to the nearest mine position
 	  */
 	UWSMPosition* updateTrackPosition();
 
