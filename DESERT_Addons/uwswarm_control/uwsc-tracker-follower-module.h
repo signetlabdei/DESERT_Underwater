@@ -41,7 +41,6 @@
 #include <uwtracker-module.h>
 #include <uwsc-tracker-follower-packet.h>
 #include <node-core.h>
-
 #include <vector>
 #include <algorithm>
 
@@ -64,6 +63,17 @@ public:
 protected:
 	virtual void expire(Event *e);
 	UwSCFTrackerModule *module;
+};
+
+/**
+ * Followerstate list all the possible state of the follower.
+ */
+enum class FollowerState
+{
+	TRACK,	/**< Tracking mines. */
+	DETECT,	/**< Detecting a mine. */
+	DEMINE,	/**< Removed a mine. */
+	IDLE	/**< Not tracking. */
 };
 
 /**
@@ -106,7 +116,8 @@ public:
 
 protected:
 	std::vector<UWSMPosition*> mine_positions; /**< Positions of the mines in the area. */
-	Position auv_position; /**< Current position of the tracker. */
+	Position auv_position; /**< Current position of the follower. */
+	FollowerState auv_state; /**< Current state of the follower. */
 	double demine_period; /**< Timer to schedule packets transmission.*/
 	hdr_uwSCFTracker mine_measure; /**< Detected mine packets. */
 	UwUpdateMineStatus mine_timer; /**< Timer to schedule detecting measurements*/

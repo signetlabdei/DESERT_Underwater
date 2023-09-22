@@ -35,7 +35,7 @@
 # which in turns sends the auv to the mines position.
 # The way-point list is imported by an external file. 
 ###########################################################################
-# Author: Filippo Campagnaro, Vincenzo Cimino
+# Author: Vincenzo Cimino
 # Version: 1.0.0
 #
 #

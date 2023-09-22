@@ -123,7 +123,7 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 				auto mine = auv->rov_mine.end()-1;
 
 				if (mine->state == Mine::MINE_TRACKED &&
-					mine->track_position->getDist(p))
+					mine->track_position->getDist(p) == 0)
 					mine->state = Mine::MINE_DETECTED;
 			}
 
@@ -166,6 +166,14 @@ UwMissionCoordinatorModule::recvSyncClMsg(ClMessage* m)
 				[id](const AUV_stats& element) {
 						return element.trk_id == id;
 				});
+
+		if (auv->rov_status)
+		{
+			auto mine = auv->rov_mine.end()-1;
+			if (mine->track_position->getDist(p) > 0 &&
+					mine->state == Mine::MINE_DETECTED)
+				removeMine(auv->ctr_id);
+		}
 
 		if (auv != auv_follower.end() && !auv->rov_status)
 		{
@@ -247,12 +255,10 @@ UwMissionCoordinatorModule::removeMine(int id)
 		}
 	}
 	else
-	{
 		if (debug_)
 			std::cout << NOW << "  UwMissionCoordinatorModule::removeMine()"
 					<< " Cannot remove mine detected by ROV (" << id << ")"
 					<< std::endl;
-	}
 }
 
 bool

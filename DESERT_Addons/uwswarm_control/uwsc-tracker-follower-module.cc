@@ -69,6 +69,7 @@ UwSCFTrackerModule::UwSCFTrackerModule()
 	: UwTrackerModule()
 	, mine_positions()
 	, auv_position()
+	, auv_state()
 	, demine_period(0)
 	, mine_measure{0}
 	, mine_timer(this)
@@ -107,7 +108,42 @@ UwSCFTrackerModule::sendPkt()
 {
 	UwTrackerModule::sendPkt();
 
-	mine_measure.mine_remove() = false;
+	if (auv_state == FollowerState::DETECT && mine_positions.size() > 1)
+	{
+		Position temp_position;
+		temp_position.setX(track_measure.x());
+		temp_position.setY(track_measure.y());
+		temp_position.setZ(track_measure.z());
+
+		for (auto it = mine_positions.begin(); it != mine_positions.end();++it)
+	    {
+			if((*it)->getDist(&temp_position) < 0.001)
+			{
+				if (it == mine_positions.end()-1)
+				{
+					track_position = *(--it);
+					mine_positions.erase(++it);
+				}
+				else
+				{
+					track_position = *(++it);
+					mine_positions.erase(--it);
+				}
+				break;
+			}
+	    }
+
+		mine_measure.mine_remove() = false;
+
+		auv_state = FollowerState::DEMINE;
+	}
+
+	if (auv_state == FollowerState::DETECT && mine_positions.size() <= 1)
+	{
+		mine_measure.mine_remove() = false;
+		auv_state = FollowerState::IDLE;
+	}
+
 	mine_timer.resched(tracking_period);
 }
 
@@ -127,38 +163,38 @@ UwSCFTrackerModule::initPkt(Packet* p)
 void
 UwSCFTrackerModule::updateMineRemove()
 {
-	if (auv_position.getX() == track_measure.x() &&
+	if (auv_state == FollowerState::TRACK &&
+			auv_position.getX() == track_measure.x() &&
 			auv_position.getY() == track_measure.y() &&
 			auv_position.getZ() == track_measure.z())
 	{
+		mine_measure.mine_remove() = true;
 
-		if (!mine_measure.mine_remove())
-		{
-			mine_measure.mine_remove() = true;
+		auv_state = FollowerState::DETECT;
 
-			mine_timer.resched(demine_period);
-			sendTmr_.resched(demine_period);
-			measure_timer.resched(demine_period);
+		mine_timer.resched(demine_period);
+		sendTmr_.resched(demine_period);
+		measure_timer.resched(demine_period);
 
-			if (debug_)
-				std::cout << NOW << "UwSCFTrackerModule::updateMineRemove()"
-						<< " Mine at position: X = " << track_measure.x() 
-						<< ", Y = " << track_measure.y() 
-						<< ", Z = " << track_measure.z() 
-						<< " is detected" << std::endl;
-		}
+		if (debug_)
+			std::cout << NOW << "UwSCFTrackerModule::updateMineRemove()"
+					<< " Mine at position: X = " << track_measure.x()
+					<< ", Y = " << track_measure.y()
+					<< ", Z = " << track_measure.z()
+					<< " is detected" << std::endl;
 	}
 
 	auv_position.setX(getPosition()->getX());
 	auv_position.setY(getPosition()->getY());
 	auv_position.setZ(getPosition()->getZ());
 
+	if (auv_state == FollowerState::DEMINE)
+		auv_state = FollowerState::TRACK;
 
-	if(!mine_measure.mine_remove())
+	if (auv_state != FollowerState::DETECT &&
+			auv_state != FollowerState::IDLE)
 	{
-		if (!mine_positions.empty())
-			track_position = updateTrackPosition();
-
+		track_position = updateTrackPosition();
 		mine_timer.resched(tracking_period);
 	}
 }
