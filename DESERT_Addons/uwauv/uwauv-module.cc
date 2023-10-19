@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -89,14 +89,14 @@ UwAUVModule::UwAUVModule()
 	, ackPriority(0)
 	, ackNotPgbk(0)
 	, drop_old_waypoints(0)
-	, log_flag(0)
+	, log_on_file(0)
 	, out_file_stats(0)
 {
 	posit= new UWSMWPPosition();
     bind("ackTimeout_", (double*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -115,14 +115,14 @@ UwAUVModule::UwAUVModule(UWSMWPPosition* p)
 	, ackPriority(0)
 	, ackNotPgbk(0)
 	, drop_old_waypoints(0)
-	, log_flag(0)
+	, log_on_file(0)
 	, out_file_stats(0)
 {
 	posit = p;
     bind("ackTimeout_", (double*) &ackTimeout);
     bind("ackPriority_", (int*) &ackPriority);
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
     if (ackTimeout < 0) {
     	cerr << NOW << " Invalide ACK timout < 0, timeout set to 10 by defaults"
     		<< std::endl;
@@ -144,29 +144,23 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
 			tcl.resultf("%d", getAUVMonHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
 			tcl.resultf("%d", getAUVCTRHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getX") == 0) {
+		} else if(strcasecmp(argv[1], "getX") == 0) {
 			tcl.resultf("%f", posit->getX());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getY") == 0) {
+		} else if(strcasecmp(argv[1], "getY") == 0) {
 			tcl.resultf("%f", posit->getY());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getZ") == 0) {
+		} else if(strcasecmp(argv[1], "getZ") == 0) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getAckNotPgbk") == 0) {
+		} else if(strcasecmp(argv[1], "getAckNotPgbk") == 0) {
 			tcl.resultf("%d", ackNotPgbk);
 			return TCL_OK;
 		}
-	}
-	else if(argc == 3){
+	} else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 
 			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
@@ -175,7 +169,7 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 				posit=p;
 				tcl.resultf("%s", "position Setted\n");
 				return TCL_OK;
-			}else{
+			} else {
 				tcl.resultf("%s", "Invalid position\n");
 				return TCL_ERROR;
 			}
@@ -193,8 +187,8 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 			if (atof(argv[2]) == 3) {
 				ackPolicy = ACK_PGBK_OR_TO;
 				return TCL_OK;
-			}else{
-				cerr<<"Plicy not supported" << std::endl;
+			} else {
+				cerr<<"Policy not supported" << std::endl;
 				return TCL_ERROR;
 			}
 		}
@@ -206,17 +200,15 @@ int UwAUVModule::command(int argc, const char*const* argv) {
 			ackPriority = atof(argv[2]);
 			return TCL_OK;
 		}
-	}
-	else if(argc == 5){
+	} else if(argc == 5){
 		if (strcasecmp(argv[1], "setDest") == 0) {
 			posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
-		}else if (strcasecmp(argv[1], "addDest") == 0) {
+		} else if (strcasecmp(argv[1], "addDest") == 0) {
 			posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
 		}
-	}
-	else if(argc == 6){
+	} else if(argc == 6){
 	if (strcasecmp(argv[1], "setDest") == 0) {
 		posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
@@ -259,7 +251,8 @@ void UwAUVModule::recv(Packet* p) {
 
 	hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 
-	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+	//obsolete packets
+	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { 
 
 		if (debug_) {
 			std::cout << NOW << " UwAUVModule::old waypoint with sn " 
@@ -276,7 +269,7 @@ void UwAUVModule::recv(Packet* p) {
 	ack = last_sn_confirmed+1;
 	priority_ = (char) ackPriority;
 
-	if (log_flag == 1) {
+	if (log_on_file == 1) {
 		out_file_stats.open("my_log_file.csv",std::ios_base::app);
 		out_file_stats << left << "time: " << NOW << ", positions AUV: x = " 
 			<< posit->getX() << ", y = " << posit->getY() 
@@ -287,24 +280,13 @@ void UwAUVModule::recv(Packet* p) {
 
 	if (debug_)
 		std::cout << NOW << " UwAUVModule::recv(Packet *p) AUV received new "
-			"way point: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
+			<< "way point: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() 
 			<< ", Z = " << uwAUVh->z()<< std::endl;
 	
 	UwCbrModule::recv(p);
 
-	if (ackPolicy == ACK_IMMEDIATELY) {
-			
-		if (ackPriority == 0) {
-			UwCbrModule::sendPkt();
-			if (debug_)
-				cout << NOW << " ACK sent immediately with standard priority " 
-					<< std::endl;
-		} else {
-			UwCbrModule::sendPktHighPriority();
-			if (debug_)
-				cout << NOW << " ACK sent immediately with high priority " 
-					<< std::endl;
-		}
+	if (ackPolicy == ACK_IMMEDIATELY) {			
+		sendAck();
 	}
 
 	if (ackPolicy == ACK_PGBK_OR_TO) {
@@ -317,14 +299,26 @@ void UwAUVModule::sendAck() {
 	ackNotPgbk++;
 	if (ackPriority == 0) {
 		UwCbrModule::sendPkt();
-		if (debug_)
-			cout << NOW << " ACK timeout expired, ACK sent with standard "
+		if (debug_){
+			if (ackPolicy == ACK_IMMEDIATELY) {
+				cout << NOW << " ACK sent immediately with standard priority " 
+					<< std::endl;
+			} else {
+				cout << NOW << " ACK timeout expired, ACK sent with standard "
 				<< "priority " << std::endl;
+			}			
+		}
 	} else {
 		UwCbrModule::sendPktHighPriority();
-		if (debug_)
-			cout << NOW << " ACK timeout expired, ACK sent with high priority " 
-				<< std::endl;
+		if (debug_){
+			if (ackPolicy == ACK_IMMEDIATELY) {
+				cout << NOW << " ACK sent immediately with high priority " 
+					<< std::endl;
+			} else {
+				cout << NOW << " ACK timeout expired, ACK sent with high priority" 
+					<< std::endl;
+			}
+		}
 	}
 	
 }

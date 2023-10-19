@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @file   uwauv-defaults.tcl
-# @author Filippo Campagnaro Alessia Ortile
+# @author Alessia Ortile
 # @version 1.0.0
 
 PacketHeaderManager set tab_(PacketHeader/UWAUV) 1

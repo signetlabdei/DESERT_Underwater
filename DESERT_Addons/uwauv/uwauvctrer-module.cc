@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMWPPosition* p)
 	, last_sn_confirmed(0)
 	, sn(0)
 	, drop_old_waypoints(1)
-	, log_flag(0)
+	, log_on_file(0)
 	, period(60)
 	, speed(1.5)
 	, accuracy(0.001)
@@ -83,7 +83,7 @@ UwAUVCtrErModule::UwAUVCtrErModule(UWSMWPPosition* p)
 	y_sorg = posit->getY();
 
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma);
 	bind("th_ne_", (double*) &th_ne );
@@ -96,7 +96,7 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	, last_sn_confirmed(0)
 	, sn(0)
 	, drop_old_waypoints(1)
-	, log_flag(0)
+	, log_on_file(0)
 	, period(60)
 	, speed(1.5)
 	, accuracy(0.001)
@@ -107,7 +107,7 @@ UwAUVCtrErModule::UwAUVCtrErModule()
 	y_sorg = posit->getY();
 
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma);
 	bind("th_ne_", (double*) &th_ne );
@@ -123,40 +123,34 @@ int UwAUVCtrErModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
 			tcl.resultf("%d", this->getAUVMonHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
 			tcl.resultf("%d", this->getAUVCTRHeaderSize());
 			return TCL_OK;
-		}else if(strcasecmp(argv[1], "getAUVErrorheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVErrorheadersize") == 0) {
 			tcl.resultf("%d", this->getAUVErrorHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getX") == 0) {
+		} else if(strcasecmp(argv[1], "getX") == 0) {
 			tcl.resultf("%f", posit->getX());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getY") == 0) {
+		} else if(strcasecmp(argv[1], "getY") == 0) {
 			tcl.resultf("%f", posit->getY());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getZ") == 0) {
+		} else if(strcasecmp(argv[1], "getZ") == 0) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
 		}
-	}
-	else if(argc == 3){
+	} else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
 			if(p){
 				posit=p;
 				tcl.resultf("%s", "position Setted\n");
 				return TCL_OK;
-			}else{
+			} else {
 				tcl.resultf("%s", "Invalid position\n");
 				return TCL_ERROR;
 			}
-		} else
-		if (strcasecmp(argv[1], "setSpeed") == 0) {
+		} else if (strcasecmp(argv[1], "setSpeed") == 0) {
 			speed = atof(argv[2]);
 			return TCL_OK;
 		} 
@@ -172,7 +166,7 @@ void UwAUVCtrErModule::setPosition(UWSMWPPosition* p){
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-	if (log_flag == 1) {
+	if (log_on_file == 1) {
 		pos_log.open("log/position_log.csv",std::ios_base::app);
 		pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
 			<< ","<< posit->getZ() << std::endl;
@@ -186,7 +180,7 @@ void UwAUVCtrErModule::transmit() {
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVCtrErModule::Sending pkt with period:  " << period 
+		std::cout << NOW << " UwAUVCtrErModule::Sending pkt with period: " << period 
 			<< std::endl;
 	}
 	
@@ -219,22 +213,25 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 		this->p = p;
 
 		if (debug_) 
-			std::cout << NOW << " UwAUVCtrErrModule::initPkt(Packet *p) Error released"<< std::endl;
+			std::cout << NOW << " UwAUVCtrErrModule::initPkt(Packet *p) Error" 
+				<< "released"<< std::endl;
 
 
-	}else if (alarm_mode == 2){ //I need to go there
+	} else if (alarm_mode == 2){ //I need to go there
 
-		if ((getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0)){ //If in the right position
-			
+		//If in the right position
+		if ((getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0)){ 
 			found = true;
 			x_s = x_err;
 			y_s = y_err;
 			
 			if (debug_) 
-				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV reached the destination"<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
+					<< "reached the destination"<< std::endl;
 				
-
-		}else if((getDistance(x_sorg,y_sorg,x_err,y_err) < getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg))){ //if the right position																													// has been already passed
+		//if the right position
+		} else if((getDistance(x_sorg,y_sorg,x_err,y_err) < 
+			getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg))){ 
 			
 			found = true;
 			x_s = x_err;
@@ -242,7 +239,8 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 
 			if (debug_) 
-				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV has gone too far "<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV has gone"
+					<< "too far "<< std::endl;
 				
 		}
 
@@ -255,7 +253,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			uwAUVh->y() = y_s;
 			this->p = p;
 
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 
 				err_log.open("log/error_log_t.csv",std::ios_base::app);
 				err_log << "R,"<< NOW << "," << x_s<<","<<y_s<<", OFF"<< std::endl;
@@ -263,7 +261,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 			}
 
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 
 				pos_log.open("log/position_log.csv",std::ios_base::app);
 				pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
@@ -273,11 +271,11 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			}
 
 			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") SOLVED" 
-				<< std::endl;
+				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err 
+					<< "," << y_err << ") SOLVED" << std::endl;
 			}
 
-		}else{
+		} else {
 
 			uwAUVh->error() = 1;
 			uwAUVh->sn() = ++sn; 
@@ -286,8 +284,8 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			this->p = p;
 
 			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err << "," << y_err << ") still to solve" 
-				<< std::endl;
+				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err 
+					<< "," << y_err << ") still to solve" << std::endl;
 			}
 
 		}
@@ -301,7 +299,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 	
 	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 
-	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+	//obsolete packets
+	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { 
 		if (debug_) {
 			std::cout << NOW << " UwAUVCtrErrModule::old error with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
@@ -312,7 +311,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 			if (debug_)
 				std::cout << NOW << " UwAUVCtrErrModule:: no error" << std::endl;
 
-		}else{ // error of some kind
+		} else { // error of some kind
 
 			rcv_queue.push_back({uwAUVh->x(), uwAUVh->y()});
 
@@ -334,7 +333,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 				if(exists){
 
 					if (debug_)
-						std::cout << NOW << " UwAUVCtrErModule::recv(Pakct p) gray_queue error value updated, old error("<< (gray_queue[i][2]/gray_queue[i][3]) << "),";
+						std::cout << NOW << " UwAUVCtrErModule::recv(Pakct p) gray_queue error"
+							<< "value updated, old error("<< (gray_queue[i][2]/gray_queue[i][3]) << "),";
 
 					gray_queue[i][2] += uwAUVh->error();
 					gray_queue[i][3] += 1;
@@ -342,7 +342,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 					status = checkError(gray_queue[i][2],gray_queue[i][3], uwAUVh->x(), uwAUVh->y());
 
 					if (debug_)
-						std::cout << " updated error("<< (gray_queue[i][2]/gray_queue[i][3]) << ")" << std::endl;
+						std::cout << " updated error("<< (gray_queue[i][2]/gray_queue[i][3]) 
+							<< ")" << std::endl;
 					
 				}
 			}
@@ -353,8 +354,10 @@ void UwAUVCtrErModule::recv(Packet* p) {
 					gray_queue.push_back({uwAUVh->x(), uwAUVh->y(), uwAUVh->error(),1});
 
 					if (debug_){
-						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) new error added to gray_queue, error = " << uwAUVh->error() << std::endl;
-						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) Next gray error = " << (gray_queue[0][2]/gray_queue[0][3]) << std::endl;
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) new error added" 
+							<< "to gray_queue, error = " << uwAUVh->error() << std::endl;
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Pakct p) Next gray error"
+							<< "= " << (gray_queue[0][2]/gray_queue[0][3]) << std::endl;
 					}
 				}
 
@@ -386,26 +389,29 @@ void UwAUVCtrErModule::recv(Packet* p) {
 						alarm_mode = 2;
 
 						if (debug_) 
-							std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV received new "
-							"error(2): X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() << ", error = " << uwAUVh->error() << std::endl;
+							std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV" 
+								<< "received new error(2): X = " << uwAUVh->x() << ", Y = " 
+								<< uwAUVh->y() << ", error = " << uwAUVh->error() << std::endl;
 
-						if (log_flag == 1) {
+						if (log_on_file == 1) {
 							pos_log.open("log/position_log.csv",std::ios_base::app);
-							pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-								<< ","<< posit->getZ() << std::endl;
+							pos_log << NOW << "," << posit->getX() << ","<< 
+								posit->getY() << ","<< posit->getZ() << std::endl;
 							pos_log.close();
 
 							err_log.open("log/error_log_t.csv",std::ios_base::app);
-							err_log << "R,"<< NOW << "," << x_err <<","<<y_err<<", ON"<< std::endl;
+							err_log << "R,"<< NOW << "," << x_err <<","<<y_err<<
+								",ON"<< std::endl;
 							err_log.close();
 						}
 
-					}else{
+					} else {
 
 						exists=false;
 
 						for (const auto& vec : rcv_queue) {
-							if (vec[0] == alarm_queue[0][0] && vec[1] == alarm_queue[0][1]) { //next error is associated to this app
+							//next error is associated to this app
+							if (vec[0] == alarm_queue[0][0] && vec[1] == alarm_queue[0][1]) { 
 								exists = true;
 								break;
 							}
@@ -423,7 +429,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 							alarm_queue.erase(alarm_queue.begin());
 
-						}else{
+						} else {
 
 							alarm_mode = 3;
 							//wait another app to take care of it
@@ -440,32 +446,35 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 						if (!exists){
 							alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
-							if (log_flag == 1) {
+							if (log_on_file == 1) {
 								err_log.open("log/error_log_t.csv",std::ios_base::app);
-								err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<< uwAUVh->y() <<", ON"<< std::endl;
+								err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<< 
+									uwAUVh->y() << ", ON"<< std::endl;
 								err_log.close();
 							}
 						}
 						
 						
 
-						if (log_flag == 1) {
+						if (log_on_file == 1) {
 
 							pos_log.open("log/position_log.csv",std::ios_base::app);
-							pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-								<< ","<< posit->getZ() << std::endl;
+							pos_log << NOW << "," << posit->getX() << ","<< 
+								posit->getY() << ","<< posit->getZ() << std::endl;
 							pos_log.close();
 
 						}
 
 
 						if (debug_) 
-							std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV add new "
-								"error(2) in the queue: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() << ", error = " <<  uwAUVh->error() << std::endl;
+							std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p)" 
+								<< "SV add new error(2) in the queue: X = " << uwAUVh->x()
+								<< ", Y = " << uwAUVh->y() << ", error = " <<  
+								uwAUVh->error() << std::endl;
 
 					}
 
-				}else{
+				} else {
 
 					exists = false;
 
@@ -478,20 +487,23 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 					if (!exists){
 						alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
-						if (log_flag == 1) {
+						if (log_on_file == 1) {
 							err_log.open("log/error_log_t.csv",std::ios_base::app);
-							err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<<uwAUVh->y()<<", ON"<< std::endl;
+							err_log << "R,"<< NOW << "," << uwAUVh->x() <<","<<
+								uwAUVh->y()<<", ON"<< std::endl;
 							err_log.close();
 						}
 					}
 
 					if (debug_) 
-						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV add new "
-						"error(2) in the queue: X = " << uwAUVh->x() << ", Y = " << uwAUVh->y() << ", error = " <<  uwAUVh->error() << std::endl;
+						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV" 
+							<< "add new error(2) in the queue: X = " << uwAUVh->x() <<
+							",Y = " << uwAUVh->y() << ", error = " <<  uwAUVh->error() 
+							<< std::endl;
 					
 				}
 
-			}else{
+			} else {
 
 				//status 0 --> no error
 				int i = 0;
@@ -506,14 +518,16 @@ void UwAUVCtrErModule::recv(Packet* p) {
 				x_s = uwAUVh->x();
 				y_s = uwAUVh->y();
 
-				if (log_flag == 1) {
+				if (log_on_file == 1) {
 						err_log.open("log/error_log_t.csv",std::ios_base::app);
-						err_log << "G,"<< NOW << "," << x_s <<","<< y_s <<", OFF"<< std::endl;
+						err_log << "G,"<< NOW << "," << x_s <<","<< y_s <<", OFF"
+							<< std::endl;
 						err_log.close();
 				}
 				
 				if (debug_)
-					std::cout << NOW << " UwAUVCtrErrModule:: After some tx converged to no error" << std::endl;
+					std::cout << NOW << " UwAUVCtrErrModule:: After some tx" 
+						<<"converged to no error" << std::endl;
 			}
 
 		}
@@ -525,16 +539,16 @@ void UwAUVCtrErModule::recv(Packet* p) {
 }
 
 int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){
-
-    double p_e = std::erfc((((th_ne - (m/n_pkt)) *  std::sqrt(n_pkt)) / std::sqrt(2.0)) / sigma)/2; // prob of true error (t_e) greater than th_ne
-
+	
+	// prob of true error (t_e) greater than th_ne
+    double p_e = std::erfc((((th_ne - (m/n_pkt)) *  std::sqrt(n_pkt)) / std::sqrt(2.0)) / sigma)/2; 
 	int status;
 	if (p_e < accuracy){ //if p_e is small enough --> no error 
 		status = 0;
-	}else if (p_e > (1-accuracy)){
+	} else if (p_e > (1-accuracy)){
 		// FOR SURE ERROR
 		status = 2;
-	}else{
+	} else {
 		//I NEED MORE DATA
 		status = 1;
 	}

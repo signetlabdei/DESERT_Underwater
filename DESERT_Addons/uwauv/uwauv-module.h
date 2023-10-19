@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,6 @@
 #define UWAUV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWAUV</i> module. */
 #define UWAUV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWAUV</i> module. */
-
-using namespace std;
 
 class UwAUVModule;
 
@@ -169,7 +167,7 @@ protected:
 								lower or equal than last_sn_confirmed.*/
 
 
-	int log_flag; /**< Flag to enable log file writing.*/
+	int log_on_file; /**< Flag to enable log file writing.*/
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 };
 

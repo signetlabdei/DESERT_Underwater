@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -116,32 +116,27 @@ int UwAUVCtrModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
 			tcl.resultf("%d", this->getAUVMonHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
 			tcl.resultf("%d", this->getAUVCTRHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getX") == 0) {
+		} else if(strcasecmp(argv[1], "getX") == 0) {
 			tcl.resultf("%f", posit->getX());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getY") == 0) {
+		} else if(strcasecmp(argv[1], "getY") == 0) {
 			tcl.resultf("%f", posit->getY());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getZ") == 0) {
+		} else if(strcasecmp(argv[1], "getZ") == 0) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
 		}
-	}
-	else if(argc == 3){
+	} else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
 			if(p){
 				posit=p;
 				tcl.resultf("%s", "position Setted\n");
 				return TCL_OK;
-			}else{
+			} else {
 				tcl.resultf("%s", "Invalid position\n");
 				return TCL_ERROR;
 			}
@@ -153,8 +148,7 @@ int UwAUVCtrModule::command(int argc, const char*const* argv) {
 			adaptiveRTO_parameter = atof(argv[2]);
 			return TCL_OK;
 		}
-	}
-	else if(argc == 5){
+	} else if(argc == 5){
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
 			newX = atof(argv[2]);
 			newY = atof(argv[3]);
@@ -164,7 +158,7 @@ int UwAUVCtrModule::command(int argc, const char*const* argv) {
 			tcl.resultf("%s", "position Setted");
 			return TCL_OK;
 		}
-	}else if(argc == 6){
+	} else if(argc == 6){
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
 			newX = atof(argv[2]);
 			newY = atof(argv[3]);
@@ -208,8 +202,7 @@ void UwAUVCtrModule::initPkt(Packet* p) {
 		uwAUVh->speed() = speed;
 		uwAUVh->sn() = ++sn;
 		this->p = p;
-	}
-	else{
+	} else {
 		hdr_uwAUV_ctr* uwAUVh = hdr_uwAUV_ctr::access(p);
 		uwAUVh->x() = newX;
 		uwAUVh->y() = newY;

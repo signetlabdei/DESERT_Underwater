@@ -21,7 +21,7 @@ proc createAUV { id } {
     Module/UW/AUV/ERS set PoissonTraffic_      0
     Module/UW/AUV/ERS set traffic_type_        3
     Module/UW/AUV/ERS set debug_               0
-    Module/UW/AUV/ERS set log_flag_            1
+    Module/UW/AUV/ERS set log_on_file_            1
     Module/UW/AUV/ERS set errrop_              $opt(e_prob)
     Module/UW/AUV/ERS set sigma_               $opt(variance)
     Module/UW/AUV/ERS set accuracy_            $opt(accuracy)

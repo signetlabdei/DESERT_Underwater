@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -120,31 +120,29 @@ UWSMWPPosition::setDest(
 	if (alarm_mode){
 
 		if (debug_)
-			printf("Alarm_mode %f, dest(%f,%f,%f) not accepted\n",
-					alarm_mode,
-					x_dest,
-					y_dest,
-					z_dest);
+			cout << "Alarm_mode"<< alarm_mode <<", dest("<< x_dest <<","<< 
+			y_dest <<","<< z_dest <<") not accepted"<< std::endl; 
+
 	}else{
 
 		if (!waypoints.empty()){
 
-			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && waypoints[0][2] == z_dest){
+			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && 
+				waypoints[0][2] == z_dest){
 
 					if (debug_)
-						printf("New dest next waypoint in the queue (%f,%f,%f)\n",
-						waypoints[0][0],
-						waypoints[0][1],
-						waypoints[0][2]);
+						cout << "New dest next waypoint in the queue (" << 
+						waypoints[0][0] << "," << waypoints[0][1] << "," 
+						<< waypoints[0][2] << ")"<< std::endl;
+
 
 			}else{
 
 				waypoints.insert(waypoints.begin(),{x_dest,y_dest,z_dest,speed_setted});
 				if (debug_)
-					printf("New destination (%f,%f,%f), skip the queue\n",
-					x_dest,
-					y_dest,
-					z_dest);
+					cout << "New destination (" << x_dest << "," << y_dest <<
+						 "," << z_dest << "), skip the queue"<< std::endl; 
+
 
 			}
 
@@ -154,29 +152,19 @@ UWSMWPPosition::setDest(
 		}
 
 		if (debug_)
-			printf("Pos (%f,%f,%f), last dest(%f,%f,%f), new dest = (%f,%f,%f)\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_,
-					x_dest,
-					y_dest,
-					z_dest);
+			cout << "Pos (" << x_ << "," << y_ << "," << z_ << "), last dest("
+				<< Xdest_ << "," << Ydest_ << "," << Zdest_ << "), new dest = ("
+				<< x_dest << "," << y_dest << "," << z_dest << ")"<< std::endl; 
+
 
 		
 		UWSMPosition::setdest(x_dest,y_dest,z_dest,speed_setted);
 
 		if (debug_)
-			printf("Pos (%f,%f,%f), new dest(%f,%f,%f), speed = %f\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_,
-					speed_setted);
+			cout << "Pos (" << x_ << "," << y_ << "," << z_ << "), new dest(" 
+				<< Xdest_ << "," << Ydest_ << "," << Zdest_ << "), speed = " 
+				<< speed_setted << std::endl; 
+
 	}
 	
 }
@@ -187,30 +175,27 @@ UWSMWPPosition::setDest(double x_dest, double y_dest, double z_dest)
 {
 	if (alarm_mode){
 		if (debug_)
-			printf("Alarm_mode %f, dest(%f,%f,%f) not accepted\n",
-					alarm_mode,
-					x_dest,
-					y_dest,
-					z_dest);
+			cout << "Alarm_mode " << alarm_mode << ", dest(" << x_dest <<
+				"," << y_dest << "," << z_dest << ") not accepted" << std::endl; 
+
 	}else{
 
 		if (!waypoints.empty()){
-			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && waypoints[0][2] == z_dest){
+			if (waypoints[0][0] == x_dest && waypoints[0][1] == y_dest && 
+				waypoints[0][2] == z_dest){
 
 				if (debug_)
-					printf("New dest next waypoint in the queue (%f,%f,%f)\n",
-					waypoints[0][0],
-					waypoints[0][1],
-					waypoints[0][2]);
+        			cout << "New dest next waypoint in the queue (" << waypoints[0][0]
+						<< "," << waypoints[0][1] << "," << waypoints[0][2] <<
+						")"<< std::endl; 
 
 			}else{
 
 				waypoints.insert(waypoints.begin(),{x_dest,y_dest,z_dest});
 				if (debug_)
-					printf("New destionation (%f,%f,%f), skip the queue\n",
-					x_dest,
-					y_dest,
-					z_dest);
+					cout << "New destination (" << x_dest << "," << y_dest << "," 
+						<< z_dest << "), skip the queue" << std::endl; 
+
 
 			}
 
@@ -224,13 +209,9 @@ UWSMWPPosition::setDest(double x_dest, double y_dest, double z_dest)
 
 
 		if (debug_)
-			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_);
+			cout << "Pos (" << x_ << "," << y_ << "," << z_ << "), new dest(" << 
+				Xdest_ << "," << Ydest_ << "," << Zdest_ << ")"<< std::endl; 
+
 	}
 }
 
@@ -253,23 +234,18 @@ UWSMWPPosition::addDest(
 		if (!exist){
 			waypoints.push_back({x_dest,y_dest,z_dest, speed_setted});
 			if (debug_)
-				printf("New waypoint (%f,%f,%f)\n",
-					x_dest,
-					y_dest,
-					z_dest);
+				cout << "New waypoint (" << x_dest << "," << y_dest << "," 
+					<< z_dest << ")\n";
+
 		}
 		
 				
 	}else{
 		UWSMWPPosition::setDest(x_dest,y_dest,z_dest, speed_setted);
 		if (debug_)
-			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_);
+			cout << "Pos (" << x_ << "," << y_ << "," << z_ << "), new dest(" 
+				<< Xdest_ << "," << Ydest_ << "," << Zdest_ << ")\n";
+
 	}	
 }
 	
@@ -292,10 +268,9 @@ UWSMWPPosition::addDest(
 		if (!exist){
 			waypoints.push_back({x_dest,y_dest,z_dest});
 			if (debug_)
-				printf("New waypoint (%f,%f,%f)\n",
-					x_dest,
-					y_dest,
-					z_dest);
+				cout << "New waypoint (" << x_dest << "," << y_dest << "," 
+					<< z_dest << ")\n";
+
 		}
 		
 				
@@ -304,13 +279,9 @@ UWSMWPPosition::addDest(
 		UWSMWPPosition::setDest(x_dest,y_dest,z_dest);
 
 		if (debug_)
-			printf("Pos (%f,%f,%f), new dest(%f,%f,%f)\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_);
+			cout << "Pos (" << x_ << "," << y_ << "," << z_ << "), new dest("
+				<< Xdest_ << "," << Ydest_ << "," << Zdest_ << ")\n";
+
 	}
 		
 }
@@ -323,7 +294,7 @@ UWSMWPPosition::update(double now)
 
 	double gamma;
 	double theta;
-	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0) +				//distance to destination
+	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0) +				
 			pow(Xdest_ - Xsorg_, 2.0) + pow(Zdest_ - Zsorg_, 2.0));
 
 	if (theta_den == 0) {
@@ -335,29 +306,30 @@ UWSMWPPosition::update(double now)
 
 		if (!waypoints.empty()){
 
-			if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ && waypoints[0][2] == Zdest_){
+			if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ 
+				&& waypoints[0][2] == Zdest_){
 				
 				if (debug_)
-						printf("Last waypoints erased (%f,%f,%f)\n",
-						waypoints[0][0],
-						waypoints[0][1],
-						waypoints[0][2]);
+					cout << "Last waypoints erased (" << waypoints[0][0] << ","
+						<< waypoints[0][1] << "," << waypoints[0][2] << ")\n";
+
 
 				waypoints.erase(waypoints.begin());
 
 				if (!waypoints.empty()){
 
 					if(waypoints[0].size()>3){
-						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],
+							waypoints[0][2],waypoints[0][3]);
 					}else{
-						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+						UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],
+							waypoints[0][2]);
 					}
 
 					if (debug_)
-						printf("New dest (%f,%f,%f) from waypoints list\n",
-						Xdest_,
-						Ydest_,
-						Zdest_);
+						cout << "New dest (" << Xdest_ << "," << Ydest_ << "," 
+							<< Zdest_ << ") from waypoints list\n";
+
 				}
 			}
 				
@@ -383,10 +355,13 @@ UWSMWPPosition::update(double now)
 		y_ = Ysorg_ + (speed_ * (now - trgTime_)) * sin(theta) * sin(gamma);
 		z_ = Zsorg_ + (speed_ * (now - trgTime_)) * cos(theta);
 
-		if (pow(Ydest_ - Ysorg_, 2.0) + pow(Xdest_ - Xsorg_, 2.0) +
-						pow(Zdest_ - Zsorg_, 2.0) <
-				pow(x_ - Xsorg_, 2.0) + pow(y_ - Ysorg_, 2.0) +
-						pow(z_ - Zsorg_, 2.0)) {
+		double dist_dest_sorg = pow(Ydest_ - Ysorg_, 2.0) + pow(Xdest_ - Xsorg_, 2.0)
+			+ pow(Zdest_ - Zsorg_, 2.0);
+
+		double dist_pos_sorg = pow(x_ - Xsorg_, 2.0) + pow(y_ - Ysorg_, 2.0) +
+			pow(z_ - Zsorg_, 2.0);
+
+		if ( dist_dest_sorg < dist_pos_sorg ){
 
 			x_ = Xdest_;
 			y_ = Ydest_;
@@ -394,20 +369,19 @@ UWSMWPPosition::update(double now)
 
 
 			if (debug_)
-					printf("Destination (%f,%f,%f) reached\n",
-					Xdest_,
-					Ydest_,
-					Zdest_);
+				cout << "Destination (" << Xdest_ << "," << Ydest_ << "," << 
+					Zdest_ << ") reached\n";
+
 
 			if (!waypoints.empty()){
 
-				if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ && waypoints[0][2] == Zdest_){
+				if(waypoints[0][0] == Xdest_ && waypoints[0][1] == Ydest_ && 
+					waypoints[0][2] == Zdest_){
 					
 					if (debug_)
-						printf("Last waypoints erased (%f,%f,%f)\n",
-						waypoints[0][0],
-						waypoints[0][1],
-						waypoints[0][2]);
+						cout << "Last waypoints erased (" << waypoints[0][0] <<
+							"," << waypoints[0][1] << "," << waypoints[0][2] << 
+							")\n";
 
 					waypoints.erase(waypoints.begin());
 				
@@ -415,22 +389,23 @@ UWSMWPPosition::update(double now)
 					if (!waypoints.empty()){
 
 						if (debug_)
-								printf("Next dest (%f,%f,%f)\n",
-								waypoints[0][0],
-								waypoints[0][1],
-								waypoints[0][2]);
+								cout << "Next dest (" << waypoints[0][0] << "," 
+									<< waypoints[0][1] << "," << waypoints[0][2] 
+									<< ")\n";
+
 
 						if(waypoints[0].size()>3){
-							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2],waypoints[0][3]);
+							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],
+								waypoints[0][2],waypoints[0][3]);
 						}else{
-							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],waypoints[0][2]);
+							UWSMWPPosition::setDest(waypoints[0][0],waypoints[0][1],
+								waypoints[0][2]);
 						}
 
 						if (debug_)
-							printf("New dest (%f,%f,%f) from waypoints list\n",
-							Xdest_,
-							Ydest_,
-							Zdest_);
+							cout << "New dest (" << Xdest_ << "," << Ydest_ << "," <<
+								Zdest_ << ") from waypoints list\n";
+
 					}
 				}
 			
@@ -438,19 +413,11 @@ UWSMWPPosition::update(double now)
 
 		}
 		if (debug_)
-			printf("New pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), speed %f sen(%f)=%f\n",
-					x_,
-					y_,
-					z_,
-					Xdest_,
-					Ydest_,
-					Zdest_,
-					Xsorg_,
-					Ysorg_,
-					Zsorg_,
-					speed_,
-					gamma,
-					sin(gamma));
+			cout << "New pos (" << x_ << "," << y_ << "," << z_ << "), dest(" << Xdest_ <<
+				"," << Ydest_ << "," << Zdest_ << "), source(" << Xsorg_ << "," << Ysorg_ <<
+				"," << Zsorg_ << "), speed " << speed_ << " sen(" << gamma << ")=" << 
+				sin(gamma) << "\n";
+
 	}
 
 	lastUpdateTime_ = now;

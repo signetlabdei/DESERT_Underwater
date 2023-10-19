@@ -26,7 +26,7 @@ proc createASV { id } {
     Module/UW/AUV/CER set PoissonTraffic_      0
     Module/UW/AUV/CER set traffic_type_        3
     Module/UW/AUV/CER set debug_               0
-    Module/UW/AUV/CER set log_flag_            1
+    Module/UW/AUV/CER set log_on_file_            1
     Module/UW/AUV/CER set sigma_               $opt(variance)
     Module/UW/AUV/CER set th_ne_               [expr 1 - $opt(e_prob)]
     Module/UW/AUV/CER set accuracy_ne_         $opt(accuracy)

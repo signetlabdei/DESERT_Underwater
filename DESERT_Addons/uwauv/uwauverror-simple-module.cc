@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule()
 	, last_sn_confirmed(0)
 	, sn(0)
 	, drop_old_waypoints(1)
-	, log_flag(0)
+	, log_on_file(0)
 	, period(60)
 	, error_p(0.001)
 	, alarm_mode(0)
@@ -83,7 +83,7 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule()
 {
 	posit= new UWSMWPPosition();
 	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);
@@ -96,7 +96,7 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule(UWSMWPPosition* p)
 	, last_sn_confirmed(0)
 	, sn(0)
 	, drop_old_waypoints(1)
-	, log_flag(0)
+	, log_on_file(0)
 	, period(60)
 	, error_p(0.01)
 	, alarm_mode(0)
@@ -105,7 +105,7 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule(UWSMWPPosition* p)
 {
 	posit = p;
     bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_flag_", (int*) &log_flag );
+    bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);
@@ -125,55 +125,48 @@ int UwAUVErrorSimpleModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "getAUVMonheadersize") == 0) {
 			tcl.resultf("%d", getAUVMonHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVctrheadersize") == 0) {
 			tcl.resultf("%d", getAUVCTRHeaderSize());
 			return TCL_OK;
-		}else if(strcasecmp(argv[1], "getAUVErrorheadersize") == 0) {
+		} else if(strcasecmp(argv[1], "getAUVErrorheadersize") == 0) {
 			tcl.resultf("%d", getAUVErrorHeaderSize());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getX") == 0) {
+		} else if(strcasecmp(argv[1], "getX") == 0) {
 			tcl.resultf("%f", posit->getX());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getY") == 0) {
+		} else if(strcasecmp(argv[1], "getY") == 0) {
 			tcl.resultf("%f", posit->getY());
 			return TCL_OK;
-		}
-		else if(strcasecmp(argv[1], "getZ") == 0) {
+		} else if(strcasecmp(argv[1], "getZ") == 0) {
 			tcl.resultf("%f", posit->getZ());
 			return TCL_OK;
 		}
-	}
-	else if(argc == 3){
+	} else if(argc == 3){
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			UWSMWPPosition* p = dynamic_cast<UWSMWPPosition*> (tcl.lookup(argv[2]));
 			if(p){
 				posit=p;
 				tcl.resultf("%s", "position Setted\n");
 				return TCL_OK;
-			}else{
+			} else {
 				tcl.resultf("%s", "Invalid position\n");
 				return TCL_ERROR;
 			}
 			
 		}
-	}
-	else if(argc == 5){
+	} else if(argc == 5){
 		if (strcasecmp(argv[1], "setDest") == 0) {
 			posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
-		}else if (strcasecmp(argv[1], "addDest") == 0) {
+		} else if (strcasecmp(argv[1], "addDest") == 0) {
 			posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]));
 			return TCL_OK;
 		}
-	}
-	else if(argc == 6){
+	} else if(argc == 6){
 	if (strcasecmp(argv[1], "setDest") == 0) {
 		posit->setDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
-		}else if (strcasecmp(argv[1], "addDest") == 0) {
+		} else if (strcasecmp(argv[1], "addDest") == 0) {
 		posit->addDest(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]));
 		return TCL_OK;
 		}
@@ -186,7 +179,7 @@ void UwAUVErrorSimpleModule::transmit() {
 	sendPkt();
 
 	if (debug_) {
-		std::cout << NOW << " UwAUVErrorSimpleModule::Sending pkt with period:  " << period 
+		std::cout << NOW << " UwAUVErrorSimpleModule::Sending pkt with period: " << period 
 			<< std::endl;
 	}
 
@@ -214,10 +207,10 @@ void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 
 		double m = t_e + noise;
 
-		double p_e = std::erfc((((1 - error_p) - m) / std::sqrt(2.0)) / sigma)/2; // prob of true error (t_e) greater than th_ne
-
+		// prob of true error (t_e) greater than th_ne
+		double p_e = std::erfc((((1 - error_p) - m) / std::sqrt(2.0)) / sigma)/2;
 		if (t_e > (1-error_p)){
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 				t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 				t_err_log << NOW << "," << x_e <<","<< y_e <<",e" << std::endl;
 				t_err_log.close();
@@ -238,31 +231,31 @@ void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 			uwAUVh->error() = 1;
 			uwAUVh->sn() = ++sn;
 
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 					err_log.open("log/error_log.csv",std::ios_base::app);
 					err_log << "ON,"<< NOW << "," << x_e <<","<< y_e << std::endl;
 					err_log.close();
 			}
 
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 				if(t_e > (1-error_p)){
 					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 					t_err_log << NOW << "," << x_e <<","<< y_e <<",tp" << std::endl;
 					t_err_log.close();
-				}else{
+				} else {
 					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 					t_err_log << NOW << "," << x_e <<","<< y_e <<",fp" << std::endl;
 					t_err_log.close();
 				}
 			}
-		}else{
+		} else { 
 
-			if (log_flag == 1) {
+			if (log_on_file == 1) {
 				if(t_e <= (1-error_p)){
 					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 					t_err_log << NOW << "," << x_e <<","<< y_e <<",tn" << std::endl;
 					t_err_log.close();
-				}else{
+				} else {
 					t_err_log.open("log/true_error_log.csv",std::ios_base::app);
 					t_err_log << NOW << "," << x_e <<","<< y_e <<",fn" << std::endl;
 					t_err_log.close();
@@ -271,7 +264,7 @@ void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 		}
 		
 
-	}else{
+	} else {
 
 		uwAUVh->x() = x_e;                      
 		uwAUVh->y() = y_e;
@@ -283,7 +276,7 @@ void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 
 	UwCbrModule::initPkt(p);
 
-	if (log_flag == 1) {
+	if (log_on_file == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
 			<< "," << posit->getZ() << ',' << posit->getSpeed() << std::endl;
@@ -296,7 +289,8 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
 	
-	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { //obsolete packets
+	//obsolete packets
+	if (drop_old_waypoints == 1 && uwAUVh->sn() <= last_sn_confirmed) { 
 
 		if (debug_) {
 			std::cout << NOW << " UwAUVErrBModule::old error with sn " 
@@ -305,7 +299,8 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 
 	} else { //packet in order
 
-		if (alarm_mode && uwAUVh->x() == x_e && uwAUVh->y() == y_e){  //Valid pkt refering to my error
+		//Valid pkt refering to my error
+		if (alarm_mode && uwAUVh->x() == x_e && uwAUVh->y() == y_e){  
 
 			if (uwAUVh->error() < 0 ){
 
@@ -317,15 +312,16 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 				sendTmr_.force_cancel();
 				sendTmr_.resched(period);
 
-				if (log_flag == 1) {
+				if (log_on_file == 1) {
 					err_log.open("log/error_log.csv",std::ios_base::app);
 					err_log << "OFF,"<< NOW << "," << x_e <<","<< y_e << std::endl;
 					err_log.close();
 				}
 
 				if (debug_) {
-					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<") solved "
-					"AUV can move again with speed=" << posit->getSpeed()<< std::endl;
+					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error("
+						<< x_e <<","<< y_e <<") solved AUV can move again with"
+						<< "speed=" << posit->getSpeed()<< std::endl;
 				}
 
 			} else if (uwAUVh->error() == 1 ){
@@ -333,8 +329,8 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 				alarm_mode = true;
 
 				if (debug_)
-					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error ("<< x_e <<","<< y_e <<")"
-					"STOP until ctr arrival"<< std::endl;
+					std::cout << NOW << " UwAUVErrBModule::recv(Packet *p) error("
+					<< x_e <<","<< y_e <<") STOP until ctr arrival"<< std::endl;
 
 			}
 		}
@@ -345,7 +341,7 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 
 	UwCbrModule::recv(p);
 		
-	if (log_flag == 1) {
+	if (log_on_file == 1) {
 		out_file_stats.open("log/position_log_a.csv",std::ios_base::app);
 		out_file_stats << NOW << "," << posit->getX() << ","<< posit->getY() 
 			<< "," << posit->getZ() << ',' << posit->getSpeed() << std::endl;
