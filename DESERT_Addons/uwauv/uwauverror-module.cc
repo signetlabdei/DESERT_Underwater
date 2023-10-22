@@ -87,8 +87,8 @@ UwAUVErrorModule::UwAUVErrorModule()
 {
 
 	posit= new UWSMWPPosition();
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma );
 	bind("th_ne_", (double*) &th_ne );
@@ -109,8 +109,8 @@ UwAUVErrorModule::UwAUVErrorModule(UWSMWPPosition* p)
 	, accuracy(0.001)
 {
 	posit = p;
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("sigma_", (double*) &sigma);
 	bind("th_ne_", (double*) &th_ne );
@@ -269,7 +269,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 		
 	} else {
 
-		uwAUVh->x() = x_e;                      
+		uwAUVh->x() = x_e;
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = error_m;
 		this->p = p;

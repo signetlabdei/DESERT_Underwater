@@ -83,7 +83,7 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule()
 {
 	posit= new UWSMWPPosition();
 	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);
@@ -104,8 +104,8 @@ UwAUVErrorSimpleModule::UwAUVErrorSimpleModule(UWSMWPPosition* p)
 	, accuracy(0.01)
 {
 	posit = p;
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	bind("error_p_", (int*) &error_p );
 	bind("sigma_", (double*) &sigma);

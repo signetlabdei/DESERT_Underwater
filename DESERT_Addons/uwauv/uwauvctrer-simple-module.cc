@@ -79,8 +79,8 @@ UwAUVCtrErSimpleModule::UwAUVCtrErSimpleModule(UWSMWPPosition* p)
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 }
 
@@ -98,8 +98,8 @@ UwAUVCtrErSimpleModule::UwAUVCtrErSimpleModule()
 	x_sorg = posit->getX();
 	y_sorg = posit->getY();
 
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
 	bind("period_", (int*) &period );
 	
 }

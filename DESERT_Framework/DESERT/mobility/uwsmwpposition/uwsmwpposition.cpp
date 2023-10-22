@@ -185,7 +185,7 @@ UWSMWPPosition::setDest(double x_dest, double y_dest, double z_dest)
 				waypoints[0][2] == z_dest){
 
 				if (debug_)
-        			cout << "New dest next waypoint in the queue (" << waypoints[0][0]
+					cout << "New dest next waypoint in the queue (" << waypoints[0][0]
 						<< "," << waypoints[0][1] << "," << waypoints[0][2] <<
 						")"<< std::endl; 
 

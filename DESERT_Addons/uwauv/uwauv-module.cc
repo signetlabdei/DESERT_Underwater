@@ -93,15 +93,15 @@ UwAUVModule::UwAUVModule()
 	, out_file_stats(0)
 {
 	posit= new UWSMWPPosition();
-    bind("ackTimeout_", (double*) &ackTimeout);
-    bind("ackPriority_", (int*) &ackPriority);
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
+	bind("ackTimeout_", (double*) &ackTimeout);
+	bind("ackPriority_", (int*) &ackPriority);
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
+	if (ackTimeout < 0) {
+		cerr << NOW << " Invalide ACK timeout < 0, timeout set to 10 by defaults"
+			<< std::endl;
+		ackTimeout = 10;
+	}
 
 }
 
@@ -119,15 +119,15 @@ UwAUVModule::UwAUVModule(UWSMWPPosition* p)
 	, out_file_stats(0)
 {
 	posit = p;
-    bind("ackTimeout_", (double*) &ackTimeout);
-    bind("ackPriority_", (int*) &ackPriority);
-    bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
-    bind("log_on_file_", (int*) &log_on_file );
-    if (ackTimeout < 0) {
-    	cerr << NOW << " Invalide ACK timout < 0, timeout set to 10 by defaults"
-    		<< std::endl;
-    	ackTimeout = 10;
-    }
+	bind("ackTimeout_", (double*) &ackTimeout);
+	bind("ackPriority_", (int*) &ackPriority);
+	bind("drop_old_waypoints_", (int*) &drop_old_waypoints);
+	bind("log_on_file_", (int*) &log_on_file );
+	if (ackTimeout < 0) {
+		cerr << NOW << " Invalide ACK timout < 0, timeout set to 10 by defaults"
+			<< std::endl;
+		ackTimeout = 10;
+	}
 
 
 }
