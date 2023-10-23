@@ -157,7 +157,8 @@ public:
 	*/
 	static inline int getAUVErrorHeaderSize() { return sizeof(hdr_uwAUV_error); }
 
-	float getDistance(float x_s,float y_s, float x_d, float y_d); 
+	float getDistance(float x_s,float y_s, float x_d, float y_d);
+	float getDistance(float x_s,float y_s, float z_s, float x_d, float y_d, float z_d);  
 
 protected:
 
@@ -180,6 +181,7 @@ protected:
 	double speed;
 
 	static int alarm_mode;
+	bool active_alarm;
 	bool error_released;   /*
 								* 0 no error
 								* 1 maybe an error --> wait more info
@@ -190,14 +192,15 @@ protected:
 
 private:
 
-
-	virtual int checkError(double m, int n_pkt, float x, float y); 
+	enum dev_status {no_error = 0, undetermined = 1, error=2};
+	int checkError(double m, int n_pkt, float x, float y); 
 	std::ofstream pos_log;
 	std::ofstream err_log;
 	std::ofstream t_err_log;
 	double sigma; // standard deviation
 	double th_ne; // if x < th_e NO error
 	double accuracy;
+	
 
 	vector<vector<float>> rcv_queue;
 
@@ -207,5 +210,6 @@ private:
 int UwAUVCtrErModule::alarm_mode = 0;
 vector<vector<float>>  UwAUVCtrErModule::alarm_queue = {};
 vector<vector<float>>  UwAUVCtrErModule::gray_queue = {};
+
 
 #endif // UWAUVCtr_MODULE_H

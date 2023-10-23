@@ -103,8 +103,6 @@ load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
 load libuwposbasedrt.so
-#load libuwnoderep.so;                  #non riesco ad importarla
-#load libuwsecurity_clmsg.so;           #non riesco ad importarla
 load libuwflooding.so
 load libuwinterference.so
 load libuwphy_clmsgs.so
@@ -126,9 +124,9 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(n_auv)              4 ;# Number of Nodes
+set opt(n_auv)              4;#4 ;# Number of Nodes
 set opt(starttime)          1
-set opt(stoptime)           150000
+set opt(stoptime)           250000;#150000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
@@ -151,7 +149,8 @@ set opt(txpower_op)           30
 set opt(acq_db_op)        10
 set opt(temperatura)       293.15 ; # in Kelvin
 set opt(txArea)            0.000010
-set opt(rxArea)            0.0000011 ; # receveing area, it has to be the same for optical physical and propagation
+ # receveing area, it has to be the same for optical physical and propagation
+set opt(rxArea)            0.0000011 ;
 set opt(c)                 0.4 ; # coastal water
 set opt(theta)             1
 set opt(id)                [expr 1.0e-9]

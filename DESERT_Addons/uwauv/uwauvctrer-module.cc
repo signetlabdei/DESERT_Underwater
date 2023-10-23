@@ -195,6 +195,16 @@ float UwAUVCtrErModule::getDistance(float x_s,float y_s,float x_d,float y_d){
 
 }
 
+float UwAUVCtrErModule::getDistance(float x_s,float y_s,float z_s,float x_d,float y_d,float z_d){
+
+	float dx = x_s - x_d;
+	float dy = y_s - y_d;
+	float dz = z_s - z_d;
+
+	return std::sqrt(dx*dx + dy*dy + dz*dz); 
+
+}
+
 void UwAUVCtrErModule::initPkt(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
@@ -217,66 +227,56 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 				<< "released"<< std::endl;
 
 
-	} else if (alarm_mode == 2){ //I need to go there
+	} else if (alarm_mode == 2 && active_alarm){ //I need to go there
 
-		//If in the right position
-		if ((getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0)){ 
-			found = true;
-			x_s = x_err;
-			y_s = y_err;
-			
-			if (debug_) 
-				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
-					<< "reached the destination"<< std::endl;
-				
-		//if the right position
-		} else if((getDistance(x_sorg,y_sorg,x_err,y_err) < 
-			getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg))){ 
-			
-			found = true;
-			x_s = x_err;
-			y_s = y_err;
+		if (log_on_file == 1) {
 
+			pos_log.open("log/position_log.csv",std::ios_base::app);
+			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+				<< ","<< posit->getZ() << std::endl;
+			pos_log.close();
 
-			if (debug_) 
-				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV has gone"
-					<< "too far "<< std::endl;
-				
 		}
 
-		if (found){
+		//If in the right position
+		if (getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0){ 
+			found = true;
+			//x_s = x_err;
+			//y_s = y_err;
+
 			
-			uwAUVh->error() = -2;
-			alarm_mode = 0;
-			uwAUVh->sn() = ++sn;
-			uwAUVh->x() = x_s;
-			uwAUVh->y() = y_s;
-			this->p = p;
+			alarm_mode = 3;
+			posit->setDest(x_err,y_err,-990,speed);
 
-			if (log_on_file == 1) {
-
-				err_log.open("log/error_log_t.csv",std::ios_base::app);
-				err_log << "R,"<< NOW << "," << x_s<<","<<y_s<<", OFF"<< std::endl;
-				err_log.close();
-
+			if (debug_){ 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
+					<< "reached the surface destination"<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) start to dive"
+					<< std::endl;
 			}
 
-			if (log_on_file == 1) {
+				
+		//if the right position
+		} else if(getDistance(x_sorg,y_sorg,x_err,y_err) < 
+			getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg)){ 
+			
+			found = true;
+			//x_s = x_err;
+			//y_s = y_err;
 
-				pos_log.open("log/position_log.csv",std::ios_base::app);
-				pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-					<< ","<< posit->getZ() << std::endl;
-				pos_log.close();
+			alarm_mode = 3;
+			posit->setDest(x_err,y_err,-990,speed);
 
-			}
 
-			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err 
-					<< "," << y_err << ") SOLVED" << std::endl;
-			}
+			if (debug_){ 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) ASV has gone"
+					<< "too far "<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) start to dive"
+					<< std::endl;
+			}	
+		}
 
-		} else {
-
+		if(!found){
 			uwAUVh->error() = 1;
 			uwAUVh->sn() = ++sn; 
 			uwAUVh->x() = x_err;
@@ -287,9 +287,76 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err 
 					<< "," << y_err << ") still to solve" << std::endl;
 			}
-
 		}
 	}
+
+	if(alarm_mode == 3 && active_alarm){
+
+		if (log_on_file == 1) {
+
+			pos_log.open("log/position_log.csv",std::ios_base::app);
+			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+				<< ","<< posit->getZ() << std::endl;
+			pos_log.close();
+
+		}
+		
+		found = false;
+
+		if (getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-990) == 0.0){
+			found = true;
+			x_s = x_err;
+			y_s = y_err;
+			
+			if (debug_) 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
+						<< "in range"<< std::endl;
+
+		}else if(getDistance(x_sorg,y_sorg,-1,x_err,y_err,-990) < 
+			getDistance(posit->getX(),posit->getY(),posit->getZ(),x_sorg,y_sorg,-1)){ 
+
+			found = true;
+			x_s = x_err;
+			y_s = y_err;
+			
+			if (debug_) 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
+						<< "in range (too far)"<< std::endl;
+
+		}
+		
+		if (found){
+			
+			uwAUVh->error() = -2;
+			alarm_mode = 0;
+			uwAUVh->sn() = ++sn;
+			uwAUVh->x() = x_s;
+			uwAUVh->y() = y_s;
+			this->p = p;
+			active_alarm = false;
+
+			posit->setDest(x_err,y_err,-1,speed);
+			
+
+			if (log_on_file == 1) {
+
+				err_log.open("log/error_log_t.csv",std::ios_base::app);
+				err_log << "R,"<< NOW << "," << x_s<<","<<y_s<<", OFF"<< std::endl;
+				err_log.close();
+
+			}
+
+			if (debug_) {
+				std::cout << NOW << " UwAUVCtrErModule::initPkt(Packet *p)  ERROR ("<< x_err 
+					<< "," << y_err << ") SOLVED" << std::endl;
+			}
+
+			x_err = -4000;
+			y_err = -4000;
+
+		} 
+
+	} 
 	
 	UwCbrModule::initPkt(p);
 
@@ -315,6 +382,8 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 			rcv_queue.push_back({uwAUVh->x(), uwAUVh->y()});
 
+
+			//dev_status status = checkError(uwAUVh->error(),1,uwAUVh->x(), uwAUVh->y());
 			int status = checkError(uwAUVh->error(),1,uwAUVh->x(), uwAUVh->y());
 			
 			bool exists = false;
@@ -385,8 +454,9 @@ void UwAUVCtrErModule::recv(Packet* p) {
 						x_sorg = posit->getX();
 						y_sorg = posit->getY();
 
-						posit->setDest(x_err,y_err,posit->getZ(),speed);
+						posit->addDest(x_err,y_err,-1,speed);
 						alarm_mode = 2;
+						active_alarm = true;
 
 						if (debug_) 
 							std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p) SV" 
@@ -421,8 +491,9 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 							x_err = alarm_queue[0][0];
 							y_err = alarm_queue[0][1];
-							posit->setDest(x_err,y_err,posit->getZ(),speed);
+							posit->addDest(x_err,y_err,-1,speed);
 							alarm_mode = 2;
+							active_alarm = true;
 							
 							x_sorg = posit->getX();
 							y_sorg = posit->getY();
@@ -431,7 +502,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 						} else {
 
-							alarm_mode = 3;
+							//alarm_mode = 4;
 							//wait another app to take care of it
 						}
 
@@ -505,7 +576,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 			} else {
 
-				//status 0 --> no error
 				int i = 0;
 				for (auto it = gray_queue.begin(); it != gray_queue.end(); ++it) {
 					if ((*it)[0]== uwAUVh->x() &&  (*it)[1] == uwAUVh->y()) {
@@ -514,20 +584,34 @@ void UwAUVCtrErModule::recv(Packet* p) {
 					}
 				}
 
-				error_released = true;
-				x_s = uwAUVh->x();
-				y_s = uwAUVh->y();
-
-				if (log_on_file == 1) {
-						err_log.open("log/error_log_t.csv",std::ios_base::app);
-						err_log << "G,"<< NOW << "," << x_s <<","<< y_s <<", OFF"
-							<< std::endl;
-						err_log.close();
-				}
+				exists = false;
 				
-				if (debug_)
-					std::cout << NOW << " UwAUVCtrErrModule:: After some tx" 
-						<<"converged to no error" << std::endl;
+				for (const auto& vec : rcv_queue) {
+					//next error is associated to this app
+					if (vec[0] == uwAUVh->x() && vec[1] == uwAUVh->y()) { 
+						exists = true;
+						break;
+					}
+				}
+
+				if(exists){
+
+					error_released = true;
+					x_s = uwAUVh->x();
+					y_s = uwAUVh->y();
+
+					if (log_on_file == 1) {
+							err_log.open("log/error_log_t.csv",std::ios_base::app);
+							err_log << "G,"<< NOW << "," << x_s <<","<< y_s <<", OFF"
+								<< std::endl;
+							err_log.close();
+					}
+					
+					if (debug_)
+						std::cout << NOW << " UwAUVCtrErrModule:: After some tx" 
+							<<"converged to no error" << std::endl;
+				}
+
 			}
 
 		}
@@ -542,15 +626,19 @@ int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){
 	
 	// prob of true error (t_e) greater than th_ne
     double p_e = std::erfc((((th_ne - (m/n_pkt)) *  std::sqrt(n_pkt)) / std::sqrt(2.0)) / sigma)/2; 
+	//dev_status status;
 	int status;
 	if (p_e < accuracy){ //if p_e is small enough --> no error 
-		status = 0;
+		//status = no_error;
+		status=0;
 	} else if (p_e > (1-accuracy)){
 		// FOR SURE ERROR
+		//status = error;
 		status = 2;
 	} else {
 		//I NEED MORE DATA
-		status = 1;
+		//status = undetermined;
+		status=1;
 	}
 
 	return status;
