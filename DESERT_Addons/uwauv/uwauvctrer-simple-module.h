@@ -159,6 +159,7 @@ public:
 	static inline int getAUVErrorHeaderSize() { return sizeof(hdr_uwAUV_error); }
 
 	float getDistance(float x_s,float y_s, float x_d, float y_d); 
+	float getDistance(float x_s,float y_s, float z_s, float x_d, float y_d, float z_d); 
 
 
 
@@ -181,6 +182,7 @@ protected:
 	float x_sorg;
 	float y_sorg;
 	double speed;
+	bool active_alarm;
 
 	static int alarm_mode;
 	static vector<vector<float>> alarm_queue;
@@ -190,6 +192,7 @@ private:
 	std::ofstream pos_log;
 	std::ofstream err_log;
 	std::ofstream t_err_log;
+	vector<vector<float>> rcv_queue;
 
 };
 

@@ -176,6 +176,15 @@ float UwAUVCtrErSimpleModule::getDistance(float x_s,float y_s,float x_d,float y_
 
 }
 
+float UwAUVCtrErSimpleModule::getDistance(float x_s,float y_s, float z_s, float x_d,float y_d, float z_d){
+
+	float dx = x_s - x_d;
+	float dy = y_s - y_d;
+	float dz = z_s - z_d;
+
+	return std::sqrt(dx*dx + dy*dy + dz*dz); 
+}
+
 void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 
 	hdr_uwAUV_error* uwAUVh = hdr_uwAUV_error::access(p);
@@ -184,42 +193,98 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 
 	uwAUVh->error() = 0;
 
-	if (alarm_mode){
+	if ((alarm_mode == 1) & active_alarm){
 
 		//If in the right position
 		if ((getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0)){ 
 			
 			found = true;
-			x_s = x_err;
-			y_s = y_err;
+			alarm_mode = 2;
+			posit->setDest(x_err,y_err,-990,speed);
+			//x_s = x_err;
+			//y_s = y_err;
 			
-			if (debug_) 
+			if (debug_){ 
 				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
-					<< "SV reached the destination"<< std::endl;
-				
+					<< "SV reached the surface destination"<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
+					<< "SV starts to dive"<< std::endl;
+			}
+
 		 //if the right position
 		} else if((getDistance(x_sorg,y_sorg,x_err,y_err) < 
 			getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg))){
 			
 			found = true;
+			alarm_mode = 2;
+			posit->setDest(x_err,y_err,-990,speed);
+			//x_s = x_err;
+			//y_s = y_err;
+
+			if (debug_){ 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
+					<< "has gone too far "<< std::endl;
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
+					<< "SV starts to dive"<< std::endl;
+			}	
+		}
+
+		if (!found){
+
+			uwAUVh->error() = 1;
+			uwAUVh->sn() = sn;
+			uwAUVh->x() = x_err;
+			uwAUVh->y() = y_err;
+			this->p = p;
+
+			if (debug_) {
+				std::cout << NOW << " UwAUVCtrErSimpleModule::initPkt(Packet *p)"
+					<< "ERROR ("<< x_err << "," << y_err << ") still to solve" 
+					<< std::endl;
+			}
+
+		}
+
+	}
+	if ((alarm_mode == 2) & active_alarm){
+
+		found =false;
+
+		if ((getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-990) == 0.0)){ 
+			
+			found = true;
 			x_s = x_err;
 			y_s = y_err;
 
-
-			if (debug_) 
-				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
-					<< "has gone too far "<< std::endl;
+			if (debug_){ 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
+					<< "in range"<< std::endl;
+			}
+		
+		} else if((getDistance(x_sorg,y_sorg,-1,x_err,y_err,-990) < 
+			getDistance(posit->getX(),posit->getY(),posit->getZ(),x_sorg,y_sorg,-1))){
 				
+			found = true;
+			x_s = x_err;
+			y_s = y_err;
+
+			if (debug_){ 
+				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
+					<< "in range (too far)"<< std::endl;
+			}
 		}
 
-		if (found){
+		if (found) {
 			
 			uwAUVh->error() = -1;
-			alarm_mode = false;
+			alarm_mode = 0;
+			active_alarm = false;
 			uwAUVh->sn() = ++sn;
 			uwAUVh->x() = x_s;
 			uwAUVh->y() = y_s;
 			this->p = p;
+
+			posit->setDest(x_err,y_err,-1,speed);
 
 			if (log_on_file == 1) {
 
@@ -240,8 +305,9 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 				x_err = alarm_queue[0][0];
 				y_err = alarm_queue[0][1];
 
-				posit->setDest(x_err,y_err,posit->getZ(),speed);
-				alarm_mode = true;
+				posit->addDest(x_err,y_err,-1,speed);
+				alarm_mode = 1;
+				active_alarm = true;
 
 				alarm_queue.erase(alarm_queue.begin());
 
@@ -254,23 +320,7 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 						<< "Y = " << y_err<< std::endl;
 				}
 			}
-
-		} else { 
-
-			uwAUVh->error() = 1;
-			uwAUVh->sn() = sn;
-			uwAUVh->x() = x_err;
-			uwAUVh->y() = y_err;
-			this->p = p;
-
-			if (debug_) {
-				std::cout << NOW << " UwAUVCtrErSimpleModule::initPkt(Packet *p)"
-					<< "ERROR ("<< x_err << "," << y_err << ") still to solve" 
-					<< std::endl;
-			}
-
 		}
-
 	}
 
 	if (log_on_file == 1) {
@@ -310,6 +360,8 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 
 			if (!alarm_mode){
 
+				rcv_queue.push_back({uwAUVh->x(), uwAUVh->y()});
+
 				//check in the queue before
 				if (alarm_queue.empty()){
 
@@ -318,9 +370,10 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 					x_sorg = posit->getX();
 					y_sorg = posit->getY();
 
-					posit->setDest(x_err,y_err,posit->getZ(),speed);
+					posit->addDest(x_err,y_err,-1,speed);
 
-					alarm_mode = true;
+					alarm_mode = 1;
+					active_alarm = true;
 
 					if (debug_) 
 						std::cout << NOW << " UwAUVCtrErrModule::recv(Packet *p)" 
@@ -339,14 +392,32 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 
 				} else {
 
-					x_err = alarm_queue[0][0];
-					y_err = alarm_queue[0][1];
-					posit->setDest(x_err,y_err,posit->getZ(),speed);
+					exist=false;
 
-					alarm_mode = true;
-					
-					x_sorg = posit->getX();
-					y_sorg = posit->getY();
+					for (const auto& vec : rcv_queue) {
+						//next error is associated to this app
+						if (vec[0] == alarm_queue[0][0] && vec[1] == alarm_queue[0][1]) { 
+							exist = true;
+							break;
+						}
+					}
+
+					if(exist){
+
+						x_err = alarm_queue[0][0];
+						y_err = alarm_queue[0][1];
+						posit->addDest(x_err,y_err, -1,speed);
+
+						alarm_mode = 1;
+						active_alarm = true;
+						
+						x_sorg = posit->getX();
+						y_sorg = posit->getY();
+
+						alarm_queue.erase(alarm_queue.begin());
+					} else {
+						//wait another app to take care of it
+					}
 
 					exist = false;
 
@@ -360,8 +431,6 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 					if (!exist){
 						alarm_queue.push_back({uwAUVh->x(),uwAUVh->y()});
 					}
-					
-					alarm_queue.erase(alarm_queue.begin());
 
 					if (log_on_file == 1) {
 
