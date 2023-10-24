@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -123,11 +123,11 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(n_auv)              4 ;# Number of Nodes
+set opt(n_auv)              4;#4 ;# Number of Nodes
 set opt(starttime)          1
 set opt(stoptime)           150000
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
-set opt(rngstream)            3
+set opt(rngstream)          3
 
 set opt(maxinterval_)       20.0
 set opt(freq)               20000.0
@@ -138,15 +138,15 @@ set opt(ack_mode)           "setNoAckMode"
 set opt(txpower)            175.0 
 set opt(pktsize)            5
 set opt(period)             60
-set opt(accuracy)          0.001
-set opt(variance)          0.01
-set opt(e_prob)            0.01
+set opt(accuracy)           0.001
+set opt(variance)           0.01
+set opt(e_prob)             0.01
 
 
 set opt(op_freq)           10000000
 set opt(op_bw)             100000
 set opt(bitrate_op)        1000000
-set opt(txpower_op)        30
+set opt(txpower_op)        50
 set opt(acq_db_op)         10
 set opt(temperatura)       293.15 ; # in Kelvin
 set opt(txArea)            0.000010
@@ -347,7 +347,7 @@ $position_auv(2) setY_  -1
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
     set position_auv($id) [new "Position/UWSMWP"]
-    $position_auv($id) setZ_ -1000
+    $position_auv($id) setZ_ -100
 
     $auv_app($id) setPosition $position_auv($id) 
     $auv_err($id) setPosition $position_auv($id) 

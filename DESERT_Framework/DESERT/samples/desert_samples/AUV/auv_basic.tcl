@@ -2,7 +2,7 @@ set scr [info script]
 proc createAUV { id } {
 
     global ns auv_app auv_err position_auv node_auv udp portnum_auv portnum2_auv ipr_auv ipif_auv
-    global channel propagation propagation_op data_mask data_mask_op phy_auv posdb_auv opt rvposx mll_auv mll_op_auv mac_auv mac_op_auv 
+    global channel channel_op propagation propagation_op data_mask data_mask_op phy_auv posdb_auv opt rvposx mll_auv mll_op_auv mac_auv mac_op_auv 
     global db_manager node_auv_coordinates
     
     # TRAFFICO 1: MONITORING AUV --> ASV
@@ -51,8 +51,9 @@ proc createAUV { id } {
     set mll_op_auv($id)  [new Module/UW/MLL] 
     Module/UW/CSMA_ALOHA set listen_time_          [expr 1.0e-12]
     Module/UW/CSMA_ALOHA set wait_costant_         [expr 1.0e-12]
-    Module/UW/CSMA_ALOHA set debug_ 0
+    Module/UW/CSMA_ALOHA set debug_                         0
     set mac_op_auv($id)  [new Module/UW/CSMA_ALOHA]
+    Module/UW/OPTICAL/PHY set debug_                        0
     set phy_op_auv($id)  [new Module/UW/OPTICAL/PHY]
 
     $node_auv($id) addModule 8 $auv_app($id)   0  "CBR1"
@@ -91,7 +92,7 @@ proc createAUV { id } {
     $node_auv($id) setConnection $ctr_auv($id)   $mll_op_auv($id)   2
     $node_auv($id) setConnection $mll_op_auv($id)  $mac_op_auv($id)   2
     $node_auv($id) setConnection $mac_op_auv($id)  $phy_op_auv($id)   2
-    $node_auv($id) addToChannel  $channel    $phy_op_auv($id)   0
+    $node_auv($id) addToChannel  $channel_op    $phy_op_auv($id)   0
 
     set portnum_auv($id) [$udp_auv($id) assignPort $auv_app($id) ]
     set portnum2_auv($id) [$udp_auv($id) assignPort $auv_err($id) ]

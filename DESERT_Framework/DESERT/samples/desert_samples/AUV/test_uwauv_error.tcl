@@ -124,44 +124,45 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(n_auv)              4;#4 ;# Number of Nodes
-set opt(starttime)          1
-set opt(stoptime)           250000;#150000
-set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
+set opt(n_auv)                4 ;# Number of Nodes
+set opt(starttime)            1
+set opt(stoptime)             150000;#150000
+set opt(txduration)           [expr $opt(stoptime) - $opt(starttime)]
 set opt(rngstream)            1
 
-set opt(maxinterval_)       20.0
-set opt(freq)               20000.0 
-set opt(bw)                 10000.0
-set opt(bitrate)            4800.0
-set opt(ack_mode)           "setNoAckMode"
+set opt(maxinterval_)         20.0
+set opt(freq)                 20000.0 
+set opt(bw)                   10000.0
+set opt(bitrate)              4800.0
+set opt(ack_mode)             "setNoAckMode"
 
 
-set opt(txpower)            175.0 
-set opt(pktsize)    125
-set opt(pktsize_monitoring) 5
-set opt(period) 60
+set opt(txpower)              175.0 
+set opt(pktsize)              125
+set opt(pktsize_monitoring)   5
+set opt(period)               60
 
 set opt(op_freq)              10000000
 set opt(op_bw)                100000
 set opt(bitrate_op)           1000000
-set opt(txpower_op)           30
-set opt(acq_db_op)        10
-set opt(temperatura)       293.15 ; # in Kelvin
-set opt(txArea)            0.000010
+set opt(txpower_op)           50; #30
+set opt(acq_db_op)            10
+set opt(temperatura)          293.15 ; # in Kelvin
+set opt(txArea)               0.000010
  # receveing area, it has to be the same for optical physical and propagation
-set opt(rxArea)            0.0000011 ;
-set opt(c)                 0.4 ; # coastal water
-set opt(theta)             1
-set opt(id)                [expr 1.0e-9]
-set opt(il)                [expr 1.0e-6]
-set opt(shuntRes)          [expr 1.49e9]
-set opt(sensitivity)       0.26
-set opt(LUTpath)           "..dbs/optical_noise/LUT.txt"
-set opt(rngstream)          13
-set opt(accuracy)          0.001
-set opt(variance)          0.01
-set opt(e_prob)            0.01
+set opt(rxArea)               0.0000011 ;
+set opt(c)                    0.4; #0.4 coastal water
+set opt(theta)                1
+set opt(id)                   [expr 1.0e-9]
+set opt(il)                   [expr 1.0e-6]
+set opt(shuntRes)             [expr 1.49e9]
+set opt(sensitivity)          0.26
+set opt(LUTpath)              "..dbs/optical_noise/LUT.txt"
+set opt(rngstream)            13
+
+set opt(accuracy)             0.001
+set opt(variance)             0.01
+set opt(e_prob)               0.01
 
 #set opt(ctr_period) 60
 
@@ -226,7 +227,7 @@ Module/UW/UDP set debug_                     0
 
 #TRAFFIC_CTR
 Module/UW/MULTI_TRAFFIC_RANGE_CTR set debug_            0
-Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  50
+Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  5
 
 Module/UW/CSMA_ALOHA set wait_costant_ 0.01
 Module/UW/CSMA_ALOHA set listen_time_ 0.01
@@ -345,13 +346,13 @@ $position_auv(1) setY_  -1
 $position_auv(2) setX_ 1
 $position_auv(2) setY_  1
 
-$position_auv(2) setX_ -1
-$position_auv(2) setY_  -1
+$position_auv(3) setX_ -1
+$position_auv(3) setY_  -1
 
 for {set id 0} {$id < $opt(n_auv)} {incr id}  { 
 
     set position_auv($id) [new "Position/UWSMWP"]
-    $position_auv($id) setZ_ -1000
+    $position_auv($id) setZ_ -100
 
     $auv_app($id) setPosition $position_auv($id) 
     $auv_err($id) setPosition $position_auv($id) 

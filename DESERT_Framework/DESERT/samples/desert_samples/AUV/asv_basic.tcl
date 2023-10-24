@@ -40,6 +40,7 @@ proc createASV { id } {
     set ipr_asv  [new Module/UW/StaticRouting]
     set ipif_asv [new Module/UW/IP]
 
+    Module/UW/MULTI_TRAFFIC_RANGE_CTR set debug_ 0
     set ctr_asv  [new Module/UW/MULTI_TRAFFIC_RANGE_CTR]
 
     set mll_asv  [new Module/UW/MLL] 

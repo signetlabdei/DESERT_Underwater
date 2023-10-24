@@ -41,6 +41,9 @@ proc createASV { id } {
     set ipr_asv  [new Module/UW/StaticRouting]
     set ipif_asv [new Module/UW/IP]
 
+    Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  5
+    Module/UW/MULTI_TRAFFIC_RANGE_CTR set debug_  0
+
     set ctr_asv  [new Module/UW/MULTI_TRAFFIC_RANGE_CTR]
 
     set mll_asv  [new Module/UW/MLL] 
@@ -54,7 +57,9 @@ proc createASV { id } {
     Module/UW/CSMA_ALOHA set listen_time_          [expr 1.0e-12]
     Module/UW/CSMA_ALOHA set wait_costant_         [expr 1.0e-12]
     set mac_op_asv  [new Module/UW/CSMA_ALOHA]
+    Module/UW/OPTICAL/PHY set debug_ 0
     set phy_op_asv  [new Module/UW/OPTICAL/PHY]
+    $mll_op_asv setstackid 2
 
     #$node_asv addModule 8 $cbr_asv   0  "CBR1"
     for {set id1 0} {$id1 <= $opt(n_auv)} {incr id1} {
