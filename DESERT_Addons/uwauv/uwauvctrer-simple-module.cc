@@ -195,12 +195,21 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 
 	if ((alarm_mode == 1) & active_alarm){
 
+		if (log_on_file == 1) {
+
+				pos_log.open("log/position_log.csv",std::ios_base::app);
+				pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
+					<< ","<< posit->getZ() << std::endl;
+				pos_log.close();
+
+		}
+
 		//If in the right position
 		if ((getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0)){ 
 			
 			found = true;
 			alarm_mode = 2;
-			posit->setDest(x_err,y_err,-990,speed);
+			posit->setDest(x_err,y_err,-90,speed);
 			//x_s = x_err;
 			//y_s = y_err;
 			
@@ -217,7 +226,7 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 			
 			found = true;
 			alarm_mode = 2;
-			posit->setDest(x_err,y_err,-990,speed);
+			posit->setDest(x_err,y_err,-90,speed);
 			//x_s = x_err;
 			//y_s = y_err;
 
@@ -250,7 +259,7 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 
 		found =false;
 
-		if ((getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-990) == 0.0)){ 
+		if ((getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-90) == 0.0)){ 
 			
 			found = true;
 			x_s = x_err;
@@ -261,7 +270,7 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 					<< "in range"<< std::endl;
 			}
 		
-		} else if((getDistance(x_sorg,y_sorg,-1,x_err,y_err,-990) < 
+		} else if((getDistance(x_sorg,y_sorg,-1,x_err,y_err,-90) < 
 			getDistance(posit->getX(),posit->getY(),posit->getZ(),x_sorg,y_sorg,-1))){
 				
 			found = true;
@@ -285,15 +294,6 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 			this->p = p;
 
 			posit->setDest(x_err,y_err,-1,speed);
-
-			if (log_on_file == 1) {
-
-				pos_log.open("log/position_log.csv",std::ios_base::app);
-				pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-					<< ","<< posit->getZ() << std::endl;
-				pos_log.close();
-
-			}
 
 			if (debug_) {
 				std::cout << NOW << " UwAUVCtrErSimpleModule::initPkt(Packet *p)"
@@ -322,16 +322,6 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 			}
 		}
 	}
-
-	if (log_on_file == 1) {
-
-		pos_log.open("log/position_log.csv",std::ios_base::app);
-		pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-			<< ","<< posit->getZ() << std::endl;
-		pos_log.close();
-
-	}
-	
 
 	UwCbrModule::initPkt(p);
 }

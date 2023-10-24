@@ -246,7 +246,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 			
 			alarm_mode = 3;
-			posit->setDest(x_err,y_err,-990,speed);
+			posit->setDest(x_err,y_err,-90,speed);
 
 			if (debug_){ 
 				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
@@ -265,7 +265,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			//y_s = y_err;
 
 			alarm_mode = 3;
-			posit->setDest(x_err,y_err,-990,speed);
+			posit->setDest(x_err,y_err,-90,speed);
 
 
 			if (debug_){ 
@@ -291,19 +291,10 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 	}
 
 	if(alarm_mode == 3 && active_alarm){
-
-		if (log_on_file == 1) {
-
-			pos_log.open("log/position_log.csv",std::ios_base::app);
-			pos_log << NOW << "," << posit->getX() << ","<< posit->getY() 
-				<< ","<< posit->getZ() << std::endl;
-			pos_log.close();
-
-		}
 		
 		found = false;
 
-		if (getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-990) == 0.0){
+		if (getDistance(posit->getX(),posit->getY(),posit->getZ(),x_err,y_err,-90) == 0.0){
 			found = true;
 			x_s = x_err;
 			y_s = y_err;
@@ -312,7 +303,7 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
 						<< "in range"<< std::endl;
 
-		}else if(getDistance(x_sorg,y_sorg,-1,x_err,y_err,-990) < 
+		}else if(getDistance(x_sorg,y_sorg,-1,x_err,y_err,-90) < 
 			getDistance(posit->getX(),posit->getY(),posit->getZ(),x_sorg,y_sorg,-1)){ 
 
 			found = true;
