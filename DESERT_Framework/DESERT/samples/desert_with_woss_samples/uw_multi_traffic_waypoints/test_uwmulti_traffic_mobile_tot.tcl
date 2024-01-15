@@ -100,6 +100,7 @@ load libuwphysical.so
 load libuwsecurity_clmsg.so
 load libuwflooding.so
 load libuwoptical_propagation.so
+load libuwem_channel.so
 load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwmulti_traffic_control.so

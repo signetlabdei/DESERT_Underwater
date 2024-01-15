@@ -36,7 +36,7 @@
 # making a trajectory described in the Waypoints
 # 
 # N.B.: This example uses the Waypoint mobility model provided by WOSS.
-# For more informations please refer to http://telecom.dei.unipd.it/ns/woss/
+# For more informations please refer to https://woss.dei.unipd.it
 #
 # NOTE: tcl sample tested on Ubuntu 11.10, 64 bits OS
 #

@@ -39,15 +39,13 @@
 #ifndef UW_OPTICAL_CHANNEL_H
 #define UW_OPTICAL_CHANNEL_H
 
-#include <channel-module.h>
-#include <stdlib.h>
-#include <tclcl.h>
+#include <uwem-channel.h>
 
 /**
  * UwOpticalChannel extends Miracle channel class and implements the underwater
  * optical channel
  */
-class UwOpticalChannel : public ChannelModule
+class UwOpticalChannel : public UwElectroMagneticChannel
 {
 
 public:
@@ -59,50 +57,7 @@ public:
 	/**
 	* Destructor of UwOpticalChannel class.
 	*/
-	virtual ~UwOpticalChannel()
-	{
-	}
-
-	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet received.
-	* @param ChSAP* Pointer to the channel Service Access Point (SAP)
-	*/
-	virtual void recv(Packet *p, ChSAP *chsap);
-
-	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	*
-	* @param argc Number of arguments in <i>argv</i>.
-	* @param argv Array of strings which are the command parameters (Note that
-	* <i>argv[0]</i> is the name of the object).
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched
-	* successfully or not.
-	*
-	*/
-	virtual int command(int argc, const char *const *argv);
-
-protected:
-	/**
-	* Returns the underwater optical propagation delay between the two given
-	* Position pointers.
-	* @param Position* s pointer to the first Position object
-	* @param Position* d pointer to the second Position object
-	* @return underwater optical propagation delay [s]
-	*/
-	virtual double getPropDelay(Position *s, Position *d);
-
-	/**
-	* Sends the given Packet* to the upper PHY layer
-	*
-	* @param Packet* Pointer to the packet received.
-	* @param ChSAP* Pointer to the channel Service Access Point (SAP)
-	*/
-	void sendUpPhy(Packet *p, ChSAP *chsap);
-
-	double refractive_index; /**< refractive index of the underwater medium. */
-	double speed_of_light; /**< Speed of light in the underwater medium. */
+	virtual ~UwOpticalChannel() = default;
 };
 
 #endif /* UW_OPTICAL_CHANNEL_H */

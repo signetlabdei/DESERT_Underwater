@@ -41,10 +41,6 @@
 
 #include "uwoptical-channel.h"
 
-#define SPEED_OF_LIGHT_VACUUM (3e8)
-#define REFRACTIVE_INDEX_MIN (1)
-#define REFRACTIVE_INDEX_WATER (1.33)
-
 /**
  * Adds the module for UwOpticalChannel in ns2.
  */
@@ -63,71 +59,8 @@ public:
 } class_uwoptical_channel_module;
 
 UwOpticalChannel::UwOpticalChannel()
-	: ChannelModule()
-	, refractive_index(REFRACTIVE_INDEX_WATER)
-	, speed_of_light(SPEED_OF_LIGHT_VACUUM)
+	: UwElectroMagneticChannel()
 {
-	bind("RefractiveIndex_", (double *) &refractive_index);
-
-	if (refractive_index < REFRACTIVE_INDEX_MIN) {
-		refractive_index = REFRACTIVE_INDEX_MIN;
-	}
-
-	speed_of_light /= refractive_index;
+	
 }
 
-int
-UwOpticalChannel::command(int argc, const char *const *argv)
-{
-	// Tcl& tcl = Tcl::instance();
-	return ChannelModule::command(argc, argv);
-}
-
-void
-UwOpticalChannel::sendUpPhy(Packet *p, ChSAP *chsap)
-{
-	Scheduler &s = Scheduler::instance();
-	struct hdr_cmn *hdr = HDR_CMN(p);
-
-	hdr->direction() = hdr_cmn::UP;
-
-	Position *sourcePos = chsap->getPosition();
-	ChSAP *dest;
-
-	if (debug_)
-		cout << "UwOpticalChannel::sendUpPhy() sending packet" << endl;
-
-	for (int i = 0; i < getChSAPnum(); i++) {
-		dest = (ChSAP *) getChSAP(i);
-
-		if (chsap == dest) // it's the source node -> skip it
-			continue;
-
-		s.schedule(
-				dest, p->copy(), getPropDelay(sourcePos, dest->getPosition()));
-	}
-
-	Packet::free(p);
-}
-
-void
-UwOpticalChannel::recv(Packet *p, ChSAP *chsap)
-{
-	sendUpPhy(p, chsap);
-}
-
-double
-UwOpticalChannel::getPropDelay(Position *src, Position *dst)
-{
-	double distance = src->getDist(dst);
-
-	assert(distance >= 0.0);
-
-	double delay = distance / speed_of_light;
-
-	if (debug_)
-		cout << "UwOpticalChannel::getPropDelay() distance = " << distance
-			 << "; speed = " << speed_of_light << "; delay = " << delay << endl;
-
-	return delay;
-}

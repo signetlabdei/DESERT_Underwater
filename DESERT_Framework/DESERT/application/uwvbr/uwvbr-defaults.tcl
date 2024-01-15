@@ -30,7 +30,7 @@
 # @author Giovanni Toso
 # @version 1.1.0
 
-PacketHeaderManager set tab_(PacketHeader/UW/VBR) 1
+PacketHeaderManager set tab_(PacketHeader/UWVBR) 1
 
 Module/UW/VBR set packetSize_         500
 Module/UW/VBR set period1_            60

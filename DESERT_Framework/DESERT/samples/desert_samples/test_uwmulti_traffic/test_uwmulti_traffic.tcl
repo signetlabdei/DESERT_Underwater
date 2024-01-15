@@ -101,17 +101,13 @@ load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
 load libuwposbasedrt.so
-<<<<<<< DESERT_Framework/DESERT/samples/desert_samples/test_uwmulti_traffic/test_uwmulti_traffic.tcl
-=======
-load libuwnoderep.so
->>>>>>> DESERT_Framework/DESERT/samples/desert_samples/test_uwmulti_traffic/test_uwmulti_traffic.tcl
-load libuwsecurity_clmsg.so
 load libuwflooding.so
 load libuwinterference.so
 load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
 load libuwoptical_propagation.so
+load libuwem_channel.so
 load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwmulti_traffic_control.so
@@ -177,7 +173,7 @@ set opt(id)                [expr 1.0e-9]
 set opt(il)                [expr 1.0e-6]
 set opt(shuntRes)          [expr 1.49e9]
 set opt(sensitivity)       0.26
-set opt(LUTpath)           "..dbs/optical_noise/LUT.txt"
+set opt(LUTpath)           "../dbs/optical_noise/LUT.txt"
 set opt(rngstream) 13
 set opt(cbr_period) 60
 

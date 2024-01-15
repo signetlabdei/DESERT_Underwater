@@ -104,19 +104,19 @@ set opt(bw)                 5000.0
 set opt(bitrate)            4800.0
 set opt(ack_mode)           "setNoAckMode"
 
-set opt(txpower)	    135.0 
+set opt(txpower)	    155.0 
 set opt(per_tgt)	    0.1
 set opt(rx_snr_penalty_db)  -10.0
 set opt(tx_margin_db)	    10.0
 set opt(pktsize)        125
-set opt(vbr_period_1)   100
-set opt(vbr_period_2)   20
+set opt(vbr_period_1)   200
+set opt(vbr_period_2)   60
 set opt(timer_switch_1) 600
 set opt(timer_switch_2) 60
 set opt(rngstream)	        1
 
 if {$opt(bash_parameters)} {
-    if {$argc != 6} {
+    if {$argc != 7} {
         puts "The script requires six inputs:"
         puts "- the first one is the vbr packet size (byte);"
         puts "- the second one is the vbr period in the first slot (seconds);"
@@ -124,7 +124,8 @@ if {$opt(bash_parameters)} {
         puts "- the fourth one is the time duration of the first slot (seconds);"
         puts "- the fifth one is the time duration of the second slot (seconds);"
         puts "- the sixth one is the random generator substream;"
-        puts "example: ns uwvbr.tcl 125 100 20 600 60 13"
+        puts "- the seventh one is the number of nodes (excluded the sink);"
+        puts "example: ns uwvbr.tcl 125 100 20 600 60 13 4"
         puts "Please try again."
         return
     } else {
@@ -134,6 +135,7 @@ if {$opt(bash_parameters)} {
         set opt(timer_switch_1) [lindex $argv 3]
         set opt(timer_switch_2) [lindex $argv 4]
         set opt(rngstream) [lindex $argv 5]
+        set opt(nn) [lindex $argv 6]
     }
 }
 
@@ -170,6 +172,7 @@ Module/UW/VBR set period2_             $opt(vbr_period_2)
 Module/UW/VBR set timer_switch_1_      $opt(timer_switch_1)
 Module/UW/VBR set timer_switch_2_      $opt(timer_switch_2)
 Module/UW/VBR set PoissonTraffic_      1
+Module/UW/VBR set drop_out_of_order_   0
 
 # BPSK
 Module/UW/PHYSICAL  set BitRate_                      $opt(bitrate)
@@ -338,23 +341,23 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 # Setup positions
-$position(0) setX_ 0
-$position(0) setY_ 0
-$position(0) setZ_ -1000
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    $position($id1) setX_ [expr 500 * $id1]
+    $position($id1) setY_ [expr 500 * $id1]
+    $position($id1) setZ_ -1000
+}
 
-$position(1) setX_ 500
-$position(1) setY_ 500
-$position(1) setZ_ -1000
-
-$position_sink setX_ 1000
-$position_sink setY_ 1000
+$position_sink setX_ [expr 500 * $opt(nn)]
+$position_sink setY_ [expr 500 * $opt(nn)]
 $position_sink setZ_ -1000
 
 # Setup routing table
-#$ipr(0) addRoute "1.0.0.254" "255.255.255.255" "1.0.0.2"
-#$ipr(1) addRoute "1.0.0.254" "255.255.255.255" "1.0.0.254"
-$ipr(0) addRoute [$ipif_sink addr] [$ipif_sink addr]
-$ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
+for {set id1 0} {$id1 < [expr $opt(nn) - 1]} {incr id1}  {
+    set id2 [expr $id1 + 1]
+    $ipr($id1) addRoute [$ipif_sink addr] [$ipif($id2) addr]
+}
+set last_id [expr int($opt(nn) - 1)]
+$ipr($last_id) addRoute [$ipif_sink addr] [$ipif_sink addr]
 
 #####################
 # Start/Stop Timers #
@@ -407,9 +410,9 @@ proc finish {} {
         set sum_vbr_rcv_pkts   [expr $sum_vbr_rcv_pkts + $vbr_rcv_pkts]
     }
         
-    set ipheadersize        [$ipif(1) getipheadersize]
-    set udpheadersize       [$udp(1) getudpheadersize]
-    set vbrheadersize       [$vbr(1) getvbrheadersize]
+    set ipheadersize        [$ipif(0) getipheadersize]
+    set udpheadersize       [$udp(0) getudpheadersize]
+    set vbrheadersize       [$vbr(0) getvbrheadersize]
     
     puts "Mean Throughput          : [expr ($sum_vbr_throughput/($opt(nn)))]"
     puts "Sent Packets             : $sum_vbr_sent_pkts"

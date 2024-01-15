@@ -763,6 +763,8 @@ build_NETCDF() {
                 --enable-shared         \
                 --enable-netcdf-4      \
                 --disable-dap           \
+                --disable-byterange     \
+                --disable-libxml2       \
                 --prefix=${DEST_FOLDER} \
                 CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
                 LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib" \

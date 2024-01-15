@@ -44,7 +44,7 @@
 ############
 # 
 # N.B.: This example uses the Waypoint mobility model provided by WOSS.
-# For more informations please refer to http://telecom.dei.unipd.it/ns/woss/
+# For more informations please refer to https://woss.dei.unipd.it
 #
 #
 #
@@ -105,6 +105,7 @@ load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
 load libuwmulti_stack_controller.so
+load libuwem_channel.so
 load libuwoptical_channel.so
 load libuwoptical_propagation.so
 load libuwoptical_phy.so

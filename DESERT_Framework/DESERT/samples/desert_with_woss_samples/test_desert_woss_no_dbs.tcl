@@ -42,7 +42,7 @@
 # This complete example is provided with the aim to demonstrate the fully             #
 # compatibility with DESERT stack and WOSS channel models, propagation models,        #
 # and PHY layer. The interference model, instead, is provided by DESERT framework     #
-# For more information please refer to http://telecom.dei.unipd.it/ns/woss/           #
+# For more information please refer to https://woss.dei.unipd.it                      #
 #                                                                                     #
 #######################################################################################
 #
@@ -70,7 +70,7 @@
 ######################################
 # Flags to enable or disable options #
 ######################################
-set opt(verbose) 			1
+set opt(verbose) 		1
 set opt(trace_files)		0
 set opt(bash_parameters) 	0
 
@@ -120,8 +120,8 @@ if {$opt(bash_parameters)} {
 		puts "- The first for the random generator substream"
 		puts "- The second for CBR period"
 		puts "For example, ns test_uw_csma_aloha.tcl 4 100"
-    puts "If you want to leave the default values, please set to 0"
-    puts "the value opt(bash_parameters) in the tcl script"
+                puts "If you want to leave the default values, please set to 0"
+                puts "the value opt(bash_parameters) in the tcl script"
 		puts "Please try again."
 	} else { 
 		set opt(rngstream)		[lindex $argv 0]
@@ -135,10 +135,10 @@ set opt(extra_time)			  1000.0
 
 #PHY PARAMETERS:
 
-set opt(txpower)	 		      150
-set opt(per_tgt)	 		      0.1
+set opt(txpower)	 	150
+set opt(per_tgt)	 	0.1
 set opt(rx_snr_penalty_db)	0.0
-set opt(tx_margin_db)		    0.0
+set opt(tx_margin_db)		10.0
 
 set opt(node_min_angle)		 -90.0
 set opt(node_max_angle)		  90.0
@@ -358,11 +358,11 @@ Module/UW/CBR set PoissonTraffic_      1
 WOSS/Module/MPhy/BPSK  set debug_                     0
 WOSS/Module/MPhy/BPSK  set AcquisitionThreshold_dB_   10.0 
 WOSS/Module/MPhy/BPSK  set BitRate_                   $opt(bitrate)
-WOSS/Module/MPhy/BPSK  set MaxTxSPL_dB_               190
+WOSS/Module/MPhy/BPSK  set MaxTxSPL_dB_               $opt(txpower)
 WOSS/Module/MPhy/BPSK  set MinTxSPL_dB_               10
 WOSS/Module/MPhy/BPSK  set MaxTxRange_                10000
-WOSS/Module/MPhy/BPSK  set PER_target_                0.01
-WOSS/Module/MPhy/BPSK  set TxSPLMargin_dB_            10
+WOSS/Module/MPhy/BPSK  set PER_target_                $opt(per_tgt)
+WOSS/Module/MPhy/BPSK  set TxSPLMargin_dB_            $opt(tx_margin_db)
 WOSS/Module/MPhy/BPSK  set RxSnrPenalty_dB_           -10.0
 WOSS/Module/MPhy/BPSK  set SPLOptimization_           1
 WOSS/Module/MPhy/BPSK  set CentralFreqOptimization_   0

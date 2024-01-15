@@ -1,5 +1,12 @@
+3.4.0 - 2024-01
+	* You can now specify 'ALL' if you want to install all Add-ons using command-line installer (and not wizard)
+	* Support for Electromagnetic propagation and PHY model thanks to Riccardo Tumiati <riccardo.tumiati@studenti.unipd.it>
+	* New module for mission coordinator. Thanks to Vincenzo Cimino
+	* Drivers for MODA modem
+	* Updated WOSS, Acoustic Toolbox, HDF
 3.3.2 - 2023-05-09
 	* Fixes on uw-csma-aloha
+	* New MAC protocol: OFDM Reservation MAC (thanks to Sara Falleni <falleni.s@husky.neu.edu>)
 3.3.1 - 2023-03-30
 	* Fixes on MAC protocols (uw-aloha and uw-csma-aloha)
 	* Fixes on AHOI SIR csv DB

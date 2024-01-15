@@ -362,24 +362,25 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 # Setup positions
-$position(0) setX_ 0
-$position(0) setY_ 0
-$position(0) setZ_ -1000
+# Setup positions
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    $position($id1) setX_ [expr 500 * $id1]
+    $position($id1) setY_ [expr 500 * $id1]
+    $position($id1) setZ_ -1000
+}
 
-#$position(1) setX_ 500
-#$position(1) setY_ 500
-#$position(1) setZ_ -1000
-
-$position_sink setX_ 1000
-$position_sink setY_ 1000
+$position_sink setX_ [expr 500 * $opt(nn)]
+$position_sink setY_ [expr 500 * $opt(nn)]
 $position_sink setZ_ -1000
 
 # Setup routing table
-$ipr(0) addRoute [$ipif_sink addr] [$ipif_sink addr];#[$ipif(1) addr]
-#$ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
+for {set id1 0} {$id1 < [expr $opt(nn) - 1]} {incr id1}  {
+    set id2 [expr $id1 + 1]
+    $ipr($id1) addRoute [$ipif_sink addr] [$ipif($id2) addr]
+}
+set last_id [expr int($opt(nn) - 1)]
+$ipr($last_id) addRoute [$ipif_sink addr] [$ipif_sink addr]
 
-#$ipr(0) defaultGateway [$ipif(1) addr]
-#$ipr(1) defaultGateway [$ipif_sink addr]
 
 #####################
 # Start/Stop Timers #

@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-AC_INIT(DESERT,3.3.0)
+AC_INIT(DESERT,3.4.0)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -100,9 +100,12 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhermesphy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwofdmphy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoimodem'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodamodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphy_clmsgs'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_phy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_antenna'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/utility/msg-display'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
@@ -111,7 +114,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwsmposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwem_propagation'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwem_channel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/statistics/uwstats_utilities'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
@@ -185,9 +190,12 @@ AC_CONFIG_FILES([
     physical/uwofdmphy/Makefile
     physical/uwahoi_phy/Makefile
     physical/uwahoimodem/Makefile
+    physical/uwmodamodem/Makefile
     physical/uwoptical_phy/Makefile
     physical/uwopticalbeampattern/Makefile
     physical/uwphy_clmsgs/Makefile
+    physical/uwem_phy/Makefile
+    physical/uwem_antenna/Makefile
     utility/msg-display/Makefile
     mobility/uwdriftposition/Makefile
     mobility/uwgmposition/Makefile
@@ -196,7 +204,9 @@ AC_CONFIG_FILES([
     interference/uwinterference/Makefile
     interference/uwinterferenceofdm/Makefile
     propagation/uwoptical_propagation/Makefile
+    propagation/uwem_propagation/Makefile
     channel/uwoptical_channel/Makefile
+    channel/uwem_channel/Makefile
     statistics/uwstats_utilities/Makefile
     ranging/uwranging_tokenbus/Makefile
     ranging/uwranging_tdma/Makefile

@@ -80,6 +80,7 @@ load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
 load libuwoptical_propagation.so
+load libuwem_channel.so
 load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwopticalbeampattern.so

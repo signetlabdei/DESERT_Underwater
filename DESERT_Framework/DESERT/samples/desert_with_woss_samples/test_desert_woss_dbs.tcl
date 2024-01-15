@@ -39,12 +39,12 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.      #"
 # You can download the sediment and SSP databases at the following link:              #"
-#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
 # After the download, please set opt(db_path) to the correct path.                    #"
 # (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 # Please note that we cannot redistribute the GEBCO bathymetry database.              #"
 # You can download the database by registering on the GEBCO web site at:              #"
-#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2022/zip/                 #"
+#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2023/zip/                 #"
 # After the download you can place the GEBCO file in the bathymetry folder of         #"
 # WOSS databases.                                                                     #"
 # Directory tree should be                                                            #"
@@ -89,7 +89,7 @@
 ######################################
 # Flags to enable or disable options #
 ######################################
-set opt(verbose) 			1
+set opt(verbose) 		1
 set opt(trace_files)		0
 set opt(bash_parameters) 	0
 
@@ -133,9 +133,9 @@ set opt(stoptime)       100000
 set opt(dist_nodes)     200.0  ;# Distace of the nodes in m
 set opt(nn_in_row)      2       ;# Number of a nodes in m
 set opt(ack_mode)       "setNoAckMode"
-set opt(rngstream)    1
-set opt(cbr_period) 100
-set opt(db_path)   "/usr/share/woss/dbs/"
+set opt(rngstream)      1
+set opt(cbr_period)     100
+set opt(db_path)        "./dbs/"
 
 
 if {$opt(bash_parameters)} {
@@ -167,21 +167,21 @@ set opt(extra_time)         250.0
 
 #PHY PARAMETERS:
 
-set opt(txpower) 150
-set opt(per_tgt) 0.01
-set opt(rx_snr_penalty_db) -10.0
-set opt(tx_margin_db) 10.0
+set opt(txpower)               190
+set opt(per_tgt)               0.01
+set opt(rx_snr_penalty_db)     -10.0
+set opt(tx_margin_db)          10.0
 
 set opt(node_min_angle)		 -90.0
 set opt(node_max_angle)		  90.0
 set opt(sink_min_angle)		 -90.0
 set opt(sink_max_angle) 	  90.0
-set opt(node_bathy_offset)	-2.0
+set opt(node_bathy_offset)	 -2.0
 
 set opt(maxinterval_)    	  11500.0
-set opt(freq) 				  25000.0
+set opt(freq) 			  25000.0
 set opt(bw)              	  5000.0
-set opt(bitrate)	 		  4800.0
+set opt(bitrate)	 	  4800.0
 
 
 ########################
@@ -205,19 +205,19 @@ set opt(db_res_path) "./test_desert_woss_dbs"
 
 
 set exists_ssp [file exists "$opt(db_path)/ssp/WOA2018/WOA2018_SSP_April.nc"]
-set exists_gebco [file exists "$opt(db_path)/bathymetry/GEBCO_2022.nc"]
+set exists_gebco [file exists "$opt(db_path)/bathymetry/GEBCO_2023.nc"]
 
 if { $exists_ssp == 0 || $exists_gebco == 0 } {
     puts "#######################################################################################"
-    puts "Database files not found.                                                             #"
+    puts "# Database files not found.                                                           #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
+    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #"
     puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
     puts "# (i.e. /usr/share/dbs/ if you extracted WOSS databases in /usr/share/)               #"
     puts "# Please note that we cannot redistribute the GEBCO bathymetry database.              #"
     puts "# You can download GEBCO database at:                                                 #"
-    puts "#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2022/zip/                 #"
+    puts "#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2023/zip/                 #"
     puts "# After the download you can place the GEBCO file in the bathymetry folder of         #"
     puts "# WOSS databases .                                                                    #"
     puts "# Directory tree should be                                                            #"
@@ -237,6 +237,8 @@ if { $exists_ssp == 0 || $exists_gebco == 0 } {
     puts "#    └── RESON                                                                        #"
     puts "#                                                                                     #"
     puts "#######################################################################################"
+
+    exit
 }
 
 WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rngstream)
@@ -291,7 +293,7 @@ WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO set debug           0
 WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO set woss_db_debug   0
 
 set db_bathy [new "WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO"]
-$db_bathy setDbPathName "${opt(db_path)}/bathymetry/GEBCO_2022.nc"
+$db_bathy setDbPathName "${opt(db_path)}/bathymetry/GEBCO_2023.nc"
 $db_bathy use2DFifteenSecondsPrecision
 
 
@@ -341,9 +343,9 @@ $woss_creator setSimulationTimes    0 0 1 1 2013 0 0 1 2 1 2013 0 0 1
 
 WOSS/Manager/Simple/MultiThread set debug                     0
 WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
-WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 WOSS/Manager/Simple/MultiThread set space_sampling            0.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
+$woss_manager setConcurrentThreads 0
 
 
 WOSS/Utilities set debug 0
@@ -489,7 +491,7 @@ proc createNode { id } {
     set curr_lat    [ $woss_utilities getLatfromDistBearing  $opt(start_lat) $opt(start_long) 180.0 $curr_y ]
     set curr_lon    [ $woss_utilities getLongfromDistBearing $opt(start_lat) $opt(start_long) 90.0  $curr_x ]
     set curr_depth 50
-    puts "$curr_x $curr_y $curr_depth"
+    puts "Coordinates: x: $curr_x, y: $curr_y, depth: $curr_depth"
 
     
     $position($id) setLatitude_  $curr_lat
@@ -674,14 +676,15 @@ proc finish { } {
     global ns opt cbr mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
     global woss_manager outfile outfile_sink
 
-	if {$opt(verbose)} {
-		puts "\n"
-		puts "CBR_PERIOD : $opt(cbr_period)"
-		puts "SEED: $opt(rngstream)"
-		puts "NUMBER OF NODES: $opt(nn)"
-	} else {
-		puts "Simulation done!"
-	}
+    if {$opt(verbose)} {
+            puts "\n"
+            puts "CBR_PERIOD : $opt(cbr_period)"
+            puts "SEED: $opt(rngstream)"
+            puts "NUMBER OF NODES: $opt(nn)"
+    } else {
+            puts "Simulation done!"
+    }
+
     set sum_cbr_throughput 	0
     set sum_per		0
     set sum_cbr_sent_pkts	0.0

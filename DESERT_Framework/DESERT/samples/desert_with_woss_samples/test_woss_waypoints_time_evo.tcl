@@ -24,7 +24,7 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,   #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.    #"
 # You can download the sediment and SSP databases at the following link:            #"
-#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz              #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                   #"
 # After the download, please set opt(db_path) to the correct path.                  #" 
 #	Please note that we cannot redistribute the GEBCO bathymetry database. You can    #"
 # download the database by registering on the GEBCO web site at:                    #"
@@ -145,7 +145,7 @@ if { $exists_transducers == 0 } {
 	puts "# Interference computation capabilities and network protocol stack. In particular,    #"
 	puts "# this tcl sample requires the use of electro-acoustic transducers.                   #"
 	puts "# You can download the databases at the following link:                               #"
-	puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
+	puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
 	puts "# After the download, please set opt(db_path) to the correct path.                    #" 
   puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 	puts "#######################################################################################"
@@ -337,8 +337,8 @@ $woss_creator setSimulationTimes    0 0 1 1 2014 10 11 1 1 1 2014 11 0 1
 WOSS/Manager/Simple/MultiThread set debug                     0.0
 WOSS/Manager/Simple/MultiThread set is_time_evolution_active  1.0
 WOSS/Manager/Simple/MultiThread set space_sampling            5.0
-WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
+$woss_manager setConcurrentThreads 0
 
 
 #### we create the mandatory woss::TransducerHandler

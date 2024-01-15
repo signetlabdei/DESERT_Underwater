@@ -98,6 +98,7 @@ load libuwstats_utilities.so
 load libuwphysical.so
 load libuwhermesphy.so
 load libuwoptical_propagation.so
+load libuwem_channel.so
 load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwrov.so

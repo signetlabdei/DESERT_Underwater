@@ -146,7 +146,7 @@ UWAloha::UWAloha()
 	bind("wait_constant_", (double *) &wait_constant);
 	bind("uwaloha_debug_", (int *) &uwaloha_debug); // degug mode
 	bind("max_payload_", (int *) &max_payload);
-	bind("ACK_timeout_", (double *) &ACK_timeout);
+	bind("ACK_timeout_", (int *) &ACK_timeout);
 	bind("alpha_", (double *) &alpha_);
 	bind("buffer_pkts_", (int *) &buffer_pkts);
 	bind("backoff_tuner_", (double *) &backoff_tuner);

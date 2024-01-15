@@ -119,18 +119,20 @@ set opt(pktsize)            125
 set opt(cbr_period)         60
 
 if {$opt(bash_parameters)} {
-    if {$argc != 3} {
+    if {$argc != 4} {
         puts "The script requires three inputs:"
         puts "- the first one is the cbr packet size (byte);"
         puts "- the second one is the cbr poisson period (seconds);"
         puts "- the third one is the random generator substream;"
-        puts "example: ns uwcbr.tcl 125 60 13"
+        puts "- the fourth one is the number of nodes;"
+        puts "example: ns uwcbr.tcl 125 60 13 2"
         puts "Please try again."
         return
     } else {
         set opt(pktsize)       [lindex $argv 0]
         set opt(cbr_period)    [lindex $argv 1]
         set opt(rngstream)       [lindex $argv 2]
+        set opt(nn)       [lindex $argv 3]
     }
 }
 
@@ -335,24 +337,24 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 # Setup positions
-$position(0) setX_ 0
-$position(0) setY_ 0
-$position(0) setZ_ -1000
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    $position($id1) setX_ [expr 500 * $id1]
+    $position($id1) setY_ [expr 500 * $id1]
+    $position($id1) setZ_ -1000
+}
 
-$position(1) setX_ 500
-$position(1) setY_ 500
-$position(1) setZ_ -1000
-
-$position_sink setX_ 1000
-$position_sink setY_ 1000
+$position_sink setX_ [expr 500 * $opt(nn)]
+$position_sink setY_ [expr 500 * $opt(nn)]
 $position_sink setZ_ -1000
 
 # Setup routing table
-$ipr(0) addRoute [$ipif_sink addr] [$ipif(1) addr]
-$ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
+for {set id1 0} {$id1 < [expr $opt(nn) - 1]} {incr id1}  {
+    set id2 [expr $id1 + 1]
+    $ipr($id1) addRoute [$ipif_sink addr] [$ipif($id2) addr]
+}
+set last_id [expr int($opt(nn) - 1)]
+$ipr($last_id) addRoute [$ipif_sink addr] [$ipif_sink addr]
 
-#$ipr(0) defaultGateway [$ipif(1) addr]
-#$ipr(1) defaultGateway [$ipif_sink addr]
 
 #####################
 # Start/Stop Timers #

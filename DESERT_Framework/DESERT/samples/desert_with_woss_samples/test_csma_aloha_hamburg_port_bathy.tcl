@@ -40,7 +40,7 @@
 # of the Hamburg port, sediments, as well as for the characteristics of               #"
 # electro-acoustic transducers.                                                       #"
 # You can download the databases at the following link:                               #"
-#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
 # After the download, please set opt(db_path) to the correct path.                    #"
 # (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 # Directory tree should be                                                            #"
@@ -174,7 +174,7 @@ if { $exists_dbs == 0 } {
     puts "#######################################################################################"
     puts "Database files not found.                                                             #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.6.0.tar.gz                #"
+    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #"
     puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
     puts "# Directory tree should be                                                            #"
@@ -330,9 +330,9 @@ $woss_creator setSimulationTimes    0 0 1 1 2010 0 0 1 2 1 2010 0 0 1
 
 WOSS/Manager/Simple/MultiThread set debug                     0
 WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
-WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 WOSS/Manager/Simple/MultiThread set space_sampling            0.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
+$woss_manager setConcurrentThreads 0
 
 
 WOSS/Utilities set debug 0

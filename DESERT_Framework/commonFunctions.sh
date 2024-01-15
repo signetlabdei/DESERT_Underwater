@@ -46,7 +46,7 @@ print_desert_logo() {
     printf "| |  | |/ _ \\/ __|/ _ \ '__| __| | |  | | '_ \\ / _\` |/ _ \\ '__\\ \\ /\\ / / _\` | __/ _ \\ '__|\n"
     printf "| |__| |  __/\\__ \\  __/ |  | |_  | |__| | | | | (_| |  __/ |   \\ V  V / (_| | ||  __/ |   \n"
     printf "|_____/ \\___||___/\\___|_|   \\__|  \\____/|_| |_|\\__,_|\\___|_|    \\_/\\_/ \\__,_|\\__\\___|_|   \n"
-    printf "_____Copyright (c) 2023 Regents of the SIGNET lab, University of Padova)_____\n"
+    printf "_____Copyright (c) 2024 Regents of the SIGNET lab, University of Padova)_____\n"
     printf "\n"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "return of print_desert_logo(): ${output}"
@@ -353,7 +353,7 @@ wizard_function_wossRequire() {
     wizard__print_L3 "WARNING: If you want to use enviromental databases for SSP, bathymetry,"
     wizard__print_L3 "         sediments, as well as for the characteristics of electro-acoustic transducers"
     wizard__print_L3 "         You can download the sediment and SSP databases at the following link:"
-    wizard__print_L3 "         http://telecom.dei.unipd.it/ns/woss/files/WOSS-dbs-v1.4.0.tar.gz"
+    wizard__print_L3 "         https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz"
     wizard__print_L3 "         Please note that we cannot redistribute the GEBCO bathymetry database"
     wizard__print_L3 "         You can download the database by registering on the GEBCO web site at:"
     wizard__print_L3 "         http://http://www.gebco.net/"
@@ -402,6 +402,25 @@ wizard_function_customPar() {
             printf '%s\n' "--custom_par \"${CUSTOM_PAR}\" " >> ${INSTALL_CONF}
             ;;
     esac
+}
+
+cmd_line_function_addons() {
+    # Handle the case where user put "ALL" Addons in non wizard modality
+    if [ "$ADDONS" = "ALL" ]; then
+        case "${WITHWOSS}" in
+            "0")
+                ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | grep -v "wossgmmob3D" | grep -v "wossgroupmob3D" | awk '{printf "%s ",$0} END {print ""}')
+                ADDONS=${ALL_ADDONS}
+                printf '%s\n' "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                ;;
+
+            "1")
+                ALL_ADDONS=$(cat ./${ADDONS_FILE} | awk '{print $1}' | grep -v "ALL" | awk '{printf "%s ",$0} END {print ""}')
+                ADDONS=${ALL_ADDONS}
+                printf '%s\n' "--addons \"${ADDONS}\"" >> ${INSTALL_CONF}
+                ;;
+        esac
+    fi
 }
 
 wizard_function_addons(){
@@ -627,6 +646,7 @@ call_installer() {
         debug__print_screen_L1 "fuction_name is: call_installer()"
     fi
 
+    cmd_line_function_addons
     PARAMETER4INSTALLER="${TARGET} ${INST_MODE} ${DEST_FOLDER} ${CUSTOM_PAR} ${ADDONS}"
 
     cd Installer
