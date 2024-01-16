@@ -4,6 +4,7 @@
 	* New module for mission coordinator. Thanks to Vincenzo Cimino
 	* Drivers for MODA modem
 	* Updated WOSS, Acoustic Toolbox, HDF
+	* Update miracle to latest version (1.4.0)
 3.3.2 - 2023-05-09
 	* Fixes on uw-csma-aloha
 	* New MAC protocol: OFDM Reservation MAC (thanks to Sara Falleni <falleni.s@husky.neu.edu>)
