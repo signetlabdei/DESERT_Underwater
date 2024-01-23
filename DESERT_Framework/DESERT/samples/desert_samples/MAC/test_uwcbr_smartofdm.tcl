@@ -122,7 +122,7 @@ set opt(bw)                 125000.0 ;# bandwidth
 set opt(bitrate)            64000.0  ;# bitrate or transmission rate
 set opt(subCarrier)         10  ;# used to define number of sub carrier. But not used as having trouble setting the value.
 set opt(subCarSize)         [expr $opt(bw)/$opt(subCarrier) ]     ;# used to define the bandwidth of each subcarrier
-set opt(ack_mode)           "setNoAckMode"
+set opt(ack_mode)           setNoAckMode
 set opt(filename)           "expLog.xls"
 set opt(init_mode)          "f"
 set opt(modulation)         "BPSK"
@@ -144,8 +144,8 @@ set rng_position [new RNG]
 # this block is used for defining some of the simulation variable value by commandline
 # argument. If no argument is found some default value is set. 
 if {$opt(bash_parameters)} {
-    if {$argc != 14} {
-        puts "The script requires fourteen inputs:"
+    if {$argc != 13} {
+        puts "The script requires 13 inputs:"
         puts "- the first is the cbr period;"
         puts "- the second is the filename;"
         puts "- the third is the num of nodes"
@@ -158,8 +158,8 @@ if {$opt(bash_parameters)} {
         puts "- the tenth is the max number of carriers reserved each time"
         puts "- the eleventh n of timeslots reserved each time"
         puts "- the twelveth min num of packets queued to ask for bandwidth"
-        puts "- the thirteen interference period"
-        puts "example: ns test_uwcbr_smartofdm.tcl 10 test.csv 5 0 BPSK 1 384 10 0.05 10 1 5 0 $opt(ack_mode) 1"
+        puts "- the thirteen is the aCK mode"
+        puts "example: ns test_uwcbr_smartofdm.tcl 10 test.csv 5 0 BPSK 1 384 10 0.05 10 1 5 $opt(ack_mode)"
         puts "Please try again."
         return
     } else {
@@ -167,17 +167,16 @@ if {$opt(bash_parameters)} {
         set opt(filename)      [lindex $argv 1]
         set opt(nn)            [lindex $argv 2] 
         set opt(subCarSize)    [expr $opt(bw)/$opt(subCarrier) ] 
-        set opt(fullBand)     [lindex $argv 3]
-        set opt(modulation)     [lindex $argv 4]
+        set opt(fullBand)      [lindex $argv 3]
+        set opt(modulation)    [lindex $argv 4]
         set opt(AckInBand)     [lindex $argv 5]
-        set opt(pktsize)        [lindex $argv 6]
-        set opt(timeslots)       [lindex $argv 7]             
-        set opt(tslots_len)      [lindex $argv 8]  
-        set opt(car_reserved)    [lindex $argv 9]  
-        set opt(req_tslots)       [lindex $argv 10] 
-        set opt(max_burst_size)       [lindex $argv 11] 
-        set opt(ack_mode)        [lindex $argv 12]
-        set opt(dpktcbr)        [lindex $argv 13]
+        set opt(pktsize)       [lindex $argv 6]
+        set opt(timeslots)     [lindex $argv 7]
+        set opt(tslots_len)    [lindex $argv 8]
+        set opt(car_reserved)  [lindex $argv 9]
+        set opt(req_tslots)    [lindex $argv 10]
+        set opt(max_burst_size) [lindex $argv 11]
+        set opt(ack_mode)      [lindex $argv 12]
     }
 } else {
     # default values for traffic generation and transmission
@@ -351,7 +350,7 @@ proc createNode { id } {
     $phy($id) init_ofdm_node $opt(nn) $opt(freq) $opt(subCarrier) $id    
     $phy($id) setSpectralMask $data_mask
     $phy($id) setInterference $interf_data($id)
-   
+
     $mac($id) $opt(ack_mode)
     $mac($id) initialize
     $mac($id) init_macofdm_node $opt(subCarrier) $opt(subCarSize) $opt(ctrlCar) $opt(modulation)
@@ -563,7 +562,7 @@ proc finish {} {
     puts "                                                                     "
     puts "---------------------------------------------------------------------"
     puts "SINK APP LEVEL STATISTICS "
-        puts "Average ftt           : [expr $sum_ftt / ($opt(nn))]"
+        puts "Average ftt              : [expr $sum_ftt / ($opt(nn))]"
         puts "Mean Throughput          : [expr ($sum_cbr_throughput/($opt(nn)))]"
         puts "Sent Packets             : $sum_cbr_sent_pkts"
         puts "Sent Packets by Sink     : $sum_cbr_sent_pkts_sink"
