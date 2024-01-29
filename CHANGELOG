@@ -1,3 +1,5 @@
+3.4.1 - 2024-01-29
+	* Fix on EvoLogics desert samples
 3.4.0 - 2024-01
 	* You can now specify 'ALL' if you want to install all Add-ons using command-line installer (and not wizard)
 	* Support for Electromagnetic propagation and PHY model thanks to Riccardo Tumiati <riccardo.tumiati@studenti.unipd.it>

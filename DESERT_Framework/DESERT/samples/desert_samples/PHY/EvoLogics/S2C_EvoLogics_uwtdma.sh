@@ -55,7 +55,7 @@ else
 			rm -rf S2C_Evologics_Uwtdma.tr
 			rm -rf MODEM_log_*
 			rm -rf TDMA_node_*_${4}.out
-			ns S2C_uwtdma.tcl $1 5 360000 5 $4 $2 $3
+			ns S2C_uwtdma.tcl $1 5 360000 5 $4 $2 $3 $4
 		fi
 	fi
 fi

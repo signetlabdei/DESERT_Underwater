@@ -32,7 +32,7 @@
 ######################
 # Simulation Options #
 ######################
-set opt(bash_parameters) 0
+set opt(bash_parameters) 1
 
 set opt(n_node) 5
 set opt(node)     1

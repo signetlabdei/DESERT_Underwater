@@ -58,7 +58,7 @@ else
 			rm -rf MODEM_log_*
 			rm -rf Uwpolling_AUV_*_${5}.out
 			rm -rf Uwpolling_NODE_*_${5}.out
-			ns S2C_uwpolling_sample.tcl $1 $2 5 360000 5 $5 $3 $4
+			ns S2C_uwpolling_sample.tcl $1 $2 5 360000 5 $5 $3 $4 $5
 		fi
 	fi
 fi
