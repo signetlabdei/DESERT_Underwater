@@ -144,7 +144,7 @@ read_process_UDP(void *arg)
 		}
 		if (debug_ >= 1)
 			std::cout << "[" << obj->getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::READ_PROCESS_TCP::NEW_CLIENT_IP_"
+					  << "::UWAPPLICATION::READ_PROCESS_UDP::NEW_CLIENT_IP_"
 					  << inet_ntoa(obj->clnAddr.sin_addr) << std::endl;
 		if (obj->logging)
 			obj->out_log << left << "[" << obj->getEpoch() << "]::" << NOW
@@ -181,6 +181,7 @@ read_process_UDP(void *arg)
 					hdr_Appl->payload_msg[i] = buffer_msg[i];
 					cout << buffer_msg[i];
 				}
+				std::cout << std::endl;
 			}
 			obj->queuePckReadUDP.push(p);
 			obj->incrPktsPushQueue();

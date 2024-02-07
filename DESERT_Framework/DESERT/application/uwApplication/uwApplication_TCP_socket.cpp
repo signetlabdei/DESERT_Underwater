@@ -181,7 +181,22 @@ uwApplicationModule::handleTCPclient(int clnSock)
 		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
 			buffer_msg[i] = 0;
 		}
-		if ((recvMsgSize = read(clnSock, buffer_msg, MAX_READ_LEN)) < 0) {
+		// Todo: read header (start char + payload size) - little endian preferred
+		uint32_t size;
+		if ((recvMsgSize = read(clnSock, &size, sizeof(size))) < 0) {
+			if (debug_ >= 0)
+				std::cout << getEpoch() << "::" << NOW
+						  << "::UWAPPLICATION::READ_PROCESS_TCP::HANDLE_TCP_"
+							 "CLIENT::"
+							 "CONNECTION_NOT_ACCEPTED"
+						  << endl;
+			break;
+		}
+		if (recvMsgSize == 0) { // client disconnected
+			shutdown(clnSock, 2);
+			break;
+		}		
+		if ((recvMsgSize = read(clnSock, buffer_msg, size)) < 0) {
 			if (debug_ >= 0)
 				std::cout << getEpoch() << "::" << NOW
 						  << "::UWAPPLICATION::READ_PROCESS_TCP::HANDLE_TCP_"
@@ -208,6 +223,7 @@ uwApplicationModule::handleTCPclient(int clnSock)
 				for (int i = 0; i < recvMsgSize; i++) {
 					cout << buffer_msg[i];
 				}
+				std::cout << std::endl;
 			}
 			if (logging)
 				out_log << left << getEpoch() << "::" << NOW

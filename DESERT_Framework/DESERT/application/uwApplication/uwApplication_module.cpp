@@ -372,6 +372,7 @@ uwApplicationModule::statistics(Packet *p)
 		for (int i = 0; i < uwApph->payload_size(); i++) {
 			cout << uwApph->payload_msg[i];
 		}
+		std::cout << std::endl;
 	}
 	if (debug_ >= 0)
 		std::cout << "[" << getEpoch() << "]::" << NOW
@@ -402,8 +403,18 @@ uwApplicationModule::statistics(Packet *p)
 		}
 		out_log << std::endl;
 	}
-	if (clnSockDescr) {
-		write(clnSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size());
+	if (!withoutSocket()) {
+		if (useTCP()) {
+			if (clnSockDescr) {
+				// prepend header (start char + payload size) - little endian
+				uint32_t size = uwApph->payload_size();
+				write(clnSockDescr, &size, sizeof(size));
+				write(clnSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size());
+			}
+		} else {
+			// this only works if a message was received from the peer (this sets clnAddr)!
+			sendto(servSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size(), 0, (const sockaddr*) &clnAddr, sizeof(clnAddr));
+		}
 	}
 	Packet::free(p);
 } // end statistics method
