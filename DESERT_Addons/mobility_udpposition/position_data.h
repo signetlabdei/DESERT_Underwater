@@ -61,14 +61,16 @@ struct PositionData
     /** Up in [m] */
     double z;
 
-    /// @brief Compute required buffer size for (de-)serialization 
-    /// @return 
+    /** Compute required buffer size for (de-)serialization 
+     * @return required buffer size
+     */
     constexpr size_t size()  { return sizeof(x) + sizeof(y) + sizeof(z); }
 
-    /// @brief Serialize the position data to buffer
-    /// @param buffer 
-    /// @param buffer_size 
-    /// @return bytes used in buffer (if > 0) or negative of required buffer size 
+    /** Serialize the position data to buffer
+     *  @param buffer buffer where the data are written
+     *  @param buffer_size size of buffer
+     *  @return bytes used in buffer (if > 0) or negative of required buffer size 
+     */
     size_t serialize(char* buffer, size_t buffer_size)
     {
         int idx = 0;
@@ -80,6 +82,11 @@ struct PositionData
         memcpy(buffer + idx, &z, sizeof(x)); idx += sizeof(z);
         return idx;
     }
+    /** Deserialize the position data from the buffer
+     *  @param buffer buffer with serialized data
+     *  @param buffer_size size of buffer
+     *  @return false if buffer is too small, true otherwise
+     */
     bool deserialize(char* buffer, size_t buffer_size)
     {
         int idx = 0;

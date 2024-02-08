@@ -26,8 +26,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# @file   uwsmposition-defaults.tcl
-# @author Filippo Campagnaro
+# @file   udpposition-defaults.tcl
+# @author Torsten Pfuetzenreuter
 # @version 1.0.0
 
 Position/UDP set debug_        	 0
