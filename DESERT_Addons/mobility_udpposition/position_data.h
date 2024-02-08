@@ -71,11 +71,11 @@ struct PositionData
      *  @param buffer_size size of buffer
      *  @return bytes used in buffer (if > 0) or negative of required buffer size 
      */
-    size_t serialize(char* buffer, size_t buffer_size)
+    int serialize(char* buffer, size_t buffer_size)
     {
         int idx = 0;
         if (buffer_size < size()) {
-            return -size();
+            return -((int)size());
         }
         memcpy(buffer + idx, &x, sizeof(x)); idx += sizeof(x);
         memcpy(buffer + idx, &y, sizeof(x)); idx += sizeof(y);
