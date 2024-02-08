@@ -620,7 +620,7 @@ build_DESERT_addon() {
         info_L2 "configure  [${2}]"
         case ${WITHWOSS} in
             0)
-                CXXFLAGS="-Wno-write-strings -std=c++11"                                                                         \
+                CXXFLAGS="-Wno-write-strings"                                                                         \
                 CFLAGS="-Wno-write-strings"                                                                                      \
                 ${src_addon_path}/configure --target=$ARCH                                                                       \
                                             --host=$ARCH                                                                         \
@@ -635,7 +635,7 @@ build_DESERT_addon() {
                                             >> "${currentBuildLog}/DESERT_ADDON/${1}-${2}.log"  2>&1
                 ;;
             1)
-                CXXFLAGS="-Wno-write-strings -std=c++11"                                                                         \
+                CXXFLAGS="-Wno-write-strings"                                                                         \
                 CFLAGS="-Wno-write-strings"                                                                                      \
                 CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx                                                \
                 LDFLAGS=-L${DEST_FOLDER}/lib                                                                                     \
