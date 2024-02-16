@@ -64,15 +64,16 @@ UDPPosition::UDPPosition()
     bind("udp_receive_port_", &m_UdpReceivePort);
 }
 
-UDPPosition::~UDPPosition()
-{
-}
-
 int UDPPosition::command(int argc, const char *const *argv)
 {
     // Tcl &tcl = Tcl::instance();
     if (strcasecmp(argv[1], "start") == 0)
     {
+        if (p_PositionListener) {
+            LOG_MSG_ERROR(NOW << "::UDPPosition: position listener thread already started!");
+            return TCL_ERROR;
+        }
+
         struct timeval tv;
         tv.tv_sec = 0;
         tv.tv_usec = m_SocketReadTimeout;
@@ -81,10 +82,11 @@ int UDPPosition::command(int argc, const char *const *argv)
         {
             if (debug_ >= 1)
                 LOG_MSG_INFO(NOW << "::UDPPosition: starting position listener on port " << m_UdpReceivePort);
-            p_PositionListener->Start();
+            if (p_PositionListener->Start())
+                return TCL_OK;
         }
 
-        return TCL_OK;
+        return TCL_ERROR;
     }
     else if (strcasecmp(argv[1], "stop") == 0)
     {
@@ -97,6 +99,7 @@ int UDPPosition::command(int argc, const char *const *argv)
                 p_PositionListener->Stop(true);
             }
             delete p_PositionListener;
+            p_PositionListener = nullptr;
         }
         return TCL_OK;
     }
@@ -108,42 +111,42 @@ void UDPPosition::setPosition(const PositionData &pos)
     if (debug_ >= 1)
         LOG_MSG_INFO(NOW << "::UDPPosition: setting position to [" << pos.x << "," << pos.y << "," << pos.z << "]");
     std::unique_lock<std::mutex> lock(mutex_);
-    x_ = pos.x;
-    y_ = pos.y;
-    z_ = pos.z;
+    Position::setX(pos.x);
+    Position::setY(pos.y);
+    Position::setZ(pos.z);
 }
 
 double
 UDPPosition::getX()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    return x_;
+    return Position::getX();
 }
 double
 UDPPosition::getY()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    return y_;
+    return Position::getY();
 }
 double
 UDPPosition::getZ()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    return z_;
+    return Position::getZ();
 }
 
 void UDPPosition::setX(double x)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    x_ = x;
+    Position::setX(x);
 }
 void UDPPosition::setY(double y)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    y_ = y;
+    Position::setY(y);
 }
 void UDPPosition::setZ(double z)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    z_ = z;
+    Position::setZ(z);
 }

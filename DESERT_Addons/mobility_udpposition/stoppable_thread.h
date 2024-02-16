@@ -39,62 +39,96 @@
 #pragma once
 
 #include <atomic>
+#include <iostream>
 #include <thread>
 using namespace std::chrono_literals;
 
+/** A stoppable C++11 thread implementation.
+ * 
+ */
 class StoppableThread
 {
 public:
-    bool Start()
-    {
-        try
-        {
-            m_thread = std::thread(&StoppableThread::RunInternal, this);
-            return true;
-        }
-        catch (...)
-        {
-            return false;
-        }
-    }
-    void Stop(bool wait = false)
-    {
-        m_stop.store(true);
-        if (wait && m_thread.joinable())
-        {
-            try
-            {
-                m_thread.join();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    virtual void Run()
-    {
-        while (!StopRequested())
-        {
-            Sleep(100ms);
-        }
-    }
-    /** Sleep for the given duration, use literals like 1s, 100ms, 10us */
-    template <class Rep, class Period>
-    void Sleep(const std::chrono::duration<Rep, Period> &d)
-    {
-        std::this_thread::sleep_for(d);
-    }
-    bool Running() { return m_running.load(); }
-    bool StopRequested() { return m_stop.load(); }
+	StoppableThread() = default;
+	virtual ~StoppableThread() = default;
+	/** Start the thread.
+	 * @param exc_info prints a catched exception message to stderr 
+	 * @return true if thread was started, false if not
+	 * */
+	bool Start(bool exc_info = false)
+	{
+		/* Check for double-start */
+		if (Running())
+			return false;
+		try {
+			m_thread = std::thread(&StoppableThread::RunInternal, this);
+			return true;
+		}
+		catch (std::exception& ex) {
+			if (exc_info)
+				std::cerr << "StoppableThread::Start() exception: " << ex.what() << std::endl;
+		}
+		catch (...) {
+			if (exc_info)
+				std::cerr << "StoppableThread::Start() unknow exception catched" << std::endl;
+		}
+		return false;
+	}
+
+	/** Stop the thread, needs call(s) to StopRequested() in the Run() worker function to check for the stop request.
+	 * @param wait wait for the thread to end
+	 *
+	 */
+	void Stop(bool wait = false)
+	{
+		m_stop.store(true);
+		if (wait && m_thread.joinable())
+		{
+			try
+			{
+				m_thread.join();
+			}
+			catch (...)
+			{
+			}
+		}
+	}
+	/** Pure virtual stopable worker function of thread, use the test StopRequested() to check if it should stop.
+	 * Implementation example (use in derived class):
+	 *
+	   void Run() override {
+	     while (!StopRequested())
+		 {
+			Sleep(100ms);
+		 }
+	   }
+	 */
+	virtual void Run() = 0;
+
+	/** Sleep for the given duration, use literals like 1s, 100ms, 10us */
+	template <class Rep, class Period>
+	void Sleep(const std::chrono::duration<Rep, Period> &d)
+	{
+		std::this_thread::sleep_for(d);
+	}
+	/** Returns the current state of the thread.
+	 * @return true if running
+	 */
+	bool Running() { return m_running.load(); }
+	/** Returns if a stop was requested.
+	 * @return true if a stop was requested
+	 */
+	bool StopRequested() { return m_stop.load(); }
 
 private:
-    void RunInternal()
-    {
-        m_running = true;
-        Run();
-        m_running = false;
-    }
-    std::atomic_bool m_running{false};
-    std::atomic_bool m_stop{false};
-    std::thread m_thread;
+    /** Internal thread function. */
+	void RunInternal()
+	{
+		m_running = true;
+		Run();
+		m_running = false;
+	}
+	std::atomic_bool m_running{false};
+	std::atomic_bool m_stop{false};
+	std::thread m_thread;
 };

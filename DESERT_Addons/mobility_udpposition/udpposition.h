@@ -59,7 +59,7 @@ public:
     /**
     * Destructor
     */
-    virtual ~UDPPosition();
+    virtual ~UDPPosition() = default;
 
     /**
     * Method that return the current projection of the node on the x-axis.

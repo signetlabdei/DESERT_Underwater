@@ -75,7 +75,7 @@ public:
         if (m_SocketFD)
             ::close(m_SocketFD);
     }
-    /// @brief Thread function, runs until thread is stopped
+    /** Thread function, runs until thread is stopped */
     virtual void Run()
     {
         try
@@ -86,21 +86,17 @@ public:
             if (m_SocketFD < 0)
                 throw std::runtime_error("PositionListener::ListenLoop()::socket()");
 
-            // we want to be able to resuse it (multiple folk are interested)
+            // allow to reuse the address
             int reuse = 1;
-            if (setsockopt(m_SocketFD, SOL_SOCKET, SO_REUSEADDR /* SO_REUSEPORT*/, (SET_SOCKOPT_TYPE)&reuse, sizeof(reuse)) == -1)
+            if (setsockopt(m_SocketFD, SOL_SOCKET, SO_REUSEADDR, (SET_SOCKOPT_TYPE)&reuse, sizeof(reuse)) == -1)
                 throw std::runtime_error("PositionListener::ListenLoop::setsockopt::reuse");
 
-            /*      if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT,
-                        &reuse, sizeof(reuse)) == -1)
-                    throw std::runtime_error("PositionListener::ListenLoop()::failed to set resuse port option");*/
-
-            // give ourselves plenty of receive space
+            // setup receive buffer to be large enough
             int rx_buffer_size = 1024;
             if (setsockopt(m_SocketFD, SOL_SOCKET, SO_RCVBUF, (SET_SOCKOPT_TYPE)&rx_buffer_size, sizeof(rx_buffer_size)) == -1)
                 throw std::runtime_error("PositionListener::ListenLoop()::setsockopt::rcvbuf");
 
-            /* construct a datagram address structure */
+            // construct a datagram address structure
             struct sockaddr_in dg_addr;
             memset(&dg_addr, 0, sizeof(dg_addr));
             dg_addr.sin_family = AF_INET;
@@ -111,9 +107,9 @@ public:
             if (bind(m_SocketFD, (struct sockaddr *)&dg_addr, sizeof(dg_addr)) == -1)
                 throw std::runtime_error("PositionListener::ListenLoop()::bind");
 
-            // make receive buffer and stream
-            std::vector<char> incoming_buffer(50);      
+            // reserve receive buffer, make it large enough (2 * serialized size for now)
             PositionData pd;
+            std::vector<char> incoming_buffer(pd.size() * 2);                  
             while (!StopRequested())
             {
                 if (ReadyToRead())
@@ -130,12 +126,7 @@ public:
                         LOG_MSG_INFO("Received " << num_bytes_read << " bytes from peer");
                     try
                     {
-                        #ifdef USE_ACHIVE
-                        in.seekg(0, std::ios_base::beg); // reset read position
-                        a >> pd;
-                        #else
                         pd.deserialize(incoming_buffer.data(), incoming_buffer.size());
-                        #endif
                         p_Owner->setPosition(pd);
                     }
                     catch (const std::exception &e)
@@ -152,8 +143,9 @@ public:
         }
     }
 protected:
-    /// @brief Uses select() to do a timed wait for new data 
-    /// @return true if data ara available, false if not
+    /** Uses select() to do a timed wait for new data
+     *  @return true if data ara available, false if not
+     */
     bool ReadyToRead()
     {
         int nfds;
@@ -170,12 +162,13 @@ protected:
         }
         return ret == 1;
     }
-
+    /** Socket descriptor */
     SOCKET_TYPE m_SocketFD{0};
+    /** Timeout for the select call in ReadyToRead()*/
     timeval m_ReadTimeout;
+    /** UDP port number to read position from */
     uint16_t m_Port;
-
-    /// @brief Owner instance
+    /** Owner instance */
     Owner *p_Owner;
 };
 

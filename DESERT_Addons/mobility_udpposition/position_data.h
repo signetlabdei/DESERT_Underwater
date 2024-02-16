@@ -43,7 +43,7 @@
 #if BYTE_ORDER == BIG_ENDIAN
 #error Big endian detected! Serialization expects little endian system!
 #endif
-#include <string.h>
+#include <cstring>  // for std::memcpy()
 
 // Serialization in Python:
 // import struct
@@ -61,33 +61,40 @@ struct PositionData
     /** Up in [m] */
     double z;
 
-    /// @brief Compute required buffer size for (de-)serialization 
-    /// @return 
-    constexpr size_t size()  { return sizeof(x) + sizeof(y) + sizeof(z); }
+    /** Compute required buffer size for (de-)serialization 
+     * @return required buffer size
+     */
+    constexpr size_t size() const { return sizeof(x) + sizeof(y) + sizeof(z); }
 
-    /// @brief Serialize the position data to buffer
-    /// @param buffer 
-    /// @param buffer_size 
-    /// @return bytes used in buffer (if > 0) or negative of required buffer size 
-    size_t serialize(char* buffer, size_t buffer_size)
+    /** Serialize the position data to buffer
+     *  @param buffer buffer where the data are written
+     *  @param buffer_size size of buffer
+     *  @return bytes used in buffer (if > 0) or negative of required buffer size 
+     */
+    int serialize(char* buffer, size_t buffer_size) const
     {
         int idx = 0;
         if (buffer_size < size()) {
-            return -size();
+            return -((int)size());
         }
-        memcpy(buffer + idx, &x, sizeof(x)); idx += sizeof(x);
-        memcpy(buffer + idx, &y, sizeof(x)); idx += sizeof(y);
-        memcpy(buffer + idx, &z, sizeof(x)); idx += sizeof(z);
+        std::memcpy(buffer + idx, &x, sizeof(x)); idx += sizeof(x);
+        std::memcpy(buffer + idx, &y, sizeof(x)); idx += sizeof(y);
+        std::memcpy(buffer + idx, &z, sizeof(x)); idx += sizeof(z);
         return idx;
     }
+    /** Deserialize the position data from the buffer
+     *  @param buffer buffer with serialized data
+     *  @param buffer_size size of buffer
+     *  @return false if buffer is too small, true otherwise
+     */
     bool deserialize(char* buffer, size_t buffer_size)
     {
         int idx = 0;
         if (buffer_size < size())
             return false;
-        memcpy(&x, buffer + idx, sizeof(x)); idx += sizeof(x);
-        memcpy(&y, buffer + idx, sizeof(y)); idx += sizeof(y);
-        memcpy(&z, buffer + idx, sizeof(z)); idx += sizeof(z);
+        std::memcpy(&x, buffer + idx, sizeof(x)); idx += sizeof(x);
+        std::memcpy(&y, buffer + idx, sizeof(y)); idx += sizeof(y);
+        std::memcpy(&z, buffer + idx, sizeof(z)); idx += sizeof(z);
         return true;
     }
 };
