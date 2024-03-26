@@ -137,7 +137,7 @@ public:
 	*
 	* @param Packet* Pointer to the packet will be received.
 	*/
-	virtual void recv(Packet*);
+	virtual void recv(Packet* p);
 
 	/**
 	* Creates and transmits a packet.
@@ -177,7 +177,7 @@ protected:
 	float newY; /**< Y of the new position sent to the AUV.*/
 	float newZ; /**< Z of the new position sent to the AUV.*/
 	float speed; /**< Moving speed sent to the AUV.*/
-	int sn; /**Sequence number of the last control packet sent.*/
+	int sn; /**< Sequence number of the last control packet sent.*/
 	Packet* p;
 	int adaptiveRTO; /**< 1 if an adaptive RTO is used, 0 if a
 						constant RTO is used.*/

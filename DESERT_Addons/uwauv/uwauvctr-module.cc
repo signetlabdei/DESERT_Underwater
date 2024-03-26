@@ -45,7 +45,7 @@ extern packet_t PT_UWAUV;
 extern packet_t PT_UWAUV_CTR;
 
 /**
-* Adds the module for UwAUVModuleClass in ns2.
+* Adds the module for UwAUVCtrModuleClass in ns2.
 */
 
 /**

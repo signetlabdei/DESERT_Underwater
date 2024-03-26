@@ -210,8 +210,6 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 			found = true;
 			alarm_mode = 2;
 			posit->setDest(x_err,y_err,-90,speed);
-			//x_s = x_err;
-			//y_s = y_err;
 			
 			if (debug_){ 
 				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p)"
@@ -227,8 +225,6 @@ void UwAUVCtrErSimpleModule::initPkt(Packet* p) {
 			found = true;
 			alarm_mode = 2;
 			posit->setDest(x_err,y_err,-90,speed);
-			//x_s = x_err;
-			//y_s = y_err;
 
 			if (debug_){ 
 				std::cout << NOW << " UwAUVCtrErrModule::InitPkt(Packet *p) SV" 
@@ -405,9 +401,7 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 						y_sorg = posit->getY();
 
 						alarm_queue.erase(alarm_queue.begin());
-					} else {
-						//wait another app to take care of it
-					}
+					} // otherwise wait another app to take care of it
 
 					exist = false;
 
@@ -445,7 +439,7 @@ void UwAUVCtrErSimpleModule::recv(Packet* p) {
 				exist = false;
 
 				for (const auto& vec : alarm_queue) {
-					// Controlla se le coordinate corrispondono
+					// Check if the coordinates are the same
 					if (vec[0] == uwAUVh->x() && vec[1] == uwAUVh->y()) {
 						exist = true;
 						break;

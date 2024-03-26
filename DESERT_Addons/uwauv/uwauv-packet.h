@@ -50,7 +50,7 @@ typedef struct hdr_uwAUV_ctr {
     float y_;
     float z_;
     float speed_;
-    double sn_; // sequence number
+    double sn_; /**< sequence number */
 
     static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -86,13 +86,15 @@ typedef struct hdr_uwAUV_ctr {
 } hdr_uwAUV_ctr;
 
 /**
- * <i>hdr_uwAUV_monitoring</i> describes <i>UWAUV_monitoring</i> packets sent by the AUV to the base station for monitoring the AUV state.
+ * <i>hdr_uwAUV_monitoring</i> describes <i>UWAUV_monitoring</i> packets sent by the AUV 
+ * to the base station for monitoring the AUV state.
  */
 typedef struct hdr_uwAUV_monitoring {
     float x_;
     float y_;
     float z_;
-    double ack_; // ack piggybacked of a ctr message. If =0 is not ack, if =b>0 is cumulative ack untill b, if c<0 is cumulative ack untill c-1 and NACK c.
+    double ack_; /**< ack piggybacked of a ctr message. If =0 is not ack, if =b>0 is 
+                    cumulative ack untill b, if c<0 is cumulative ack untill c-1 and NACK c.*/
 
     static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -126,14 +128,16 @@ typedef struct hdr_uwAUV_monitoring {
 } hdr_uwAUV_monitoring;
 
 /**
- * <i>hdr_uwAUV_error</i> describes <i>UWAUV_error</i> packets sent by the AUV to the surface vehicle to signal a problem.
+ * <i>hdr_uwAUV_error</i> describes <i>UWAUV_error</i> packets sent by the AUV to the 
+ * surface vehicle to signal a problem.
  */
 typedef struct hdr_uwAUV_error {
     float x_;
     float y_;
     float z_;
     float speed_;
-    double ack_; // ack piggybacked of a ctr message. If =0 is not ack, if =b>0 is cumulative ack untill b, if c<0 is cumulative ack untill c-1 and NACK c.
+    double ack_; /**< ack piggybacked of a ctr message. If =0 is not ack, if =b>0 is cumulative 
+                      ack untill b, if c<0 is cumulative ack untill c-1 and NACK c.*/
     double sn_;
     float error_;
     

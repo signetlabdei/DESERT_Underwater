@@ -48,13 +48,13 @@
 class UwAUVErrorModule;
 
 /**
-* UwSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
+* UwAUVErrorSendTimer class is used to handle the scheduling period of <i>UWAUV</i> packets.
 */
 class UwAUVErrorSendTimer : public UwSendTimer {
 	public:
 
 	/**
-   * Conscructor of UwSendTimer class 
+   * Conscructor of UwAUVErrorSendTimer class 
    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
    */
 	UwAUVErrorSendTimer(UwAUVErrorModule *m) : UwSendTimer((UwCbrModule*)(m)){
@@ -62,25 +62,25 @@ class UwAUVErrorSendTimer : public UwSendTimer {
 };
 
 /**
-* UwAUVModule class is used to manage <i>UWAUV</i> packets and to collect statistics about them.
+* UwAUVErrorModule class is used to manage <i>UWAUV</i> packets and to collect statistics about them.
 */
 class UwAUVErrorModule : public UwCbrModule {
 public:
 
 	/**
-	* Default Constructor of UwAUVModule class.
+	* Default Constructor of UwAUVErrorModule class.
 	*/
 	UwAUVErrorModule();
 
 	/**
-	* Constructor with position setting of UwAUVModule class.
+	* Constructor with position setting of UwAUVErrorModule class.
 	*
 	* @param UWSMWPPosition* p Pointer to the AUV position
 	*/
 	UwAUVErrorModule(UWSMWPPosition* p);
 
 	/**
-	* Destructor of UwAUVModule class.
+	* Destructor of UwAUVErrorModule class.
 	*/
 	virtual ~UwAUVErrorModule();
 
@@ -106,7 +106,7 @@ public:
 	*
 	* @param Packet* Pointer to the packet will be received.
 	*/
-	virtual void recv(Packet*);
+	virtual void recv(Packet* p);
 
 	/**
 	* Reset retransmissions
@@ -167,25 +167,38 @@ protected:
 
 
 	int log_on_file; /**< Flag to enable log file writing.*/
-	Packet* p;
+	Packet* p; /**< Pointer to the packet that will be received*/
 	int period;
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 	std::ofstream err_log;
 	std::ofstream t_err_log;
-	float x_e;
-	float y_e;
-	float error_m;
-	int alarm_mode;
+	float x_e; /**< x coordinate error*/
+	float y_e; /**< y coordinate error*/
+	float error_m; /**< probability value of the error*/
+	int alarm_mode; /**< error status
+					 * 0 no error
+					 * 1 maybe there is an error
+					 * 2 error 
+					*/
 
 private:
 
-	double speed;
+	double speed; /**< speed of the AUV*/
+	/**
+	 * Returns the probability of the presence of an error
+	 * @return probability error 
+	*/
 	virtual double getErrorMeasure();
+	/**
+	 * Returns the probability of the presence of an error given a previous measure
+	 * @param t_e true error
+	 * @return probability error 
+	*/
 	virtual double getErrorMeasure(double t_e);
-	double t_e;  // True error in that point
-	double sigma; // standard deviation
-	double th_ne; // if x < th_e NO error
-	double accuracy;
+	double t_e;  /**< True error in that point*/
+	double sigma; /**< standard deviation*/
+	double th_ne; /**< if x < th_e NO error*/
+	double accuracy; /**< level of accuracy to achieve before defining the status of an error*/
 
 };
 

@@ -160,10 +160,10 @@ protected:
 									 before a ackTimeout otherwise ACK is sent with a 
 									 dedicated packet after the acKTimeout.*/
 	double ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
-	UwAUVSendAckTimer ackTimer_; /**<Timer to schedule ACK transmission.*/
-	int ackPriority; /** < Flag to give higher priority to ACK or not.*/
-	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
-	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
+	UwAUVSendAckTimer ackTimer_; /**< Timer to schedule ACK transmission.*/
+	int ackPriority; /**< Flag to give higher priority to ACK or not.*/
+	int ackNotPgbk; /**< Number of ACK not sent in piggyback when ackPolicy = 2. */
+	int drop_old_waypoints; /**< Flag set to 1 to drop waypoints with sequence number 
 								lower or equal than last_sn_confirmed.*/
 
 

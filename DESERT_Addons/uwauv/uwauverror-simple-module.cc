@@ -59,9 +59,9 @@ public:
 	}
 
 	/**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
+     * Creates the TCL object needed for the tcl language interpretation
+     * @return Pointer to an TclObject
+    */
 	TclObject* create(int, const char*const*) {
 		return (new UwAUVErrorSimpleModule());
 	}

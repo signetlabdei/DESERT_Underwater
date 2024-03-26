@@ -81,7 +81,27 @@ public:
 	*  	direction of the movement) and the third value defines the speed to be
 	*used
 	* </ul>
-	*
+	*<li><b>addDest &lt;<i>integer value</i>&gt;<i>integer
+	*value</i>&gt;<i>integer value</i>&gt;</b>:
+	*  	add a following checkpoint to the movement pattern: the firts two values define the point to be
+	*reached (i.e., the
+	*  	direction of the movement) and the third value defines the speed to be
+	*used
+	* </ul>
+	<li><b>setDest &lt;<i>integer value</i>&gt;<i>integer
+	*value</i>&gt;<i>integer value</i>&gt;<i>integer value</i>&gt;</b>:
+	*  	set the movement pattern: the firts three values define the point to be
+	*reached (i.e., the
+	*  	direction of the movement) and the fourth value defines the speed to be
+	*used
+	* </ul>
+	<li><b>addDest &lt;<i>integer value</i>&gt;<i>integer
+	*value</i>&gt;<i>integer value</i>&gt;<i>integer value</i>&gt;</b>:
+	*  	add a following checkpoint to the movement pattern: the firts three values define the point to be
+	*reached (i.e., the
+	*  	direction of the movement) and the fourth value defines the speed to be
+	*used
+	* </ul>
 	* Moreover it inherits all the OTcl method of Position
 	*
 	*

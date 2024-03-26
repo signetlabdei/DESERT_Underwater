@@ -240,11 +240,8 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 
 		//If in the right position
 		if (getDistance(posit->getX(),posit->getY(),x_err,y_err) == 0.0){ 
-			found = true;
-			//x_s = x_err;
-			//y_s = y_err;
-
 			
+			found = true;
 			alarm_mode = 3;
 			posit->setDest(x_err,y_err,-90,speed);
 
@@ -261,9 +258,6 @@ void UwAUVCtrErModule::initPkt(Packet* p) {
 			getDistance(posit->getX(),posit->getY(),x_sorg,y_sorg)){ 
 			
 			found = true;
-			//x_s = x_err;
-			//y_s = y_err;
-
 			alarm_mode = 3;
 			posit->setDest(x_err,y_err,-90,speed);
 
@@ -373,8 +367,6 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 			rcv_queue.push_back({uwAUVh->x(), uwAUVh->y()});
 
-
-			//dev_status status = checkError(uwAUVh->error(),1,uwAUVh->x(), uwAUVh->y());
 			int status = checkError(uwAUVh->error(),1,uwAUVh->x(), uwAUVh->y());
 			
 			bool exists = false;
@@ -491,12 +483,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 
 							alarm_queue.erase(alarm_queue.begin());
 
-						} else {
-
-							//alarm_mode = 4;
-							//wait another app to take care of it
-						}
-
+						}// otherwise wait another app to take care of it
 						
 						exists = false;
 						for (const auto& vec : alarm_queue) {

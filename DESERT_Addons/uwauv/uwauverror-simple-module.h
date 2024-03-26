@@ -106,7 +106,7 @@ public:
 	*
 	* @param Packet* Pointer to the packet will be received.
 	*/
-	virtual void recv(Packet*);
+	virtual void recv(Packet* p);
 
 	/**
 	* Reset retransmissions
@@ -169,21 +169,21 @@ protected:
 
 
 	int log_on_file; /**< Flag to enable log file writing.*/
-	Packet* p;
+	Packet* p; /** Pointer of the packet that will be received*/
 	int period;
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 	std::ofstream err_log;
 	std::ofstream t_err_log;
-	float x_e;
-	float y_e;
-	int alarm_mode;
+	float x_e; /**< x coordinate error*/
+	float y_e; /**< x coordinate error*/
+	int alarm_mode; /**< If true, an error is present and it is being solved*/
 
 private:
 
-	double speed;
-	double error_p;
-	double sigma;
-	double accuracy;
+	double speed; /** speed of the AUV*/
+	double error_p; /** probability that an error could arise*/
+	double sigma; /** variance of the error measurement*/
+	double accuracy; /** accuracy level to obatain to define the error stauts*/
 
 
 };

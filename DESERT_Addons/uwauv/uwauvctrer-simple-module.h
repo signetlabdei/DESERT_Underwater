@@ -158,7 +158,28 @@ public:
 	*/
 	static inline int getAUVErrorHeaderSize() { return sizeof(hdr_uwAUV_error); }
 
+	/**
+	* Returns the distance (in a 2D space) between a starting point s and a destination point d.
+	* @param x_s x coordinate of point s
+	* @param y_s y coordinate of point s
+	* @param x_d x coordinate of point d
+	* @param y_d y coordinate of point d
+	*
+	* @return distance between s and d.
+	*/
 	float getDistance(float x_s,float y_s, float x_d, float y_d); 
+
+	/**
+	* Returns the distance (in a 3D space) between a starting point s and a destination point d.
+	* @param x_s x coordinate of point s
+	* @param y_s y coordinate of point s
+	* @param z_s z coordinate of point s
+	* @param x_d x coordinate of point d
+	* @param y_d y coordinate of point d
+	* @param z_d z coordinate of point d
+	*
+	* @return distance between s and d.
+	*/
 	float getDistance(float x_s,float y_s, float z_s, float x_d, float y_d, float z_d); 
 
 
@@ -167,8 +188,9 @@ protected:
 
 	UWSMWPPosition* posit; /**< Controller position.*/
 	int last_sn_confirmed; /**< Sequence number of the last command Packete received.*/
-	int sn; /**Sequence number of the last control packet sent.*/
-	int drop_old_waypoints;
+	int sn; /**< Sequence number of the last control packet sent.*/
+	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
+								lower or equal than last_sn_confirmed.*/
 	int period;
 
 	float x_err; /**< X of the last AUV position with an error.*/
@@ -177,22 +199,25 @@ protected:
 	float x_s; /**< X of the last AUV position with an error that has been solved.*/
 	float y_s; /**< Y of the last AUV position with an error that has been solved.*/
 	
-	Packet* p;
+	Packet* p; /**< Pointer to the packet that will be received*/
 	int log_on_file;
-	float x_sorg;
-	float y_sorg;
-	double speed;
+	float x_sorg; /**< X of the starting AUV position.*/
+	float y_sorg; /**< Y of the starting AUV position.*/
+	double speed; /**< speed of the AUV.*/
 	bool active_alarm;
 
-	static int alarm_mode;
-	static vector<vector<float>> alarm_queue;
+	static int alarm_mode; /**< status of the error resolution mission
+								* 0 no error
+								* 2 SUV is mooving towards the error location
+								* 3 AUV is delving close to the depth of the error location.*/
+	static vector<vector<float>> alarm_queue; /**< list of the active errors*/
 
 private:
  
 	std::ofstream pos_log;
 	std::ofstream err_log;
 	std::ofstream t_err_log;
-	vector<vector<float>> rcv_queue;
+	vector<vector<float>> rcv_queue; /**< list of error received*/
 
 };
 
