@@ -300,7 +300,7 @@ void UwAUVErrorModule::recv(Packet* p) {
 					<< uwAUVh->sn() << " dropped " << std::endl;
 			}
 
-		} else { //packet in order
+	} else { //packet in order
 
 		/** 
 		 * error > 0 tx more data
@@ -401,7 +401,7 @@ void UwAUVErrorModule::recv(Packet* p) {
 			}
 		}
 
-			last_sn_confirmed = uwAUVh->sn();
+		last_sn_confirmed = uwAUVh->sn();
 	}
 
 	UwCbrModule::recv(p);
@@ -418,21 +418,21 @@ void UwAUVErrorModule::recv(Packet* p) {
 double UwAUVErrorModule::getErrorMeasure(){
 
 	std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> u_dis(0.0, 1.0);
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> u_dis(0.0, 1.0);
 
-    // Generate a random value from the uniform distribution
-    t_e = u_dis(gen);
+	// Generate a random value from the uniform distribution
+	t_e = u_dis(gen);
 
 	std::normal_distribution<> n_dis(0.0, sigma); 
 
-    // Generate a random value from the Gaussian distribution
-    double noise = n_dis(gen);
+	// Generate a random value from the Gaussian distribution
+	double noise = n_dis(gen);
 	double m = t_e + noise;
 
 	// Calculate the error probability
 	// prob of true error (t_e) greater than th_ne
-    double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma)/2;
+	double p_e = std::erfc(((th_ne - m) / std::sqrt(2.0)) / sigma)/2;
 	//if p_e is small enough --> no error, otherwise gray zone 
 	if (p_e > accuracy){ 
 		alarm_mode = 1;
@@ -465,11 +465,11 @@ double UwAUVErrorModule::getErrorMeasure(){
 double UwAUVErrorModule::getErrorMeasure(double t_e){
 
 	std::random_device rd;
-    std::mt19937 gen(rd());
+	std::mt19937 gen(rd());
 
 	std::normal_distribution<> n_dis(0.0, sigma);  
-    // Generate a random value from the Gaussian distribution
-    double noise = n_dis(gen);
+	// Generate a random value from the Gaussian distribution
+	double noise = n_dis(gen);
 
 	double m = t_e + noise;
 
