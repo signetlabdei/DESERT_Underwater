@@ -56,9 +56,9 @@ class UwAUVErrorSendTimer : public UwSendTimer {
 	public:
 
 	/**
-   * Conscructor of UwSendTimer class 
-   * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
-   */
+	* Conscructor of UwSendTimer class 
+	* @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+	*/
 	UwAUVErrorSendTimer(UwAUVCtrErModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };

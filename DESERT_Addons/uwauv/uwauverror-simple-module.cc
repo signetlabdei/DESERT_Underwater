@@ -53,8 +53,8 @@ static class UwAUVErrorSimpleModuleClass : public TclClass {
 public: 
 
 	/**
-   * Constructor of the class
-   */
+	* Constructor of the class
+	*/
 	UwAUVErrorSimpleModuleClass() : TclClass("Module/UW/AUV/ERS") {
 	}
 
