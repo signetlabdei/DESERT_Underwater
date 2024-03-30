@@ -603,7 +603,7 @@ void UwAUVCtrErModule::recv(Packet* p) {
 int UwAUVCtrErModule::checkError(double m, int n_pkt, float x, float y){
 	
 	// prob of true error (t_e) greater than th_ne
-    double p_e = std::erfc((((th_ne - (m/n_pkt)) *  std::sqrt(n_pkt)) / std::sqrt(2.0)) / sigma)/2; 
+	double p_e = std::erfc((((th_ne - (m/n_pkt)) *  std::sqrt(n_pkt)) / std::sqrt(2.0)) / sigma)/2; 
 	//dev_status status;
 	int status;
 	if (p_e < accuracy){ //if p_e is small enough --> no error 

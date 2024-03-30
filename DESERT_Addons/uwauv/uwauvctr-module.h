@@ -55,9 +55,9 @@ class UwAUVCtrSendTimer : public UwSendTimer {
 	public:
 
 	/**
-    * Conscructor of UwSendTimer class 
-    * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
-    */
+	 * Conscructor of UwSendTimer class 
+	 * @param UwAUVCtrModule *m pointer to an object of type UwAUVCtrModule
+	*/
 	UwAUVCtrSendTimer(UwAUVCtrModule *m) : UwSendTimer((UwCbrModule*)(m)){
 	};
 };
@@ -94,10 +94,10 @@ public:
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-    * Initializes a control data packet passed as argument with the default values.
-    * 
-    * @param Packet* Pointer to a packet already allocated to fill with the right values.
-    */
+	* Initializes a control data packet passed as argument with the default values.
+	* 
+	* @param Packet* Pointer to a packet already allocated to fill with the right values.
+	*/
 	virtual void initPkt(Packet* p) ;
 
 	/**

@@ -87,20 +87,20 @@ public:
 	virtual ~UwAUVModule();
 
 	/**
-    * TCL command interpreter. It implements the following OTcl methods:
-    * 
-    * @param argc Number of arguments in <i>argv</i>.
-    * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-    * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-    * 
-    **/
+	* TCL command interpreter. It implements the following OTcl methods:
+	* 
+	* @param argc Number of arguments in <i>argv</i>.
+	* @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
+	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	* 
+	**/
 	virtual int command(int argc, const char*const* argv);
 
 	/**
-    * Initializes a monitoring data packet passed as argument with the default values.
-    * 
-    * @param Packet* Pointer to a packet already allocated to fill with the right values.
-    */
+	* Initializes a monitoring data packet passed as argument with the default values.
+	* 
+	* @param Packet* Pointer to a packet already allocated to fill with the right values.
+	*/
 	virtual void initPkt(Packet* p) ;
 
 	/**
@@ -122,7 +122,7 @@ public:
 	*
 	* @return the current AUV position
 	*/
-    inline UWSMWPPosition* getPosition() const { return posit; }
+	inline UWSMWPPosition* getPosition() const { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.

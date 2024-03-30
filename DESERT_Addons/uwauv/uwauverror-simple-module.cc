@@ -59,9 +59,9 @@ public:
 	}
 
 	/**
-     * Creates the TCL object needed for the tcl language interpretation
-     * @return Pointer to an TclObject
-    */
+	 * Creates the TCL object needed for the tcl language interpretation
+	 * @return Pointer to an TclObject
+	*/
 	TclObject* create(int, const char*const*) {
 		return (new UwAUVErrorSimpleModule());
 	}
@@ -266,7 +266,7 @@ void UwAUVErrorSimpleModule::initPkt(Packet* p) {
 
 	} else {
 
-		uwAUVh->x() = x_e;                      
+		uwAUVh->x() = x_e;
 		uwAUVh->y() = y_e;
 		uwAUVh->error() = 1;
 		this->p = p;
@@ -296,7 +296,6 @@ void UwAUVErrorSimpleModule::recv(Packet* p) {
 			std::cout << NOW << " UwAUVErrBModule::old error with sn " 
 				<< uwAUVh->sn() << " dropped " << std::endl;
 		}
-
 	} else { //packet in order
 
 		//Valid pkt refering to my error

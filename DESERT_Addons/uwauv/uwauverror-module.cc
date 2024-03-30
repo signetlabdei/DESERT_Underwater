@@ -244,7 +244,7 @@ void UwAUVErrorModule::initPkt(Packet* p) {
 			posit->setDest(posit->getXdest(),posit->getYdest(),posit->getZdest(),0); 
 			posit->setAlarm(true);
 			
-			uwAUVh->x() = x_e;                      
+			uwAUVh->x() = x_e;
 			uwAUVh->y() = y_e;
 			uwAUVh->error() = error_m;
 			this->p = p;	

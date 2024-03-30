@@ -133,7 +133,7 @@ public:
 	*
 	* @return the current AUV position
 	*/
-    inline UWSMWPPosition* getPosition() const { return posit; }
+	inline UWSMWPPosition* getPosition() const { return posit; }
 
 	/**
 	* Returns the size in byte of a <i>hdr_uwAUV_monitoring</i> packet header.
