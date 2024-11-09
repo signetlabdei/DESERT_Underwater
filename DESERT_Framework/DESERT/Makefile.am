@@ -97,9 +97,48 @@ SUBDIRS = m4 \
     data_link/uwtdma \
     data_link/uwtdma-frame \
     data_link/uwtokenbus \
+<<<<<<< HEAD
     data_link/uwjammer \
     channel/uwem_channel \
     channel/uwoptical_channel \
+=======
+    physical/uwphysical \
+    physical/uwhmmphysical \
+    physical/uwgainfromdb \
+    physical/uwphysicaldb\
+    physical/uwphysicalrogersmodel\
+    physical/uwphysicalfromdb\
+    physical/uwmodem \
+    physical/uwmodemcsa \
+    physical/uwconnector \
+    physical/uwevologicss2cmodem \
+    physical/uwmphypatch \
+    physical/uwhermesphy \
+    physical/uwofdmphy \
+    physical/uwahoi_phy \
+    physical/uwahoimodem \
+    physical/uwmodamodem \
+    physical/uwoptical_phy \
+    physical/uwopticalbeampattern \
+    physical/uw-al \
+    physical/uw-al/packer_common \
+    physical/uw-al/packer_mac \
+    physical/uwphy_clmsgs \
+    physical/uwem_phy \
+    physical/uwem_antenna \
+    utility/msg-display \
+    mobility/uwdriftposition \
+    mobility/uwgmposition \
+    mobility/uwrandomlib \
+    mobility/uwsmposition \
+    interference/uwinterference \
+    interference/uwinterferenceofdm \
+    propagation/uwoptical_propagation \
+    propagation/uwem_propagation \
+    channel/uwoptical_channel \
+    channel/uwem_channel \
+    statistics/uwstats_utilities \
+>>>>>>> bab85ff (updated top-level Makefile.am and configure.ac files)
     ranging/uwranging_tokenbus \
     ranging/uwranging_tdma \
     ranging/uwtap \
