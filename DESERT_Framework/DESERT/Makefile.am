@@ -26,9 +26,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 DISTCHECK_CONFIGURE_FLAGS = @NS_ALLINONE_DISTCHECK_CONFIGURE_FLAGS@ \
-                            @NSMIRACLE_DISTCHECK_CONFIGURE_FLAGS@ 
+                            @NSMIRACLE_DISTCHECK_CONFIGURE_FLAGS@
 
 ACLOCAL_AMFLAGS = -I m4 
 
@@ -49,9 +48,9 @@ SUBDIRS = m4 \
     physical/uwhmmphysical \
     physical/uwphysicalnoise \
     physical/uwgainfromdb \
-    physical/uwphysicaldb\
-    physical/uwphysicalrogersmodel\
-    physical/uwphysicalfromdb\
+    physical/uwphysicaldb \
+    physical/uwphysicalrogersmodel \
+    physical/uwphysicalfromdb \
     physical/uw-al \
     physical/uw-al/packer_common \
     physical/uw-al/packer_mac \
@@ -92,6 +91,8 @@ SUBDIRS = m4 \
     data_link/uwsr \
     data_link/uw-t-lohi \
     data_link/uwUFetch \
+    data_link/uw-aloha-q \
+    data_link/uw-aloha-q-sync \
     data_link/uw-csma-aloha-trigger \
     data_link/uwtdma \
     data_link/uwtdma-frame \
@@ -102,4 +103,5 @@ SUBDIRS = m4 \
     ranging/uwranging_tokenbus \
     ranging/uwranging_tdma \
     ranging/uwtap \
-    ranging/uwranging_tdoa 
+    ranging/uwranging_tdoa
+
