@@ -678,8 +678,11 @@ protected:
 	{
 		map<pktSeqNum, Packet *>::iterator it_p;
 		it_p = mapPacket.find(seq_num);
-		Packet::free((*it_p).second);
-		mapPacket.erase((*it_p).first);
+		if (it_p != mapPacket.end())
+		{
+			Packet::free((*it_p).second);
+			mapPacket.erase((*it_p).first);
+		}
 	}
 
 	/**
@@ -701,7 +704,10 @@ protected:
 	{
 		map<pktSeqNum, AckTimer>::iterator it_a;
 		it_a = mapAckTimer.find(seq_num);
-		mapAckTimer.erase((*it_a).first);
+		if (it_a != mapAckTimer.end())
+		{
+			mapAckTimer.erase((*it_a).first);
+		}
 	}
 
 	/**

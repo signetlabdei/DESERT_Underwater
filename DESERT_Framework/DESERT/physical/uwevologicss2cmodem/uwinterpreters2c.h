@@ -43,6 +43,22 @@
 #include <string>
 #include <vector>
 
+/**
+ * Structure holding the info retreived via USBL message
+ */
+struct USBLInfo {
+  double curr_time;
+  double meas_time;
+  int r_address;
+  double X;
+  double Y;
+  double Z;
+  double E;
+  double N;
+  double U;
+  double accuracy;
+};
+
 class UwInterpreterS2C
 {
 
@@ -59,6 +75,7 @@ public:
 		BUSY,
 		DELIVERING,
 		DELIVERED,
+                DELIVEREDIM,
 		DROPCNT,
 		PHYOFF,
 		NOT_ACCEPTED,
@@ -82,6 +99,8 @@ public:
 		SENDEND,
 		BITRATE,
 		UNKNOWN,
+                USBLANGLES,
+                USBLLONG,
 		NO_COMMAND
 	};
 	/**
@@ -202,10 +221,27 @@ public:
 			std::vector<char>::iterator rsp_beg,
 			std::vector<char>::iterator &rsp_end, std::string &rx_payload);
 
+	/**
+	 * Method that sets whether Extended Protocol Mode is used or not
+	 * @param enabled: true if Extended Protocol Mode is used, false otherwise
+	 */
+	void setExtProtoMode(bool enabled);
+
+        /**
+         * Method to retrieve the USBL information saved upon reception of a
+         * USBL message
+         * @return USBLinfo structure loaded with values
+         */
+       std::shared_ptr<USBLInfo> getUSBLInfo();
+
 private:
 	std::string sep; /**< Separator for paramters fo the commands: a comma */
 	std::string r_term; /**<Terminating sequence for commands read from device*/
 	std::string w_term; /**<Terminating sequence for commands wrtten to device*/
+
+	bool ext_proto_mode; /**< Flag telling if Extened Protol Mode is in use*/
+
+        std::shared_ptr<USBLInfo> usbl_info; /**< Strucure holding info retrived via USBL message*/
 
 	/**
 	 * Vector holding all possible commands for the S2C syntax and

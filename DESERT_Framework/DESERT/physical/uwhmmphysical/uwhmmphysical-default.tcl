@@ -30,8 +30,6 @@
 # @author Antonio Montanari
 # @version 1.0.0
 
-Module/UW/HMMPHYSICAL set step_duration 60
-
 # import UwPhysical default values to mute tlc warnings
 Module/UW/HMMPHYSICAL set tx_power_consumption_ 3.3
 Module/UW/HMMPHYSICAL set rx_power_consumption_ 0.620

@@ -28,7 +28,7 @@
 # Author: Roberto Francescon
 # Version: 1.0.0
 #
-set opt(bash_parameters) 0
+set opt(bash_parameters) 1
 
 # if set to 1 the Application listen from the socket port provided in input
 set opt(AppSocket)  1;
@@ -282,19 +282,19 @@ proc createNode { } {
     # PHY LAYER
     set modem_ [new Module/UW/UwModem/EvoLogicsS2C]
 
-	puts "Creating node..."
+    puts "Creating node..."
 
-	    # insert the module(s) into the node
-	$node_ addModule 8 $app_ 1 "UWA"
-	$node_ addModule 7 $transport_ 1 "UDP"
-	$node_ addModule 6 $routing_ 1 "IPR"
-	$node_ addModule 5 $ipif_ 1 "IPIF"
-	$node_ addModule 4 $mll_ 1 "ARP"  
-	$node_ addModule 3 $mac_ 1 "ALOHA"
-	$node_ addModule 2 $uwal_ 1 "UWAL"
-	$node_ addModule 1 $modem_ 1 "S2C" 
+        # insert the module(s) into the node
+    $node_ addModule 8 $app_ 1 "UWA"
+    $node_ addModule 7 $transport_ 1 "UDP"
+    $node_ addModule 6 $routing_ 1 "IPR"
+    $node_ addModule 5 $ipif_ 1 "IPIF"
+    $node_ addModule 4 $mll_ 1 "ARP"  
+    $node_ addModule 3 $mac_ 1 "ALOHA"
+    $node_ addModule 2 $uwal_ 1 "UWAL"
+    $node_ addModule 1 $modem_ 1 "S2C" 
 
-	$node_ setConnection $app_ $transport_ trace
+    $node_ setConnection $app_ $transport_ trace
     $node_ setConnection $transport_ $routing_ trace
     $node_ setConnection $routing_ $ipif_ trace
     $node_ setConnection $ipif_ $mll_ trace
@@ -302,13 +302,15 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
-	# assign a port number to the application considered (CBR or VBR)
+    # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
     $mac_ setMacAddr $opt(node)
     $modem_ set ID_ $opt(node)
-	$modem_ setModemAddress $address
+    $modem_ setModemAddress $address
     $modem_ setLogLevel DBG
+    $modem_ enableExtProtoMode
+    $modem_ enableIMAck
     # $modem_ setBurstMode
 
     # set packer for Adaptation Layer

@@ -112,12 +112,12 @@ UWSMPosition::setdest(
 		double x_dest, double y_dest, double z_dest, double spead_setted)
 {
 	double now = Scheduler::instance().clock();
-	if ((trgTime_ > 0.) && (now > lastUpdateTime_ + 1e-6))
+	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
-	if (trgTime_ <= 0.0)
-		cerr << "Warning: calling set dest at time <= 0 will not work"
-			 << endl;
 	trgTime_ = now;
+	if (trgTime_ < 0.0)
+		cerr << "Warning: calling set dest at time < 0 will not work"
+			 << endl;
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
@@ -143,12 +143,12 @@ void
 UWSMPosition::setdest(double x_dest, double y_dest, double z_dest)
 {
 	double now = Scheduler::instance().clock();
-	if ((trgTime_ > 0.) && (now > lastUpdateTime_ + 1e-6))
+	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
-	if (trgTime_ <= 0.0)
-		cerr << "Warning: calling set dest at time <= 0 will not work"
-			 << endl;
 	trgTime_ = now;
+	if (trgTime_ < 0.0)
+		cerr << "Warning: calling set dest at time < 0 will not work"
+			 << endl;
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
@@ -225,7 +225,7 @@ double
 UWSMPosition::getX()
 {
 	double now = Scheduler::instance().clock();
-	if ((trgTime_ > 0.) && (now > lastUpdateTime_ + 1e-6))
+	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
 	return (x_);
 }
@@ -255,7 +255,7 @@ double
 UWSMPosition::getY()
 {
 	double now = Scheduler::instance().clock();
-	if ((trgTime_ > 0.) && (now > lastUpdateTime_ + 1e-6))
+	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
 	return (y_);
 }
@@ -264,7 +264,7 @@ double
 UWSMPosition::getZ()
 {
 	double now = Scheduler::instance().clock();
-	if ((trgTime_ > 0.) && (now > lastUpdateTime_ + 1e-6))
+	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
 	return (z_);
 }

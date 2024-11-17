@@ -114,6 +114,16 @@ public:
     virtual int
     getModulationType(Packet *p);
 
+   /**
+    * Method that returns the duration of a given transmitted packet.
+    * It uses a linear interpolation given the packet size.
+    * Inherited from MPhy, in NS-MIRACLE, could be empty if there is no way
+    * to retrieve this information.
+    * @param p Packet pointer to the given packet being transmitted
+    * @return duration in seconds
+    */
+    virtual double getTxDuration(Packet *p);
+
     /**
      * Cross-Layer messages synchronous interpreter.
      *
@@ -265,6 +275,7 @@ private:
 
     std::string signal_address;
 
+	int premodulation; /**< True if premodulation is on, false otherwise */
 };
 
 #endif

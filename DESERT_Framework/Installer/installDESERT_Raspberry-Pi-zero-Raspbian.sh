@@ -373,6 +373,7 @@ build_NS() {
     if [ -f Makefile ] ; then
         make distclean >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     fi
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                       \
     ./configure --enable-static                                        \
                 --target=${ARCH}                                       \
                 --host=${ARCH}                                         \
@@ -454,6 +455,7 @@ build_NSMIRACLE() {
     info_L2 "configure  [$*]"
     # export ARCH="arm-linux-gnu"
     CXXFLAGS="-Wno-write-strings"                     \
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"      \
       CFLAGS="-Wno-write-strings"                     \
      LDFLAGS=-L${DEST_FOLDER}/lib                     \
     ./configure --target=${ARCH}                      \

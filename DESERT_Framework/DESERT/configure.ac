@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-AC_INIT(DESERT,3.4.1)
+AC_INIT(DESERT,3.5.0)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -54,6 +54,7 @@ fi
 
 #AC_ARG_WITH_WOSS 
 #AC_CHECK_WOSS([have_woss=yes],[have_woss=no])
+
 
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/application/uwcbr'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/application/uwvbr'
@@ -120,6 +121,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwem_channel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/statistics/uwstats_utilities'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwtap'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdoa'
+
 
 
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
@@ -210,6 +214,8 @@ AC_CONFIG_FILES([
     statistics/uwstats_utilities/Makefile
     ranging/uwranging_tokenbus/Makefile
     ranging/uwranging_tdma/Makefile
+    ranging/uwtap/Makefile
+    ranging/uwranging_tdoa/Makefile
     ])
 
 AC_OUTPUT

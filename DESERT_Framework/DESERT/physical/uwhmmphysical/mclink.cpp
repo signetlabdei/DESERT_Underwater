@@ -43,40 +43,40 @@
 #include "mclink.h"
 
 MCLink::MCLink() 
-	: p_succ_good(0.0)
-	, p_succ_bad(0.0)
+	: ber_good(0.0)
+	, ber_bad(0.0)
 	, p_gb(0.0)
 	, p_bg(0.0)
+	, last_update(NOW)
+	, step_period(5.0)
 	, ch_state(GOOD)
-	, last_step(0)
 {	
-	bind("p_succ_good", &p_succ_good);
-	bind("p_succ_bad", &p_succ_bad);
-	bind("p_gb", &p_gb);
-	bind("p_bg", &p_bg);
-	bind("ch_state", (int*)&ch_state);
-	bind("last_step", &last_step);
 }
 
 
-MCLink::MCLink(double p_succ_good, double p_succ_bad,double p_gb, double p_bg, 
-		ChState ch_state,int curr_step)
-	: p_succ_good(p_succ_good)
-	, p_succ_bad(p_succ_bad)
+MCLink::MCLink(double ber_good, double ber_bad,double p_gb, double p_bg, 
+		double step_period,ChState ch_state)
+	: ber_good(ber_good)
+	, ber_bad(ber_bad)
 	, p_gb(p_gb)
 	, p_bg(p_bg)
+	, last_update(NOW)
+	, step_period(step_period)
 	, ch_state(ch_state)
-	, last_step(curr_step)
 {
-	assert(p_succ_good >=0.0 && p_succ_good <= 1.0 && 
-			p_succ_bad >= 0.0 && p_succ_bad <= 1.0 &&
+	assert(ber_good >=0.0 && ber_good <= 1.0 && 
+			ber_bad >= 0.0 && ber_bad <= 1.0 &&
 			p_gb >= 0.0 && p_gb <= 1.0 && p_bg >= 0.0 && p_bg <= 1.0);
 }
 
 MCLink::ChState
-MCLink::updateChState(int curr_step)
+MCLink::updateChState()
 {
-	int n_step = curr_step - last_step;
+	int n_step = floor((NOW - last_update) / step_period);
+	if (n_step == 0) {
+		return ch_state;
+	}
+
 	double c1 = 1.0 / (p_gb + p_bg);
 	double c2 = pow(1.0 - p_gb - p_bg, n_step) / (p_gb + p_bg);
 
@@ -91,8 +91,19 @@ MCLink::updateChState(int curr_step)
 			ch_state = MCLink::GOOD;	
 		}
 	}
-	last_step = curr_step;
+	last_update += n_step * step_period;
 	return ch_state;
+}
+
+double 
+MCLink::getBER()
+{
+	updateChState();
+	if (ch_state == GOOD) {
+		return ber_good;
+	} else { 
+		return ber_bad;
+	}
 }
 
 int
@@ -101,14 +112,11 @@ MCLink::command(int argc, const char *const *argv)
 	Tcl &tcl = Tcl::instance();
 
 	if (argc == 2) {
-		if (strcasecmp(argv[1], "getLastStep") == 0) {
-			tcl.resultf("%d", getLastStep());
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getChState") == 0) {
+		if (strcasecmp(argv[1], "getChState") == 0) {
 			tcl.resultf("%d", getChState());
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getPSucc") == 0) {
-			tcl.resultf("%f", getPSucc());
+		} else if (strcasecmp(argv[1], "getBER") == 0) {
+			tcl.resultf("%f", getBER());
 			return TCL_OK;
 		}
 	}
@@ -127,31 +135,24 @@ public:
 	TclObject *
 	create(int argc, const char *const * argv)
 	{
-		if (argc > 7) {
-			if (argc == 8) {
+		if (argc > 8) {
+			if (argc == 9) {
 				return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
-						std::stod(argv[6]), std::stod(argv[7])));
+						std::stod(argv[6]), std::stod(argv[7]),std::stod(argv[8])));
 			}
-			if (argc == 9 || argc == 10) {
+			if (argc == 10) {
 				MCLink::ChState ch_state;
-				if (strcasecmp(argv[8], "GOOD") == 0) {
+				if (strcasecmp(argv[9], "GOOD") == 0) {
 					ch_state = MCLink::GOOD;
-				} else if (strcasecmp(argv[8], "BAD") == 0) {
+				} else if (strcasecmp(argv[9], "BAD") == 0) {
 					ch_state = MCLink::BAD;
 				} else {
 					std::cerr << "TCL: MCLink state must be GOOD or BAD"
 					<< std::endl;
 					exit(1);
 				}
-				if (argc == 9) {
-					return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
-							std::stod(argv[6]), std::stod(argv[7]), ch_state));
-				}
-				if (argc == 10) {
-					return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
-							std::stod(argv[6]), std::stod(argv[7]),
-							ch_state, std::stoi(argv[9])));
-				}	
+				return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
+						std::stod(argv[6]), std::stod(argv[7]),std::stod(argv[8]),ch_state));
 			}
 			std::cerr << "TCL: check MCLink constructor args" << std::endl;
 			exit(1);

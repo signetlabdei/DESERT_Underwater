@@ -37,10 +37,10 @@
 
 #include "packer.h"
 
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits.h>
-#include <cmath>
 
 typedef unsigned char BARR_ELTYPE;
 
@@ -312,7 +312,7 @@ packer::packPayload(Packet *p)
 		}
 
 		if (!(BARR_ARRAYSIZE(offset) > MAX_BIN_PKT_ARRAY_LENGTH - hdr_length)) {
-			memcpy(hal->binPkt() + hdr_length, buf, std::ceil(offset/8.0));
+			memcpy(hal->binPkt() + hdr_length, buf, std::ceil(offset / 8.0));
 			hal->binPktLength() += BARR_ARRAYSIZE(offset);
 			if (hal->binPktLength() != hdr_length + payload_length) {
 				if (debug_ > 1) {
@@ -1127,10 +1127,10 @@ packer::bindump(const char *data, size_t len)
 	for (size_t i = 0; i < len; i++) {
 		str_tmp = "";
 		for (int j = 0; j < CHAR_BIT; j++) {
-			if
-				BARR_TEST(data, i * CHAR_BIT + j)
-			str_tmp += '1';
-			else str_tmp += '0';
+			if BARR_TEST (data, i * CHAR_BIT + j)
+				str_tmp += '1';
+			else
+				str_tmp += '0';
 		}
 		str_out += ("[" + str_tmp + "]");
 	}

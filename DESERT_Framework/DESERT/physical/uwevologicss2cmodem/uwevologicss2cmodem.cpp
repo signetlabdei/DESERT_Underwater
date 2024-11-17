@@ -26,6 +26,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "phymac-clmsg.h"
 #include <clmessage.h>
 #include <hdr-uwal.h>
 #include <ms2c_ClMessage.h>
@@ -38,15 +39,16 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <ostream>
 
 const std::chrono::milliseconds UwEvoLogicsS2CModem::MODEM_TIMEOUT =
-    std::chrono::milliseconds(210);
+		std::chrono::milliseconds(210);
 
 const std::chrono::seconds UwEvoLogicsS2CModem::WAIT_DELIVERY_BURST =
-    std::chrono::seconds(5);
+		std::chrono::seconds(5);
 
 const std::chrono::milliseconds UwEvoLogicsS2CModem::WAIT_DELIVERY_IM =
-    std::chrono::milliseconds(200);
+		std::chrono::milliseconds(200);
 
 uint UwEvoLogicsS2CModem::MAX_N_STATUS_QUERIES = 10;
 
@@ -94,12 +96,16 @@ UwEvoLogicsS2CModem::UwEvoLogicsS2CModem()
 	, n_rx_failed(0)
 	, pend_source_level(3)
 	, source_level_change(false)
+	, size2dur_()
+	, txdur_file_name_("")
+	, txdur_token_separator_(';')
+	, initLUT_(false)
 
 {
 	bind("buffer_size", (int *) &DATA_BUFFER_LEN);
 	bind("max_read_size", (int *) &MAX_READ_BYTES);
 	bind("max_n_status_queries",
-        (uint *) &UwEvoLogicsS2CModem::MAX_N_STATUS_QUERIES);
+			(uint *) &UwEvoLogicsS2CModem::MAX_N_STATUS_QUERIES);
 }
 
 UwEvoLogicsS2CModem::~UwEvoLogicsS2CModem()
@@ -181,6 +187,10 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 			ack_mode = false;
 			return TCL_OK;
 		}
+		if (!strcmp(argv[1], "initLUT")) {
+			initializeLUT();
+			return TCL_OK;
+		}
 	} else if (argc == 3) {
 		if (!strcmp(argv[1], "setSourceLevel")) {
 			std::stringstream sl_ss(argv[2]);
@@ -190,9 +200,89 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 			else
 				return TCL_ERROR;
 		}
+		if (!strcmp(argv[1], "setTXDurationFileName")) {
+			std::string tmp_ = ((char *) argv[2]);
+			if (tmp_.size() == 0) {
+				fprintf(stderr, "Empty string for the file name");
+				return TCL_ERROR;
+			}
+			txdur_file_name_ = tmp_;
+			return TCL_OK;
+		}
+		if (!strcmp(argv[1], "setLUTSeparator")) {
+			string tmp_ = ((char *) argv[2]);
+			if (tmp_.size() == 0) {
+				fprintf(stderr, "Empty char for the file separator");
+				return TCL_ERROR;
+			}
+			txdur_token_separator_ = tmp_.at(0);
+			return TCL_OK;
+		}
 	}
 
 	return UwModem::command(argc, argv);
+}
+
+void
+UwEvoLogicsS2CModem::initializeLUT()
+{
+	ifstream input_file_;
+	string line_;
+
+	input_file_.open(txdur_file_name_.c_str());
+
+	if (input_file_.is_open()) {
+		while (std::getline(input_file_, line_)) {
+			if (line_[0] == '#')
+				continue;
+
+			std::istringstream line_stream(line_);
+			std::string token;
+
+			std::getline(line_stream, token, txdur_token_separator_);
+			int size = std::atoi(token.c_str());
+			if (size < 1) {
+				printOnLog(LogLevel::ERROR,
+						"EVOLOGICSS2CMODEM",
+						"initializeLUT::INVALID_PKT_SIZE " + token);
+				continue;
+			}
+
+			std::getline(line_stream, token, txdur_token_separator_);
+			double duration = 0;
+			char *end {};
+			if (token.length() > 0) {
+				duration = std::strtod(token.c_str(), &end);
+
+				if (!(duration > 0))
+					printOnLog(LogLevel::ERROR,
+							"EVOLOGICSS2CMODEM",
+							"initializeLUT::INVALID_DURATION_FOR_PKT_SIZE "
+							+ std::to_string(size));
+			}
+
+			std::getline(line_stream, token, txdur_token_separator_);
+			double proc_delay = 0;
+			if (token.length() > 0) {
+				proc_delay = std::strtod(token.c_str(), &end);
+				duration += proc_delay;
+
+				if (!(proc_delay > 0))
+					printOnLog(LogLevel::ERROR,
+							"EVOLOGICSS2CMODEM",
+							"initializeLUT::INVALID_PROC_DELAY_FOR_PKT_SIZE "
+							+ std::to_string(size));
+			}
+
+			size2dur_[size] = duration;
+		}
+
+		initLUT_ = true;
+	} else {
+		printOnLog(LogLevel::ERROR,
+				"EVOLOGICSS2CMODEM",
+				"initializeLUT::FAIL_TO_READ_FROM_FILE " + txdur_file_name_);
+	}
 }
 
 int
@@ -241,9 +331,47 @@ UwEvoLogicsS2CModem::recvSyncClMsg(ClMessage *m)
 		} else {
 			return 1;
 		}
+	} else if (m->type() == CLMSG_MAC2PHY_GETTXDURATION) {
+		Packet *p = ((ClMsgMac2PhyGetTxDuration *) m)->pkt;
+		hdr_cmn *ch = HDR_CMN(p);
+
+		if (ch->direction() == hdr_cmn::DOWN) {
+			double duration = getTxDuration(p);
+
+			if (duration > 0)
+				printOnLog(LogLevel::INFO,
+						"EVOLOGICSS2CMODEM",
+						"recvSyncClMsg::SET_TXDURATION " +
+								std::to_string(duration));
+
+			((ClMsgMac2PhyGetTxDuration *) m)->setDuration(duration);
+
+			return 0;
+		}
+
+		// Don't set TX duration on RX.
+		((ClMsgMac2PhyGetTxDuration *) m)->setDuration(-1);
+
+		return 1;
 	}
 
 	return MPhy::recvSyncClMsg(m);
+}
+
+double
+UwEvoLogicsS2CModem::getTxDuration(Packet *p)
+{
+	hdr_uwal *uwalh = HDR_UWAL(p);
+	double tx_duration = -1;
+
+	if (initLUT_)
+		tx_duration = size2dur_[uwalh->binPktLength()];
+	else
+		printOnLog(LogLevel::ERROR,
+				"EVOLOGICSS2CMODEM",
+				"getTxDuration::FAIL_TO_GET_TXDURATION");
+
+	return tx_duration;
 }
 
 bool
@@ -251,40 +379,40 @@ UwEvoLogicsS2CModem::configure(Config cmd)
 {
 	std::string config_cmd{""};
 
-	switch(cmd) {
-	case Config::ATL_GET: {
-		std::string command = p_interpreter->buildGetATL();
-		break;
-	}
-	case Config::ATL_SET: {
-		std::string command = p_interpreter->buildSetATL(pend_source_level);
-		break;
-	}
-	case Config::ATAL_GET: {
-		std::string command = p_interpreter->buildGetATAL();
-		break;
-	}
-	case Config::ATAL_SET: {
-		std::string command = p_interpreter->buildSetATAL(modemID);
-		break;
-	}
-	case Config::MODEM_STATUS: {
-		std::string command = p_interpreter->buildATS();
-		break;
-	}
-	case Config::CURR_SETTINGS: {
-		std::string command = p_interpreter->buildATV();
-		break;
-	}
-	default:
-		return false;
+	switch (cmd) {
+		case Config::ATL_GET: {
+			std::string command = p_interpreter->buildGetATL();
+			break;
+		}
+		case Config::ATL_SET: {
+			std::string command = p_interpreter->buildSetATL(pend_source_level);
+			break;
+		}
+		case Config::ATAL_GET: {
+			std::string command = p_interpreter->buildGetATAL();
+			break;
+		}
+		case Config::ATAL_SET: {
+			std::string command = p_interpreter->buildSetATAL(modemID);
+			break;
+		}
+		case Config::MODEM_STATUS: {
+			std::string command = p_interpreter->buildATS();
+			break;
+		}
+		case Config::CURR_SETTINGS: {
+			std::string command = p_interpreter->buildATV();
+			break;
+		}
+		default:
+			return false;
 	}
 
 	std::unique_lock<std::mutex> state_lock(status_m);
 
 	if (status_cv.wait_for(state_lock, MODEM_TIMEOUT, [&] {
-				return status == ModemState::AVAILABLE;
-			})) {
+			return status == ModemState::AVAILABLE;
+		})) {
 
 		status = ModemState::BUSY;
 
@@ -292,8 +420,8 @@ UwEvoLogicsS2CModem::configure(Config cmd)
 
 		if (!p_connector->writeToDevice(config_cmd)) {
 			printOnLog(LogLevel::ERROR,
-					   "EVOLOGICSS2CMODEM",
-					   "configure::FAIL_TO_WRITE_TO_DEVICE=" + config_cmd);
+					"EVOLOGICSS2CMODEM",
+					"configure::FAIL_TO_WRITE_TO_DEVICE=" + config_cmd);
 			return false;
 		}
 
@@ -303,7 +431,6 @@ UwEvoLogicsS2CModem::configure(Config cmd)
 	} else {
 
 		return false;
-
 	}
 
 	return true;
@@ -349,10 +476,10 @@ UwEvoLogicsS2CModem::startTx(Packet *p)
 			return;
 		}
 
-		
 		tx_status = TransmissionState::TX_PENDING;
-		status_cv.wait_for(state_lock, MODEM_TIMEOUT, [&]
-			 { return status == ModemState::AVAILABLE; });
+		status_cv.wait_for(state_lock, MODEM_TIMEOUT, [&] {
+			return status == ModemState::AVAILABLE;
+		});
 		state_lock.unlock();
 
 		if (tx_mode == TransmissionMode::IM) {
@@ -360,39 +487,41 @@ UwEvoLogicsS2CModem::startTx(Packet *p)
 			size_t status_polling_counter = 0;
 			im_status_updated.store(false);
 			while (status_polling_counter < MAX_N_STATUS_QUERIES &&
-				   tx_status != TransmissionState::TX_IDLE) {
-			
+					tx_status != TransmissionState::TX_IDLE) {
+
 				cmd_s = p_interpreter->buildATDI();
 
 				printOnLog(LogLevel::INFO,
-						   "EVOLOGICSS2CMODEM",
-						   "startTx::SENDING=" + cmd_s);
+						"EVOLOGICSS2CMODEM",
+						"startTx::SENDING=" + cmd_s);
 
 				if ((p_connector->writeToDevice(cmd_s)) < 0) {
 					printOnLog(LogLevel::ERROR,
-							   "EVOLOGICSS2CMODEM",
-							   "startTx::FAIL_TO_WRITE_TO_DEVICE=" + cmd_s);
+							"EVOLOGICSS2CMODEM",
+							"startTx::FAIL_TO_WRITE_TO_DEVICE=" + cmd_s);
 				}
 
-				tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY_IM, [&]
-				    { return (tx_status == TransmissionState::TX_IDLE); });
+				tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY_IM, [&] {
+					return (tx_status == TransmissionState::TX_IDLE);
+				});
 
 				if (tx_status == TransmissionState::TX_IDLE) {
 					printOnLog(LogLevel::DEBUG,
-							   "EVOLOGICSS2CMODEM",
-							   "startTx::TX_IDLE");
+							"EVOLOGICSS2CMODEM",
+							"startTx::TX_IDLE");
 					break;
 				} else {
 					im_status_updated.store(false);
 					printOnLog(LogLevel::DEBUG,
-							   "EVOLOGICSS2CMODEM",
-							   "startTx::TX_PENDING");
+							"EVOLOGICSS2CMODEM",
+							"startTx::TX_PENDING");
 				}
-			
+
 				status_polling_counter++;
 			}
 
-			//In case the attempts reached MAX_N_STATUS_QUERIES, force tx_status
+			// In case the attempts reached MAX_N_STATUS_QUERIES, force
+			// tx_status
 			if (status_polling_counter == MAX_N_STATUS_QUERIES &&
 					tx_status != TransmissionState::TX_IDLE) {
 				printOnLog(LogLevel::ERROR,
@@ -401,10 +530,10 @@ UwEvoLogicsS2CModem::startTx(Packet *p)
 			}
 
 		} else { // tx_mode == TransmissionMode::BURST
-			tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY_BURST, [&]
-				    { return (tx_status == TransmissionState::TX_IDLE); });
+			tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY_BURST, [&] {
+				return (tx_status == TransmissionState::TX_IDLE);
+			});
 		}
-
 
 		std::function<void(UwModem &, Packet * p)> callback =
 				&UwModem::realTxEnded;
@@ -431,7 +560,7 @@ UwEvoLogicsS2CModem::startRx(Packet *p)
 void
 UwEvoLogicsS2CModem::endRx(Packet *p)
 {
-	printOnLog(LogLevel::INFO, "EVOLOGICSS2CMODEM", "endRx::CALL_SENDUP");
+	printOnLog(LogLevel::INFO, "EVOLOGICSS3CMODEM", "endRx::CALL_SENDUP");
 	sendUp(p, 0.01);
 }
 
@@ -547,11 +676,10 @@ UwEvoLogicsS2CModem::receivingData()
 							cmd, end_it, cmd_b, cmd_e, rx_payload)) {
 
 				int new_r_bytes = p_connector->readFromDevice(
-				    &(*end_it), MAX_READ_BYTES - r_bytes);
+						&(*end_it), MAX_READ_BYTES - r_bytes);
 
 				r_bytes += new_r_bytes;
 				end_it = beg_it + r_bytes;
-
 			}
 
 			printOnLog(LogLevel::DEBUG,
@@ -580,7 +708,7 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 	switch (cmd) {
 
 		case UwInterpreterS2C::Response::RECVIM: {
-			
+
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			state_lock.unlock();
@@ -636,7 +764,7 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status_cv.notify_all();
 			break;
 		}
-		case UwInterpreterS2C::Response::DELIVERED: {			
+		case UwInterpreterS2C::Response::DELIVERED: {
 			status = ModemState::AVAILABLE;
 			state_lock.unlock();
 			status_cv.notify_all();
@@ -682,7 +810,7 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status_cv.notify_all();
 			std::unique_lock<std::mutex> tx_state_lock(tx_status_m);
 			tx_status = TransmissionState::TX_IDLE;
-			im_status_updated.store(true);			
+			im_status_updated.store(true);
 			tx_status_cv.notify_all();
 			break;
 		}
@@ -717,7 +845,7 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status_cv.notify_all();
 			std::unique_lock<std::mutex> tx_state_lock(tx_status_m);
 			tx_status = TransmissionState::TX_IDLE;
-			im_status_updated.store(true);			
+			im_status_updated.store(true);
 			tx_status_cv.notify_all();
 			break;
 		}
@@ -740,7 +868,7 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			break;
-	    }
+		}
 		case UwInterpreterS2C::Response::RECVEND: {
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
@@ -749,8 +877,8 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 		case UwInterpreterS2C::Response::RECVFAIL: {
 			n_rx_failed++;
 			printOnLog(LogLevel::INFO,
-						"EVOLOGICSS2CMODEM",
-						"updateStatus::FAILED_RX");
+					"EVOLOGICSS2CMODEM",
+					"updateStatus::FAILED_RX");
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			break;
@@ -759,14 +887,14 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			break;
-	    }
+		}
 		case UwInterpreterS2C::Response::SENDEND: {
 			status = ModemState::AVAILABLE;
 			state_lock.unlock();
 			status_cv.notify_all();
 			std::unique_lock<std::mutex> tx_state_lock(tx_status_m);
 			tx_status = TransmissionState::TX_IDLE;
-			im_status_updated.store(true);			
+			im_status_updated.store(true);
 			tx_status_cv.notify_all();
 			break;
 		}
@@ -774,7 +902,32 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			break;
-	    }
+	        }
+                case UwInterpreterS2C::Response::USBLANGLES: {
+                        status = ModemState::AVAILABLE;
+                        status_cv.notify_all();
+                        break;
+                }
+                case UwInterpreterS2C::Response::USBLLONG: {
+                        status = ModemState::AVAILABLE;
+                        std::shared_ptr<USBLInfo> pos = p_interpreter->getUSBLInfo();
+
+                        std::string log_msg = "updateStatus::USBLLONG::curr_time=" +
+                            std::to_string(pos->curr_time) +
+                            ",meas_time=" + std::to_string(pos->meas_time) +
+                            ",remote_address=" + std::to_string(pos->r_address) +
+                            ",X=" + std::to_string(pos->X) +
+                            ",Y=" + std::to_string(pos->Y) +
+                            ",Z=" + std::to_string(pos->Z) +
+                            ",E=" + std::to_string(pos->E) +
+                            ",N=" + std::to_string(pos->N) +
+                            ",U=" + std::to_string(pos->U) +
+                            ",accuracy=" + std::to_string(pos->accuracy);
+                          printOnLog(LogLevel::INFO, "EVOLOGICSS2CMODEM", log_msg);
+
+                        status_cv.notify_all();
+                        break;
+                }
 		case UwInterpreterS2C::Response::UNKNOWN: {
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();

@@ -30,7 +30,8 @@
  * @file uwmodemcsa.h
  * @author Emanuele Coccolo
  * \version 0.1.0
- * \brief Class that implements a generic modem driver for end-to-end communications.
+ * \brief Class that implements a generic modem driver for end-to-end
+ * communications.
  */
 
 #ifndef UWMODEMCSA_H
@@ -48,9 +49,9 @@
 
 enum class ModemState { AVAILABLE, BUSY };
 
-class UwModemCSA : public UwModem {
+class UwModemCSA : public UwModem
+{
 public:
-
 	/**
 	 * Constructor of the UwModemCSA class
 	 * @param address string containing the address to connect to
@@ -79,6 +80,15 @@ public:
 	 * @return <i>0</i> if successful.
 	 */
 	virtual int recvSyncClMsg(ClMessage *m);
+
+   /**
+    * Method that returns the duration of a given transmitted packet.
+    * Inherited from MPhy, in NS-MIRACLE, could be empty if there is no way
+    * to retrieve this information.
+    * @param p Packet pointer to the given packet being transmitted
+    * @return duration in seconds
+    */
+	virtual double getTxDuration(Packet *p);
 
 	/**
 	 * Tcl command interpreter: Method that maps Tcl commands into C++ methods.
@@ -141,16 +151,15 @@ private:
 	 * Method that finds the position of a command in a buffer.
 	 */
 	virtual std::string findCommand(std::vector<char>::iterator beg_it,
-									std::vector<char>::iterator end_it,
-									std::vector<char>::iterator &cmd_b,
-									std::vector<char>::iterator &cmd_e);
+			std::vector<char>::iterator end_it,
+			std::vector<char>::iterator &cmd_b,
+			std::vector<char>::iterator &cmd_e);
 
 	/**
 	 * Method that parses the command to obtain the recquired informations.
 	 */
 	virtual bool parseCommand(std::vector<char>::iterator cmd_b,
-							std::vector<char>::iterator cmd_e,
-							std::string &rx_payload);
+			std::vector<char>::iterator cmd_e, std::string &rx_payload);
 
 	/**
 	 *

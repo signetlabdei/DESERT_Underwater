@@ -1,3 +1,83 @@
+# Release notes - DESERT - 3.5.0
+
+### New Feature
+
+[DES-148](https://uw-signet.atlassian.net/browse/DES-148) Support new EvoLogics firmware
+
+[DES-154](https://uw-signet.atlassian.net/browse/DES-154) Driver EvoLogics: Extended Protocol Mode functionality
+
+[DES-155](https://uw-signet.atlassian.net/browse/DES-155) Driver EvoLogics: USBL responses parsing
+
+### Improvement
+
+[DES-83](https://uw-signet.atlassian.net/browse/DES-83) Better handling of tcl import
+
+[DES-92](https://uw-signet.atlassian.net/browse/DES-92) CBR improvements
+
+[DES-112](https://uw-signet.atlassian.net/browse/DES-112) Improve documentation in order to add how to compile a module during develop
+
+[DES-115](https://uw-signet.atlassian.net/browse/DES-115) DESERT CI receipts improvements
+
+[DES-129](https://uw-signet.atlassian.net/browse/DES-129) add ns-2.34 code into a repository along with the required changes to make it compatible with latest gcc versions
+
+[DES-131](https://uw-signet.atlassian.net/browse/DES-131) fix doxygen of uwsmposition
+
+[DES-133](https://uw-signet.atlassian.net/browse/DES-133) Documentation: mention the papers  in the doxygen
+
+[DES-134](https://uw-signet.atlassian.net/browse/DES-134) Remove warning in bind that are actually not failed
+
+[DES-138](https://uw-signet.atlassian.net/browse/DES-138) Re-introduce clang-format enforcement
+
+[DES-139](https://uw-signet.atlassian.net/browse/DES-139) fix warning originated by UWSMposition
+
+[DES-142](https://uw-signet.atlassian.net/browse/DES-142) HMMPhysical: model for different packet sizes
+
+[DES-143](https://uw-signet.atlassian.net/browse/DES-143) Do not force DESERT Addons using a specific version of C\+\+ 
+
+[DES-144](https://uw-signet.atlassian.net/browse/DES-144) Rewrite uwapplication using the sockets implemented for the modem interface
+
+[DES-146](https://uw-signet.atlassian.net/browse/DES-146) Ivor agreed on publishing some modules
+
+[DES-147](https://uw-signet.atlassian.net/browse/DES-147) fixes in UwPhysicalStats and UwHMMPhysicalStats
+
+### Bug
+
+[DES-61](https://uw-signet.atlassian.net/browse/DES-61) Parallel compilations  breaks Miracle and DESERT
+
+[DES-130](https://uw-signet.atlassian.net/browse/DES-130) check uwrov code
+
+[DES-140](https://uw-signet.atlassian.net/browse/DES-140) tclcl build broken with gcc 13
+
+[DES-145](https://uw-signet.atlassian.net/browse/DES-145) too much data won't be transmitted from Evologics in IM
+
+[DES-149](https://uw-signet.atlassian.net/browse/DES-149) Errors in DESERT installation on raspberry pi 4
+
+[DES-150](https://uw-signet.atlassian.net/browse/DES-150) Errors during DESERT installation on Ubuntu 24.04 LTS
+
+[DES-153](https://uw-signet.atlassian.net/browse/DES-153) Error during WOSS build on Ubuntu 24.04 LTS with gcc 13.2.0
+
+[DES-156](https://uw-signet.atlassian.net/browse/DES-156) Segfault on uwaloha
+
+[DES-157](https://uw-signet.atlassian.net/browse/DES-157) CSMA ALOHA packet loss too high in sea trial
+
+[DES-158](https://uw-signet.atlassian.net/browse/DES-158) Uwrangingtdoa with adaptive payload doesn't work
+
+[DES-159](https://uw-signet.atlassian.net/browse/DES-159) Mean throughput lower than single cbr throughputs when executing file test\_uwcsmaaloha.tcl
+
+### Epic
+
+[DES-108](https://uw-signet.atlassian.net/browse/DES-108) Refactor of private modules handling
+
+[DES-114](https://uw-signet.atlassian.net/browse/DES-114) DESERT private protocols/elements handling
+
+### Task
+
+[DES-102](https://uw-signet.atlassian.net/browse/DES-102) Make security addons and uwflooding\_sec compile.
+
+[DES-109](https://uw-signet.atlassian.net/browse/DES-109) PATH and LD\_LIBRARY\_PATH handling study
+
+[DES-152](https://uw-signet.atlassian.net/browse/DES-152) Update WOSS to 1.13 and 1.7.0 DBs
+
 3.4.1 - 2024-01-29
 	* Fix on EvoLogics desert samples
 3.4.0 - 2024-01

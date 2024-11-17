@@ -404,6 +404,7 @@ build_NS() {
     if [ -f Makefile ] ; then
         make distclean >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     fi
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                       \
     ./configure --target=${ARCH}                                       \
                 --enable-static                                        \
                 --host=${ARCH}                                         \
@@ -484,6 +485,7 @@ build_NSMIRACLE() {
     ./autogen.sh >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                     \
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"      \
       CFLAGS="-Wno-write-strings"                     \
     ./configure --target=${ARCH}                      \
                 --host=${ARCH}                        \
@@ -894,6 +896,7 @@ build_WOSS() {
     fi
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                                                  \
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                                   \
       CFLAGS="-Wno-write-strings"                                                  \
     CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx               \
      LDFLAGS=-L${DEST_FOLDER}/lib                                                  \

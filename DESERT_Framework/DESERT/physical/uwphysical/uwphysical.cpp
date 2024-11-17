@@ -42,30 +42,36 @@
 
 UwPhysicalStats::UwPhysicalStats()
 	:
-	Stats(),
-	last_rx_power(0),
-	last_noise_power(0),
-	instant_noise_power(0),
-	last_interf_power(0),
-	has_error(false)
+      Stats(),
+	  last_rx_power(0),
+	  last_noise_power(0),
+	  instant_noise_power(0),
+	  last_interf_power(0),
+	  last_sinr(0),
+	  last_ber(0),
+	  last_per(0),
+	  has_error(false)
 {
 	type_id = (int)StatsEnum::STATS_PHY_LAYER;
 }
 UwPhysicalStats::UwPhysicalStats(int mod_id, int stck_id)
 	:
-	Stats(mod_id,stck_id),
+    Stats(mod_id,stck_id),
 	last_rx_power(0),
 	last_noise_power(0),
 	instant_noise_power(0),
 	last_interf_power(0),
+	last_sinr(0),
+	last_ber(0),
+	last_per(0),
 	has_error(false)
 {
 	type_id = (int)StatsEnum::STATS_PHY_LAYER;
 }
 
-void 
-UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double noise_pwr, double interf_pwr, 
-		bool error, ChannelStates channel_state)
+void
+UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double noise_pwr, double interf_pwr,
+		double sinr, double ber, double per, bool error)
 {
 	module_id = mod_id;
 	stack_id = stck_id;
@@ -73,8 +79,10 @@ UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double nois
 	last_noise_power = noise_pwr;
 	instant_noise_power = noise_pwr;
 	last_interf_power = interf_pwr;
+	last_sinr = sinr;
+	last_ber = ber;
+	last_per = per;
 	has_error = error;
-	channel_state = channel_state;
 }
 
 Stats*
@@ -121,6 +129,12 @@ UnderwaterPhysical::UnderwaterPhysical()
 	bind("rx_power_consumption_", &rx_power_);
 	bind("tx_power_consumption_", &tx_power_);
 	stats_ptr = new UwPhysicalStats();
+}
+
+UnderwaterPhysical::~UnderwaterPhysical()
+{
+	delete stats_ptr;
+	stats_ptr = nullptr;
 }
 
 int
@@ -204,13 +218,13 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 	return UnderwaterMPhyBpsk::command(argc, argv);
 } /* UnderwaterPhysical::command */
 
-void
-UnderwaterPhysical::recv(Packet *p)
+void UnderwaterPhysical::recv(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 
-	if (ch->direction() == hdr_cmn::UP) {
+	if (ch->direction() == hdr_cmn::UP)
+	{
 		ph->dstSpectralMask = getRxSpectralMask(p);
 		ph->dstPosition = getPosition();
 		ph->dstAntenna = getRxAntenna(p);
@@ -223,28 +237,37 @@ UnderwaterPhysical::recv(Packet *p)
 		p->txinfo_.RxPr = 0;
 		p->txinfo_.CPThresh = 0;
 
-		if (ph->Pr > 0) {
+		if (ph->Pr > 0)
+		{
 			ph->Pn = getNoisePower(p);
 
-			if (interference_) {
+			if (interference_)
+			{
 				interference_->addToInterference(p);
 			}
 
 			ph->rxtime = NOW;
 			ph->worth_tracing = true;
 
-			if (isOn == true) {
+			if (isOn == true)
+			{
 				PacketEvent *pe = new PacketEvent(p);
 				Scheduler::instance().schedule(&rxtimer, pe, ph->duration);
 
 				startRx(p);
-			} else {
+			}
+			else
+			{
 				Packet::free(p);
 			}
-		} else {
+		}
+		else
+		{
 			Packet::free(p);
 		}
-	} else { // Direction DOWN
+	}
+	else
+	{ // Direction DOWN
 		assert(isOn);
 
 		ph->Pr = 0;
@@ -278,8 +301,7 @@ UnderwaterPhysical::recv(Packet *p)
 	}
 } /* UnderwaterPhysical::recv */
 
-void
-UnderwaterPhysical::endTx(Packet *p)
+void UnderwaterPhysical::endTx(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
@@ -394,6 +416,8 @@ UnderwaterPhysical::endRx(Packet *p){
 	if (PktRx != 0) {
 		if (PktRx == p) {
 			double per_ni;
+			double ber_ni;
+			double sinr;
 			int nbits = ch->size() * 8;
 			double x = RNG::defaultrng()->uniform_double();
 			bool error_n = 0; // x <= per_n;
@@ -405,17 +429,20 @@ UnderwaterPhysical::endRx(Packet *p){
 							interference_->getInterferencePowerChunkList(p);
 					if (power_chunk_list.size() < 1) {
 						// we have no interferent
-						per_ni = getPER((ph->Pr / ph->Pn), nbits, p);
+						sinr = ph->Pr / ph->Pn;
+						per_ni = getPER(sinr, nbits, p);
+						ber_ni = getPER(sinr, 1, p);
 						error_ni = x <= per_ni;
 					} else {
 						for (PowerChunkList::const_iterator itInterf =
-										power_chunk_list.begin();
-								itInterf != power_chunk_list.end();
-								itInterf++) {
+								 power_chunk_list.begin();
+							 itInterf != power_chunk_list.end();
+							 itInterf++) {
 							int nbits2 = itInterf->second * BitRate_;
 							interference_power = itInterf->first;
-							per_ni = getPER(
-									ph->Pr / (ph->Pn + itInterf->first), nbits2, p);
+							sinr = ph->Pr / (ph->Pn + itInterf->first);
+							per_ni = getPER(sinr, nbits2, p);
+							ber_ni = getPER(sinr, 1, p);
 							x = RNG::defaultrng()->uniform_double();
 							error_ni = x <= per_ni;
 							if (error_ni) {
@@ -425,8 +452,9 @@ UnderwaterPhysical::endRx(Packet *p){
 					}
 				} else if (Interference_Model == "MEANPOWER") {
 					interference_power = interference_->getInterferencePower(p);
-					per_ni = getPER(
-							ph->Pr / (ph->Pn + interference_power), nbits, p);
+					sinr = ph->Pr / (ph->Pn + interference_power);
+					per_ni = getPER(sinr, nbits, p);
+					ber_ni = getPER(sinr, 1, p);
 					error_ni = x <= per_ni;
 				} else {
 					std::cerr << "Please choose the right interference model "
@@ -438,7 +466,9 @@ UnderwaterPhysical::endRx(Packet *p){
 
 			} else {
 				interference_power = ph->Pi;
-				per_ni = getPER(ph->Pr / (ph->Pn + ph->Pi), nbits, p);
+				sinr = ph->Pr / (ph->Pn + ph->Pi);
+				per_ni = getPER(sinr, nbits, p);
+				ber_ni = getPER(sinr, 1, p);
 				error_ni = x <= per_ni;
 			}
 
@@ -447,33 +477,40 @@ UnderwaterPhysical::endRx(Packet *p){
 				error_ni = 0; // error transfered on noise
 			}
 			//update stats and trigger the modules that collect the stats
-			dynamic_cast<UwPhysicalStats *>(stats_ptr)->updateStats(getId(),
-				getStackId(), ph->Pr, ph->Pn, interference_power, 
-					(error_n>0||error_ni>0));
+			auto uwphystats = dynamic_cast<UwPhysicalStats *>(stats_ptr);
+			if (uwphystats) {
+				uwphystats->updateStats(getId(),getStackId(), ph->Pr,
+				 ph->Pn, interference_power, sinr, ber_ni, per_ni,
+				(error_n > 0 || error_ni > 0));
+			}
 			ClMsgTriggerStats m = ClMsgTriggerStats();
-				sendSyncClMsg(&m);
+			sendSyncClMsg(&m);
 
 			if (time_ready_to_end_rx_ > Scheduler::instance().clock()) {
 				Rx_Time_ = Rx_Time_ + ph->duration - time_ready_to_end_rx_ +
-						Scheduler::instance().clock();
+						   Scheduler::instance().clock();
 			} else {
 				Rx_Time_ += ph->duration;
 			}
 			time_ready_to_end_rx_ =
-					Scheduler::instance().clock() + ph->duration;
+				Scheduler::instance().clock() + ph->duration;
 			Energy_Rx_ += consumedEnergyRx(ph->duration);
 			ch->error() = error_n || error_ni;
 			if (debug_) {
 				if (error_ni == 1) {
+					if (debug_){
 					std::cout
-							<< NOW << "  UnderwaterPhysical(" << mac_addr
-							<< ")::endRx() packet " << ch->uid()
-							<< " contains errors due to noise and interference."
-							<< std::endl;
+						<< NOW << "  UnderwaterPhysical(" << mac_addr
+						<< ")::endRx() packet " << ch->uid()
+						<< " contains errors due to noise and interference."
+						<< std::endl;
+					}
 				} else if (error_n == 1) {
+					if (debug_){
 					std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
 							  << ")::endRx() packet " << ch->uid()
 							  << " contains errors due to noise." << std::endl;
+					}
 				}
 			}
 			if (error_n) {
@@ -536,6 +573,7 @@ UnderwaterPhysical::getPER(double _snr, int _nbits, Packet *_p)
 				get_prob_error_symbol_mpsk(snr_with_penalty, M);
 	}
 
+	if (_nbits == 1) {return ber_;}
 	// PER calculation
 	return 1 - pow(1 - ber_, _nbits);
 } /* UnderwaterPhysical::getPER */
@@ -544,7 +582,7 @@ UnderwaterPhysical::getPER(double _snr, int _nbits, Packet *_p)
 int UnderwaterPhysical::recvSyncClMsg(ClMessage* m)
 {
 	if (m->type() == CLMSG_UWPHY_LOSTPKT)
-	{	
+	{
 		int lost_packet = ((ClMsgUwPhyGetLostPkts*)m)->isControl() ?
 			getTot_CtrlPkts_lost() : getTot_pkts_lost();
 		((ClMsgUwPhyGetLostPkts*)m)->setLostPkts(lost_packet);
@@ -574,7 +612,7 @@ void UnderwaterPhysical::updateInstantaneousStats()
 	ph->srcPosition = getPosition();
 	assert(ph->srcSpectralMask);
 
-	(dynamic_cast<UwPhysicalStats*>(stats_ptr))->instant_noise_power = 
+	(dynamic_cast<UwPhysicalStats*>(stats_ptr))->instant_noise_power =
 		getNoisePower(temp);
 	Packet::free(temp);
 }

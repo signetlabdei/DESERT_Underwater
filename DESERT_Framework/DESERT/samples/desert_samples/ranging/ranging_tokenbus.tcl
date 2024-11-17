@@ -216,11 +216,6 @@ Module/UW/HMMPHYSICAL  set NoiseSPD_                   0
 Module/UW/HMMPHYSICAL  set debug_                      0
 ####################################
 Position/UWSM   set debug_  0
-
-#var binded by UW/HMMPHYSICAL
-Module/UW/HMMPHYSICAL  set step_duration               1  ; # sampling period for channel state transitions
-####################################
-
 Module/UnderwaterChannel   set propSpeed_      $opt(soundspeed)
 set channel [new Module/UnderwaterChannel]
 set propagation [new MPropagation/Underwater]
@@ -325,26 +320,21 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 # Setup MCLinks with dummy data  #
 ##################################
 
-# new MCLink p_succ_good p_succ_bad p_gb p_bg [GOOD/BAD [cur_step]]
+# new MCLink ber_good ber_bad p_gb p_bg step_period [GOOD/BAD]
 set ber_good [expr 0.0051]
 set ber_bad [expr 0.0193]
 set p_gb [expr 0.053]
 set p_bg [expr 0.192]
-set pktbits [expr {($opt(nn))*16+8}]; #number of bits in the packet
-set p_succ_good [expr {pow((pow(1-$ber_good,7) + 7*$ber_good*pow(1-$ber_good,6)),($pktbits/4))}]
-set p_succ_bad [expr {pow((pow(1-$ber_bad,7) + 7*$ber_bad*pow(1-$ber_bad,6)),($pktbits/4))}]
-set mclink_near [new Module/UW/HMMPHYSICAL/MCLINK $p_succ_good $p_succ_bad $p_gb $p_bg GOOD]
-set mclink_ideal [new Module/UW/HMMPHYSICAL/MCLINK 1 1 $p_gb $p_bg GOOD]
-set mclink_off [new Module/UW/HMMPHYSICAL/MCLINK 0 0 $p_gb $p_bg GOOD]
-puts "p_succ_good: $p_succ_good"
-puts "p_succ_bad: $p_succ_bad"
+set mclink_near [new Module/UW/HMMPHYSICAL/MCLINK $ber_good $ber_bad $p_gb $p_bg $opt(step) GOOD]
+set mclink_ideal [new Module/UW/HMMPHYSICAL/MCLINK 0 0 $p_gb $p_bg $opt(step) GOOD]
+set mclink_off [new Module/UW/HMMPHYSICAL/MCLINK 1 1 $p_gb $p_bg $opt(step) GOOD]
+puts "ber_good: $ber_good"
+puts "ber_bad: $ber_bad"
 
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
         if {$id1 != $id2} {
             $phy($id1) setMCLink [$mac($id2) addr] $mclink_ideal
-            # $ns at 200 "$phy($id1) setMCLink $id2 [new Module/UW/HMMPHYSICAL/MCLINK $p_succ_good $p_succ_bad $p_gb $p_bg GOOD]"
-            # $ns at 400 "$phy($id1) setMCLink $id2 $mclink_near"
         } 
     }
 }

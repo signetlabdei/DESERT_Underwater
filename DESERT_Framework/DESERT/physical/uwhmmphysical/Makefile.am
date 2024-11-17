@@ -38,7 +38,6 @@ TESTS =
 libuwhmmphysical_la_SOURCES = initlib.cpp\
 	uwhmmphysical.cpp\
 	mclink.cpp\
-	uwhmmphysicalext.cpp\
 	mclinkextended.cpp
 
 libuwhmmphysical_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
@@ -49,9 +48,7 @@ nodist_libuwhmmphysical_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc
 CLEANFILES = InitTcl.cc
 
-TCL_FILES =  uwhmmphysical-default.tcl \
-			mclink-default.tcl
-
+TCL_FILES = uwhmmphysical-default.tcl
 InitTcl.cc: Makefile $(TCL_FILES)
 		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwHMMPhysicalInitTclCode > InitTcl.cc
 

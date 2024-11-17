@@ -53,37 +53,32 @@ public:
 	TclObject *
 	create(int argc, const char *const * argv)
 	{
-		if (argc > 12) {
-			if (argc == 13) {
-				return (new MCLinkExtended(std::stod(argv[4]), std::stod(argv[5]), 
-						std::stod(argv[6]),	std::stod(argv[7]), std::stod(argv[8]),
-						std::stod(argv[9]), std::stod(argv[10]), std::stod(argv[11]),
-						std::stod(argv[12])));
-			}  
+		if (argc > 13) {
 			if (argc == 14 || argc == 15) {
-				MCLinkExtended::ChState ch_state;
-				if (strcasecmp(argv[13], "GOOD") == 0) {
-					ch_state = MCLinkExtended::GOOD;
-				} else if (strcasecmp(argv[13], "MEDIUM") == 0) {
-					ch_state = MCLinkExtended::MEDIUM;
-				} else if (strcasecmp(argv[13], "BAD") == 0) {
-					ch_state = MCLinkExtended::BAD;
-				} else {
-					std::cerr << "TCL: MCLinkExtended state must be GOOD, MEDIUM or BAD"
-					<< std::endl;
-					exit(1);
-				}
+				
 				if (argc == 14) {
 					return (new MCLinkExtended(std::stod(argv[4]), std::stod(argv[5]), 
 							std::stod(argv[6]),	std::stod(argv[7]), std::stod(argv[8]),
 							std::stod(argv[9]), std::stod(argv[10]), std::stod(argv[11]),
-							std::stod(argv[12]), ch_state));
+							std::stod(argv[12]), std::stod(argv[13])));
 				}
 				if (argc == 15) {
+							MCLinkExtended::ChState ch_state;
+							if (strcasecmp(argv[14], "GOOD") == 0) {
+								ch_state = MCLinkExtended::GOOD;
+							} else if (strcasecmp(argv[14], "MEDIUM") == 0) {
+								ch_state = MCLinkExtended::MEDIUM;
+							} else if (strcasecmp(argv[14], "BAD") == 0) {
+								ch_state = MCLinkExtended::BAD;
+							} else {
+								std::cerr << "TCL: MCLinkExtended state must be GOOD, MEDIUM or BAD"
+								<< std::endl;
+								exit(1);
+							}
 					return (new MCLinkExtended(std::stod(argv[4]), std::stod(argv[5]), 
 							std::stod(argv[6]),	std::stod(argv[7]), std::stod(argv[8]),
 							std::stod(argv[9]), std::stod(argv[10]), std::stod(argv[11]),
-							std::stod(argv[12]), ch_state, std::stoi(argv[14])));
+							std::stod(argv[12]),std::stod(argv[13]), ch_state));
 				}
 			}
 			std::cerr << "TCL: check MCLinkExtended constructor args" << std::endl;
@@ -96,7 +91,7 @@ public:
 
 MCLinkExtended::MCLinkExtended() 
 	: MCLink()
-	, p_succ_medium(0.0)
+	, ber_medium(0.0)
 	, p_gm(0.0)
 	, p_mg(0.0)
 	, p_mb(0.0)
@@ -106,11 +101,11 @@ MCLinkExtended::MCLinkExtended()
 {
 }
 
-MCLinkExtended::MCLinkExtended(double p_succ_good, double p_succ_medium,
-		double p_succ_bad, double p_gb, double p_gm, double p_mg, double p_mb, double p_bg,
-		double p_bm, ChState ch_state, int curr_step)
-	: MCLink(p_succ_good, p_succ_bad, p_gb, p_bg, ch_state, curr_step)
-	, p_succ_medium(p_succ_medium)
+MCLinkExtended::MCLinkExtended(double ber_good, double ber_medium,
+		double ber_bad, double p_gb, double p_gm, double p_mg, double p_mb, double p_bg,
+		double p_bm, double step_period, ChState ch_state)
+	: MCLink(ber_good, ber_bad, p_gb, p_bg, step_period, ch_state)
+	, ber_medium(ber_medium)
 	, p_gm(p_gm)
 	, p_mg(p_mg)
 	, p_mb(p_mb)
@@ -118,9 +113,9 @@ MCLinkExtended::MCLinkExtended(double p_succ_good, double p_succ_medium,
 	, P{{1.0 - p_gm - p_gb, p_gm, p_gb}, {p_mg, 1.0 - p_mg - p_mb, p_mb},
 			{p_bg, p_bm, 1.0 - p_bg - p_bm}}
 {
-	assert(p_succ_good >=0.0 && p_succ_good <= 1.0 && 
-			p_succ_medium >= 0.0 && p_succ_medium <= 1.0 &&
-			p_succ_bad >= 0.0 && p_succ_bad <= 1.0 && 
+	assert(ber_good >=0.0 && ber_good <= 1.0 && 
+			ber_medium >= 0.0 && ber_medium <= 1.0 &&
+			ber_bad >= 0.0 && ber_bad <= 1.0 && 
 			p_gb >= 0.0 && p_gb <= 1.0 && p_gm >= 0.0 && p_gm <= 1.0 &&
 			p_mg >= 0.0 && p_mg <= 1.0 && p_mb >= 0.0 && p_mb <= 1.0 &&
 			p_bg >= 0.0 && p_bg <= 1.0 && p_bm >= 0.0 && p_bm <= 1.0);
@@ -170,9 +165,12 @@ MCLinkExtended::pow_matrix(const double (&A)[3][3], int n, double (&R)[3][3])
 }
 
 MCLink::ChState
-MCLinkExtended::updateChState(int curr_step)
+MCLinkExtended::updateChState()
 {
-	int n_step = curr_step - last_step;
+	int n_step = floor((NOW - last_update) / step_period);
+	if (n_step == 0) {
+		return ch_state;
+	}
 	
 	double P_n[3][3] = {0.0};
 	pow_matrix(const_cast<double (&)[3][3]>(P), n_step, P_n);
@@ -205,8 +203,21 @@ MCLinkExtended::updateChState(int curr_step)
 			ch_state = MCLinkExtended::GOOD;
 		}
 	}
-	last_step = curr_step;
+	last_update += n_step * step_period;
 	return ch_state;
+}
+
+double 
+MCLinkExtended::getBER()
+{
+	updateChState();
+	if (ch_state == GOOD) {
+		return ber_good;
+	} else if (ch_state == MEDIUM) {
+		return ber_medium;
+	} else { 
+		return ber_bad;
+	}
 }
 
 int
@@ -215,16 +226,12 @@ MCLinkExtended::command(int argc, const char *const *argv)
 	Tcl &tcl = Tcl::instance();
 
 	if (argc == 2) {
-		if (strcasecmp(argv[1], "getLastStep") == 0) {
-			tcl.resultf("%d", getLastStep());
-			return TCL_OK;
-		} else
 		if (strcasecmp(argv[1], "getChState") == 0) {
 			tcl.resultf("%d", getChState());
 			return TCL_OK;
 		} else
-		if (strcasecmp(argv[1], "getPSucc") == 0) {
-			tcl.resultf("%f", getPSucc());
+		if (strcasecmp(argv[1], "getBER") == 0) {
+			tcl.resultf("%f", getBER());
 			return TCL_OK;
 		}
 	}
