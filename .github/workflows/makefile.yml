@@ -19,12 +19,9 @@ jobs:
 
     - name: Install dependencies
       run: sudo apt-get install -y build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libtool gfortran bison flex
-
-    - name: chdir on right pos
-      run: cd DESERT_Framework
     
     - name: Install DESERT
-      run: ./install.sh --target LOCAL --inst_mode development --dest_folder /tmp/DESERT_buildCopy_LOCAL --with-woss --addons "packer_uwApplication packer_uwcbr packer_uwcsma_ca packer_uwflooding packer_uwip packer_uwpolling packer_uwudp packer_uwufetch uwrov uwtracker uwswarm_control uwmulti_stack_controller uwmulti_traffic_control uwmulti_destination uwmphy_modem ms2c_evologics_lowlev wossgmmob3D wossgroupmob3D "
+      run: cd DESERT_Framework && ./install.sh --target LOCAL --inst_mode development --dest_folder /tmp/DESERT_buildCopy_LOCAL --with-woss --addons "packer_uwApplication packer_uwcbr packer_uwcsma_ca packer_uwflooding packer_uwip packer_uwpolling packer_uwudp packer_uwufetch uwrov uwtracker uwswarm_control uwmulti_stack_controller uwmulti_traffic_control uwmulti_destination uwmphy_modem ms2c_evologics_lowlev wossgmmob3D wossgroupmob3D "
 
 
 
