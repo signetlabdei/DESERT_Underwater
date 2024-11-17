@@ -28,15 +28,16 @@
 
 #include <clmessage.h>
 #include <hdr-uwal.h>
+#include <phymac-clmsg.h>
 #include <uwal.h>
 #include <uwmodemcsa.h>
 #include <uwphy-clmsg.h>
 #include <uwsocket.h>
 
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <iterator>
-#include <algorithm>
 
 const std::chrono::milliseconds UwModemCSA::MODEM_TIMEOUT =
 		std::chrono::milliseconds(210);
@@ -87,12 +88,10 @@ UwModemCSA::UwModemCSA()
 	bind("max_read_size", (int *) &MAX_READ_BYTES);
 }
 
-
 UwModemCSA::~UwModemCSA()
 {
 	stop();
 }
-
 
 void
 UwModemCSA::recv(Packet *p)
@@ -105,17 +104,12 @@ UwModemCSA::recv(Packet *p)
 			startRx(p);
 			endRx(p);
 
-			printOnLog(LogLevel::DEBUG,
-				"MODEMCSA",
-				"recv::PACKET_SENT_UP");
+			printOnLog(LogLevel::DEBUG, "MODEMCSA", "recv::PACKET_SENT_UP");
 
 		} else {
 			Packet::free(p);
 
-			printOnLog(LogLevel::DEBUG,
-				"MODEMCSA",
-				"recv::PACKET_DROPPED");
-
+			printOnLog(LogLevel::DEBUG, "MODEMCSA", "recv::PACKET_DROPPED");
 		}
 	} else { // DOWN
 		if (!isOn) {
@@ -139,17 +133,14 @@ UwModemCSA::recv(Packet *p)
 		ph->duration = getTxDuration(p);
 
 		std::unique_lock<std::mutex> tx_lock(tx_queue_m);
-		
+
 		tx_queue.push(p);
 		tx_lock.unlock();
 
-		printOnLog(LogLevel::DEBUG,
-				"MODEMCSA",
-				"recv::PUSHING_IN_TX_QUEUE");
+		printOnLog(LogLevel::DEBUG, "MODEMCSA", "recv::PUSHING_IN_TX_QUEUE");
 		tx_queue_cv.notify_one();
 	}
 }
-
 
 int
 UwModemCSA::command(int argc, const char *const *argv)
@@ -176,7 +167,38 @@ UwModemCSA::command(int argc, const char *const *argv)
 int
 UwModemCSA::recvSyncClMsg(ClMessage *m)
 {
-	return 0;
+	if (m->type() == CLMSG_MAC2PHY_GETTXDURATION) {
+		Packet *p = ((ClMsgMac2PhyGetTxDuration *) m)->pkt;
+		hdr_cmn *ch = HDR_CMN(p);
+
+		if (ch->direction() == hdr_cmn::DOWN) {
+			double duration = getTxDuration(p);
+
+			if (duration > 0)
+				printOnLog(LogLevel::INFO,
+						"MODEMCSA",
+						"recvSyncClMsg::GET_TXDURATION " +
+								std::to_string(duration));
+
+			((ClMsgMac2PhyGetTxDuration *) m)->setDuration(duration);
+
+			return 0;
+		}
+
+		((ClMsgMac2PhyGetTxDuration *) m)->setDuration(-1);
+
+		return 1;
+	}
+	return MPhy::recvSyncClMsg(m);
+}
+
+double
+UwModemCSA::getTxDuration(Packet *p)
+{
+	// Difference between RX and TX time of a packet from localhost to localhost
+	double tx_duration = 0.002404;
+
+	return tx_duration;
 }
 
 void
@@ -194,9 +216,7 @@ UwModemCSA::startTx(Packet *p)
 	std::string cmd_s;
 	cmd_s = buildSend(payload, mach->macDA());
 
-	printOnLog(LogLevel::INFO,
-			"MODEMCSA",
-			"startTx::COMMAND_TX::" + cmd_s);
+	printOnLog(LogLevel::INFO, "MODEMCSA", "startTx::COMMAND_TX::" + cmd_s);
 
 	// write the obtained command to the device, through the connector
 	std::unique_lock<std::mutex> state_lock(status_m);
@@ -224,7 +244,6 @@ UwModemCSA::startTx(Packet *p)
 	return;
 }
 
-
 std::string
 UwModemCSA::buildSend(const std::string &payload, int dest)
 {
@@ -238,17 +257,13 @@ UwModemCSA::buildSend(const std::string &payload, int dest)
 	return cmd_s;
 }
 
-
 void
 UwModemCSA::startRx(Packet *p)
 {
-	printOnLog(LogLevel::INFO,
-			"MODEMCSA",
-			"startRx::CALL_PHY2MACSTARTRX");
+	printOnLog(LogLevel::INFO, "MODEMCSA", "startRx::CALL_PHY2MACSTARTRX");
 	Phy2MacStartRx(p);
 	return;
 }
-
 
 void
 UwModemCSA::endRx(Packet *p)
@@ -258,23 +273,20 @@ UwModemCSA::endRx(Packet *p)
 	return;
 }
 
-
 void
 UwModemCSA::start()
 {
 	if (modem_address == "") {
 		std::cout << "ERROR: Modem address not set!" << std::endl;
-		printOnLog(
-				LogLevel::ERROR, "MODEMCSA", "start::ADDRESS_NOT_SET");
+		printOnLog(LogLevel::ERROR, "MODEMCSA", "start::ADDRESS_NOT_SET");
 		return;
 	}
 
 	if (!p_connector->openConnection(modem_address)) {
 		std::cout << "ERROR: connection to modem failed to open: "
 				  << modem_address << std::endl;
-		printOnLog(LogLevel::ERROR,
-				"MODEMCSA",
-				"start::CONNECTION_OPEN_FAILED");
+		printOnLog(
+				LogLevel::ERROR, "MODEMCSA", "start::CONNECTION_OPEN_FAILED");
 		return;
 	}
 
@@ -291,7 +303,6 @@ UwModemCSA::start()
 	checkTimer->resched(period);
 }
 
-
 void
 UwModemCSA::stop()
 {
@@ -304,9 +315,7 @@ UwModemCSA::stop()
 	if (tx_thread.joinable())
 		tx_thread.join();
 	if (p_connector->isConnected() && !p_connector->closeConnection()) {
-		printOnLog(LogLevel::ERROR,
-				"MODEMCSA",
-				"stop::CONNECTION_CLOSE_FAIL");
+		printOnLog(LogLevel::ERROR, "MODEMCSA", "stop::CONNECTION_CLOSE_FAIL");
 	}
 	if (rx_thread.joinable()) {
 		rx_thread.join();
@@ -314,7 +323,6 @@ UwModemCSA::stop()
 
 	checkTimer->force_cancel();
 }
-
 
 void
 UwModemCSA::transmittingData()
@@ -340,7 +348,6 @@ UwModemCSA::transmittingData()
 				"transmittingData::BLOCKING_ON_NEXT_PACKET");
 	}
 }
-
 
 void
 UwModemCSA::receivingData()
@@ -385,9 +392,8 @@ UwModemCSA::receivingData()
 
 std::string
 UwModemCSA::findCommand(std::vector<char>::iterator beg_it,
-						std::vector<char>::iterator end_it,
-						std::vector<char>::iterator &cmd_b,
-						std::vector<char>::iterator &cmd_e)
+		std::vector<char>::iterator end_it, std::vector<char>::iterator &cmd_b,
+		std::vector<char>::iterator &cmd_e)
 {
 	std::string cmd = "";
 	cmd_b = beg_it;
@@ -398,28 +404,27 @@ UwModemCSA::findCommand(std::vector<char>::iterator beg_it,
 
 	cmd_b = std::search(beg_it, end_it, del_b.begin(), del_b.end());
 
-	if((cmd_e = std::search(cmd_b, end_it, del_e.begin(), del_e.end())) != end_it) {
+	if ((cmd_e = std::search(cmd_b, end_it, del_e.begin(), del_e.end())) !=
+			end_it) {
 		cmd_e += del_e.size();
 		return std::string(cmd_b, cmd_e);
 	}
 
 	return "";
-
 }
 
 bool
 UwModemCSA::parseCommand(std::vector<char>::iterator cmd_b,
-						std::vector<char>::iterator cmd_e,
-						std::string &rx_payload)
+		std::vector<char>::iterator cmd_e, std::string &rx_payload)
 {
-	//check only packet correctness
+	// check only packet correctness
 	auto curs_b = find(cmd_b, cmd_e, ',');
 	auto curs_e = find(cmd_b, cmd_e, ',') + 1;
 
-	if(std::string(cmd_b, curs_b).compare("PACKET") != 0)
+	if (std::string(cmd_b, curs_b).compare("PACKET") != 0)
 		return false;
 	curs_b = curs_e;
-	
+
 	// length
 	curs_e = find(curs_b, cmd_e, ',');
 
@@ -438,7 +443,6 @@ UwModemCSA::parseCommand(std::vector<char>::iterator cmd_b,
 	rx_payload = std::string(payload_beg, payload_end);
 
 	return true;
-
 }
 
 void
@@ -452,12 +456,10 @@ UwModemCSA::startRealRx(const std::string &cmd)
 
 	Packet *p = Packet::alloc();
 	createRxPacket(p);
-	std::function<void(UwModem &, Packet * p)> callback =
-			&UwModem::recv;
+	std::function<void(UwModem &, Packet * p)> callback = &UwModem::recv;
 	ModemEvent e = {callback, p};
 	event_q.push(e);
 	// recv(p);
-
 }
 
 void

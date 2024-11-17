@@ -280,6 +280,8 @@ private:
 						  PSDU size. */
 	int force_endTx_; /**< 0 not force, otherwise force endTx*/
 
+	bool has_tap_clmsg; /**< True if received a ClMessage from uwTAP. */
+
 }; /* class Uwal */
 
 #endif /* UWAL_H */

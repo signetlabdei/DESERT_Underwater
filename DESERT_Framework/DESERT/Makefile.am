@@ -98,4 +98,6 @@ SUBDIRS = m4 \
     channel/uwem_channel \
     statistics/uwstats_utilities \
     ranging/uwranging_tokenbus \
-    ranging/uwranging_tdma
+    ranging/uwranging_tdma \
+    ranging/uwtap \
+    ranging/uwranging_tdoa

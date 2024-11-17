@@ -337,16 +337,16 @@ proc finish {} {
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 		for {set j 0} {$j < $opt(nn)} {incr j} {
-			set cbr_throughput           [$cbr($i,$j) getthr]
 			if {$i != $j} {
-				set cbr_sent_pkts        [$cbr($i,$j) getsentpkts]
-				set cbr_rcv_pkts           [$cbr($i,$j) getrecvpkts]
-			}
-			if ($opt(verbose)) {
-				puts "cbr($i,$j) throughput                    : $cbr_throughput"
+                set cbr_throughput           [$cbr($i,$j) getthr]
+                if ($opt(verbose)) {
+				    puts "cbr($i,$j) throughput                    : $cbr_throughput"
+			    }
+                set sum_cbr_throughput       [expr $sum_cbr_throughput + $cbr_throughput]
+				set cbr_sent_pkts            [$cbr($i,$j) getsentpkts]
+				set cbr_rcv_pkts             [$cbr($i,$j) getrecvpkts]
 			}
 		}
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
         set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
         set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
     }

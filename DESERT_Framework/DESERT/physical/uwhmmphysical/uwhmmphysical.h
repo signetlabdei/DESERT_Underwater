@@ -42,6 +42,42 @@
 #include "uwphysical.h"
 #include "mclink.h"
 
+
+class UwHMMPhysicalStats : public UwPhysicalStats
+{
+public:
+
+	/**
+	 * Destructor of UwPhysicalStats class
+	 */
+	virtual ~UwHMMPhysicalStats() = default;
+	/**
+	 * Virtual method used by the Module class in order to copy its stats an a generic fashion,
+	 * without the need to know the derived stats implementation.
+	 * @return the copy of a module the stats.
+  	**/
+	virtual Stats* clone() const;
+
+	/**
+	 * Method to update stats with the param of last received packet
+	 * @param rx_pwr, received power of the packet
+	 * @param noise_pwr, noise power
+	 * @param interf_pwr, noise power
+	 * @param sinr, signal to noise ratio according to parent UwPhysical Model
+	 * @param ber, bit error rate according to HMM channel state
+	 * @param per, packet error rate according to HMM channel state
+	 * @param error, true if packet has error
+	 * @param channel_state, HMM channel state
+	 */	
+	virtual void updateStats(int mod_id, int stck_id, double rx_pwr, 
+		double noise_pwr, double interf_pwr, double sinr, double ber, double per, bool error, 
+		MCLink::ChState channel_state = MCLink::ChState::NOT_DEFINED);
+	
+	MCLink::ChState channel_state = MCLink::ChState::NOT_DEFINED; /**<HMM channel state*/
+};
+
+
+
 /**
  * \brief UnderwaterHMMPhysical models an hidden Markov Model phy channel
  */
@@ -57,9 +93,7 @@ public:
 	/**
 	 * Destructor of UnderwaterHMMPhysical class.
 	 */
-	virtual ~UnderwaterHMMPhysical()
-	{
-	}
+	virtual ~UnderwaterHMMPhysical();
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -92,6 +126,15 @@ public:
 
 	/**
 	 *
+	 * @return the number of packets sent with medium channel
+	 */
+	int getPktsTotMedium() const
+	{
+		return pkts_tot_medium;
+	}
+
+	/**
+	 *
 	 * @return the number of packets sent with good channel
 	 */
 	int getPktsTotGood() const
@@ -104,14 +147,16 @@ public:
 	 * increase the counter of packets sent taking into account
 	 * the channel state
 	 */
-	virtual void incrTotPkts(MCLink::ChState ch_state)
+	void incrTotPkts(MCLink::ChState ch_state)
 	{
 		if (ch_state == MCLink::GOOD) {
 			pkts_tot_good++;
+		} else if (ch_state == MCLink::MEDIUM) {
+			pkts_tot_medium++;
 		} else if (ch_state == MCLink::BAD) {
 			pkts_tot_bad++;
 		}
-	}
+	} 
 
 protected:
 	
@@ -122,12 +167,22 @@ protected:
 	 *
 	 */
 	virtual void endRx(Packet *p) override;
+
+	/**
+	 * Returns the packet error rate by using the BER from HMM
+	 * and the size of a packet
+	 *
+	 * @param ber according to HMM state
+	 * @param p Packet
+	 * @return PER of the packet.
+	 */
+	virtual double ber2per(double ber, Packet * p);
 	
 
 	// Variables
 	std::map<int, MCLink*> link_map; /**< maps source mac to associated MCLink*/
-	double step_duration; /**< sampling period for channel transitions */
 	int pkts_tot_good; /**< Total number of packets arrived with good channel*/
+	int pkts_tot_medium; /**< Total number of packets arrived with medium channel*/
 	int pkts_tot_bad; /**< Total number of packets arrived with bad channel*/
 
 private:

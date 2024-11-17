@@ -26,6 +26,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "phymac-clmsg.h"
+
 #include <uwmodamodem.h>
 #include <uwsocket.h>
 
@@ -99,7 +101,10 @@ UwMODAModem::UwMODAModem()
   , signal_buffer()
   , signal_tag("DRIVER")
   , signal_address("")
+  , premodulation(0)
 {
+  bind("premodulation", (int *) &premodulation);
+
   signal_conn->setTCP();
   data_conn->setTCP();
   data_buffer.clear();
@@ -173,10 +178,55 @@ UwMODAModem::getModulationType(Packet* P)
     return 0;
 }
 
+double
+UwMODAModem::getTxDuration(Packet *p)
+{
+	hdr_uwal *uwalh = HDR_UWAL(p);
+	double tx_duration = -1;
+	
+	// With Flexframe modulation, the TX duration is obtained
+	// dividing the number of samples written by the sampling frequency
+	// (192 kHz by default).
+	// It can be written as a linear function of the packet size:
+	// tx_duration = a + b * pkt_size
+	// The two constants a = 0.560833333 [s] and b = 0.013333333 [s]
+	// are obtained by interpolating the TX duration values obtained
+	// with the smallest and biggest packet size possible.
+	tx_duration = 0.560833333 + 0.013333333 * (uwalh->binPktLength());
+	
+	if (premodulation)
+		tx_duration += 0.1;
+
+	return tx_duration;
+}
+
 int
 UwMODAModem::recvSyncClMsg(ClMessage *m)
 {
-  return 0;
+	if (m->type() == CLMSG_MAC2PHY_GETTXDURATION) {
+		Packet *p = ((ClMsgMac2PhyGetTxDuration *) m)->pkt;
+		hdr_cmn *ch = HDR_CMN(p);
+		
+		if (ch->direction() == hdr_cmn::DOWN) {
+			double duration = getTxDuration(p);
+			
+			if (duration > 0)
+				printOnLog(LogLevel::INFO, 
+						"MODAMODEM", "recvSyncClMsg::GET_TXDURATION "
+						+ std::to_string(duration));
+			
+			((ClMsgMac2PhyGetTxDuration *) m)->setDuration(duration);
+			
+			return 0;
+		}
+		
+		// Don't set TX duration on RX.
+		((ClMsgMac2PhyGetTxDuration *) m)->setDuration(-1);
+		
+		return 1;
+	}
+	
+	return MPhy::recvSyncClMsg(m);
 }
 
 void
@@ -472,3 +522,4 @@ UwMODAModem::startTx(Packet* p)
 
   }
 }
+

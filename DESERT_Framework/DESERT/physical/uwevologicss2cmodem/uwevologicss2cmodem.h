@@ -47,6 +47,14 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <map>
+
+/**
+ * Lookup table (LUT) containing all the possible transmission times.
+ * The key is an integer number from 1 to 64 bytes, the corresponding
+ * value is a time in seconds.
+ */
+typedef std::map<int, double> TransmissionDurationLUT;
 
 /**
  * Enum containing the possible statuses of the driver. In particular, a command
@@ -123,6 +131,15 @@ public:
 	virtual int recvSyncClMsg(ClMessage *m);
 
 	/**
+	 * Method that return the duration of a given transmitted packet.
+	 * Inherited from MPhy, in NS-MIRACLE, could be empty if there is no way
+	 * to retrieve this information.
+	 * @param p Packet pointer to the given packet being transmitted
+	 * @return duration in seconds
+	 */
+	virtual double getTxDuration(Packet *p);
+
+	/**
 	 * Method that sends a written configuration the the EvoLgoics modem.
 	 * The configuration string could be a request of configurations (the AT
 	 * commands conaining '?') or a setting command (the AT commands
@@ -132,6 +149,12 @@ public:
 	 * @return boolean true if the command was correctly sent to the device
 	 */
 	virtual bool configure(Config cmd);
+
+	/**
+	 * Method that loads the TX LUT into a map.
+	 * Also adds the processing delay if any.
+	 */
+	virtual void initializeLUT();
 
 private:
 	/**
@@ -253,6 +276,11 @@ private:
 	int pend_source_level; /**< Pending source level, requested but not set */
 	bool source_level_change; /**< Flag that tells a new SL value to be
 								 applied*/
+
+	TransmissionDurationLUT size2dur_; /**< Map from size [byte] to TX duration [s].  */
+	std::string txdur_file_name_; /**< TX duration LUT file name. */
+	char txdur_token_separator_; /**< TX duration LUT separator. */
+	bool initLUT_; /**< Flag that tells whether the TX duration LUT is loaded or not. */
 
 	/** Minimum time to wait before to schedule a new event in seconds*/
 	static const double EPSILON_S;

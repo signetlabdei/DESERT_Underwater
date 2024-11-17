@@ -40,6 +40,7 @@ std::vector<std::pair<std::string, UwInterpreterS2C::Response> >
 				std::make_pair("BUSY", Response::BUSY),
 				std::make_pair("DELIVERING", Response::DELIVERING),
 				std::make_pair("DELIVERED", Response::DELIVERED),
+                                std::make_pair("DELIVEREDIM", Response::DELIVEREDIM),
 				std::make_pair("DROPCNT", Response::DROPCNT),
 				std::make_pair("ERROR PHY OFF", Response::PHYOFF),
 				std::make_pair("ERROR NOT ACCEPTED", Response::NOT_ACCEPTED),
@@ -55,23 +56,28 @@ std::vector<std::pair<std::string, UwInterpreterS2C::Response> >
 				std::make_pair("ERROR PROTOCOL ID", Response::PROTOCOL_ID),
 				std::make_pair("ERROR INTERNAL", Response::INTERNAL),
 				std::make_pair("FAILED", Response::FAIL),
-	            std::make_pair("Source Level:", Response::CURR_SETTINGS),
-		        std::make_pair("Remote Address:", Response::MODEM_STATUS),
+	                        std::make_pair("Source Level:", Response::CURR_SETTINGS),
+		                std::make_pair("Remote Address:", Response::MODEM_STATUS),
 				std::make_pair("INITIATION NOISE", Response::INIT_NOISE),
 				std::make_pair("INITIATION DEAF", Response::INIT_DEAF),
 				std::make_pair("INITIATION LISTEN", Response::INIT_LISTEN),
 				std::make_pair("RECVSTART", Response::RECVSTART),
 				std::make_pair("RECVEND", Response::RECVEND),
 				std::make_pair("RECVFAILED", Response::RECVFAIL),
-		        std::make_pair("SENDSTART", Response::SENDSTART),
+		                std::make_pair("SENDSTART", Response::SENDSTART),
 				std::make_pair("SENDEND", Response::SENDEND),
-				std::make_pair("BITRATE", Response::BITRATE)};
+				std::make_pair("BITRATE", Response::BITRATE),
+                                std::make_pair("USBLANGLES", Response::USBLANGLES),
+				std::make_pair("USBLLONG", Response::USBLLONG)};
 
 UwInterpreterS2C::UwInterpreterS2C()
 	: sep(",")
 	, r_term("\r\n")
 	, w_term("\n")
+        , ext_proto_mode(false)
+        , usbl_info(nullptr)
 {
+        usbl_info = std::make_shared<USBLInfo>();
 }
 
 UwInterpreterS2C::~UwInterpreterS2C()
@@ -85,8 +91,14 @@ UwInterpreterS2C::buildSend(std::string msg, int dest)
 	std::string length = std::to_string(msg.size());
 	std::string destination = std::to_string(dest);
 
-	std::string cmd =
-			base_cmd + sep + length + sep + destination + sep + msg + w_term;
+        std::string cmd;
+        if (ext_proto_mode) {
+	    cmd =
+	       base_cmd + sep + "p0" + sep + length + sep + destination + sep + msg + w_term;
+        } else {
+            cmd =
+	       base_cmd + sep + length + sep + destination + sep + msg + w_term;
+        }
 
 	return cmd;
 }
@@ -99,13 +111,23 @@ UwInterpreterS2C::buildSendIM(std::string msg, int dest, bool ack)
 	std::string destination = std::to_string(dest);
 
 	std::string cmd;
-	if (ack) {
-		cmd = base_cmd + sep + length + sep + destination + sep + "ack" + sep +
-				msg + w_term;
+        if (ext_proto_mode) {
+        	if (ack) {
+			cmd = base_cmd + sep + "p0" + sep + length + sep + destination + sep + "ack" + sep +
+			      msg + w_term;
+		} else {
+			cmd = base_cmd + sep + "p0" + sep + length + sep + destination + sep + "noack" +
+			      sep + msg + w_term;
+		}
 	} else {
-		cmd = base_cmd + sep + length + sep + destination + sep + "noack" +
-				sep + msg + w_term;
-	}
+        	if (ack) {
+			cmd = base_cmd + sep + length + sep + destination + sep + "ack" + sep +
+			      msg + w_term;
+		} else {
+			cmd = base_cmd + sep + length + sep + destination + sep + "noack" +
+			      sep + msg + w_term;
+		}
+        }
 
 	return cmd;
 }
@@ -235,7 +257,7 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			} else {
 				return false;
 			}
-			// length
+
 			auto curs_b = std::find(rsp_beg, rsp_end, ',') + 1;
 			if (curs_b >= end) {
 				return false;
@@ -244,6 +266,19 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			if (curs_e >= end) {
 				return false;
 			}
+                        // protocol ID if Extended Protocol Mode is used
+                        if (ext_proto_mode) {
+                        	std::string ch = std::string(curs_b, curs_e);
+                        	curs_b = curs_e + 1;
+                        	if (curs_b >= end) {
+                                	return false;
+                        	}
+                        	curs_e = std::find(curs_b, rsp_end, ',');
+                        	if (curs_e >= end) {
+                                	return false;
+                        	}
+                        }
+                        // length
 			int len = std::stoi(std::string(curs_b, curs_e));
 			// source address
 			curs_b = curs_e + 1;
@@ -341,7 +376,7 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			} else {
 				return false;
 			}
-			// length
+
 			auto curs_b = std::find(rsp_beg, rsp_end, ',') + 1;
 			if (curs_b >= end) {
 				return false;
@@ -350,6 +385,19 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			if (curs_e >= end) {
 				return false;
 			}
+                        // Protocol ID if Extended Protocol Mode enabled
+                        if (ext_proto_mode) {
+                            std::string ch = std::string(curs_b, curs_e);
+                            curs_b = curs_e + 1;
+                            if (curs_b >= end) {
+                                    return false;
+                            }
+                            curs_e = std::find(curs_b, rsp_end, ',');
+                            if (curs_e >= end) {
+                                    return false;
+                            }
+                        }
+                        // length
 			int len = std::stoi(std::string(curs_b, curs_e));
 			// source address
 			curs_b = curs_e + 1;
@@ -661,6 +709,16 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			}
 		}
 
+                case Response::DELIVEREDIM: {
+			auto it = search(rsp_beg, end, r_term.begin(), r_term.end());
+			if (it != end) {
+				rsp_end = it + r_term.size();
+				return true;
+			} else {
+				return false;
+			}
+                }
+
 		case Response::FAIL: {
 			auto it = search(rsp_beg, end, r_term.begin(), r_term.end());
 			if (it != end) {
@@ -819,8 +877,433 @@ UwInterpreterS2C::parseResponse(Response rsp, std::vector<char>::iterator end,
 			return true;
 		}
 
+		case Response::USBLANGLES: {
+
+			std::stringstream ss;
+			auto it = std::search(rsp_beg, end, r_term.begin(), r_term.end());
+			if (it != end) {
+				rsp_end = it + r_term.size();
+			} else {
+				return false;
+			}
+
+			auto curs_b = std::find(rsp_beg, rsp_end, ',') + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			auto curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        // Current time
+                        std::string c_time = std::string(curs_b, curs_e);
+                        // measurement time
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+			std::string m_time = std::string(curs_b, curs_e);
+                        // remote address
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+			int r_addr = stoi(std::string(curs_b, curs_e));
+                        // LBearing
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string l_bearing_s = std::string(curs_b, curs_e);
+                        double lbearing;
+                        ss << l_bearing_s;
+                        ss >> lbearing;
+                        ss.clear();
+                        // LBearing
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string l_elevation_s = std::string(curs_b, curs_e);
+                        double lelevation;
+                        ss << l_elevation_s;
+                        ss >> lelevation;
+                        ss.clear();
+                        // Bearing
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string bearing_s = std::string(curs_b, curs_e);
+                        double bearing;
+                        ss << bearing_s;
+                        ss >> bearing;
+                        ss.clear();
+                        // Elevation
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string elevation_s = std::string(curs_b, curs_e);
+                        double elevation;
+                        ss << elevation_s;
+                        ss >> elevation;
+                        ss.clear();
+                        // Roll
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string roll_s = std::string(curs_b, curs_e);
+                        double roll;
+                        ss << roll_s;
+                        ss >> roll;
+                        ss.clear();
+                        // Pitch
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string pitch_s = std::string(curs_b, curs_e);
+                        double pitch;
+                        ss << pitch_s;
+                        ss >> pitch;
+                        ss.clear();
+                        // Yaw
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string yaw_s = std::string(curs_b, curs_e);
+                        double yaw;
+                        ss << yaw_s;
+                        ss >> yaw;
+                        ss.clear();
+                        // RSSI
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        int rssi = stoi(std::string(curs_b, curs_e));
+                        // Integrity
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        int integrity = stoi(std::string(curs_b, curs_e));
+                        // Accuracy
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, '\n');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string accuracy_s = std::string(curs_b, curs_e);
+                        double accuracy;
+                        ss << accuracy_s;
+                        ss >> accuracy;
+                        ss.clear();
+
+                        return true;
+                }
+                case Response::USBLLONG: {
+
+			std::stringstream ss;
+			auto it = std::search(rsp_beg, end, r_term.begin(), r_term.end());
+			if (it != end) {
+				rsp_end = it + r_term.size();
+			} else {
+				return false;
+			}
+
+			auto curs_b = std::find(rsp_beg, rsp_end, ',') + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			auto curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        // Current time
+                        std::string c_time_s = std::string(curs_b, curs_e);
+                        double c_time;
+                        ss << c_time_s;
+                        ss >> c_time;
+                        ss.clear();
+                        // measurement time
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+			std::string m_time_s = std::string(curs_b, curs_e);
+                        double m_time;
+                        ss << m_time_s;
+                        ss >> m_time;
+                        ss.clear();
+                        // remote address
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+			int r_addr = stoi(std::string(curs_b, curs_e));
+                        // X
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string X_s = std::string(curs_b, curs_e);
+                        double X;
+                        ss << X_s;
+                        ss >> X;
+                        ss.clear();
+                        // Y
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string Y_s = std::string(curs_b, curs_e);
+                        double Y;
+                        ss << Y_s;
+                        ss >> Y;
+                        ss.clear();
+                        // Z
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string Z_s = std::string(curs_b, curs_e);
+                        double Z;
+                        ss << Z_s;
+                        ss >> Z;
+                        ss.clear();
+                        // E
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string E_s = std::string(curs_b, curs_e);
+                        double E;
+                        ss << E_s;
+                        ss >> E;
+                        ss.clear();
+                        // N
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string N_s = std::string(curs_b, curs_e);
+                        double N;
+                        ss << N_s;
+                        ss >> N;
+                        ss.clear();
+                        // U
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string U_s = std::string(curs_b, curs_e);
+                        double U;
+                        ss << U_s;
+                        ss >> U;
+                        ss.clear();
+                        // Roll
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string roll_s = std::string(curs_b, curs_e);
+                        double roll;
+                        ss << roll_s;
+                        ss >> roll;
+                        ss.clear();
+                        // Roll
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string pitch_s = std::string(curs_b, curs_e);
+                        double pitch;
+                        ss << pitch_s;
+                        ss >> pitch;
+                        ss.clear();
+                        // Yaw
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string yaw_s = std::string(curs_b, curs_e);
+                        double yaw;
+                        ss << yaw_s;
+                        ss >> yaw;
+                        ss.clear();
+                        // Propagation time
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string prop_s = std::string(curs_b, curs_e);
+                        double propagation;
+                        ss << prop_s;
+                        ss >> propagation;
+                        ss.clear();
+                        // RSSI
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        int rssi = stoi(std::string(curs_b, curs_e));
+                        // Integrity
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, ',');
+			if (curs_e >= end) {
+				return false;
+			}
+                        int integrity = stoi(std::string(curs_b, curs_e));
+                        // Accuracy
+                        curs_b = curs_e + 1;
+			if (curs_b >= end) {
+				return false;
+			}
+			curs_e = std::find(curs_b, rsp_end, '\n');
+			if (curs_e >= end) {
+				return false;
+			}
+                        std::string accuracy_s = std::string(curs_b, curs_e);
+                        double accuracy;
+                        ss << accuracy_s;
+                        ss >> accuracy;
+                        ss.clear();
+
+                        usbl_info->curr_time = c_time;
+                        usbl_info->meas_time = m_time;
+                        usbl_info->r_address = r_addr;
+                        usbl_info->X = X;
+                        usbl_info->Y = Y;
+                        usbl_info->Z = Z;
+                        usbl_info->E = E;
+                        usbl_info->N = N;
+                        usbl_info->U = U;
+                        usbl_info->accuracy = accuracy;
+
+                        return true;
+
+		}
+
 		default:
 			return false;
 
 	} // end of switch on commands
+}
+
+void
+UwInterpreterS2C::setExtProtoMode(bool enabled)
+{
+	ext_proto_mode = enabled;
+}
+
+std::shared_ptr<USBLInfo>
+UwInterpreterS2C::getUSBLInfo()
+{
+    return usbl_info;
 }

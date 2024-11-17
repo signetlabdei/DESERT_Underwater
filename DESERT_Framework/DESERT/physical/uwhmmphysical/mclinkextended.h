@@ -30,7 +30,7 @@
 /**
  * @file   mclinkextended.h
  * @author Nicola Toffolo
- * @version 1.0.0
+ * @version 1.1.0
  *
  * \brief Definition of MCLinkExtended class, extending MCLink.
  *
@@ -57,25 +57,23 @@ public:
 	/**
 	 * Constructor of MCLinkExtended class.
 	 * 
-	 * @param p_succ_good Probability of successful reception with channel in
-	 *  GOOD state
-	 * @param p_succ_medium Probability of successful reception with channel in
-	 *  MEDIUM state
-	 * @param p_succ_bad Probability of successful reception with channel in
-	 *  BAD state
+	 * @param ber_good BER with channel in GOOD state
+	 * @param ber_medium BER with channel in MEDIUM state
+	 * @param ber_bad BER with channel in BAD state
 	 * @param p_gb Probability of transition from GOOD to BAD in one step
 	 * @param p_gm Probability of transition from GOOD to MEDIUM in one step
 	 * @param p_mg Probability of transition from MEDIUM to GOOD in one step
 	 * @param p_mb Probability of transition from MEDIUM to BAD in one step
 	 * @param p_bg Probability of transition from BAD to GOOD in one step
 	 * @param p_bm Probability of transition from BAD to MEDIUM in one step
-	 * @param ch_state Optional (default = GOOD) channel state 
+	 * @param step_period period (s) for state transitions
+	 * @param ch_state Optional initial channel state (default = GOOD)
 	 *  of type MCLink::{GOOD | MEDIUM | BAD}
-	 * @param curr_step Optional (default = 0) time step associated to the state
+
 	 */	
-	MCLinkExtended(double p_succ_good, double p_succ_medium, double p_succ_bad, double p_gb,
+	MCLinkExtended(double ber_good, double ber_medium, double ber_bad, double p_gb,
 			double p_gm, double p_mg, double p_mb, double p_bg, double p_bm,
-			ChState ch_state = MCLink::GOOD, int curr_step = 0);
+			double step_period, ChState ch_state = MCLink::GOOD);
 			
 	/**
 	 * Default destructor of MCLinkExtended class.
@@ -103,22 +101,13 @@ public:
 	 * @return the channel state at curr_step as 
 	 *	MCLink::{GOOD | MEDIUM | BAD}
 	 */
-	virtual ChState updateChState(int curr_step) override;
+	virtual ChState updateChState() override;
 
 	/**
 	 *
-	 * @return prob of successful reception with current channel state
+	 * @return BER with current channel state
 	 */
-	virtual double getPSucc() const override
-	{
-		if (ch_state == GOOD) {
-			return p_succ_good;
-		} else if (ch_state == MEDIUM) {
-			return p_succ_medium;
-		} else { 
-			return p_succ_bad;
-		}
-	}
+	virtual double getBER() override; //remember to call updateChState() before returning a BER value
 	
 protected:
 
@@ -139,7 +128,7 @@ protected:
 	void pow_matrix (const double (&A)[3][3], int n, double (&R)[3][3]);
 
 	// Variables
-	double p_succ_medium; /**< Prob of successful reception with medium channel*/
+	double ber_medium; /**< BER with medium channel*/
 	double p_gm; /**< Prob of transition from good to medium channel */
 	double p_mg; /**< Prob of transition from medium to good channel */
 	double p_mb; /**< Prob of transition from medium to bad channel */

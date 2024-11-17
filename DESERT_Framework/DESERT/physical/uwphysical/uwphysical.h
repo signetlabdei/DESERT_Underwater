@@ -90,19 +90,22 @@ public:
 	 * @param rx_pwr, received power of the packet
 	 * @param noise_pwr, noise power
 	 * @param interf_pwr, noise power
+	 * @param sinr, signal to noise ratio
+	 * @param ber, bit error rate
+	 * @param per, packet error rate
 	 * @param error, true if packet has error
 	 */
-	enum ChannelStates {NOT_DEFINED = -1, GOOD = 1, BAD = 2};
 	virtual void updateStats(int mod_id, int stck_id, double rx_pwr, 
-		double noise_pwr, double interf_pwr, bool error, 
-		ChannelStates channel_state = NOT_DEFINED);
+		double noise_pwr, double interf_pwr, double sinr, double ber, double per, bool error);
 
 	double last_rx_power; /** Power of the last received packet.*/
 	double last_noise_power; /** Noise power of the last received packet. */
 	double instant_noise_power; /** Noise power measured on query. */
 	double last_interf_power; /** Interference power of the last rx packet.*/
+	double last_sinr; /** SINR of the last received packet. */
+	double last_ber; /** BER of the last received packet. */
+	double last_per; /** PER of the last received packet. */
 	bool has_error; /** True if last packet wasn't correctly received. */
-	ChannelStates channel_state {NOT_DEFINED}; /** used by UwHMMPhysical */
 };
 
 
@@ -118,9 +121,7 @@ public:
 	/**
 	 * Destructor of UnderwaterPhysical class.
 	 */
-	virtual ~UnderwaterPhysical()
-	{
-	}
+	virtual ~UnderwaterPhysical();
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:

@@ -45,8 +45,6 @@
  */
 #define DEFAULT_PSDU 32
 
-
-
 /**
  * Class to create the Otcl shadow object for an object of the class Uwal.
  */
@@ -79,6 +77,7 @@ Uwal::Uwal()
 	, frame_set_validity(0)
 	, frame_padding(0)
 	, force_endTx_(0)
+	, has_tap_clmsg(false)
 {
 	while (dummyStr.size() < PSDU) {
 		dummyStr += " DEFAULT DUMMY STRING ";
@@ -213,16 +212,21 @@ Uwal::recv(Packet *p)
 			std::cout << NOW << "  UW-AL(" << nodeID
 					  << ") : received pkt DOWN ****" << endl;
 		}
-		initializeHdr(p, ++pkt_counter);
+		initializeHdr(p, (has_tap_clmsg ? pkt_counter : ++pkt_counter));
+
 		//        initializeHdr(p, ch->uid()); // the uid is also used to
 		//        identify the packet at the AL
+
+		has_tap_clmsg = false;
+
 		if (pPacker != NULL) {
-			hdr_cmn *ch = HDR_CMN(p);
 			pPacker->packHdr(p);
 			pPacker->packPayload(p);
+
 			// ch->size_ = pPacker->getHdrBytesLength() +
 			// pPacker->getPayloadBytesLength();
 		}
+
 		sendDownPkts.push(p);
 	}
 
@@ -351,7 +355,7 @@ Uwal::fragmentPkt(Packet *p)
 			}
 
 			for (uint i = 0; i < frameNumber; i++) {
-				f_tmp =  p->copy();
+				f_tmp = p->copy();
 				initializeHdr(f_tmp, hal->pktID());
 
 				hal_tmp = HDR_UWAL(f_tmp);
@@ -578,8 +582,33 @@ Uwal::recvSyncClMsg(ClMessage *m)
 			Phy2MacEndTx(((ClMsgPhy2MacEndTx *) m)->pkt);
 		}
 		return 0;
-	} else
-		return Module::recvSyncClMsg(m);
+	} else if (m->type() == CLMSG_MAC2PHY_GETTXDURATION
+			&& m->direction() == DOWN) {
+		Packet *p = ((ClMsgMac2PhyGetTxDuration *) m)->pkt;
+		hdr_cmn *ch = HDR_CMN(p);
+
+		if (ch->direction() == hdr_cmn::DOWN) {
+
+			initializeHdr(p, ++pkt_counter);
+
+			if (pPacker != NULL) {
+				pPacker->packHdr(p);
+				pPacker->packPayload(p);
+
+				if (debug_)
+					std::cout << NOW << " UW-AL(" << nodeID
+							  << ") : received ClMsg pkt DOWN ****"
+							  << std::endl;
+			}
+
+			has_tap_clmsg = true;
+		}
+
+		sendSyncClMsgDown(m);
+		return 0;
+	}
+
+	return Module::recvSyncClMsg(m);
 }
 
 void
@@ -685,6 +714,7 @@ Uwal::startTx(Packet *p)
 	if (!hal->Mbit() && force_endTx_) {
 		endTx(p);
 	}
+
 	sendDown(p);
 }
 

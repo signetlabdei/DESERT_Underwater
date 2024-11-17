@@ -394,6 +394,7 @@ build_NS() {
     if [ -f Makefile ] ; then
         make distclean >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     fi
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                       \
     ./configure --enable-static                                        \
                 --target=${ARCH}                                       \
                 --host=${ARCH}                                         \
@@ -474,6 +475,7 @@ build_NSMIRACLE() {
     ./autogen.sh >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                     \
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"      \
       CFLAGS="-Wno-write-strings"                     \
     ./configure --target=${ARCH}                      \
                 --host=${ARCH}                        \
@@ -916,6 +918,7 @@ build_WOSS() {
     fi
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                                                  \
+    CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                                   \
       CFLAGS="-Wno-write-strings"                                                  \
     CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx               \
      LDFLAGS=-L${DEST_FOLDER}/lib                                                  \
@@ -945,6 +948,9 @@ build_WOSS() {
         tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
         exit 1
     fi
+    # Since WOSS is checking bellhop sanity during check, we need to temporarily add it 
+    # to PATH, since WOSS can't know bellhop's bin path
+    export PATH=${DEST_FOLDER}/bin:$PATH
     make check >> ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log 2>&1
     if [ $? -ne 0 ]; then
 	err_L1 "Error during make check of woss-${WOSS_VERSION}! Exiting..."
