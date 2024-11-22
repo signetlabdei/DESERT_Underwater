@@ -101,40 +101,6 @@ SUBDIRS = m4 \
     data_link/uwjammer \
     data_link/uw-cs-burst \
     data_link/uwtwr \
-    physical/uwphysical \
-    physical/uwhmmphysical \
-    physical/uwgainfromdb \
-    physical/uwphysicaldb\
-    physical/uwphysicalrogersmodel\
-    physical/uwphysicalfromdb\
-    physical/uwmodem \
-    physical/uwmodemcsa \
-    physical/uwconnector \
-    physical/uwevologicss2cmodem \
-    physical/uwmphypatch \
-    physical/uwhermesphy \
-    physical/uwofdmphy \
-    physical/uwahoi_phy \
-    physical/uwahoimodem \
-    physical/uwmodamodem \
-    physical/uwoptical_phy \
-    physical/uwopticalbeampattern \
-    physical/uw-al \
-    physical/uw-al/packer_common \
-    physical/uw-al/packer_mac \
-    physical/uwphy_clmsgs \
-    physical/uwem_phy \
-    physical/uwem_antenna \
-    utility/msg-display \
-    mobility/uwdriftposition \
-    mobility/uwgmposition \
-    mobility/uwrandomlib \
-    mobility/uwsmposition \
-    interference/uwinterference \
-    interference/uwinterferenceofdm \
-    propagation/uwoptical_propagation \
-    propagation/uwem_propagation \
-    channel/uwoptical_channel \
     channel/uwem_channel \
     channel/uwoptical_channel \
     ranging/uwranging_tokenbus \

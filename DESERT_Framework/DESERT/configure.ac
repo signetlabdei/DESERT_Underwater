@@ -265,40 +265,6 @@ AC_CONFIG_FILES([
     data_link/uwjammer/Makefile
     data_link/uw-cs-burst/Makefile
     data_link/uwtwr/Makefile
-    physical/uwmodem/Makefile
-    physical/uwmodemcsa/Makefile
-    physical/uwconnector/Makefile
-    physical/uwevologicss2cmodem/Makefile
-    physical/uwmphypatch/Makefile
-    physical/uwphysical/Makefile
-    physical/uwhmmphysical/Makefile
-    physical/uwphysicalrogersmodel/Makefile
-    physical/uwgainfromdb/Makefile
-    physical/uwphysicaldb/Makefile
-    physical/uwphysicalfromdb/Makefile
-    physical/uw-al/Makefile
-    physical/uw-al/packer_common/Makefile
-    physical/uw-al/packer_mac/Makefile    
-    physical/uwhermesphy/Makefile
-    physical/uwofdmphy/Makefile
-    physical/uwahoi_phy/Makefile
-    physical/uwahoimodem/Makefile
-    physical/uwmodamodem/Makefile
-    physical/uwoptical_phy/Makefile
-    physical/uwopticalbeampattern/Makefile
-    physical/uwphy_clmsgs/Makefile
-    physical/uwem_phy/Makefile
-    physical/uwem_antenna/Makefile
-    utility/msg-display/Makefile
-    mobility/uwdriftposition/Makefile
-    mobility/uwgmposition/Makefile
-    mobility/uwrandomlib/Makefile
-    mobility/uwsmposition/Makefile
-    interference/uwinterference/Makefile
-    interference/uwinterferenceofdm/Makefile
-    propagation/uwoptical_propagation/Makefile
-    propagation/uwem_propagation/Makefile
-    channel/uwoptical_channel/Makefile
     channel/uwem_channel/Makefile
     channel/uwoptical_channel/Makefile
     ranging/uwranging_tokenbus/Makefile
