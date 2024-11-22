@@ -61,6 +61,7 @@ SUBDIRS = m4 \
     data_link/uwtdma \
     data_link/uwtdma-frame \
     data_link/uwtokenbus \
+    data_link/uwtwr \
     physical/uwphysical \
     physical/uwhmmphysical \
     physical/uwgainfromdb \
