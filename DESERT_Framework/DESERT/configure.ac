@@ -77,6 +77,8 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-ofdm-aloha'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-smart-ofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwsr'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-t-lohi'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q-sync'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha-trigger'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwUFetch'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma'
@@ -172,6 +174,8 @@ AC_CONFIG_FILES([
     data_link/uwsr/Makefile
     data_link/uw-t-lohi/Makefile
     data_link/uwUFetch/Makefile
+    data_link/uw-aloha-q/Makefile
+    data_link/uw-aloha-q-sync/Makefile
     data_link/uw-csma-aloha-trigger/Makefile
     data_link/uwtdma/Makefile
     data_link/uwtdma-frame/Makefile
