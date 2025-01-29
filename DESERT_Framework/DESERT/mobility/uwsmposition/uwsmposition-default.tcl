@@ -30,4 +30,4 @@
 # @author Filippo Campagnaro
 # @version 1.0.0
 
-Position/UWSM set debug        0
+Position/UWSM set debug_        0

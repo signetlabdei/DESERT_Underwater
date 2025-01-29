@@ -950,7 +950,7 @@ build_WOSS() {
     fi
     # Since WOSS is checking bellhop sanity during check, we need to temporarily add it 
     # to PATH, since WOSS can't know bellhop's bin path
-    export PATH=${DEST_FOLDER}/bin:$PATH
+    export PATH="${DEST_FOLDER}/bin:$PATH"
     make check >> ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log 2>&1
     if [ $? -ne 0 ]; then
 	err_L1 "Error during make check of woss-${WOSS_VERSION}! Exiting..."

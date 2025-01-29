@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -44,10 +44,6 @@ ClMsgCtr2McPosition::ClMsgCtr2McPosition(int dest_id)
 {
 }
 
-ClMsgCtr2McPosition::~ClMsgCtr2McPosition()
-{
-}
-
 ClMsgCtr2McPosition*
 ClMsgCtr2McPosition::copy()
 {
@@ -71,10 +67,6 @@ ClMsgCtr2McPosition::getRovPosition() const
 ClMsgMc2CtrPosition::ClMsgMc2CtrPosition(int dest_id)
 	: ClMessage(CLMSG_MC2CTR_VERBOSITY, CLMSG_MC2CTR_SETPOS, UNICAST, dest_id)
 	, rov_destination(nullptr)
-{
-}
-
-ClMsgMc2CtrPosition::~ClMsgMc2CtrPosition()
 {
 }
 
@@ -104,10 +96,6 @@ ClMsgMc2CtrStatus::ClMsgMc2CtrStatus(int dest_id)
 {
 }
 
-ClMsgMc2CtrStatus::~ClMsgMc2CtrStatus()
-{
-}
-
 ClMsgMc2CtrStatus*
 ClMsgMc2CtrStatus::copy()
 {
@@ -129,13 +117,9 @@ ClMsgMc2CtrStatus::getRovStatus() const
 ////////////////////////////////////////////////////////
 
 ClMsgTrack2McPosition::ClMsgTrack2McPosition(int dest_id)
-	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
-		CLMSG_TRACK2MC_TRACKPOS, UNICAST, dest_id)
+	: ClMessage(CLMSG_TRACK2MC_VERBOSITY, CLMSG_TRACK2MC_TRACKPOS, UNICAST, 
+					dest_id)
 	, track_position(nullptr)
-{
-}
-
-ClMsgTrack2McPosition::~ClMsgTrack2McPosition()
 {
 }
 
@@ -163,10 +147,6 @@ ClMsgTrack2McStatus::ClMsgTrack2McStatus(int dest_id)
 	: ClMessage(CLMSG_TRACK2MC_VERBOSITY,
 		CLMSG_TRACK2MC_GETSTATUS, UNICAST, dest_id)
 	, mine_status(false)
-{
-}
-
-ClMsgTrack2McStatus::~ClMsgTrack2McStatus()
 {
 }
 

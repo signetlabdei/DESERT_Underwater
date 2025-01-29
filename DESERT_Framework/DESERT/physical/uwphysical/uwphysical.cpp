@@ -337,7 +337,7 @@ UnderwaterPhysical::startRx(Packet *p)
 					  << "; AcquisitionThreshold_dB_ = "
 					  << getAcquisitionThreshold() << " pr "
 					  << 10 * log10(ph->Pr) << " pn " << 10 * log10(ph->Pn)
-					  << " end " << NOW + HDR_CMN(p)->txtime() << " src "
+					  << " end " << NOW + ph->duration << " src "
 					  << HDR_CMN(p)->prev_hop_ << " dest "
 					  << HDR_CMN(p)->next_hop() << " size "
 					  << HDR_CMN(p)->size() << std::endl;

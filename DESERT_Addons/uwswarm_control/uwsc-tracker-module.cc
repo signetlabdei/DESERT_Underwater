@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,38 +27,42 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-tracker-module.cc
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the <i>UWSCTRACKER</i> class implementation.
-*
-* Provides the UwSCTracker class implementation.
-*/
+ * @file uwsc-tracker-module.cc
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the <i>UWSCTRACKER</i> class implementation.
+ *
+ * Provides the UwSCTracker class implementation.
+ */
 #include "uwsc-tracker-module.h"
+#include "uwsc-clmsg.h"
 #include "uwsc-tracker-follower-packet.h"
 #include <iostream>
 
 #define HDR_UWTRACK(p) (hdr_uwTracker::access(p))
-#define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
 
 /**
-* Class that represents the binding with the tcl configuration script.
-*/
-static class UwSCTrackerModuleClass : public TclClass {
+ * Class that represents the binding with the tcl configuration script.
+ */
+static class UwSCTrackerModuleClass : public TclClass
+{
 public:
-
 	/**
-	* Constructor of the class
-	*/
-	UwSCTrackerModuleClass() : TclClass("Module/UW/SC/TRACKER") {
+	 * Constructor of the class
+	 */
+	UwSCTrackerModuleClass()
+		: TclClass("Module/UW/SC/TRACKER")
+	{
 	}
 
 	/**
-	* Creates the TCL object needed for the tcl language interpretation.
-	* @return Pointer to an TclObject
-	*/
-	TclObject* create(int, const char*const*) {
+	 * Creates the TCL object needed for the tcl language interpretation.
+	 * @return Pointer to an TclObject
+	 */
+	TclObject *
+	create(int, const char *const *)
+	{
 		return (new UwSCTrackerModule());
 	}
 } class_module_uwSCTracker;
@@ -70,51 +74,48 @@ UwSCTrackerModule::UwSCTrackerModule()
 {
 }
 
-
-UwSCTrackerModule::~UwSCTrackerModule() {}
-
 int
-UwSCTrackerModule::command(int argc, const char*const* argv) {
-	Tcl& tcl = Tcl::instance();
-	if(argc == 3){
+UwSCTrackerModule::command(int argc, const char *const *argv)
+{
+	Tcl &tcl = Tcl::instance();
+
+	if (argc == 3) {
 		if (strcasecmp(argv[1], "setLeaderId") == 0) {
-			leader_id = atoi(argv[2]);
+			leader_id = std::atoi(argv[2]);
+
 			tcl.resultf("%s", "leader_id Setted\n");
+
 			return TCL_OK;
 		}
 	}
-	return UwTrackerModule::command(argc,argv);
+	return UwTrackerModule::command(argc, argv);
 }
 
-
 void
-UwSCTrackerModule::recv(Packet* p) {
-	hdr_uwSCFTracker* uwscf_track_h = HDR_UWSCFTRACK(p);
+UwSCTrackerModule::recv(Packet *p)
+{
+	hdr_uwSCFTracker *uwscf_track_h = HDR_UWSCFTRACK(p);
 
-	if (uwscf_track_h->mine_remove())
-	{
+	if (uwscf_track_h->mine_remove()) {
 		ClMsgTrack2McStatus m(leader_id);
 		m.setMineStatus(uwscf_track_h->mine_remove());
 		sendSyncClMsg(&m);
 
 		if (debug_)
 			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
-				<< " ROV (" << m.getSource()
-				<< ") removed current detected mine"
-				<< " at position X = " << uwscf_track_h->x()
-				<< " Y = " << uwscf_track_h->y()
-				<< " Z = " << uwscf_track_h->z()
-				<< std::endl;
+					  << " ROV (" << m.getSource()
+					  << ") removed current detected mine"
+					  << " at position X = " << uwscf_track_h->x()
+					  << " Y = " << uwscf_track_h->y()
+					  << " Z = " << uwscf_track_h->z() << std::endl;
 
-	}
-	else
-	{
+	} else {
 		Position mine_position;
 		mine_position.setX(uwscf_track_h->x());
 		mine_position.setY(uwscf_track_h->y());
 		mine_position.setZ(uwscf_track_h->z());
 
-		for (auto& mine : tracked_mines)
+		for (auto &mine : tracked_mines)
 			if (mine.getDist(&mine_position) == 0)
 				return;
 
@@ -126,11 +127,11 @@ UwSCTrackerModule::recv(Packet* p) {
 
 		if (debug_)
 			std::cout << NOW << "  UwSCTrackerModule::recv(Packet* p)"
-				<< " ROV (" << m.getSource()
-				<< ") tracked a mine at position: X = " << mine_position.getX()
-				<< "  , Y = " << mine_position.getY()
-				<< "  , Z = " << mine_position.getZ()
-				<< std::endl;
+					  << " ROV (" << m.getSource()
+					  << ") tracked a mine at position: X = "
+					  << mine_position.getX()
+					  << "  , Y = " << mine_position.getY()
+					  << "  , Z = " << mine_position.getZ() << std::endl;
 	}
 
 	UwCbrModule::recv(p);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,29 +27,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-tracker-follower-module.h
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UWSCFTRACKER</i>.
-*
-* Provides the definition of the class UwSCFTracker.
-*/
+ * @file uwsc-tracker-follower-module.h
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UWSCFTRACKER</i>.
+ *
+ * Provides the definition of the class UwSCFTracker.
+ */
 
 #ifndef UWTRACKF_MODULE_H
 #define UWTRACKF_MODULE_H
-#include <uwtracker-module.h>
 #include <uwsc-tracker-follower-packet.h>
-#include <node-core.h>
+#include <uwsmposition.h>
+#include <uwtracker-module.h>
 #include <vector>
-#include <algorithm>
-
-#define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
 
 class UwSCFTrackerModule; // forward declaration
 
 /**
- * UwUpdateMineStatus class is used to handle the scheduling period of <i>UWSCFTRACKER</i> packets.
+ * UwUpdateMineStatus class is used to handle the scheduling period of
+ * <i>UWSCFTRACKER</i> packets.
  */
 class UwUpdateMineStatus : public TimerHandler
 {
@@ -66,56 +64,59 @@ protected:
 };
 
 /**
- * Followerstate list all the possible state of the follower.
+ * UwSCFTrackerModule class is used to track mines via sonar and share tracking
+ * information via packets. After a given time a mine is detected, this module
+ * provides to remove it.
  */
-enum class FollowerState
+class UwSCFTrackerModule : public UwTrackerModule
 {
-	TRACK,	/**< Tracking mines. */
-	DETECT,	/**< Detecting a mine. */
-	DEMINE,	/**< Removed a mine. */
-	IDLE	/**< Not tracking. */
-};
-
-/**
- * UwSCFTrackerModule class is used to track mines via sonar and share tracking information via packets.
- * After a given time a mine is detected, this module provides to remove it.
- */
-class UwSCFTrackerModule : public UwTrackerModule {
 	friend class UwUpdateMineStatus;
-public:
 
+public:
 	/**
 	 * Default Constructor of UwSCFTrackerModule class.
 	 */
 	UwSCFTrackerModule();
 
-
 	/**
 	 * Destructor of UwSCFTrackerModule class.
 	 */
-	virtual ~UwSCFTrackerModule();
-
+	virtual ~UwSCFTrackerModule() = default;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
-	 * 
+	 *
 	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	 * 
-	 */
-	virtual int command(int argc, const char*const* argv);
-
-	/**
-	 * Initializes a monitoring data packet passed as argument with the default values.
-	 * 
-	 * @param Packet* Pointer to a packet already allocated to fill with the right values.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
 	 *
 	 */
-	virtual void initPkt(Packet* p) ;
+	virtual int command(int argc, const char *const *argv) override;
+
+	/**
+	 * Initializes a monitoring data packet passed as argument with the default
+	 * values.
+	 *
+	 * @param Packet* Pointer to a packet already allocated to fill with the
+	 * right values.
+	 *
+	 */
+	virtual void initPkt(Packet *p) override;
 
 protected:
-	std::vector<UWSMPosition*> mine_positions; /**< Positions of the mines in the area. */
+	/**
+	 * Followerstate list all the possible state of the follower.
+	 */
+	enum class FollowerState {
+		TRACK, /**< Tracking mines. */
+		DETECT, /**< Detecting a mine. */
+		DEMINE, /**< Removed a mine. */
+		IDLE /**< Not tracking. */
+	};
+
+	std::vector<UWSMPosition *> mine_positions;	/**< Positions of the mines in the area. */
 	Position auv_position; /**< Current position of the follower. */
 	FollowerState auv_state; /**< Current state of the follower. */
 	double demine_period; /**< Timer to schedule packets transmission.*/
@@ -135,21 +136,21 @@ protected:
 	void updateMineRemove();
 
 	/**
-	  * Update the current track position with the nearest mine position
-	  *
-	  * @return UWSMPosition Pointer to the nearest mine position
-	  */
-	UWSMPosition* updateTrackPosition();
+	 * Update the current track position with the nearest mine position
+	 *
+	 * @return UWSMPosition* Pointer to the nearest mine position
+	 */
+	UWSMPosition *updateTrackPosition();
 
 	/**
 	 * Start to send packets.
 	 */
-	virtual void start();
+	virtual void start() override;
 
 	/**
 	 * Stop to send packets.
 	 */
-	virtual void stop();
+	virtual void stop() override;
 };
 
 #endif // UWTRACKF_MODULE_H

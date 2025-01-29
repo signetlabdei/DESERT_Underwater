@@ -130,6 +130,7 @@ public:
 	virtual void setdest(
 			double x_dest, double y_dest, double z_dest, double spead);
 	virtual void setdest(double x_dest, double y_dest, double z_dest);
+	virtual bool isDestReached() const;
 	virtual void setX(double x);
 	virtual void setY(double y);
 	virtual void setZ(double z);

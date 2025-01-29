@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -37,12 +37,7 @@
 */
 
 #include "uwsc-tracker-follower-module.h"
-#include <uwsmposition.h>
 #include <iostream>
-
-extern packet_t PT_UWSCFTRACK;
-int hdr_uwSCFTracker::offset_; /**< Offset used to access in 
-									<i>hdr_uwTracker</i> packets header. */
 
 /**
 * Class that represents the binding with the tcl configuration script.
@@ -77,8 +72,6 @@ UwSCFTrackerModule::UwSCFTrackerModule()
 	bind("demine_period_", (double*) &demine_period);
 }
 
-
-UwSCFTrackerModule::~UwSCFTrackerModule() {}
 
 int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
@@ -117,7 +110,7 @@ UwSCFTrackerModule::sendPkt()
 
 		for (auto it = mine_positions.begin(); it != mine_positions.end();++it)
 	    {
-			if((*it)->getDist(&temp_position) < 0.001)
+			if((*it)->getDist(&temp_position) < 1e-3)
 			{
 				if (it == mine_positions.end()-1)
 				{
@@ -203,13 +196,13 @@ UWSMPosition*
 UwSCFTrackerModule::updateTrackPosition()
 {
 	UWSMPosition* new_track_position (track_position);
-	float min_distance = new_track_position->getDist(&auv_position);
+	double min_distance = new_track_position->getDist(&auv_position);
 
 	mine_measure.timestamp() = NOW;
 
-	for (auto& pos : mine_positions)
+	for (const auto& pos : mine_positions)
 	{
-		float distance = pos->getDist(&auv_position);
+		double distance = pos->getDist(&auv_position);
 		if(distance < min_distance)
 		{
 			min_distance = distance;

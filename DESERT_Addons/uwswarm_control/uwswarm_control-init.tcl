@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # @file   uwmc-init.tcl
-# @author Filippo Campagnaro, Vincenzo Cimino
+# @author Vincenzo Cimino
 # @version 1.0.0
 
 PacketHeaderManager set tab_(PacketHeader/UWSCFTRACK) 1

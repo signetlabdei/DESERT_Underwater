@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ public:
 	/**
 	* Destructor of UwSCROVCtrModule class.
 	*/
-	virtual ~UwSCROVCtrModule();
+	virtual ~UwSCROVCtrModule() = default;
 
 	/**
 	* TCL command interpreter. It implements the following OTcl methods:
@@ -69,24 +69,24 @@ public:
 	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
 	*
 	**/
-	virtual int command(int argc, const char*const* argv);
+	virtual int command(int argc, const char*const* argv) override;
 
 	/**
 	* Performs the reception of packets from upper and lower layers.
 	*
 	* @param Packet* Pointer to the packet will be received.
 	*/
-	virtual void recv(Packet*);
+	virtual void recv(Packet*) override;
 
 
 	/**
 	 * Recv syncronous cross layer messages to require an operation from another module.
 	 *
 	 * @param m Pointer cross layer message
-	 * @return zero if successful
+	 * @return int Zero if successful
 	 *
 	 */
-	int recvSyncClMsg(ClMessage* m);
+	virtual int recvSyncClMsg(ClMessage* m) override;
 
 protected:
 	int leader_id;		/**< Id of the Mission Coordinator module. */

@@ -46,7 +46,7 @@ print_desert_logo() {
     printf "| |  | |/ _ \\/ __|/ _ \ '__| __| | |  | | '_ \\ / _\` |/ _ \\ '__\\ \\ /\\ / / _\` | __/ _ \\ '__|\n"
     printf "| |__| |  __/\\__ \\  __/ |  | |_  | |__| | | | | (_| |  __/ |   \\ V  V / (_| | ||  __/ |   \n"
     printf "|_____/ \\___||___/\\___|_|   \\__|  \\____/|_| |_|\\__,_|\\___|_|    \\_/\\_/ \\__,_|\\__\\___|_|   \n"
-    printf "_____Copyright (c) 2024 Regents of the SIGNET lab, University of Padova)_____\n"
+    printf "_____Copyright (c) 2025 Regents of the SIGNET lab, University of Padova)_____\n"
     printf "\n"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "return of print_desert_logo(): ${output}"
@@ -312,7 +312,7 @@ wizard_function_instMode() {
 wizard_function_destFolder() {
     sleep ${SLEEP05}
     printf "\n"
-    DESERT_DEF_PATH=$(cd $(pwd)/../ && pwd)/DESERT_buildCopy_${TARGET}
+    DESERT_DEF_PATH="$(cd $(pwd)/../ && pwd)/DESERT_buildCopy_${TARGET}"
     wizard__print_L2 "Setting of the DESTINATION FOLDER"
     wizard__print_L3 " the default path is:"
     wizard__print_L3 " ${DESERT_DEF_PATH}"
@@ -850,8 +850,8 @@ after_building() {
             (
                 cd ${DEST_FOLDER}
                 touch environment
-                printf "export PATH=${DEST_FOLDER}/bin:\${PATH}\n" > environment
-                printf "export LD_LIBRARY_PATH=${DEST_FOLDER}/lib:\${LD_LIBRARY_PATH}\n" >> environment
+                printf "export PATH=\"${DEST_FOLDER}/bin:\${PATH}\"\n" > environment
+                printf "export LD_LIBRARY_PATH=\"${DEST_FOLDER}/lib:\${LD_LIBRARY_PATH}\"\n" >> environment
             )
             log_L2 "[after_building]: the environment file has been created" ${INSTALL_LOG}
             continue
@@ -894,8 +894,8 @@ after_building() {
                 printf "# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n" >> make_environment.sh
                 printf "\n" >> make_environment.sh
                 printf "touch environment\n" >> make_environment.sh
-                printf 'printf "export PATH=$(pwd)/bin:\${PATH}\n" > environment\n' >> make_environment.sh
-                printf 'printf "export LD_LIBRARY_PATH=$(pwd)/lib:\${LD_LIBRARY_PATH}\n" >> environment\n' >> make_environment.sh
+                printf 'printf "export PATH=\"$(pwd)/bin:\${PATH}\"\n" > environment\n' >> make_environment.sh
+                printf 'printf "export LD_LIBRARY_PATH=\"$(pwd)/lib:\${LD_LIBRARY_PATH}\"\n" >> environment\n' >> make_environment.sh
             )
             log_L2 "[after_building]: release mode: removing the BUILD FOLDER" ${INSTALL_LOG}
             rm_build_folder
@@ -962,8 +962,8 @@ debug__print_screen_L1() {
 }
 
 check_sh() {
-    SH_PATH=$(which sh)
-    SH_PATH_LN=$(ls -la ${SH_PATH})
+    SH_PATH="$(which sh)"
+    SH_PATH_LN="$(ls -la ${SH_PATH})"
     if [ "${_DEBUG}" = "1" ]; then
         debug__print_screen_L1 "[which sh]: ${SH_PATH_LN}"
     fi

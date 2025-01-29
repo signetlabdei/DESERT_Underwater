@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,9 @@
 #include <clmessage.h>
 #include <node-core.h>
 
-#define CLMSG_MC2CTR_VERBOSITY 3 /**< Verbosity level. */
-#define CLMSG_CTR2MC_VERBOSITY 3 /**< Verbosity level. */
-#define CLMSG_TRACK2MC_VERBOSITY 3 /**< Verbosity level. */
+#define CLMSG_MC2CTR_VERBOSITY 3	/**< Verbosity level. */
+#define CLMSG_CTR2MC_VERBOSITY 3	/**< Verbosity level. */
+#define CLMSG_TRACK2MC_VERBOSITY 3	/**< Verbosity level. */
 
 extern ClMessage_t CLMSG_MC2CTR_SETPOS;
 extern ClMessage_t CLMSG_MC2CTR_SETSTATUS;
@@ -64,30 +64,30 @@ class ClMsgCtr2McPosition : public ClMessage
 
 	/**
 	 * Class constructor.
-	 * @param dest_id id of the destination module
+	 * @param int ID of the destination module
 	 */
     ClMsgCtr2McPosition(int dest_id);
   
 	/**
 	 * Destructor of ClMsgCtr2McPosition class.
 	 */
-    virtual ~ClMsgCtr2McPosition();
+    virtual ~ClMsgCtr2McPosition() = default;
 
 	/**
 	 * Creates a copy of the object.
-	 * @return Pointer to a copy of the object
+	 * @return ClMsgCtr2McPosition* Pointer to a copy of the object
 	 */
     ClMsgCtr2McPosition* copy();
 
     /**
 	* Sets the ROV follower position.
-	* @param position rov follower current position
+	* @param Position* Pointer to rov follower current position
 	*/
     void setRovPosition(Position* position);
 
 	/**
 	 * Get the ROV follower current position.
-	 * @return rov_position rov follower current position
+	 * @return Position* Pointer to rov follower current position
 	 */
     Position* getRovPosition() const;
 
@@ -105,29 +105,30 @@ class ClMsgMc2CtrPosition : public ClMessage
 
 	/**
 	 * Class constructor
-     * @param dest_id id of the destination module
+     * @param int Id of the destination module
 	 */
     ClMsgMc2CtrPosition(int dest_id);
        
 	/**
 	 * Destructor of ClMsgMc2CtrPosition class.
 	 */
-    virtual ~ClMsgMc2CtrPosition();
+    virtual ~ClMsgMc2CtrPosition() = default;
 
 	/**
 	 * Creates a copy of the object
-	 * @return Pointer to a copy of the object
+	 * @return ClMsgMc2CtrPosition* Pointer to a copy of the object
 	*/
     ClMsgMc2CtrPosition* copy();
 
     /**
 	 * Sets the ROV follower destination.
-	 * @param destination rov follower destination
+	 * @param Position* Pointer to rov follower destination
 	 */
     void setRovDestination(Position* destination);
 
 	/**
-	 * Get the ROV follower destination. @return rov_destination rov follower destination
+	 * Get the ROV follower destination.
+	 * @return Position* Pointer to rov follower destination
 	 */
     Position* getRovDestination() const;
    
@@ -146,30 +147,30 @@ class ClMsgMc2CtrStatus : public ClMessage
 
 	/**
 	 * Class constructor.
-	 * @param dest_id id of the destination module
+	 * @param int ID of the destination module
 	 */
     ClMsgMc2CtrStatus(int dest_id);
        
 	/**
 	 * Destructor of ClMsgMc2CtrStatus class.
 	 */
-    virtual ~ClMsgMc2CtrStatus();
+    virtual ~ClMsgMc2CtrStatus() = default;
 
 	/**
 	 * Creates a copy of the object.
-	 * @return Pointer to a copy of the object
+	 * @return ClMsgMc2CtrStatus* Pointer to a copy of the object
 	 */
     ClMsgMc2CtrStatus* copy();
 
 	/**
 	 * Sets the rov follower status.
-	 * @param detect rov follower status
+	 * @param bool Rov follower status
 	 */
     void setRovStatus(bool detect);
 
 	/**
 	 * Get the rov follower status.
-	 * @return rov_detect rov follower status
+	 * @return bool Rov follower status
 	 */
     bool getRovStatus() const;
 
@@ -188,30 +189,30 @@ class ClMsgTrack2McPosition : public ClMessage
 
 	/**
 	 * Class constructor.
-	 * @param dest_id id of the destination module
+	 * @param int Id of the destination module
 	 */
     ClMsgTrack2McPosition(int dest_id);
        
 	/**
 	 * Destructor of ClMsgTrack2McPosition class.
 	 */
-    virtual ~ClMsgTrack2McPosition();
+    virtual ~ClMsgTrack2McPosition() = default;
 
 	/**
 	 * Creates a copy of the object.
-	 * @return Pointer to a copy of the object
+	 * @return ClMsgTrack2McPosition* Pointer to a copy of the object
 	 */
     ClMsgTrack2McPosition* copy();
 
 	/**
 	 * Sets the track position
-	 * @param track_position Tracked position from UwTracker module
+	 * @param Position* Tracked position from UwTracker module
 	 */
     void setTrackPosition(Position* position);
 
 	/**
 	 * Get the track position.
-	 * @return track_position Tracked position from UwTracker module
+	 * @return Position* Tracked position from UwTracker module
      */
     Position* getTrackPosition() const;
  
@@ -236,23 +237,23 @@ class ClMsgTrack2McStatus : public ClMessage
 	/**
 	 * Destructor of ClMsgTrack2McStatus class.
 	 */
-    virtual ~ClMsgTrack2McStatus();
+    virtual ~ClMsgTrack2McStatus() = default;
 
 	/**
 	 * Creates a copy of the object.
-	 * @return Pointer to a copy of the object
+	 * @return ClMsgTrack2McStatus* Pointer to a copy of the object
 	 */
     ClMsgTrack2McStatus* copy();
 
 	/**
 	 * Sets the current mine status.
-	 * @param remove status of the current mine
+	 * @param bool Status of the current mine
 	 */
     void setMineStatus(bool remove);
 
 	/**
 	 * Get the current mine status.
-	 * @return mine_status status of the current mine
+	 * @return bool Status of the current mine
 	 */
     bool getMineStatus() const;
 

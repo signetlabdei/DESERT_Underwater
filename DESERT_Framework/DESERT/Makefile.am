@@ -100,4 +100,6 @@ SUBDIRS = m4 \
     ranging/uwranging_tokenbus \
     ranging/uwranging_tdma \
     ranging/uwtap \
-    ranging/uwranging_tdoa
+    ranging/uwranging_tdoa \
+    data_link/uwjammer \
+    physical/uwphysicalnoise

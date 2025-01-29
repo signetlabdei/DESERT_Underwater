@@ -27,7 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-AC_INIT(DESERT,3.5.0)
+AC_INIT(DESERT,3.5.1)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -123,6 +123,8 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwtap'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdoa'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwjammer'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalnoise'
 
 
 
@@ -216,6 +218,8 @@ AC_CONFIG_FILES([
     ranging/uwranging_tdma/Makefile
     ranging/uwtap/Makefile
     ranging/uwranging_tdoa/Makefile
+    data_link/uwjammer/Makefile
+	physical/uwphysicalnoise/Makefile
     ])
 
 AC_OUTPUT

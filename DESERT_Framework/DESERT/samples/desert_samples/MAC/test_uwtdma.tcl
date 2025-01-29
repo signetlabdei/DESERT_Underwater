@@ -208,6 +208,7 @@ proc createNode { id } {
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
+        if { $id == $cnt} { continue }
 		set cbr($id,$cnt)  [new Module/UW/CBR] 
 	}
     set udp($id)  [new Module/UW/UDP]
@@ -218,6 +219,7 @@ proc createNode { id } {
     set phy($id)  [new Module/UW/PHYSICAL]  
 	
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
+        if { $id == $cnt} { continue }
         $node($id) addModule 7 $cbr($id,$cnt)   1  "CBR"
     }
 
@@ -229,6 +231,7 @@ proc createNode { id } {
     $node($id) addModule 1 $phy($id)   1  "PHY"
 
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
+        if { $id == $cnt} { continue }
         $node($id) setConnection $cbr($id,$cnt)   $udp($id)   0
         set portnum($id,$cnt) [$udp($id) assignPort $cbr($id,$cnt) ]
     }
@@ -417,27 +420,15 @@ proc finish {} {
        	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
     }
 
-    set per_cbr1 [$cbr(0,1) getper]
-    set per_cbr2 [$cbr(1,0) getper]
-    set per_cbr3 [$cbr(0,2) getper]
-    set per_cbr4 [$cbr(2,0) getper]
-    set per_cbr5 [$cbr(1,2) getper]
-    set per_cbr6 [$cbr(2,1) getper]
-    
     if ($opt(verbose)) {
         puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
         puts "MAC sent Packets         : $sum_mac_sent_pkts"
         puts "MAC received Packets     : $sum_mac_recv_pkts"
-        puts "MAC upper_pcks_rx     : $sum_upper_pcks_rx"
+        puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
         puts "CBR sent Packets         : $sum_sent_pkts"
         puts "CBR received Packets     : $sum_recv_pkts"
         puts "Packets in buffer        : $sum_pcks_in_buffer"
-        puts "PER CBR (0,1)            : $per_cbr1 "
-        puts "PER CBR (1,0)            : $per_cbr2 "
-	puts "PER CBR (0,2)            : $per_cbr3 "
-        puts "PER CBR (2,0)            : $per_cbr4 "
-	puts "PER CBR (1,2)            : $per_cbr5 "
-        puts "PER CBR (2,1)            : $per_cbr6 "
+        puts "Packet Delivery Ratio    : [format %.4f [expr $sum_recv_pkts / $sum_sent_pkts * 100]]"
     }
     
     $ns flush-trace

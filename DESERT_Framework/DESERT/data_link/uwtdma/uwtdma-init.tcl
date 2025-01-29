@@ -36,7 +36,7 @@ Module/UW/TDMA set HDR_size_ 		0
 Module/UW/TDMA set wait_constant_	0.1
 Module/UW/TDMA set MAC_addr_ 		0
 Module/UW/TDMA set sea_trial_ 		0
-Module/UW/TDMA set frame_time           0
+Module/UW/TDMA set frame_duration   0
 Module/UW/TDMA set guard_time           0
 Module/UW/TDMA set tot_slots            0
 Module/UW/TDMA set fair_mode            0

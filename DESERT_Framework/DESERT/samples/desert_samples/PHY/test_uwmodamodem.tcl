@@ -172,7 +172,7 @@ Module/UW/AL set frame_set_validity 3
 # variables for the packer(s)
 UW/AL/Packer set SRC_ID_Bits 8
 UW/AL/Packer set PKT_ID_Bits 8
-UW/AL/Packer set FRAME_OFFSET_Bits 7
+UW/AL/Packer set FRAME_OFFSET_Bits 15
 UW/AL/Packer set M_BIT_Bits 1
 UW/AL/Packer set DUMMY_CONTENT_Bits 0
 UW/AL/Packer set debug_ 0
@@ -181,9 +181,9 @@ NS2/COMMON/Packer set PTYPE_Bits 8
 NS2/COMMON/Packer set SIZE_Bits 8
 NS2/COMMON/Packer set UID_Bits 8
 NS2/COMMON/Packer set ERROR_Bits 0
-NS2/COMMON/Packer set TIMESTAMP_Bits 0
-NS2/COMMON/Packer set PREV_HOP_Bits 2
-NS2/COMMON/Packer set NEXT_HOP_Bits 2
+NS2/COMMON/Packer set TIMESTAMP_Bits 8
+NS2/COMMON/Packer set PREV_HOP_Bits 8
+NS2/COMMON/Packer set NEXT_HOP_Bits 8
 NS2/COMMON/Packer set ADRR_TYPE_Bits 0
 NS2/COMMON/Packer set LAST_HOP_Bits 0
 NS2/COMMON/Packer set TXTIME_Bits 0

@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,30 +26,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-tracker-module.h
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UWSCTRACKER</i>.
-*
-* Provides the definition of the class UwSCTracker.
-*/
+ * @file uwsc-tracker-module.h
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UWSCTRACKER</i>.
+ *
+ * Provides the definition of the class UwSCTracker.
+ */
 
 #ifndef UWSCTRACK_MODULE_H
 #define UWSCTRACK_MODULE_H
-#include <uwtracker-module.h>
-#include <uwsc-tracker-follower-packet.h>
-#include "uwsc-clmsg.h"
 #include <list>
-
+#include <uwtracker-module.h>
 
 /**
-* UwSCTrackerModule class adds to the UwTrackerModule class the possibility
-* to send cross layer messages.
-*/
-class UwSCTrackerModule : public UwTrackerModule {
+ * UwSCTrackerModule class adds to the UwTrackerModule class the possibility
+ * to send cross layer messages.
+ */
+class UwSCTrackerModule : public UwTrackerModule
+{
 public:
-
 	/**
 	 * Default Constructor of UwSCTrackerModule class.
 	 */
@@ -58,29 +55,31 @@ public:
 	/**
 	 * Destructor of UwSCTrackerModule class.
 	 */
-	virtual ~UwSCTrackerModule();
+	virtual ~UwSCTrackerModule() = default;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 *
 	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
 	 *
 	 */
-	virtual int command(int argc, const char*const* argv);
-
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
-	virtual void recv(Packet*);
+	virtual void recv(Packet *) override;
 
 protected:
-	int leader_id;				/** Id of the Tracker leader. */
-	std::list<Position> tracked_mines;	/**< Positions of the mines tracked by the follower. */
+	int leader_id; /**< ID of the Tracker leader. */
+	std::list<Position> tracked_mines; /**< Positions of the mines tracked by
+										  the follower. */
 };
 
 #endif // UWSCTRACK_MODULE_H
