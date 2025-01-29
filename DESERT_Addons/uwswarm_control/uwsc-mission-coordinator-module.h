@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,89 +27,32 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwmc-module.h
-* @author  Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UwMissionCooridnator</i>.
-*
-* This module is used to coordinates a swarm of AUV with a node leader and node
-* followers which perform an underwater mine detection.
-* The leader receives tracking information from the followers  and decides
-* where they have to go.
-*/
+ * @file uwmc-module.h
+ * @author  Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UwMissionCooridnator</i>.
+ *
+ * This module is used to coordinates a swarm of AUV with a node leader and node
+ * followers which perform an underwater mine detection.
+ * The leader receives tracking information from the followers  and decides
+ * where they have to go.
+ */
 
 #ifndef UWMC_MODULE_H
 #define UWMC_MODULE_H
-#include "uwsc-clmsg.h"
-#include <uwsmposition.h>
 #include <plugin.h>
-#include <tclcl.h>
 #include <vector>
 
 class UwMissionCoordinatorModule;
 
 /**
- * Mine describes a mine by its position and state.
+ * UwMissionCoordinatorModule class is used to manage AUV followers and to
+ * collect statistics about them.
  */
-typedef struct Mine
+class UwMissionCoordinatorModule : public PlugIn
 {
-	/**
-	 * MineState list all the possible state of a mine.
-	 */
-	enum MineState
-	{
-		MINE_TRACKED,	/**< Mine tracked.*/
-		MINE_DETECTED,	/**< Mine found and started the removing process */
-		MINE_REMOVED	/**< Mine removed */
-	};
-
-	Position* track_position;	/**< Mine tracked position*/
-	MineState state;			/**< Mine state */
-
-	Mine(Position* p, MineState s)
-		: track_position(p)
-		, state(s)
-	{
-	}
-} Mine;
-
-/**
- * AUV_stats describes statistics about the AUV follower.
- * It also contains ids of respectively the ROV controller
- * and Tracker receiver module installed in the AUV leader.
- */
-typedef struct AUV_stats
-{
-	int ctr_id;	/**< Id of the CTR module. */
-	int trk_id;	/**< Id of the Tracker module. */
-	Position* rov_position;			/**< Position of ROV follower. */
-	std::vector<Mine> rov_mine;	/** Mines found by ROV follower. */
-	int n_mines;		/** Number of mines found by ROV follower. */
-	bool rov_status;	/** Status of the ROV, if true is detecting a mine. */
-
-	/**
-	* Constructor of AUV_stats struct.
-	*/
-	AUV_stats(int id_ctr, int id_trk)
-		: ctr_id(id_ctr)
-		, trk_id(id_trk)
-		, rov_position(nullptr)
-		, rov_mine()
-		, n_mines(0)
-		, rov_status(false)
-	{
-	}
-
-} AUV_stats;
-
-/**
-* UwMissionCoordinatorModule class is used to manage AUV followers and to
-* collect statistics about them.
-*/
-class UwMissionCoordinatorModule : public PlugIn {
 public:
-
 	/**
 	 * Default Constructor of UwMissionCoordinatorModule class.
 	 */
@@ -118,37 +61,89 @@ public:
 	/**
 	 * Destructor of UwMissionCoordinatorModule class.
 	 */
-	virtual ~UwMissionCoordinatorModule();
+	virtual ~UwMissionCoordinatorModule() = default;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 *
 	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 *<i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 *successfully or not.
 	 *
 	 **/
-	virtual int command(int argc, const char*const* argv);
-
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
-	 * Recv syncronous cross layer messages to require an operation from another module.
+	 * Recv syncronous cross layer messages to require an operation from another
+	 * module.
 	 *
 	 * @param m Pointer cross layer message
 	 * @return zero if successful
 	 *
 	 */
-	int recvSyncClMsg(ClMessage* m);
-
+	virtual int recvSyncClMsg(ClMessage *m) override;
 
 protected:
-	std::vector<AUV_stats> auv_follower;	/**< ROV followers info. */
+	/**
+	 * Mine describes a mine by its position and state.
+	 */
+	typedef struct Mine {
+		/**
+		 * MineState list all the possible state of a mine.
+		 */
+		enum MineState {
+			MINE_TRACKED, /**< Mine tracked.*/
+			MINE_DETECTED, /**< Mine found and started the removing process. */
+			MINE_REMOVED /**< Mine removed. */
+		};
+
+		Position *track_position; /**< Mine tracked position. */
+		MineState state; /**< Mine state. */
+
+		Mine(Position *p, MineState s)
+			: track_position(p)
+			, state(s)
+		{
+		}
+	} Mine;
+
+	/**
+	 * AUV_stats describes statistics about the AUV follower.
+	 * It also contains ids of respectively the UwROV controller
+	 * and UwTracker receiver module installed in the AUV leader.
+	 */
+	typedef struct AUV_stats {
+		int ctr_id; /**< Id of the CTR module. */
+		int trk_id; /**< Id of the Tracker module. */
+		Position *rov_position; /**< Position of ROV follower. */
+		std::vector<Mine> rov_mine; /**< Mines found by ROV follower. */
+		int n_mines; /**< Number of mines found by ROV follower. */
+		bool rov_status; /**< Status of the ROV, if true is detecting a mine. */
+
+		/**
+		 * Constructor of AUV_stats struct.
+		 */
+		AUV_stats(int id_ctr, int id_trk)
+			: ctr_id(id_ctr)
+			, trk_id(id_trk)
+			, rov_position(nullptr)
+			, rov_mine()
+			, n_mines(0)
+			, rov_status(false)
+		{
+		}
+
+	} AUV_stats;
+
+	std::vector<AUV_stats> auv_follower; /**< ROV followers info. */
 
 	/**
 	 * Send a signal to the AUV follower to inform it, that the mine
 	 * it is detecting is removed.
 	 *
-	 * @param int id of the ROV sent to detect the mine
+	 * @param int ID of the ROV sent to detect the mine
 	 *
 	 */
 	void removeMine(int id);
@@ -156,11 +151,11 @@ protected:
 	/**
 	 * Check if the mine at received position is already tracked.
 	 *
-	 * @param p Pointer to mine position
-	 * @return bool true if the mine is already tracked false otherwise
+	 * @param Position* Pointer to mine position
+	 * @return bool True if the mine is already tracked false otherwise
 	 *
 	 */
-	bool isTracked(Position* p);
+	bool isTracked(Position *p) const;
 };
 
 #endif // UWMC_MODULE_H

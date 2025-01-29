@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,9 @@
 
 #ifndef UWSCFTRACKER_HDR_H
 #define UWSCFTRACKER_HDR_H
+#include <packet.h>
+
+#define HDR_UWSCFTRACK(p) (hdr_uwSCFTracker::access(p))
 
 extern packet_t PT_UWSCFTRACK;
 

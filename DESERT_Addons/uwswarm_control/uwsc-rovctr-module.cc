@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@
 */
 
 #include "uwsc-rovctr-module.h"
-#include "uwsc-clmsg.h"
 #include <iostream>
 
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
@@ -70,25 +69,27 @@ UwSCROVCtrModule::UwSCROVCtrModule()
 {
 }
 
-UwSCROVCtrModule::~UwSCROVCtrModule() {}
-
 int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 	Tcl& tcl = Tcl::instance();
 	if (argc == 3){
 		if (strcasecmp(argv[1], "setLeaderId") == 0) {
-			leader_id = atoi(argv[2]);
+			leader_id = std::atoi(argv[2]);
+
 			tcl.resultf("%s", "leader_id Setted\n");
+
 			return TCL_OK;
 		}
 	} else if(argc == 5){
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
 			if (!rov_status)
 			{
-				newX = atof(argv[2]);
-				newY = atof(argv[3]);
-				newZ = atof(argv[4]);
+				newX = std::atof(argv[2]);
+				newY = std::atof(argv[3]);
+				newZ = std::atof(argv[4]);
+
 				UwROVCtrModule::reset_retx();
 				UwROVCtrModule::transmit();
+
 				tcl.resultf("%s", "position Setted");
 			}
 			return TCL_OK;
@@ -97,12 +98,14 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
 			if (!rov_status)
 			{
-				newX = atof(argv[2]);
-				newY = atof(argv[3]);
-				newZ = atof(argv[4]);
-				speed = atof(argv[5]);
+				newX = std::atof(argv[2]);
+				newY = std::atof(argv[3]);
+				newZ = std::atof(argv[4]);
+				speed = std::atof(argv[5]);
+
 				UwROVCtrModule::reset_retx();
 				UwROVCtrModule::transmit();
+
 				tcl.resultf("%s", "position Setted");
 			}
 			return TCL_OK;

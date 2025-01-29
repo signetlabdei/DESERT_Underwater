@@ -28,17 +28,17 @@
 //
 
 /**
-* @file   uwsmposition.cpp
-* @author Filippo Campagnaro
-* @version 1.0.0
-*
-* \brief Provides the <i>UWSMPosition</i> class implementation.
-*
-* Provides the <i>UWSMPosition</i> class implementation.
-*/
+ * @file   uwsmposition.cpp
+ * @author Filippo Campagnaro
+ * @version 1.0.0
+ *
+ * \brief Provides the <i>UWSMPosition</i> class implementation.
+ *
+ * Provides the <i>UWSMPosition</i> class implementation.
+ */
 
-#include <iostream>
 #include "uwsmposition.h"
+#include <iostream>
 
 /* ======================================================================
    TCL Hooks for the simulator
@@ -116,8 +116,7 @@ UWSMPosition::setdest(
 		update(now);
 	trgTime_ = now;
 	if (trgTime_ < 0.0)
-		cerr << "Warning: calling set dest at time < 0 will not work"
-			 << endl;
+		cerr << "Warning: calling set dest at time < 0 will not work" << endl;
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
@@ -126,7 +125,8 @@ UWSMPosition::setdest(
 	Ysorg_ = y_;
 	Zsorg_ = z_;
 	if (debug_)
-		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), speed %f\n",
+		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), "
+			   "source(%f,%f,%f), speed %f\n",
 				x_,
 				y_,
 				z_,
@@ -147,8 +147,7 @@ UWSMPosition::setdest(double x_dest, double y_dest, double z_dest)
 		update(now);
 	trgTime_ = now;
 	if (trgTime_ < 0.0)
-		cerr << "Warning: calling set dest at time < 0 will not work"
-			 << endl;
+		cerr << "Warning: calling set dest at time < 0 will not work" << endl;
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
@@ -156,7 +155,8 @@ UWSMPosition::setdest(double x_dest, double y_dest, double z_dest)
 	Ysorg_ = y_;
 	Zsorg_ = z_;
 	if (debug_)
-		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), speed %f\n",
+		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), "
+			   "source(%f,%f,%f), speed %f\n",
 				x_,
 				y_,
 				z_,
@@ -167,7 +167,6 @@ UWSMPosition::setdest(double x_dest, double y_dest, double z_dest)
 				Ysorg_,
 				Zsorg_,
 				speed_);
-
 }
 
 void
@@ -203,7 +202,8 @@ UWSMPosition::update(double now)
 			z_ = Zdest_;
 		}
 		if (debug_)
-			printf("New pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), speed %f sen(%f)=%f\n",
+			printf("New pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), "
+				   "speed %f sen(%f)=%f\n",
 					x_,
 					y_,
 					z_,
@@ -219,6 +219,18 @@ UWSMPosition::update(double now)
 	}
 
 	lastUpdateTime_ = now;
+}
+
+bool
+UWSMPosition::isDestReached() const
+{
+	double dist = std::sqrt(pow(Xdest_ - x_, 2.0) + pow(Ydest_ - y_, 2.0) +
+			pow(Zdest_ - z_, 2.0));
+
+	if (std::fabs(dist) < 1e-6)
+		return true;
+
+	return false;
 }
 
 double
@@ -269,22 +281,26 @@ UWSMPosition::getZ()
 	return (z_);
 }
 
-double UWSMPosition::getXdest() const
+double
+UWSMPosition::getXdest() const
 {
 	return Xdest_;
 }
 
-double UWSMPosition::getYdest() const
+double
+UWSMPosition::getYdest() const
 {
 	return Ydest_;
 }
 
-double UWSMPosition::getZdest() const
+double
+UWSMPosition::getZdest() const
 {
 	return Zdest_;
 }
 
-double UWSMPosition::getSpeed() const
+double
+UWSMPosition::getSpeed() const
 {
 	return speed_;
 }
