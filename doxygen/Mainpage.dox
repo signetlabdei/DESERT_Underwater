@@ -6,11 +6,11 @@
 
 @version {{version}}
 
-@authors <b> Project supervisor: </b> Filippo Campagnaro - campagn1@dei.unipd.it
+@authors <b> Project supervisor: </b> Filippo Campagnaro - filippo.campagnaro@unipd.it
 
 @authors <b> Maintainers: </b> Federico Favaro - federico.favaro@dei.unipd.it, Federico Guerra - federico@guerra-tlc.com, Roberto Francescon - francescon.roberto@gmail.com, Antonio Montanari - montanar@dei.unipd.it
 
-@authors <b> Contributors: </b> <A HREF="https://www1.coe.neu.edu/~sarafalleni/">Sara Falleni</A> - falleni.s@northeastern.edu, Riccardo Tumiati - riccardo.tumiati@studenti.unipd.it, Vincenzo Cimino 
+@authors <b> Contributors: </b> <A HREF="https://www1.coe.neu.edu/~sarafalleni/">Sara Falleni</A> - falleni.s@northeastern.edu, Riccardo Tumiati - riccardo.tumiati@studenti.unipd.it, Vincenzo Cimino - vincenzo.cimino@unipd.it, Filippo Donegà - filippo.donega@unipd.it
 
 @authors <b> Former contributors and members: </b> Riccardo Masiero, Saiful Azad, Ivano Calabrese, Cristiano Tapparello, Alberto Signori, Loris Brolo, \link Giovanni Giovanni Toso
 
@@ -26,7 +26,7 @@ Among the components of DESERT, some libraries and tools help speed up the trans
 
 DESERT is based on ns2 <b>[2]</b> and NS-MIRACLE <b>[3]</b>. In particular, DESERT follows the modular approach of the latter. Other than network protocols, DESERT provides additional libraries and tools to help simulate underwater networks realistically. These tools include mobility models that reproduce realistic mobility patterns, energy consumption models, and channel models. The most advanced model available is provided via a close interaction between DESERT and WOSS <b>[4]</b>.
 
-The last DESERT version can be cross-compiled for Raspberry PI Zero 2 W and last EvoLogics modem's sandbox. DESERT supports real data transmission via EvoLogics, ahoi modems, and all devices that provide an Ethernet transparent interface (such as Ethernet switches and many commercial optical modems).
+DESERT can be cross-compiled for Raspberry Pi (e.g., Zero 2 W, 4, 5) and last EvoLogics modem's sandbox. DESERT supports real data transmission via EvoLogics <b>[5]</b>, ahoi modems <b>[6]</b>, SuM modems <b>[7]</b>, and all devices that provide an Ethernet transparent interface (such as Ethernet switches and many commercial optical modems).
 Altogether, the many proof-of-concept implementations and complex tests carried out with DESERT so far make DESERT an effective solution for realizing underwater networking experiments by reusing the same protocol code already written for simulations.
 
 DESERT Underwater has been adopted in several real life <A HREF="http://desert-underwater.dei.unipd.it/index.php/field-experiments/">sea-trials</A>. You can find more on brand new <A HREF="http://desert-underwater.dei.unipd.it">website</A> of the project
@@ -36,11 +36,11 @@ DESERT Underwater has been adopted in several real life <A HREF="http://desert-u
 
 A considerable amount of work has been done in order to make the installation of the software automatic via a modular installation script, that includes a fully-guided wizard mode.
 At the same time, the installation is organized into separate modules. An experienced users can easily extend the process to accommodate specific requirements, new functionalities, or even to make DESERT part of larger projects.
-As a further help for users wishing to experiment with real hardware using DESERT, we also provide different installer modules, suitable for different compact/embedded hardware platforms, starting from <A HREF="http://www.raspberrypi.org/">Raspberry Pi</A>, and <A HREF="http://www.evologics.com/">EvoLogics</A> modem sandbox.
+As a further help for users wishing to experiment with real hardware using DESERT, we also provide different installer modules, suitable for different compact/embedded hardware platforms, starting from <A HREF="https://www.raspberrypi.org/">Raspberry Pi</A>, and <A HREF="https://www.evologics.com/">EvoLogics</A> modem sandbox.
 This set will be extended in the future.
-In order to use DESERT more and more in real environments, uwApplication is provided. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication trough a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
+In order to use DESERT more and more in real environments, uwApplication is provided. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication through a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
 Finally, the functionalities offered by DESERT have been extended with a control framework that provides a set of primitives to remotely control the hardware modems, and thus the network operations.
-All these features are released constantly on our <A HREF="https://github.com/uwsignet/DESERT_Underwater">GitHub</A> repository
+All these features are released constantly on our <A HREF="https://github.com/signetlabdei/DESERT_Underwater">GitHub</A> repository
 
 <br>
 
@@ -48,41 +48,47 @@ All these features are released constantly on our <A HREF="https://github.com/uw
 
 <b>[1]</b> R. Masiero, P. Casari, M. Zorzi, "The NAUTILUS project: Physical Parameters, Architectures and Network Scenarios," <i>Proc. MTS/IEEE OCEANS</i>, Kona, HI, 2011.
 
-<b>[2]</b> The Network Simulator - ns2. http://nsnam.isi.edu/nsnam/index.php/Main_Page
+<b>[2]</b> The Network Simulator - ns2. https://www.isi.edu/websites/nsnam/ns/
 
-<b>[3]</b> N. Baldo, M. Miozzo, F. Guerra, M. Rossi, and M. Zorzi, "Miracle: the multi-interface cross-layer extension of ns2," EURASIP J. of Wireless Commun. and Networking, 2010. [Online]. Available: http://www.hindawi.com/journals/wcn/aip.761792.html
+<b>[3]</b> N. Baldo, M. Miozzo, F. Guerra, M. Rossi, and M. Zorzi, "Miracle: the multi-interface cross-layer extension of ns2," EURASIP J. of Wireless Commun. and Networking, 2010. [Online]. Available: https://dl.acm.org/doi/10.1155/2010/761792
 
 <b>[4]</b> WOSS - World Ocean Simulation System. https://woss.dei.unipd.it
 
-<b>[5]</b> EvoLogics GmbH web site. http://www.evologics.de/
+<b>[5]</b> EvoLogics GmbH web site. https://www.evologics.de/
 
-<b>[6]</b> Woods Hole Oceanographic Institution web site. http://www.whoi.edu/
+<b>[6]</b> Ahoi modem web site. http://bcrenner.de/?ahoi-modem
 
-<b>[7]</b> The Goby Underwater Autonomy Project web site. http://gobysoft.com/
+<b>[7]</b> SubSeaPulse SRL web site. https://www.subseapulse.com/
 
-<b>[8]</b> Develogic Subsea Systems. http://www.develogic.de/
+<b>[8]</b> Woods Hole Oceanographic Institution web site. https://www.whoi.edu/
 
-<b>[9]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007.
+<b>[9]</b> The Goby Underwater Autonomy Project web site. https://gobysoft.com/
 
-<b>[10]</b> N. Abramson, "Development of the ALOHANET," <i>IEEE Transactions on Information Theory</i>, vol. 31, num. 2, pp. 119-123, 1985.
+<b>[10]</b> Develogic Subsea Systems. https://www.develogic.de/
 
-<b>[11]</b> X. Guo, M. R. Frater and M. J. Ryan, "A propagation-delay-tolerant collision avoidance protocol for underwater acoustic sensor networks," <i>Proc. OES/IEEE OCEANS</i>, Singapore, May 2006.
+<b>[11]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007.
 
-<b>[12]</b> B. Peleato and M. Stojanovic, "Distance aware collision avoidance protocol for ad-hoc underwater acoustic sensor networks," <i>IEEE Communications Letters</i>, vol. 11, num. 12, pp. 1025-1027, 2007.
+<b>[12]</b> N. Abramson, "Development of the ALOHANET," <i>IEEE Transactions on Information Theory</i>, vol. 31, num. 2, pp. 119-123, 1985.
 
-<b>[13]</b> F. Favaro, P. Casari, F. Guerra, M. Zorzi, "Data Upload from a Static Underwater Network to an AUV: Polling or Random Access?", <i>Proc. MTS/IEEE OCEANS</i>, Yeosu, South Korea, May 2012.
+<b>[13]</b> X. Guo, M. R. Frater and M. J. Ryan, "A propagation-delay-tolerant collision avoidance protocol for underwater acoustic sensor networks," <i>Proc. OES/IEEE OCEANS</i>, Singapore, May 2006.
 
-<b>[14]</b> A. Syed, W. Ye and J. Heidemann, "T-Lohi: A new class of MAC protocols for underwater acoustic sensor networks," <i>IEEE INFOCOM</i>, Phoenix, AZ, Apr. 2008.
+<b>[14]</b> B. Peleato and M. Stojanovic, "Distance aware collision avoidance protocol for ad-hoc underwater acoustic sensor networks," <i>IEEE Communications Letters</i>, vol. 11, num. 12, pp. 1025-1027, 2007.
 
-<b>[15]</b> S. Azad, P. Casari, M. Zorzi, The Underwater Selective Repeat Error Control Protocol for Multiuser Acoustic Networks: Design and Parameter Optimization," <i>IEEE Transactions on Wireless Communications</i>, vol. 12, no. 10, pp. 4866-4877, Oct. 2013.
+<b>[15]</b> F. Favaro, P. Casari, F. Guerra, M. Zorzi, "Data Upload from a Static Underwater Network to an AUV: Polling or Random Access?", <i>Proc. MTS/IEEE OCEANS</i>, Yeosu, South Korea, May 2012.
 
-<b>[16]</b> F. Favaro, L. Brolo, G. Toso, P. Casari, M. Zorzi, "A Study on Data Retrieval Strategies in Underwater Acoustic Networks", <i>Proc. MTS/IEEE OCEANS</i>, San Diego, CA, Sep. 2013.
+<b>[16]</b> A. Syed, W. Ye and J. Heidemann, "T-Lohi: A new class of MAC protocols for underwater acoustic sensor networks," <i>IEEE INFOCOM</i>, Phoenix, AZ, Apr. 2008.
 
-<b>[17]</b> C. Tapparello, P. Casari, G. Toso, I. Calabrese, R. Otnes, P. van Walree, M. Goetz, I. Nissen, M. Zorzi, "Performance Evaluation of Forwarding Protocols for the RACUN Network," Proc. of ACM WUWNet, Kaohsiung, Taiwan, Nov. 2013.
+<b>[17]</b> S. Azad, P. Casari, M. Zorzi, "The Underwater Selective Repeat Error Control Protocol for Multiuser Acoustic Networks: Design and Parameter Optimization," <i>IEEE Transactions on Wireless Communications</i>, vol. 12, no. 10, pp. 4866-4877, Oct. 2013.
 
-<b>[18]</b> B. Liang and Z. Haas, "Predictive distance-based mobility management for PCS networks," <i>Proc. IEEE INFOCOM</i>, New York, NY, Mar. 1999.
+<b>[18]</b> F. Favaro, L. Brolo, G. Toso, P. Casari, M. Zorzi, "A Study on Data Retrieval Strategies in Underwater Acoustic Networks", <i>Proc. MTS/IEEE OCEANS</i>, San Diego, CA, Sep. 2013.
 
-<b>[19]</b> F. Campagnaro, R. Francescon, F. Guerra, F. Favaro, P. Casari, R. Diamant, M. Zorzi, "The DESERT underwater framework v2: Improved capabilities and extension tools," <i>Proc. IEEE UCOMMS</i>, Lerici, Italy, Oct. 2016.
+<b>[19]</b> C. Tapparello, P. Casari, G. Toso, I. Calabrese, R. Otnes, P. van Walree, M. Goetz, I. Nissen, M. Zorzi, "Performance Evaluation of Forwarding Protocols for the RACUN Network," Proc. of ACM WUWNet, Kaohsiung, Taiwan, Nov. 2013.
+
+<b>[20]</b> B. Liang and Z. Haas, "Predictive distance-based mobility management for PCS networks," <i>Proc. IEEE INFOCOM</i>, New York, NY, Mar. 1999.
+
+<b>[21]</b> F. Campagnaro, R. Francescon, F. Guerra, F. Favaro, P. Casari, R. Diamant, M. Zorzi, "The DESERT underwater framework v2: Improved capabilities and extension tools," <i>Proc. IEEE UCOMMS</i>, Lerici, Italy, Oct. 2016.
+
+<b>[22]</b> R. Francescon, R. Francescon, F. Favaro, F. Guerra, M. Zorzi, "Software Defined Underwater Communications: an Experimental Platform for Research" <i>OCEANS 2023 - Limerick</i>, Limerick, Ireland, 2023
 
 
 
@@ -507,8 +513,8 @@ Let us now have a deeper look at the script. We focus first on the main block:
 
         handle_package host ZLIB
         handle_package host TCL
-        export PATH="${BUILD_HOST}/bin:$PATH"
-        export LD_LIBRARY_PATH="${BUILD_HOST}/lib"
+        export PATH=${BUILD_HOST}/bin:$PATH
+        export LD_LIBRARY_PATH=${BUILD_HOST}/lib
         handle_package host OTCL
         handle_package host TCLCL
         handle_package host NS
