@@ -96,7 +96,7 @@ All these features are released constantly on our <A HREF="https://github.com/si
 
 /** \page INSTALL1 Installation Guidelines
 
-\section requirements Installation requirements: Ubuntu
+\section requirements Installation requirements
 
 Before installing the DESERT framework, please check that your host device has the following packages installed:
 
@@ -117,7 +117,8 @@ Before installing the DESERT framework, please check that your host device has t
 </BLOCKQUOTE>
 </SMALL>
 
-If you are using a Debian-based Linux distribution, you can type this command in a terminal
+\subsection debian Debian
+If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, etc...) , you can type the following command in a terminal, in order to install all dependencies above:
 
 <small>
 
@@ -125,11 +126,18 @@ If you are using a Debian-based Linux distribution, you can type this command in
 
 </small>
 
-in order to install all dependencies above.
+\subsection arch-requirements Archlinux
+If you are using an Arch Linux based distribution, youy can type the following command in a terminal:
 
-\section fed-requirements Installation requirements: Fedora
+<small>
 
-DESERT Underwater was successfully installed on Fedora 23 and following releases. Before installing the DESERT framework in Fedora, please check that your host device has the following packages installed:
+    sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake libtool patch patchutils
+
+</small>
+
+\subsection fed-requirements Fedora
+
+Before installing the DESERT framework in Fedora, check that your host device has the following packages installed:
 
 <SMALL>
 <BLOCKQUOTE>
@@ -142,7 +150,7 @@ DESERT Underwater was successfully installed on Fedora 23 and following releases
 </BLOCKQUOTE>
 </SMALL>
 
-Please note that main C develoment tools are installed by installing the package group "C Development Tools and Libraries". To install all the software requirements you can run the following commands in a terminal:
+Note that main C develoment tools are installed by installing the package group "C Development Tools and Libraries". To install all the software requirements you can run the following commands in a terminal:
 
 <small>
 
@@ -156,7 +164,16 @@ Please note that main C develoment tools are installed by installing the package
 
 </small>
 
-\section install Installation procedures
+\section download-install Download and install
+The latest version of DESERT can be cloned from the github repository, as follows:
+
+<small>
+
+    git clone https://github.com/signetlabdei/DESERT_Underwater
+
+</small>
+
+Alternatively, you can download the source code of a specific version from: https://github.com/signetlabdei/DESERT_Underwater/releases
 
 To install DESERT Underwater, you can choose between two different approaches:
 
@@ -167,19 +184,11 @@ The wizard mode implements an interactive installation procedure. As such, it is
 The command-line mode is recommended for more experienced users.
 Note that, after completing an installation with the wizard, you will be also provided a command-line string. You can note down this string and enter it at the command prompt in order to reproduce exactly the same installation steps (with the same options, the same packages installed, etc.). When you become more comfortable with DESERT's installation options, you can also modify the automatically generated command-line string to reflect your desired configuration.
 
-To launch the installation in wizard mode, once you have downloaded and unpacked the framework, you have to cd into the framework folder by using:
+To launch the installation in wizard mode, once you have downloaded DESERT, you have to cd into the framework folder by using:
 
 <small>
 
     cd DESERT_Underwater/DESERT_Framework
-
-</small>
-
-set the executable flag of the installer:
-
-<small>
-
-    chmod +x ./install.sh
 
 </small>
 
@@ -196,7 +205,7 @@ The procedure will guide you through 6 steps:
 - setting of the installation-target
 - setting of the installation mode
 - setting of the destination folder
-- choice whether or not to install the WOSS libraries
+- choose whether or not to install the WOSS libraries
 - setting of possible custom parameters (OPTIONAL)
 - selection of the addons to be installed (OPTIONAL)
 
@@ -223,7 +232,7 @@ Here is a list of all options currently available:
         From the point of view of the installation tool, passing the target option
         is equivalent to choosing the specific installation script to be used after
         the preliminary settings. The installation scripts are located in
-        .../DESERT_Underwater/DESERT_Framework/Installation/.
+        DESERT_Underwater/DESERT_Framework/Installation/.
         If you create a custom installation script, you must put it in this folder.
         Targets available:
             - LOCAL
@@ -250,10 +259,12 @@ Here is a list of all options currently available:
     --addons <list-of-the-DESERT-addons>
         Only for command-line. This option specifies which addons to Desert Underwater
         should be installed. The available addons are usually found in
-        .../DESERT_Underwater/DESERT_Addons/
+        DESERT_Underwater/DESERT_Addons/
         The <list-of-the-DESERT-addons> parameter is composed by the names of any addons
-        separated by a white space and enclosed in quotes, e.g.,
-        "ADDON1 ADDON2 ADDON3"
+        separated by a white space e.g.,
+        ADDON1 ADDON2 ADDON3
+        Or if you want to install all of them you can just type
+        ALL
 
     --custom_par <list-of-parameters>
         Only for command-line. This option provides a useful means of passing a variable
@@ -268,7 +279,7 @@ If you encounter any problem while building this library, you can refer to githu
 
 <br>
 
-\section todoafter After the installation has been completed
+\subsection todoafter After the installation has been completed
 
 When the installation of DESERT Underwater has been successfully completed, you need to update your environment variables by exporting the paths to the bin/ and lib/ folders created in the path specified during the installation. This is required in order to correctly use DESERT and its dependencies (ns, ns-miracle, etc.).
 This operation is made simpler via the <i>environment</i> file generated at the end of the installation session in the <destination-folder-path> only for the "development" installation-mode. So, by running the following command:
@@ -290,6 +301,14 @@ With the "release" installation-mode, instead, you can set the environment via t
 </small>
 
 before updating your environment variables. The "make_environment.sh" script is particularly useful after the DESERT framework has been cross-compiled and copied into the target device: in this case, the script dynamically generates the environment file in agreement with the destination folder path within the target device.
+
+In order to make the environment update persistant even after you close the terminal, you need to append the source command to your bash configuration file, as follows:
+
+<small>
+
+    echo "source <destination-folder-path>/environment" >> $HOME/.bashrc
+
+</small>
 <br>
 
 */
