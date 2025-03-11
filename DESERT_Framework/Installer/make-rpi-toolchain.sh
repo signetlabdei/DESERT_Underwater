@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz  -o /opt/raspi-toolchain.tar.gz
+wget https://github.com/Pro/raspi-toolchain/releases/latest/download/raspi-toolchain.tar.gz  -O /opt/raspi-toolchain.tar.gz
 cd /opt/
 tar xzf /opt/raspi-toolchain.tar.gz
 cd -
