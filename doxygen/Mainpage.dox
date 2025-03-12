@@ -275,7 +275,15 @@ Here is a list of all options currently available:
 
 </small>
 
-If you encounter any problem while building this library, you can refer to github and open a dedicated issue, that we will investigate
+For instance, the following command will install DESERT on your local machine in development mode with all the addons:
+
+<small>
+
+    ./install.sh --target LOCAL --inst_mode development --dest_folder <destination-folder-path> --addons "ALL"
+
+</small>
+
+If you encounter any problem while building this library, you can refer to github and open a dedicated issue, that we will investigate.
 
 <br>
 
@@ -310,6 +318,28 @@ In order to make the environment update persistant even after you close the term
 
 </small>
 <br>
+
+\section docker-install Use Docker
+Alternatively to the manual installation, DESERT provide an automatic installation using docker.
+
+Go to the dockerfile directory
+
+<small>
+
+    cd DESERT_Underwater/DESERT_Framework/Docker/ubuntu_dockerfile_with_desert/
+
+</small>
+
+And build it
+
+<small>
+
+    docker build .
+
+</small>
+
+It will download all the dependencies and install DESERT with WOSS and all the addons in a docker container with Ubuntu.
+
 
 */
 
