@@ -29,8 +29,8 @@
 # Version: 1.0.0
 #
 
-# To use the MODA modems with DESERT, it is needed to set the PSDU of the AL
-# (Adaptation Layer) to 32 (bytes), which is the maximum size of a MODA packet
+# To use the SuM modems with DESERT, it is needed to set the PSDU of the AL
+# (Adaptation Layer) to 64 (bytes), which is the maximum size of a SuM packet
 # If a larger PSDU is set, some bytes will be lost
 
 # if set to 1 the Application listen from the socket port provided in input
@@ -130,12 +130,12 @@ $ns use-scheduler RealTime
 ##################
 # Tcl variables  #
 ##################
-# address and port of the EvoLogics modem
+# address and port of the modem
 set opt(s_port) 55006
 set address "${opt(address)}:${opt(port)}"
 set opt(sig_address) "${opt(address)}:${opt(s_port)}"
 
-# set MAC address for the EvoLogics modem
+# set MAC address for the modem
 set addrMAC $opt(node)
 
 # time when actually to stop the simulation
@@ -160,11 +160,9 @@ $rnd_gen use-rng $rng
 # Put here all the commands to set globally the initialization values of
 # the binded variables (optional)
 
-# variables for the ALOHA-CSMA module
-
 # variables for the AL module
 Module/UW/AL set Dbit 0
-Module/UW/AL set PSDU 32
+Module/UW/AL set PSDU 64
 Module/UW/AL set debug_ 0
 Module/UW/AL set interframe_period 0.e1
 Module/UW/AL set frame_set_validity 3
@@ -184,7 +182,7 @@ NS2/COMMON/Packer set ERROR_Bits 0
 NS2/COMMON/Packer set TIMESTAMP_Bits 8
 NS2/COMMON/Packer set PREV_HOP_Bits 8
 NS2/COMMON/Packer set NEXT_HOP_Bits 8
-NS2/COMMON/Packer set ADRR_TYPE_Bits 0
+NS2/COMMON/Packer set ADDR_TYPE_Bits 0
 NS2/COMMON/Packer set LAST_HOP_Bits 0
 NS2/COMMON/Packer set TXTIME_Bits 0
 NS2/COMMON/Packer set debug_ 0
@@ -300,15 +298,10 @@ proc createNode { } {
     set packer_ [new UW/AL/Packer]
 
     set packer_payload0 [new NS2/COMMON/Packer]  
-    #$packer_payload0 printAllFields  
-
-    set packer_payload1 [new UW/IP/Packer]
-
-    set packer_payload2 [new NS2/MAC/Packer]
+    set packer_payload1 [new NS2/MAC/Packer]
+    set packer_payload2 [new UW/IP/Packer]
     set packer_payload3 [new UW/UDP/Packer]
     set packer_payload4 [new UW/APP/uwApplication/Packer]
-    #$packer_payload4 printAllFields
-    # $packer_payload4 printMap
 
     $packer_ addPacker $packer_payload0
     $packer_ addPacker $packer_payload1

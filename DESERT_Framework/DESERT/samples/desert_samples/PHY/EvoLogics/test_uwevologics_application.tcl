@@ -179,7 +179,7 @@ for {set k 0} {$k < $opt(rngstream)} {incr k} {
 
 # variables for the AL module
 Module/UW/AL set Dbit 0
-Module/UW/AL set PSDU 1400
+Module/UW/AL set PSDU 64
 Module/UW/AL set debug_ 0
 Module/UW/AL set interframe_period 0.e1
 Module/UW/AL set frame_set_validity 0
@@ -198,8 +198,8 @@ NS2/COMMON/Packer set UID_Bits 8
 NS2/COMMON/Packer set ERROR_Bits 0
 NS2/COMMON/Packer set TIMESTAMP_Bits 8
 NS2/COMMON/Packer set PREV_HOP_Bits 8
-NS2/COMMON/Packer set NEXT_HOP_Bits 38
-NS2/COMMON/Packer set ADRR_TYPE_Bits 0
+NS2/COMMON/Packer set NEXT_HOP_Bits 8
+NS2/COMMON/Packer set ADDR_TYPE_Bits 0
 NS2/COMMON/Packer set LAST_HOP_Bits 0
 NS2/COMMON/Packer set TXTIME_Bits 0
 NS2/COMMON/Packer set debug_ 0
@@ -317,15 +317,10 @@ proc createNode { } {
     set packer_ [new UW/AL/Packer]
 
     set packer_payload0 [new NS2/COMMON/Packer]  
-    #$packer_payload0 printAllFields  
-
-    set packer_payload1 [new UW/IP/Packer]
-
-    set packer_payload2 [new NS2/MAC/Packer]
+    set packer_payload1 [new NS2/MAC/Packer]
+    set packer_payload2 [new UW/IP/Packer]
     set packer_payload3 [new UW/UDP/Packer]
     set packer_payload4 [new UW/APP/uwApplication/Packer]
-    #$packer_payload4 printAllFields
-    $packer_payload4 printMap
 
     $packer_ addPacker $packer_payload0
     $packer_ addPacker $packer_payload1
