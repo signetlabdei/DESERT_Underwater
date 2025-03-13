@@ -143,10 +143,10 @@ $ns use-scheduler RealTime
 ##################
 # Tcl variables  #
 ##################
-# address and port of the EvoLogics modem
+# address and port of the modem
 set address $opt(port)
 
-# set MAC address for the EvoLogics modem
+# set MAC address for the modem
 set addrMAC $opt(node)
 
 # time when actually to stop the simulation
@@ -194,8 +194,8 @@ NS2/COMMON/Packer set UID_Bits 8
 NS2/COMMON/Packer set ERROR_Bits 0
 NS2/COMMON/Packer set TIMESTAMP_Bits 8
 NS2/COMMON/Packer set PREV_HOP_Bits 8
-NS2/COMMON/Packer set NEXT_HOP_Bits 38
-NS2/COMMON/Packer set ADRR_TYPE_Bits 0
+NS2/COMMON/Packer set NEXT_HOP_Bits 8
+NS2/COMMON/Packer set ADDR_TYPE_Bits 0
 NS2/COMMON/Packer set LAST_HOP_Bits 0
 NS2/COMMON/Packer set TXTIME_Bits 0
 NS2/COMMON/Packer set debug_ 0
@@ -329,10 +329,8 @@ proc createNode { } {
 
     set packer_payload0 [new NS2/COMMON/Packer]  
     #$packer_payload0 printAllFields  
-
-    set packer_payload1 [new UW/IP/Packer]
-
-    set packer_payload2 [new NS2/MAC/Packer]
+    set packer_payload1 [new NS2/MAC/Packer]
+    set packer_payload2 [new UW/IP/Packer]
     set packer_payload3 [new UW/UDP/Packer]
     set packer_payload4 [new UW/APP/uwApplication/Packer]
     #$packer_payload4 printAllFields
