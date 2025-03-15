@@ -279,7 +279,7 @@ For instance, the following command will install DESERT on your local machine in
 
 <small>
 
-    ./install.sh --target LOCAL --inst_mode development --dest_folder <destination-folder-path> --addons "ALL"
+    ./install.sh --target LOCAL --inst_mode development --dest_folder <destination-folder-path> --addons ALL
 
 </small>
 
@@ -322,7 +322,7 @@ In order to make the environment update persistant even after you close the term
 \section docker-install Use Docker
 Alternatively to the manual installation, DESERT provide an automatic installation using docker.
 
-Go to the dockerfile directory
+You will need to cd to the dockerfile directory
 
 <small>
 
@@ -334,11 +334,18 @@ And build it
 
 <small>
 
-    docker build .
+    docker build -t docker_desert .
 
 </small>
 
-It will download all the dependencies and install DESERT with WOSS and all the addons in a docker container with Ubuntu.
+It will create a container with Ubuntu 22.04 LTS, download all the dependencies and install DESERT with WOSS and all the addons.
+Finally run the just created container
+
+<small>
+
+    docker run -it docker_desert
+
+</small>
 
 
 */
