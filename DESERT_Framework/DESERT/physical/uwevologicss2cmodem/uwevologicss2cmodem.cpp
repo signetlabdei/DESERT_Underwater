@@ -187,6 +187,14 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 			ack_mode = false;
 			return TCL_OK;
 		}
+		if (!strcmp(argv[1], "enableExtProtoMode")) {
+			p_interpreter->setExtProtoMode(true);
+			return TCL_OK;
+		}
+		if (!strcmp(argv[1], "disableExtProtoMode")) {
+			p_interpreter->setExtProtoMode(false);
+			return TCL_OK;
+		}
 		if (!strcmp(argv[1], "initLUT")) {
 			initializeLUT();
 			return TCL_OK;
