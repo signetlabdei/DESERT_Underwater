@@ -44,14 +44,9 @@
 #ifndef UWCBR_MODULE_H
 #define UWCBR_MODULE_H
 
+#include <module.h>
 #include <uwip-module.h>
 #include <uwudp-module.h>
-
-#include <module.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <climits>
 
 #define UWCBR_DROP_REASON_UNKNOWN_TYPE \
@@ -62,8 +57,6 @@
 	"DPK" /**< Reason for a drop in a <i>UWCBR</i> module. */
 
 #define HDR_UWCBR(p) (hdr_uwcbr::access(p))
-
-
 
 extern packet_t PT_UWCBR;
 
@@ -178,7 +171,7 @@ public:
 	/**
 	 * Destructor of UwCbrModule class.
 	 */
-	virtual ~UwCbrModule();
+	virtual ~UwCbrModule() = default;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
@@ -222,7 +215,7 @@ public:
 	 * @return Forward Trip Time.
 	 */
 	virtual double GetFTT() const;
-		/**
+	/**
 	 * Returns the mean transmission time.
 	 *
 	 * @return transmission time.
@@ -293,18 +286,17 @@ protected:
 
 	int txsn; /**< Sequence number of the next packet to be transmitted. */
 	int hrsn; /**< Highest received sequence number. */
-	int
-			pkts_recv; /**< Total number of received packets. Packet out of
-						  sequence are not counted here. */
+	int pkts_recv; /**< Total number of received packets. Packet out of
+					  sequence are not counted here. */
 	int pkts_ooseq; /**< Total number of packets received out of sequence. */
-	int
-			pkts_lost; /**< Total number of lost packets, including packets
-						  received out of sequence. */
+	int pkts_lost; /**< Total number of lost packets, including packets
+					  received out of sequence. */
 	int pkts_invalid; /**< Total number of invalid packets received. */
 	int pkts_last_reset; /**< Used for error checking after stats are reset. Set
 							to pkts_lost+pkts_recv each time resetStats is
 							called. */
-	int cnt;  	/**< Used for check if is the first time that tracefile<ip of sink> is opened. */					
+	int cnt; /**< Used for check if is the first time that tracefile<ip of sink>
+				is opened. */
 
 	double rftt; /**< Forward Trip Time seen for last received packet. */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP. */
@@ -323,14 +315,15 @@ protected:
 	double sumftt; /**< Sum of FTT samples. */
 	double sumftt2; /**< Sum of (FTT^2). */
 	int fttsamples; /**< Number of FTT samples. */
-		double sumtxtimes = 0; /**< Sum of transmission times  */
+	double sumtxtimes = 0; /**< Sum of transmission times  */
 
 	double sumbytes; /**< Sum of bytes received. */
 	double sumdt; /**< Sum of the delays. */
 
 	uint32_t esn; /**< Expected serial number. */
 
-	int tracefile_enabler_; /**< True if enable tracefile of received packets, default disabled. */
+	int tracefile_enabler_; /**< True if enable tracefile of received packets,
+							   default disabled. */
 
 	/**
 	 * Initializes a data packet passed as argument with the default values.
@@ -437,7 +430,7 @@ protected:
 	/**
 	 * Print to tracefile details about a received packet
 	 *
-	 * @param Packet* Pointer to the received packet 
+	 * @param Packet* Pointer to the received packet
 	 */
 	virtual void printReceivedPacket(Packet *p);
 

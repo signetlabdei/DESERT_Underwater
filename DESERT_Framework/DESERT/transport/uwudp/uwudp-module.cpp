@@ -41,6 +41,8 @@
 
 #include <iostream>
 #include <set>
+#include <sstream>
+#include <string>
 
 extern packet_t PT_UWUDP;
 
@@ -121,9 +123,9 @@ UwUdp::command(int argc, const char *const *argv)
 void
 UwUdp::recv(Packet *p)
 {
-std:
-	cerr << "PortMap::recv() a Packet is sent without source module!"
-		 << std::endl;
+	printOnLog(Logger::LogLevel::ERROR,
+			"UWUDP",
+			"recv(Packet *)::packet sent without source module");
 	Packet::free(p);
 }
 
@@ -140,10 +142,11 @@ UwUdp::recv(Packet *p, int idSrc)
 			map<int, int>::const_iterator iter = id_map.find(uwudp->dport());
 
 			if (iter == id_map.end()) { // Unknown Port Number
-				if (debug_)
-					std::cout << "UwUdp::recv() (dir:UP) "
-							  << " dport=" << uwudp->dport()
-							  << " portcounter=" << portcounter << std::endl;
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWUDP",
+						"recv(Packet *, int)::unknown port number, dport = " +
+								to_string(uwudp->dport()));
+
 				drop(p, 1, DROP_UNKNOWN_PORT_NUMBER);
 				return;
 			}
@@ -153,46 +156,57 @@ UwUdp::recv(Packet *p, int idSrc)
 			if (drop_duplicated_packets_ == 1) {
 				map<uint16_t, map_packets_el>::iterator it =
 						map_packets.find(iter->first);
-				if (debug_ > 10)
-					std::cout << ch->uid() << ":"
-							  << static_cast<uint16_t>(iph->saddr()) << ":"
-							  << iter->first << std::endl;
+
+				std::stringstream msg;
+				msg << "recv(Packet *, int)::duplicate packet with id "
+					<< ch->uid() << " from ip "
+					<< static_cast<uint16_t>(iph->saddr()) << " : "
+					<< iter->first;
+				printOnLog(Logger::LogLevel::DEBUG, "UWUDP", msg.str());
+
 				if (it == map_packets.end()) { // Packet to a "new" port.
-					if (debug_ > 10)
-						std::cout << "--> new port" << std::endl;
+					printOnLog(
+							Logger::LogLevel::DEBUG, "UWUDP", "--> new port");
+
 					std::set<int> tmp_set_;
 					tmp_set_.insert(ch->uid());
 					map_packets_el tmp_map_el_;
-					tmp_map_el_.insert(pair<uint8_t, std::set<int> >(
+					tmp_map_el_.insert(pair<uint8_t, std::set<int>>(
 							iph->saddr(), tmp_set_));
 					map_packets.insert(pair<uint16_t, map_packets_el>(
 							iter->first, tmp_map_el_));
 				} else { // Port already used.
-					if (debug_ > 10)
-						std::cout << "--> old port" << std::endl;
-					std::map<uint8_t, std::set<int> >::iterator it2 =
+					printOnLog(
+							Logger::LogLevel::DEBUG, "UWUDP", "--> old port");
+
+					std::map<uint8_t, std::set<int>>::iterator it2 =
 							it->second.find(iph->saddr());
 					if (it2 == it->second.end()) { // Port already used but
 												   // packet from a new source.
-						if (debug_ > 10)
-							std::cout << "  --> new source" << std::endl;
+						printOnLog(Logger::LogLevel::DEBUG,
+								"UWUDP",
+								"--> new source");
+
 						std::set<int> tmp_set_;
 						tmp_set_.insert(ch->uid());
-						it->second.insert(pair<uint8_t, std::set<int> >(
+						it->second.insert(pair<uint8_t, std::set<int>>(
 								iph->saddr(), tmp_set_));
 					} else { // Port already used and old source.
-						if (debug_ > 10)
-							std::cout << "  --> old source" << std::endl;
+						printOnLog(Logger::LogLevel::DEBUG,
+								"UWUDP",
+								"--> old source");
+
 						if (it2->second.count(ch->uid()) < 1) {
-							if (debug_ > 10)
-								std::cout << "    --> new packet" << std::endl;
+							printOnLog(Logger::LogLevel::DEBUG,
+									"UWUDP",
+									"--> new packet");
+
 							it2->second.insert(ch->uid());
 						} else { // Packet already received.
-							if (debug_ > 10) {
-								std::cout << "    --> duplicated packet"
-										  << std::endl;
-								std::cout << "    --> dropped" << std::endl;
-							}
+							printOnLog(Logger::LogLevel::DEBUG,
+									"UWUDP",
+									"--> duplicated packet\n--> dropped");
+
 							drop(p, 1, DROP_RECEIVED_DUPLICATED_PACKET);
 							return;
 						}
@@ -206,9 +220,11 @@ UwUdp::recv(Packet *p, int idSrc)
 			map<int, int>::const_iterator iter = port_map.find(idSrc);
 
 			if (iter == port_map.end()) {
-			std:
-				cerr << "UwUdp::recv() (dir:DOWN) no port assigned to id "
-					 << idSrc << ", dropping packet!" << std::endl;
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWUDP",
+						"recv(Packet *, int)::no port assigned to id " +
+								to_string(idSrc) + ", dropping packet!");
+
 				Packet::free(p);
 				return;
 			}
@@ -239,10 +255,11 @@ UwUdp::assignPort(Module *m)
 	id_map[newport] = id;
 	assert(id_map.find(newport) != id_map.end());
 
-	if (debug_) {
-		std::cerr << "UwUdp::assignPort() "
-				  << " id=" << id << " port=" << newport
-				  << " portcounter=" << portcounter << std::endl;
-	}
+	std::stringstream msg;
+	msg << "assignPort(Module *)::"
+		<< "id = " << id << " port = " << newport
+		<< " portcounter = " << portcounter << std::endl;
+	printOnLog(Logger::LogLevel::INFO, "UWUDP", msg.str());
+
 	return newport;
 }

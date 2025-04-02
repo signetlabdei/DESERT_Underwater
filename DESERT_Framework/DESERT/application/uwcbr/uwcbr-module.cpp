@@ -42,8 +42,6 @@
 #include <iostream>
 #include <rng.h>
 #include <stdint.h>
-#include <fstream>
-#include <cstdlib>
 
 extern packet_t PT_UWCBR;
 
@@ -141,12 +139,6 @@ UwCbrModule::UwCbrModule()
 	}
 }
 
-
-UwCbrModule::~UwCbrModule()
-{
-	cout << "sdpaosdisaopdisp" << endl;
-}
-
 int
 UwCbrModule::command(int argc, const char *const *argv)
 {
@@ -218,30 +210,32 @@ UwCbrModule::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
-		if (strcasecmp(argv[1], "setLogSuffix") == 0){
+		if (strcasecmp(argv[1], "setLogSuffix") == 0) {
 			string tmp_ = (char *) argv[2];
 			log_suffix = std::string(tmp_);
 			tracefilename = "tracefile" + log_suffix + ".txt";
 			if (tracefile_enabler_) {
-				tracefile.open(tracefilename.c_str() , std::ios_base::out | std::ios_base::app);
+				tracefile.open(tracefilename.c_str(),
+						std::ios_base::out | std::ios_base::app);
 			}
-		return TCL_OK;	
+			return TCL_OK;
 		}
 	} else if (argc == 4) {
-		if (strcasecmp(argv[1], "setLogSuffix") == 0){
+		if (strcasecmp(argv[1], "setLogSuffix") == 0) {
 			string tmp_ = (char *) argv[2];
 			int precision = std::atoi(argv[3]);
 			log_suffix = std::string(tmp_);
 			tracefilename = "tracefile" + log_suffix + ".txt";
 			if (tracefile_enabler_) {
-				tracefile.open(tracefilename.c_str() , std::ios_base::out | std::ios_base::app);
+				tracefile.open(tracefilename.c_str(),
+						std::ios_base::out | std::ios_base::app);
 				tracefile.precision(precision);
 			}
 
-		return TCL_OK;	
+			return TCL_OK;
 		}
 	}
-	
+
 	return Module::command(argc, argv);
 }
 
@@ -296,11 +290,11 @@ UwCbrModule::sendPkt()
 	this->initPkt(p);
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
-	if (debug_ > 10)
-		printf("CbrModule(%d)::sendPkt, send a pkt (%d) with sn: %d\n",
-				getId(),
-				ch->uid(),
-				uwcbrh->sn());
+
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPkt()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 	sendDown(p, delay);
 }
 
@@ -313,11 +307,11 @@ UwCbrModule::sendPktLowPriority()
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 0;
-	if (debug_ > 10)
-		printf("CbrModule(%d)::sendPkt, send a pkt (%d) with sn: %d\n",
-				getId(),
-				ch->uid(),
-				uwcbrh->sn());
+
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPktLowPriority()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 	sendDown(p, delay);
 }
 
@@ -330,11 +324,11 @@ UwCbrModule::sendPktHighPriority()
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 1;
-	if (debug_ > 10)
-		printf("CbrModule(%d)::sendPkt, send a pkt (%d) with sn: %d\n",
-				getId(),
-				ch->uid(),
-				uwcbrh->sn());
+
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPktHighPriority()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 	sendDown(p, delay);
 }
 
@@ -354,7 +348,6 @@ UwCbrModule::stop()
 void
 UwCbrModule::recv(Packet *p, Handler *h)
 {
-	//    hdr_cmn* ch = hdr_cmn::access(p);
 	recv(p);
 }
 
@@ -362,12 +355,10 @@ void
 UwCbrModule::recv(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
-	hdr_uwip *uwiph = hdr_uwip::access(p);
 
-	if (debug_ > 10)
-		printf("CbrModule(%d)::recv(Packet*p,Handler*) pktId %d\n",
-				getId(),
-				ch->uid());
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"recv(Packet *)::received packet with id " + to_string(ch->uid()));
 
 	if (ch->ptype() != PT_UWCBR) {
 		drop(p, 1, UWCBR_DROP_REASON_UNKNOWN_TYPE);
@@ -390,16 +381,15 @@ UwCbrModule::recv(Packet *p)
 	sn_check[uwcbrh->sn() & 0x00ffffff] = true;
 
 	if (drop_out_of_order_) {
-		if (uwcbrh->sn() <
-				esn) { // packet is out of sequence and is to be discarded
+		if (uwcbrh->sn() < esn) {
+			// packet is out of sequence and is to be discarded
 			incrPktOoseq();
-			if (debug_ > 1) {
-				printf("CbrModule::recv() Pkt out of sequence! "
-					   "cbrh->sn=%d\thrsn=%d\tesn=%d\n",
-						uwcbrh->sn(),
-						hrsn,
-						esn);
-			}
+
+			std::stringstream msg;
+			msg << "recv(Packet *)::packet out of sequence sn = "
+				<< uwcbrh->sn() << " hrsn = " << hrsn << " esn = " << esn;
+			printOnLog(Logger::LogLevel::ERROR, "UWCBR", msg.str());
+
 			drop(p, 1, UWCBR_DROP_REASON_OUT_OF_SEQUENCE);
 			return;
 		}
@@ -528,10 +518,6 @@ UwCbrModule::updateThroughput(const int &bytes, const double &dt)
 {
 	sumbytes += bytes;
 	sumdt += dt;
-
-	if (debug_ > 1) {
-		cerr << "bytes=" << bytes << "  dt=" << dt << endl;
-	}
 }
 
 void
@@ -596,15 +582,16 @@ UwCbrModule::getTimeBeforeNextPkt()
 	}
 }
 
-void 
+void
 UwCbrModule::printReceivedPacket(Packet *p)
 {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwip *uwiph = hdr_uwip::access(p);
 	if (tracefile_enabler_) {
-		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " " 
-				<< (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " " << ch->size() <<"\n";
+		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " "
+				  << (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " "
+				  << ch->size() << "\n";
 		tracefile.flush();
 	}
 }

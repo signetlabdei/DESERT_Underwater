@@ -279,7 +279,9 @@ proc createSink { } {
             puts "hostnum > 252!!! exiting"
             exit
         }    
+		$cbr_sink($cnt) setLog 3 "test_uwcbr.log"
     }
+
     
     $ipif_sink addr 254
 

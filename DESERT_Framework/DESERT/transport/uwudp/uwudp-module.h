@@ -44,8 +44,8 @@
 
 #include <uwip-module.h>
 
-#include <module.h>
 #include <map>
+#include <module.h>
 #include <set>
 
 #define DROP_UNKNOWN_PORT_NUMBER \
@@ -167,14 +167,12 @@ protected:
 	map<int, int> port_map; /**< Map: value = port;  key = id. */
 	map<int, int> id_map; /**< Map: value = id;    key = port. */
 
-	typedef std::map<uint8_t, std::set<int> > map_packets_el;
-	std::
-			map<uint16_t, map_packets_el>
-					map_packets; /**< Map used to keep track of the packets
-									received by each port. The key is the port
-									number. The second element
-															contains the saddr
-									IP and a vector used as bucketlist.*/
+	typedef std::map<uint8_t, std::set<int>> map_packets_el;
+	std::map<uint16_t, map_packets_el>
+			map_packets; /**< Map used to keep track of the packets received by
+							each port. The key is the port number. The second
+							element contains the saddr IP and a vector used as
+							bucketlist.*/
 
 	int drop_duplicated_packets_; /**< Flat to enable or disable the drop of
 									 duplicated packets. */
