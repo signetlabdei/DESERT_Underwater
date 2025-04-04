@@ -4,7 +4,7 @@
 
 \image html ./desert.png
 
-@version {{version}}
+@version 3.5.1
 
 @authors <b> Project supervisor: </b> Filippo Campagnaro - filippo.campagnaro@unipd.it
 
@@ -350,7 +350,7 @@ Finally run the just created container
 
 */
 
-/** \page CROSS-COMPILE-RPI How to cross-compile DESERT for Raspberry Pi Zero
+/** \page CROSS-COMPILE-RPI How to cross-compile DESERT for Raspberry Pi Zero (32bit)
 \section CROSS-COMPILE-RPI-bare  Cross-compilation on Debian/Ubuntu workstation
 To download the appropriate toolchain, you can use the script provided inside
 
@@ -445,7 +445,7 @@ After script correctly finished, you can compile DESERT for EvoLogics sandbox se
 
 <small>
 
-    ./install.sh --target EvoLogics-sandbox-debian_armhf --inst_mode release --dest_folder /home/yourhome/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf
+    ./install.sh --target EvoLogics-sandbox-debian_armhf --inst_mode release --dest_folder <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf
 
 </small>
 
@@ -453,7 +453,7 @@ After installation has been correctly completed, you can copy *_buildCopy* folde
 
 <small>
 
-    scp -r /home/yourhome/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf root@<your-modem-ip-address>:~
+    scp -r <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf root@<your-modem-ip-address>:~
 
 </small>
 
@@ -461,8 +461,9 @@ you can now get access via ssh to your modem sandbox and source the DESERT env f
 
 <small>
 
-    ssh root@<your-modem-ip-address>
-    source .../DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/environment
+	ssh root@<your-modem-ip-address>
+	cd ~/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/ && ./make_environment.sh
+	source ~/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/environment
 
 </small>
 
