@@ -500,7 +500,7 @@ you can exit the docker container shell (container will now die) and copy the *_
 
 /** \page ROS ROS Integration for DESERT
 
-\section FRAMEWORK ROS middelware
+\section FRAMEWORK ROS middleware
 
 The DESERT framework can be combined with an easy-to-use and efficient ROS middleware module that enables robotic applications to communicate through an underwater acoustic channel by leveraging the DESERT protocol stack. With a specific focus on the unique characteristics of underwater networks, this module provides an open-source interface that can be used for any robotic project involving submerged devices.
 
@@ -517,37 +517,273 @@ This middleware, provides:
 
 /** \page DEV Developer guide
 
-\section DESMod Structure of a DESERT module
+\section desstruct	DESERT Structure
+The DESERT underwater framework is an extension of [ns-miracle](https://signet.dei.unipd.it/dgt/ns/miracle/doxygen/index.html), thus it inherits its modular structure and can directly use all the modules of such framework.
+Each DESERT module extends from the ns-miracle class Module, which in turn extends from the class PlugIn.
+They provide basic APIs to (i) send packets to upper/lower layers, (ii) communicate via crosslayer messages with other layers of the stack and (iii) configure the layer via tcl script (command and bind).
 
-Each DESERT module derives either from another DESERT or ns-miracle module (e.g., UnderwaterPhysical derives from ns2-miracle UnderwaterMPhyBpsk) or from the base ns2-miracle Module class. In order to use it with tcl, in the cpp file you always need to create a static class that derives from TclClass and gives the name that will be used from tcl to create and bind an object of that module. For instance UnderwaterPhysical is “converted” in tcl using the following class
+The folder structure is composed by two main folders: DESERT_Framework and DESERT_Addons.
+Inside the former, you find all the modules organized according to the ISO/OSI stack and the installer folder.
+While the latter contains external modules which doesn't necessarily fit inside the ISO/OSI stack and/or the DESERT core.
 
-<small> 
+\section howmod How to add a new module
+In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
 
-    static class UwPhysicalClass : public TclClass
+As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named uwcool_phy. The procedure to create a new module is described in the following.
+- The folder structure aims to follow ISO/OSI structure. Identify where your module can be logically placed and give  it a name, in this case, our new uwcool_phy physical layer module should stay inside  DESERT_Framework/DESERT/physical, therefore you need to create a folder DESERT_Framework/DESERT/physical/uwcool_phy: this folder will contain your new library.
+- Create two files called uwcoolphy.h and uwcoolphy.cpp files containing your class definition UwCoolPhy.
+For this class to work, some types of binding are necessary.
+Moreover you will need to create initlib.cpp, Makefile.am and uwcoolphy-default.tcl files.
+- In order to use your class with tcl, in the cpp file you always need to create a static class that derives from TclClass and gives the name that will be used from tcl to create and bind an object of that module. In our example it would be done via the following code:
+
+\code{cpp} 
+
+    static class UwCoolPhyClass : public TclClass
     {
     public:
-        UwPhysicalClass()
-            : TclClass("Module/UW/PHYSICAL")
+        UwCoolPhyClass()
+            : TclClass("Module/UW/CoolPhy")
         {
         }
         TclObject *
         create(int, const char *const *)
         {
-            return (new UnderwaterPhysical);
+            return (new UwCoolPhy);
         }
-    } class_module_uwphysical;
+    } class_module_uwcoolphy;
+
+\endcode
+- Then we need to link class parameters to Tcl variables, this is usually done in the C++ constructor, using the bind() function. This function take as input a string representing a tcl variable which is bound to the second input representing a cpp class parameter.
+
+\code
+
+	bind("debug", (int *) &debug_);			// inside uwcoolphy.cpp
+	Module/UW/CoolPhy set debug 1			// inside uwcoolphy-init.tcl
+
+\endcode
+- The initlib.cpp file make “the connection” between the C++ library of your module and the OTcl representing your scenario under simulation/emulation. You need to define an extern variable representing an EmbeddedTcl object, which has a specific name structure: <ModuleNameInCamelCase><TclCode>.
+You need also to define a function with fixed naming, which is the name of your module with the first capital letter and _Init suffix.
+Following our example, your initlib.cc will look like this:
+
+\code{.cpp}
+
+	#include <tclcl.h>
+	
+	extern EmbeddedTcl UwCoolPhyTclCode;
+	
+	extern "C" int
+	Uwcoolphy_Init()
+	{
+		UwCoolPhyTclCode.load();
+		return 0;
+	}
+
+\endcode
+- All bound variables need to be initialized to a default value in the uwcoolphy-defaults.tcl file. An example of it would be
+
+\code{.tcl}
+
+	Module/UW/CoolPhy set BitRate					32500
+	Module/UW/CoolPhy set AcquisitionThreshold_dB_	10.0
+	Module/UW/CoolPhy set debug_					0
+
+\endcode
+- To compile your module, you need to fill the Makefile.am file:
+	- There should be the definition of your library. The name of your library should always contain lib prefix, i.e., libuwcoolphy.
+	- Specify the list of sources (libuwcool_phy_la_SOURCES), which should contain only the cpp files located in the uwcool_phy folder.
+	- Remember to define the CPPFLAGS, LDFLAGS and LIBADD as needed.
+	- Define the Tcl files variables defaults which are specified inside uwcool-phy-default.tcl.
+
+Finally, your Makefile.am should look like this:
+
+\code{.am}
+
+	AM_CXXFLAGS = -Wall -ggdb3
+	
+	lib_LTLIBRARIES = libuwcoolphy.la
+	libuwcoolphy_la_SOURCES = initlib.cpp uwcoolphy.cpp
+	
+	libuwcoolphy_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+	libuwcoolphy_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+	libuwcoolphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+	
+	nodist_libuwcoolphy_la_SOURCES = InitTcl.cc
+	BUILT_SOURCES = InitTcl.cc
+	CLEANFILES = InitTcl.cc
+	
+	TCL_FILES =  uwcoolphy-default.tcl
+	
+	InitTcl.cc: Makefile $(TCL_FILES)
+	                cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwCoolPhyTclCode > InitTcl.cc
+	
+	EXTRA_DIST = $(TCL_FILES)
+
+\endcode
+- We also need to modify the top-level Makefile.am and configure.ac: DESERT compilation and linking is based on autotools, hence to add a new library you need to modify and DESERT_Framework/DESERT/Makefile.am and DESERT_Framework/DESERT/configure.ac as follows:
+    - Makefile.am: we need to add our folder to the subdirectories list (SUBDIS) using \ as a separator
+
+\code{.am}
+
+		… \
+        physical/uwcool_phy
+
+\endcode
+    - configure.ac: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
+
+\code{.ac}
+
+    […]
+    DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
+    […]
+    AC_CONFIG_FILES=([
+    [...]
+    physical/uwcool_phy
+    [...]
+    ])
+
+\endcode
+
+\subsection cmdMet The command method
+Finally, inside a Tcl script we can use our module by (i) setting its parameter, (ii) instantiating an object and (iii) conneting or calling the necessary methods on it.
+To set the parameters and instantiate the object we can write
+
+\code{.tcl}
+	
+	Module/UW/CoolPhy set BitRate_				   32500
+	Module/UW/CoolPhy set AcquisitionThreshold_dB_ 10.0
+
+	set phy [new Module/UW/CoolPhy]
+
+\endcode
+To enable the communciation between C++ and the tcl script we need to overwrite the command method, for example to get and set parameters of a module object.
+It must be declared in this way, in your module class
+
+\code{.cpp}
+
+	virtual int command(int argc, const char *const *rgv);
+
+\endcode
+And then in should be defined in this way
+
+\code{.cpp}
+
+	UwCoolPhy::command(int argc, const char *const *argv) {
+		if (argc == 2) {
+			if (strcmp(argv[1], "Method1") == 0) {
+				method1();
+				return TCL_OK;
+			}
+		}
+		else if (argc == 3) { .... }
+		
+		return Module::command(argc, argv)
+	}
+
+\endcode
+
+\section newheader How to add a new Packet headers
+
+In the case your module needs its own packet header, a few things need to be performed:
+define a header struct, for example hdr_uwmyprotocol inside a file myproto-hdr.h with your parameters plus the offset field required by the packet header manager:
+
+\code{.cpp}
+
+	typedef struct hdr_uwmyprotocol 
+	{
+		uint8_t param;
+		static int offset_;
+
+		inline uint8_t & param() { return param_ }
+		inline static int& offset() {return offset_;}
+
+		inline static struct hdr_uwmyprotocol *
+		access(const Packet *p)
+		{ 
+			return (struct hdr_uwmyprotocol *) p->access(offset_); 
+		}
+	} hdr_uwmyprotocol;
+
+\endcode
+
+To simplify the access of your header from the packet, at the beginning of the source file where your header is defined you can define a macro
+
+\code{.cpp}
+
+    define HDR_UWMYPROTOCOL(p) (hdr_uwmyprotocol::access(p))
+
+\endcode
+
+Just after the macro, at the beginning of the file, you need to define a new packet type with 
+
+<small>
+
+    extern packet_t PT_MYPACKET;
 
 </small>
 
-The name "Module/UW/PHYSICAL" is the one that will be used in TCL to create and bind objects of type UnderwaterPhysical.
+Inside initlib.cpp you need to 
+- Include your header file and define the offset and the packet type
 
-You can pass variables to and from tcl script and C++ class, by means of bind function, inside the constructor of your module class.
-To bind a variable you need to use the bind function inside the constructor of your module class. 
-In example,  in UnderwaterPhysical we bind the rx_power_ with 
-bind("rx_power_consumption_", &rx_power_);
-All bound variables need to be initialized to a default value in the *-defaults.tcl inside your folder.
+\code{.cpp}
 
-Another way to communicate with the tcl script is to overwrite the command method, for example to get and set parameters of a module object. For more details, just check the UnderwaterPhysical::command method. It is usually best practice to call the father class’ command method at the end.
+	#include<myproto-hdr.h>
+	...
+
+	int hdr_uwmyprotocol::ofset_;
+	packet_t PT_MYPACKET;
+
+\endcode
+
+- Add a static class
+
+\code{.cpp}
+
+    static class MyProtoHeaderClass : public PacketHeaderClass
+    {
+    public:
+        MyProtoHeaderClass()
+            : PacketHeaderClass("PacketHeader/MYPROTO", sizeof(hdr_uwmyprotocol))
+        {
+            this->bind();
+            bind_offset(&hdr_uwmyprotocol::offset_);
+        }
+    }
+
+
+\endcode
+
+- Add the packet in the init function (before the load), using the same name of the extern
+
+\code{.cpp}
+
+    PT_MYPACKET = p_info::addPacket("MYPROTO");
+
+\endcode
+
+Finally, inside the *-default.tcl you need to add the packet to the packet manager, with
+
+\code{.tcl}
+
+    PacketHeaderManager set tab_(PacketHeader/MYPROTO) 1
+
+\endcode
+
+This last step is really important to have the right memory allocation done. Missing it could lead to unpredictable behavior, usually really hard to troubleshoot.
+
+
+\section newaddon How to add a new DESERT Add-on
+
+In this section we describe how to add a new module as a DESERT add-on, inside the folder DESERT_Addons. An addon is an external autotools project that depends on DESERT, ns2miracle and, in some cases, WOSS, so we don’t need to modify the DESERT toplevel Makefile.am and configure.ac, but we need to create just the addon internal Makefile.am and a dedicated configure.ac with m4 folder to resolve the dependencies. The complete procedure is described as follows.
+- Add your folder inside DESERT_Addons/
+- Add your .h and .cpp files like in point 2 of the previous section
+- Add iniltib.cpp like in point 3 of the previous section
+- Add the tcl file for the default initialization of your module like in point 3 of the previous section
+- Add the Makefile.am like in point 5 of the previous section
+- add in your folder the file autogen.sh: you can copy and paste is from another addon: this file should not be modified
+- copy from another addon the file configure.ac and modify the AC_INIT writing the name of your module, e.g., . In the case your module uses WOSS, copy the configure.ac from an addon that uses WOSS as well (e.g., wossgmmob3D), otherwise copy it from an addon that does not (e.g., one of the packer)
+- copy the folder m4 from another addon
+- inside the folded m4, change desert.m4 according to the DESERT dependencies of your module. e.g., you need to list in dir and in lib the directories and libraries your module uses.
+- in the case your module uses some woss dependencies, you need to do the same with woss.m4
 
 \section HowTo How to add a new custom installer
 
@@ -668,129 +904,6 @@ in order to correctly cross-compile DESERT and its addons for
 
 We remark that you need the <b>TOOLCHAIN</b> of <tt><your-custom-installation-target></tt> in order to
 correctly complete the installation.
-
-\section newmod How to add a new DESERT module
-
-In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
-As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named uwcool_phy. The procedure to create a new module is described as follows:
-- The folder structure aims to follow ISO/OSI structure. Identify where your module can be logically placed and give  it a name ( i.e., our new uwcool_phy physical layer module should stay inside  DESERT_Framework/DESERT/physical, therefore you need to create a folder DESERT_Framework/DESERT/physical/uwcool_phy: this folder will contain your new library.
-- Add your .h and .cpp files containing your class definition, called, for instance UwCoolPhy: this point will be discussed more in detail later.
-- Add the file initlib.cpp: this file is really standard and you can use an existing one (i.e., an existing physical layer module) as an example.
-This is the file that make “the connection” between the C++ library of your module and the tcl representing your scenario under simulation/emulation. You need to define an extern variable representing an EmbeddedTcl object, which has a specific name structure: <ModuleNameInCameCase><InitTclCode>.
-You need also to define a function with fixed naming, which is the name of your module with the first capital letter and _Init suffix
-Following our example, the variable should be named UwCoolPhyInitTclCode and the function should be Uwcoolphy_Init. Some of those initlib files has also support to Cygwin. If you are not planning to use it, you can get rid of it.
-- Add the tcl for default initialization, called uwcool-phy-default.tcl, which will contain the initialization of your tcl binded variables. You can take a look at uwphysical module to have an example of it
-- Add to your folder the internal Makefile.am: here there should be the definition of your library. The name of your library should always contain lib prefix, i.e. libuwcoolphy. Since the structure of the Makefiles is really standard you can take, for example, the uwphysical module’s one and modify some parts of it:
-the word libuwphysical should be changed EVERYWHERE with the name of your library, e.g., libuwcoolphy
-the word UwPhysicalInitTclCode should be changed to UwCoolPhyInitTclCode 
-the list of sources (libuwcool_phy_la_SOURCES) should contain only the cpp files located in the uwcool_phy folder
-the TCL_FILES should be equal to uwcool-phy-default.tcl
-- Modify top-level Makefile.am and configure.ac: DESERT compilation and linking is based on autotools, hence to add a new library you need to modify and DESERT_Framework/DESERT/Makefile.am and DESERT_Framework/DESERT/configure.ac as follows:
-    1. Makefile.am: we need to add our folder to the subdirectories list (SUBDIS) using \ as a separator
-<small>
-
-    … \
-        physical/uwcool_phy
-
-</small>
-    2. configure.ac: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
-<small>
-
-    […]
-    DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
-    […]
-    AC_CONFIG_FILES=([
-    [...]
-    physical/uwcool_phy
-    [...]
-    ])
-
-</small>
-
-\section newaddon How to add a new DESERT Add-on
-
-In this section we describe how to add a new module as a DESERT add-on, inside the folder DESERT_Addons. An addon is an external autotools project that depends on DESERT, ns2miracle and, in some cases, WOSS, so we don’t need to modify the DESERT toplevel Makefile.am and configure.ac, but we need to create just the addon internal Makefile.am and a dedicated configure.ac with m4 folder to resolve the dependencies. The complete procedure is described as follows.
-- Add your folder inside DESERT_Addons/
-- Add your .h and .cpp files like in point 2 of the previous section
-- Add iniltib.cpp like in point 3 of the previous section
-- Add the tcl file for the default initialization of your module like in point 3 of the previous section
-- Add the Makefile.am like in point 5 of the previous section
-- add in your folder the file autogen.sh: you can copy and paste is from another addon: this file should not be modified
-- copy from another addon the file configure.ac and modify the AC_INIT writing the name of your module, e.g., . In the case your module uses WOSS, copy the configure.ac from an addon that uses WOSS as well (e.g., wossgmmob3D), otherwise copy it from an addon that does not (e.g., one of the packer)
-- copy the folder m4 from another addon
-- inside the folded m4, change desert.m4 according to the DESERT dependencies of your module. e.g., you need to list in dir and in lib the directories and libraries your module uses.
-- in the case your module uses some woss dependencies, you need to do the same with woss.m4
-
-\section newheader How to add a new Packet headers
-
-In the case your module needs its own packet header, a few things need to be performed:
-define a header struct, for example hdr_MY inside a file my_hdr.h with your parameters plus the following members:
-
-<small>
-
-    public static int offser_ member 
-    inline static int& offset() {return offset_;}
-    inline static struct hdr_MY * access(const Packet *p) { 
-    return (struct hdr_MY *) p->access(offset_); 
-    }
-
-</small>
-
-to simplify the access of your header from the packet, at the beginning of the source file where your header is defined you can define a macro
-
-<small>
-
-    define HDR_MY(p) (hdr_MY::access(p))
-
-</small>
-
-just after the macro, at the beginning of the file, you need to define a new packet type with 
-
-<small>
-
-    extern packet_t PT_MY;
-
-</small>
-
-Inside initlib.cpp you need to 
-
-- add a static class
-
-<small>
-
-    static class MY_HeaderClass : public PacketHeaderClass
-    {
-    public:
-        MY_HeaderClass()
-            : PacketHeaderClass("PacketHeader/MY", sizeof(hdr_MY))
-        {
-            this->bind();
-            bind_offset(&hdr_MY::offset_);
-        }
-    } class_MY_HeaderClass;
-
-
-</small>
-
-- add the packet in the init function (before the load), using the same name of the extern
-
-<small>
-
-    PT_MY = p_info::addPacket("UWPROTOCOL/MY");
-
-</small>
-
-where PROTOCOL is the name of the protocol
-
-Finally, inside the *-default.tcl you need to add the packet to the packet manager, with
-
-<small>
-
-    PacketHeaderManager set tab_(PacketHeader/MY) 1
-
-</small>
-
-This last step is really important to have the right memory allocation done. Missing it could lead to unpredictable behavior, usually really hard to troubleshoot.
 
 
 
