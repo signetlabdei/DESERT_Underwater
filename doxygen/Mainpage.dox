@@ -528,13 +528,22 @@ While the latter contains external modules which doesn't necessarily fit inside 
 
 \section howmod How to add a new module
 In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
+As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named `uwcool_phy`. The procedure to create a new module is described in the following.
 
-As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named uwcool_phy. The procedure to create a new module is described in the following.
-- The folder structure aims to follow ISO/OSI structure. Identify where your module can be logically placed and give  it a name, in this case, our new uwcool_phy physical layer module should stay inside  DESERT_Framework/DESERT/physical, therefore you need to create a folder DESERT_Framework/DESERT/physical/uwcool_phy: this folder will contain your new library.
-- Create two files called uwcoolphy.h and uwcoolphy.cpp files containing your class definition UwCoolPhy.
+The folder structure aims to follow ISO/OSI structure.
+First of all, identify where your module can be logically placed and give  it a name, in this case, our new `uwcool_phy` physical layer module should stay inside  `DESERT_Framework/DESERT/physical` folder, therefore you need to cd to that directory and create a folder named `uwcool_phy`.
+This folder will contain your new library.
+
+Create two files called `uwcoolphy.h` and `uwcoolphy.cpp` files containing your class definition `UwCoolPhy`.
 For this class to work, some types of binding are necessary.
-Moreover you will need to create initlib.cpp, Makefile.am and uwcoolphy-default.tcl files.
-- In order to use your class with tcl, in the cpp file you always need to create a static class that derives from TclClass and gives the name that will be used from tcl to create and bind an object of that module. In our example it would be done via the following code:
+Moreover you will need to create the following files:
+
+- `initlib.cpp`,
+- `Makefile.am`,
+- `uwcoolphy-default.tcl`.
+
+In order to use your class with tcl, in the cpp file you always need to create a **static** class that derives from `TclClass` and gives the name that will be used from tcl to create and bind an object of that module.
+In our example it would be done via the following code:
 
 \code{cpp} 
 
@@ -553,17 +562,25 @@ Moreover you will need to create initlib.cpp, Makefile.am and uwcoolphy-default.
     } class_module_uwcoolphy;
 
 \endcode
-- Then we need to link class parameters to Tcl variables, this is usually done in the C++ constructor, using the bind() function. This function take as input a string representing a tcl variable which is bound to the second input representing a cpp class parameter.
 
-\code
+Then we need to link class parameters to tcl variables, this is usually done in the cpp constructor, using the `bind()` function.
+This function take as input a string representing a tcl variable which is bound to the second input, which represents a cpp class parameter.
+
+\code{.cpp}
 
 	bind("debug", (int *) &debug_);			// inside uwcoolphy.cpp
-	Module/UW/CoolPhy set debug 1			// inside uwcoolphy-init.tcl
 
 \endcode
-- The initlib.cpp file make “the connection” between the C++ library of your module and the OTcl representing your scenario under simulation/emulation. You need to define an extern variable representing an EmbeddedTcl object, which has a specific name structure: <ModuleNameInCamelCase><TclCode>.
-You need also to define a function with fixed naming, which is the name of your module with the first capital letter and _Init suffix.
-Following our example, your initlib.cc will look like this:
+\code{.tcl}
+
+	Module/UW/CoolPhy set debug 1			# inside uwcoolphy-init.tcl
+
+\endcode
+
+The `initlib.cpp` file make *the connection* between the cpp library of your module and the tcl representing your scenario under simulation/emulation.
+You need to define an extern variable representing an **EmbeddedTcl** object, which has a specific name structure: `<ModuleNameInCamelCase><TclCode>`.
+You need also to define a function with fixed naming, which is the name of your module with the first capital letter and `_Init` suffix.
+Following our example, your `initlib.cc` will look like this:
 
 \code{.cpp}
 
@@ -579,7 +596,9 @@ Following our example, your initlib.cc will look like this:
 	}
 
 \endcode
-- All bound variables need to be initialized to a default value in the uwcoolphy-defaults.tcl file. An example of it would be
+
+All bound variables need to be initialized to a default value in the `uwcoolphy-defaults.tcl` file.
+An example of it would be
 
 \code{.tcl}
 
@@ -588,13 +607,14 @@ Following our example, your initlib.cc will look like this:
 	Module/UW/CoolPhy set debug_					0
 
 \endcode
-- To compile your module, you need to fill the Makefile.am file:
-	- There should be the definition of your library. The name of your library should always contain lib prefix, i.e., libuwcoolphy.
-	- Specify the list of sources (libuwcool_phy_la_SOURCES), which should contain only the cpp files located in the uwcool_phy folder.
-	- Remember to define the CPPFLAGS, LDFLAGS and LIBADD as needed.
-	- Define the Tcl files variables defaults which are specified inside uwcool-phy-default.tcl.
 
-Finally, your Makefile.am should look like this:
+Finally, to compile your module, you need to fill the `Makefile.am` file:
+- There should be the definition of your library. The name of your library should always contain *lib* prefix, i.e., `libuwcoolphy`.
+- Specify the list of sources (`libuwcool_phy_la_SOURCES`), which should contain only the cpp files located in the `uwcool_phy` folder.
+- Remember to define the `CPPFLAGS`, `LDFLAGS` and `LIBADD` where needed.
+- Define the tcl files variables defaults which are specified inside `uwcool-phy-default.tcl`.
+
+Your `Makefile.am` should look like this:
 
 \code{.am}
 
@@ -619,8 +639,10 @@ Finally, your Makefile.am should look like this:
 	EXTRA_DIST = $(TCL_FILES)
 
 \endcode
-- We also need to modify the top-level Makefile.am and configure.ac: DESERT compilation and linking is based on autotools, hence to add a new library you need to modify and DESERT_Framework/DESERT/Makefile.am and DESERT_Framework/DESERT/configure.ac as follows:
-    - Makefile.am: we need to add our folder to the subdirectories list (SUBDIS) using \ as a separator
+
+DESERT compilation and linking is based on autotools, hence to add a new library you need to modify the top-level `DESERT_Framework/DESERT/Makefile.am` and `DESERT_Framework/DESERT/configure.ac` files as follows:
+- `Makefile.am`: we need to add our folder to the subdirectories list (SUBDIRS) using \ as a separator
+- `configure.ac`: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
 
 \code{.am}
 
@@ -628,7 +650,6 @@ Finally, your Makefile.am should look like this:
         physical/uwcool_phy
 
 \endcode
-    - configure.ac: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
 
 \code{.ac}
 
@@ -644,7 +665,12 @@ Finally, your Makefile.am should look like this:
 \endcode
 
 \subsection cmdMet The command method
-Finally, inside a Tcl script we can use our module by (i) setting its parameter, (ii) instantiating an object and (iii) conneting or calling the necessary methods on it.
+Finally, inside a tcl script we can use our module by:
+
+1. Setting its parameter, 
+2. instantiating an object, 
+3. connecting or calling the necessary methods on it.
+
 To set the parameters and instantiate the object we can write
 
 \code{.tcl}
@@ -655,15 +681,16 @@ To set the parameters and instantiate the object we can write
 	set phy [new Module/UW/CoolPhy]
 
 \endcode
-To enable the communciation between C++ and the tcl script we need to overwrite the command method, for example to get and set parameters of a module object.
-It must be declared in this way, in your module class
+
+To enable the communciation between the cpp class and the tcl script we need to overwrite the command method, for example to get and set parameters of a module object.
+It must be declared in this way, in your module class (`uwcoolphy.h`)
 
 \code{.cpp}
 
 	virtual int command(int argc, const char *const *rgv);
 
 \endcode
-And then in should be defined in this way
+And then it should be defined in this way (inside `uwcoolphy.cpp`)
 
 \code{.cpp}
 
@@ -683,8 +710,9 @@ And then in should be defined in this way
 
 \section newheader How to add a new Packet headers
 
-In the case your module needs its own packet header, a few things need to be performed:
-define a header struct, for example hdr_uwmyprotocol inside a file myproto-hdr.h with your parameters plus the offset field required by the packet header manager:
+In the case your module needs its own **packet header**, a few things need to be performed:
+
+Define a header *struct*, for example `hdr_uwmyprotocol` inside a file `myproto-hdr.h` with your parameters plus the offset field required by the *packet header manager*:
 
 \code{.cpp}
 
@@ -705,15 +733,15 @@ define a header struct, for example hdr_uwmyprotocol inside a file myproto-hdr.h
 
 \endcode
 
-To simplify the access of your header from the packet, at the beginning of the source file where your header is defined you can define a macro
+To simplify the access of your *header* from the *packet* class, at the beginning of the source file where your header is defined you can define the following macro
 
 \code{.cpp}
 
-    define HDR_UWMYPROTOCOL(p) (hdr_uwmyprotocol::access(p))
+    #define HDR_UWMYPROTOCOL(p) (hdr_uwmyprotocol::access(p))
 
 \endcode
 
-Just after the macro, at the beginning of the file, you need to define a new packet type with 
+Just after the macro, at the beginning of the file, you need to define a new *packet* type with
 
 <small>
 
@@ -752,7 +780,7 @@ Inside initlib.cpp you need to
 
 \endcode
 
-- Add the packet in the init function (before the load), using the same name of the extern
+- Add the packet inside the `init` function (before the `load` function call), using the same name of the extern
 
 \code{.cpp}
 
@@ -773,45 +801,87 @@ This last step is really important to have the right memory allocation done. Mis
 
 \section newaddon How to add a new DESERT Add-on
 
-In this section we describe how to add a new module as a DESERT add-on, inside the folder DESERT_Addons. An addon is an external autotools project that depends on DESERT, ns2miracle and, in some cases, WOSS, so we don’t need to modify the DESERT toplevel Makefile.am and configure.ac, but we need to create just the addon internal Makefile.am and a dedicated configure.ac with m4 folder to resolve the dependencies. The complete procedure is described as follows.
-- Add your folder inside DESERT_Addons/
-- Add your .h and .cpp files like in point 2 of the previous section
-- Add iniltib.cpp like in point 3 of the previous section
-- Add the tcl file for the default initialization of your module like in point 3 of the previous section
-- Add the Makefile.am like in point 5 of the previous section
-- add in your folder the file autogen.sh: you can copy and paste is from another addon: this file should not be modified
-- copy from another addon the file configure.ac and modify the AC_INIT writing the name of your module, e.g., . In the case your module uses WOSS, copy the configure.ac from an addon that uses WOSS as well (e.g., wossgmmob3D), otherwise copy it from an addon that does not (e.g., one of the packer)
-- copy the folder m4 from another addon
-- inside the folded m4, change desert.m4 according to the DESERT dependencies of your module. e.g., you need to list in dir and in lib the directories and libraries your module uses.
-- in the case your module uses some woss dependencies, you need to do the same with woss.m4
+In this section we describe how to add a new module as a DESERT addon.
+An addon, is an external autotools project that depends on DESERT, ns-miracle and, in some cases, WOSS or even other addons, so we don’t need to modify the DESERT toplevel `Makefile.am` and `configure.ac`.
+We need to create just the addon internal `Makefile.am` and a dedicated `configure.ac` with `m4` folder to resolve the dependencies. 
+The complete procedure is described in the following.
+
+Inside the `DESERT_Addons` folder, create your addon folder, say `cool-addon`.
+Inside that folder, create the basic files for a properly cpp module, i.e., `cool-addon.h` and `cool-addon.cpp` and the `initlib.cpp` as well.
+
+Similarly to what you did for the adding a module, your `initlib.cpp` will look like
+
+\code{.cpp}
+
+	#include <tclcl.h>
+
+	extern EmbeddedTcl CoolAddonTclCode;
+
+	extern "C" int
+	Cooladdon_Init()
+	{
+		CoolAddonTclCode.load();
+		return 0;
+	}
+
+\endcode
+
+To make the addon compilable and complete, we also need:
+- A `Makefile.am`,
+- a `configure.ac` config file,
+- an initialization file for the tcl, i.e., `cool-addon-init.tcl`,
+- the `autogen.sh` script,
+- and a `m4` folder
+
+The `Makefile.am` can be taken from another addon or module and modified according to your addond needs, similarly to what what we did for a module.
+Just note that in case of a *WOSS* dependent addon, it is better to take the `Makefile.am` from another *WOSS*-based addon, such as `wossgmmob3D` or `wossgroupmob3D`.
+Similarly, in case your addon is based on another existing addon, take it from `uwswarm_control` or `ms2c_evologics_lowlev` addons.
+
+Also for the `configure.ac` you take one from another addon and copy into your folder.
+You just need to modify the `AC_INIT` with the name of your addon.
+Also in this case if you need WOSS functionalities take it from a WOSS-based addon.
+
+The `autogen.sh` file is needed to compile your addon and can be copied from any other addon and doesn't need any modification.
+
+Add all the variables that you have *binded* in your addon class inside the `cool-addon-init.tcl` files as youd did for the module.
+
+The `m4` folder contains the `desert.m4` file and the `desertAddon.m4` and `woss.m4` files if the addon depend from another addon or woss.
+Also in this case, it is easier to copy from another addon and modify the dependencies wee ned for our addon.
+Those are directories listed in `dir` and `lib` portion of the given `m4` file.
+
+Finally, to have your addon visible during installation, modify the installation file `DESERT_Framework/.addon.list` adding the name of your addon folder.
 
 \section HowTo How to add a new custom installer
+<BLOCKQUOTE>
+NOTE: When you see a pathname preceded by three dots, this refers to a well-known but unspecified top-level directory. The top-level directory is context-dependent, but almost always refers to top-level DESERT source directory.
+For example, `.../DESERT_Underwater/DESERT_Framework/Installer/installDESERT_LOCAL.sh` refers to the `installDESERT_LOCAL.sh` file located in the architecture branch of a DESERT framework source tree.
+The actual path might be something like `/home/foo/DESERT_Underwater/DESERT_Framework/Installer/installDESERT_LOCAL.sh`.
+</BLOCKQUOTE>
 
 First of all, enter the installation folder:
 
-<small>
+\code{.sh}
 
     cd .../DESERT_Underwater/DESERT_Framework/Installation/
 
-<BLOCKQUOTE>
-NOTE: When you see a pathname preceded by three dots, this refers to a well-known but unspecified top-level directory. The top-level directory is context-dependent, but almost universally refers to top-level DESERT source directory. For example, <tt>.../DESERT_Underwater/DESERT_Framework/Installer/installDESERT_PC.sh</tt> refers to the <tt>installDESERT_PC.sh</tt> file located in the architecture branch of a DESERT framework source tree.
-The actual path might be something like <tt>/home/foo/DESERT_Underwater/DESERT_Framework/Installer/installDESERT_PC.sh</tt>.
-</BLOCKQUOTE>
-</small>
+\endcode
 
-At this point, create a new script. We suggest to copy an existing installation script (e.g. <tt>installDESERT_PC.sh</tt>):
+Now, create a new script.
+We suggest to copy an existing installation script (e.g. `installDESERT_LOCAL.sh`):
 
-<small>
+\code{.sh}
 
-    cp installDESERT_PC.sh installDESERT_<your-custom-installation-target>.sh
+    cp installDESERT_LOCAL.sh installDESERT_<your-custom-installation-target>.sh
 
-</small>
+\endcode
 
-Please note the <tt><your-custom-installation-target></tt> label: this will be the same parameter you will pas later as an option to the installation script when indicating which installation-target to choose. We remark that these steps are very easy but also very important, since the only way to call the correct installation script for <tt><your-custom-installation-target></tt> is that the script <tt>installDESERT_<your-custom-installation-target>.sh</tt> exists in the folder <tt>.../DESERT_Underwater/DESERT_Framework/Installation/</tt>
+Please note the `<your-custom-installation-target>` label:
+this will be the same parameter you will pas later as an option to the installation script when indicating which installation-target to choose.
+We remark that these steps are very easy but also very important, since the only way to call the correct installation script for `<your-custom-installation-target>` is that the script `installDESERT_<your-custom-installation-target>.sh` exists in the folder `.../DESERT_Underwater/DESERT_Framework/Installation/`
 
 Let us now have a deeper look at the script. We focus first on the main block:
 
-<small>
+\code{.sh}
 
     main() {
         #******************************************************************************
@@ -845,13 +915,13 @@ Let us now have a deeper look at the script. We focus first on the main block:
         #******************************************************************************
     }
 
-</small>
+\endcode
 
-Notice the "host" directive. This tells the installation script to compile the
-libraries for the current host. If you need to modify this script to cross-compile
-for a different target, substitute all lines with the following ones:
+Notice the **host*** directive.
+This tells the installation script to compile the libraries for the current host.
+If you need to modify this script to cross-compile for a different target, substitute all lines with the following ones:
 
-<small>
+\code{.sh}
 
     main() {
         #******************************************************************************
@@ -886,14 +956,11 @@ for a different target, substitute all lines with the following ones:
         #******************************************************************************
     }
 
-</small>
+\endcode
 
 With these changes we instructed the installer to compile some modules only for the
-host ("host" directive), some for both the host and the target ("host/target"
-directive) and the remaining ones only for the target ("target" directive).
-This step is crucial, because some libraries must be compiled for the host,
-in order to correctly cross-compile DESERT and its addons for
-<tt><your-custom-installation-target></tt>.
+host, some for both the host and the target and the remaining ones only for the target (***target*** directive).
+This step is crucial, because some libraries must be compiled for the host, in order to correctly cross-compile DESERT and its addons for `<your-custom-installation-target>`.
 
 <small>
 
