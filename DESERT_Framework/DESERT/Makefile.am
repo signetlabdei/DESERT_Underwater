@@ -102,4 +102,5 @@ SUBDIRS = m4 \
     ranging/uwtap \
     ranging/uwranging_tdoa \
     data_link/uwjammer \
-    physical/uwphysicalnoise
+    physical/uwphysicalnoise \
+    transport/uwtp

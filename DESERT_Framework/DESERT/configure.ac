@@ -125,6 +125,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwtap'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdoa'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwjammer'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalnoise'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/transport/uwtp'
 
 
 
@@ -220,6 +221,7 @@ AC_CONFIG_FILES([
     ranging/uwranging_tdoa/Makefile
     data_link/uwjammer/Makefile
 	physical/uwphysicalnoise/Makefile
+    transport/uwtp/Makefile
     ])
 
 AC_OUTPUT
