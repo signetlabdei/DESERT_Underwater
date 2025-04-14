@@ -90,6 +90,7 @@ SUBDIRS = m4 \
     mobility/uwgmposition \
     mobility/uwrandomlib \
     mobility/uwsmposition \
+    mobility/uwsmwpposition \
     interference/uwinterference \
     interference/uwinterferenceofdm \
     propagation/uwoptical_propagation \
