@@ -982,6 +982,18 @@ CsmaAloha::stateRxData(Packet *data_pkt)
 				stateCheckListenExpired();
 		} break;
 
+		case CSMA_STATE_LISTEN: {
+			hdr_cmn *ch = hdr_cmn::access(data_pkt);
+			ch->size() = ch->size() - HDR_size;
+			incrDataPktsRx();
+			sendUp(data_pkt);
+
+			if (ack_mode == CSMA_ACK_MODE)
+				stateTxAck(dst_addr);
+			else
+				stateCheckListenExpired();
+		} break;
+
 		case CSMA_STATE_RX_BACKOFF: {
 			hdr_cmn *ch = hdr_cmn::access(data_pkt);
 			ch->size() = ch->size() - HDR_size;
