@@ -383,7 +383,6 @@ UwRangingTDOA::rangeTX()
 	mach->ftype() = MF_DATA;
 	rangh->source_pkt_id = packet_id;
 	rangh->source_node_id = node_id;
-	rangh->times_size_ = range_entries;
 
 	tx_timestamp.emplace((tx_timestamp.begin() + rangh->source_pkt_id), NOW);
 
@@ -394,6 +393,7 @@ UwRangingTDOA::rangeTX()
 
 	calcOptEntries(&sorted_entries);
 	saved_entries += (n_nodes - 1) - sorted_entries.size();
+	rangh->times_size_ = sorted_entries.size();
 
 	DEBUG(2,
 			"rangeTX::OPT SIZE: " << sorted_entries.size() 
