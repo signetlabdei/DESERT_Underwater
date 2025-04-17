@@ -178,7 +178,7 @@ public:
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
-	virtual void recv(Packet *);
+	virtual void recv(Packet *) override;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
@@ -186,7 +186,7 @@ public:
 	 * @param Packet* Pointer to the packet will be received.
 	 * @param Handler* Handler.
 	 */
-	virtual void recv(Packet *p, Handler *h);
+	virtual void recv(Packet *p, Handler *h) override;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -198,9 +198,7 @@ public:
 	 * successfully or not.
 	 *
 	 */
-	virtual int command(int argc, const char *const *argv);
-
-	virtual int crLayCommand(ClMessage *m);
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
 	 * Returns the mean Round Trip Time.
@@ -266,6 +264,8 @@ public:
 
 protected:
 	static int uidcnt_; /**< Unique id of the packet generated. */
+	static std::stringstream log_msg;
+
 	uint16_t dstPort_; /**< Destination port. */
 	std::string log_suffix; /**< Possibility to insert a log suffix */
 	nsaddr_t dstAddr_; /**< IP of the destination. */

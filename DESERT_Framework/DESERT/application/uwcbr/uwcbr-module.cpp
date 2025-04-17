@@ -47,6 +47,7 @@ extern packet_t PT_UWCBR;
 
 int hdr_uwcbr::offset_; /**< Offset used to access in <i>hdr_uwcbr</i> packets
 						   header. */
+std::stringstream UwCbrModule::log_msg;
 
 /**
  * Adds the header for <i>hdr_uwcbr</i> packets in ns2.
@@ -90,6 +91,7 @@ int UwCbrModule::uidcnt_ = 0;
 
 UwCbrModule::UwCbrModule()
 	: dstPort_(0)
+	, log_suffix("")
 	, dstAddr_(0)
 	, priority_(0)
 	, PoissonTraffic_(0)
@@ -104,6 +106,7 @@ UwCbrModule::UwCbrModule()
 	, pkts_lost(0)
 	, pkts_invalid(0)
 	, pkts_last_reset(0)
+	, cnt(0)
 	, rftt(-1)
 	, srtt(0)
 	, sftt(0)
@@ -114,7 +117,6 @@ UwCbrModule::UwCbrModule()
 	, sumrtt(0)
 	, sumrtt2(0)
 	, rttsamples(0)
-	, log_suffix("")
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
@@ -122,7 +124,6 @@ UwCbrModule::UwCbrModule()
 	, sumdt(0)
 	, esn(0)
 	, tracefile_enabler_(0)
-	, cnt(0)
 { // binding to TCL variables
 	bind("period_", &period_);
 	bind("destPort_", (int *) &dstPort_);
@@ -197,7 +198,7 @@ UwCbrModule::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "resetStats") == 0) {
 			resetStats();
-			fprintf(stderr,
+			tcl.resultf(
 					"CbrModule::command() resetStats %s, pkts_last_reset=%d, "
 					"hrsn=%d, txsn=%d\n",
 					tag_,
@@ -237,15 +238,6 @@ UwCbrModule::command(int argc, const char *const *argv)
 	}
 
 	return Module::command(argc, argv);
-}
-
-int
-UwCbrModule::crLayCommand(ClMessage *m)
-{
-	switch (m->type()) {
-		default:
-			return Module::crLayCommand(m);
-	}
 }
 
 void
@@ -291,10 +283,10 @@ UwCbrModule::sendPkt()
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
-	printOnLog(Logger::LogLevel::INFO,
-			"UWCBR",
-			"sendPkt()::send a packet (" + to_string(ch->uid()) +
-					") with sn: " + to_string(uwcbrh->sn()));
+	log_msg << "sendPkt()::send a packet (" << ch->uid()
+			<< ") with sn: " << uwcbrh->sn();
+	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+
 	sendDown(p, delay);
 }
 
@@ -308,10 +300,10 @@ UwCbrModule::sendPktLowPriority()
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 0;
 
-	printOnLog(Logger::LogLevel::INFO,
-			"UWCBR",
-			"sendPktLowPriority()::send a packet (" + to_string(ch->uid()) +
-					") with sn: " + to_string(uwcbrh->sn()));
+	log_msg << "sendPktLowPriority()::send a packet (" << ch->uid()
+			<< ") with sn: " << uwcbrh->sn();
+	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+
 	sendDown(p, delay);
 }
 
@@ -325,10 +317,10 @@ UwCbrModule::sendPktHighPriority()
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 1;
 
-	printOnLog(Logger::LogLevel::INFO,
-			"UWCBR",
-			"sendPktHighPriority()::send a packet (" + to_string(ch->uid()) +
-					") with sn: " + to_string(uwcbrh->sn()));
+	log_msg << "sendPktHighPriority()::send a packet (" << ch->uid()
+			<< ") with sn: " << uwcbrh->sn();
+	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+
 	sendDown(p, delay);
 }
 
@@ -385,10 +377,9 @@ UwCbrModule::recv(Packet *p)
 			// packet is out of sequence and is to be discarded
 			incrPktOoseq();
 
-			std::stringstream msg;
-			msg << "recv(Packet *)::packet out of sequence sn = "
-				<< uwcbrh->sn() << " hrsn = " << hrsn << " esn = " << esn;
-			printOnLog(Logger::LogLevel::ERROR, "UWCBR", msg.str());
+			log_msg << "recv(Packet *)::packet out of sequence sn = "
+					<< uwcbrh->sn() << " hrsn = " << hrsn << " esn = " << esn;
+			printOnLog(Logger::LogLevel::ERROR, "UWCBR", log_msg.str());
 
 			drop(p, 1, UWCBR_DROP_REASON_OUT_OF_SEQUENCE);
 			return;
@@ -408,31 +399,27 @@ UwCbrModule::recv(Packet *p)
 
 	updateFTT(rftt);
 
-	/* a new packet has been received */
 	incrPktRecv();
 
 	hrsn = uwcbrh->sn();
 	if (drop_out_of_order_) {
-		if (uwcbrh->sn() > esn) { // packet losses are observed
+		if (uwcbrh->sn() > esn) {
 			incrPktLost(uwcbrh->sn() - (esn));
 		}
 	}
 
-	double dt = Scheduler::instance().clock() - lrtime;
+	double dt = NOW - lrtime;
 	updateThroughput(ch->size(), dt);
 
-	lrtime = Scheduler::instance().clock();
+	lrtime = NOW;
 
 	Packet::free(p);
 
 	if (drop_out_of_order_) {
 		if (pkts_lost + pkts_recv + pkts_last_reset != hrsn) {
-			fprintf(stderr,
-					"ERROR CbrModule::recv() pkts_lost=%d  pkts_recv=%d  "
-					"hrsn=%d\n",
-					pkts_lost,
-					pkts_recv,
-					hrsn);
+			log_msg << "recv(Packet *)::pkts_lost = " << pkts_lost
+					<< " pkts_recv = " << pkts_recv << " hrsn = " << hrsn;
+			printOnLog(Logger::LogLevel::ERROR, "UWCBR", log_msg.str());
 		}
 	}
 }
@@ -462,8 +449,9 @@ UwCbrModule::GetRTTstd() const
 		double var =
 				(sumrtt2 - (sumrtt * sumrtt / rttsamples)) / (rttsamples - 1);
 		return (sqrt(var));
-	} else
-		return 0;
+	}
+
+	return 0;
 }
 
 double
@@ -474,11 +462,9 @@ UwCbrModule::GetFTTstd() const
 		var = (sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
 		if (var > 0)
 			return (sqrt(var));
-		else
-			return 0;
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 double
@@ -486,9 +472,9 @@ UwCbrModule::GetPER() const
 {
 	if ((pkts_recv + pkts_lost) > 0) {
 		return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 double
@@ -572,14 +558,14 @@ UwCbrModule::getTimeBeforeNextPkt()
 		fprintf(stderr, "%s : Error : period <= 0", __PRETTY_FUNCTION__);
 		exit(1);
 	}
+
 	if (PoissonTraffic_) {
 		double u = RNG::defaultrng()->uniform_double();
 		double lambda = 1 / period_;
 		return (-log(u) / lambda);
-	} else {
-		// CBR
-		return period_;
 	}
+
+	return period_;
 }
 
 void
