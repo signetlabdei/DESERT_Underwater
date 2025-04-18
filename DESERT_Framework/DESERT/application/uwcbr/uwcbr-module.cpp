@@ -42,12 +42,12 @@
 #include <iostream>
 #include <rng.h>
 #include <stdint.h>
+#include <string>
 
 extern packet_t PT_UWCBR;
 
 int hdr_uwcbr::offset_; /**< Offset used to access in <i>hdr_uwcbr</i> packets
 						   header. */
-std::stringstream UwCbrModule::log_msg;
 
 /**
  * Adds the header for <i>hdr_uwcbr</i> packets in ns2.
@@ -283,9 +283,10 @@ UwCbrModule::sendPkt()
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
-	log_msg << "sendPkt()::send a packet (" << ch->uid()
-			<< ") with sn: " << uwcbrh->sn();
-	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPkt()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 
 	sendDown(p, delay);
 }
@@ -300,9 +301,10 @@ UwCbrModule::sendPktLowPriority()
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 0;
 
-	log_msg << "sendPktLowPriority()::send a packet (" << ch->uid()
-			<< ") with sn: " << uwcbrh->sn();
-	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPktLowPriority()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 
 	sendDown(p, delay);
 }
@@ -317,9 +319,10 @@ UwCbrModule::sendPktHighPriority()
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	uwcbrh->priority() = 1;
 
-	log_msg << "sendPktHighPriority()::send a packet (" << ch->uid()
-			<< ") with sn: " << uwcbrh->sn();
-	printOnLog(Logger::LogLevel::INFO, "UWCBR", log_msg.str());
+	printOnLog(Logger::LogLevel::INFO,
+			"UWCBR",
+			"sendPktHighPriority()::send a packet (" + to_string(ch->uid()) +
+					") with sn: " + to_string(uwcbrh->sn()));
 
 	sendDown(p, delay);
 }
@@ -377,9 +380,11 @@ UwCbrModule::recv(Packet *p)
 			// packet is out of sequence and is to be discarded
 			incrPktOoseq();
 
-			log_msg << "recv(Packet *)::packet out of sequence sn = "
-					<< uwcbrh->sn() << " hrsn = " << hrsn << " esn = " << esn;
-			printOnLog(Logger::LogLevel::ERROR, "UWCBR", log_msg.str());
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWCBR",
+					"recv(Packet *)::packet out of sequence sn = " +
+							to_string(uwcbrh->sn()) + " hrsn = " +
+							to_string(hrsn) + " esn = " + to_string(esn));
 
 			drop(p, 1, UWCBR_DROP_REASON_OUT_OF_SEQUENCE);
 			return;
@@ -417,9 +422,12 @@ UwCbrModule::recv(Packet *p)
 
 	if (drop_out_of_order_) {
 		if (pkts_lost + pkts_recv + pkts_last_reset != hrsn) {
-			log_msg << "recv(Packet *)::pkts_lost = " << pkts_lost
-					<< " pkts_recv = " << pkts_recv << " hrsn = " << hrsn;
-			printOnLog(Logger::LogLevel::ERROR, "UWCBR", log_msg.str());
+
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWCBR",
+					"recv(Packet *)::pkts_lost = " + to_string(pkts_lost) +
+							" pkts_recv = " + to_string(pkts_recv) +
+							" hrsn = " + to_string(hrsn));
 		}
 	}
 }

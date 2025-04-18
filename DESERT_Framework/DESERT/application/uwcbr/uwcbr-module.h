@@ -264,7 +264,6 @@ public:
 
 protected:
 	static int uidcnt_; /**< Unique id of the packet generated. */
-	static std::stringstream log_msg;
 
 	uint16_t dstPort_; /**< Destination port. */
 	std::string log_suffix; /**< Possibility to insert a log suffix */
