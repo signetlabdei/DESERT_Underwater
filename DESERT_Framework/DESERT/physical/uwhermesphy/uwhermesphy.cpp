@@ -37,6 +37,9 @@
  */
 
 #include "uwhermesphy.h"
+#include "rng.h"
+#include "mac.h"
+#include "phymac-clmsg.h"
 #include <fstream>
 #include <sstream>
 
