@@ -39,39 +39,42 @@
 #include "uwphysical.h"
 #include "uwphy-clmsg.h"
 #include "uwstats-utilities.h"
+#include <mac.h>
+#include <phymac-clmsg.h>
+#include <sstream>
+#include <string>
 
 UwPhysicalStats::UwPhysicalStats()
-	:
-      Stats(),
-	  last_rx_power(0),
-	  last_noise_power(0),
-	  instant_noise_power(0),
-	  last_interf_power(0),
-	  last_sinr(0),
-	  last_ber(0),
-	  last_per(0),
-	  has_error(false)
+	: Stats()
+	, has_error(false)
+	, last_rx_power(0)
+	, last_noise_power(0)
+	, instant_noise_power(0)
+	, last_interf_power(0)
+	, last_sinr(0)
+	, last_ber(0)
+	, last_per(0)
 {
-	type_id = (int)StatsEnum::STATS_PHY_LAYER;
+	type_id = (int) StatsEnum::STATS_PHY_LAYER;
 }
 UwPhysicalStats::UwPhysicalStats(int mod_id, int stck_id)
-	:
-    Stats(mod_id,stck_id),
-	last_rx_power(0),
-	last_noise_power(0),
-	instant_noise_power(0),
-	last_interf_power(0),
-	last_sinr(0),
-	last_ber(0),
-	last_per(0),
-	has_error(false)
+	: Stats(mod_id, stck_id)
+	, has_error(false)
+	, last_rx_power(0)
+	, last_noise_power(0)
+	, instant_noise_power(0)
+	, last_interf_power(0)
+	, last_sinr(0)
+	, last_ber(0)
+	, last_per(0)
 {
-	type_id = (int)StatsEnum::STATS_PHY_LAYER;
+	type_id = (int) StatsEnum::STATS_PHY_LAYER;
 }
 
 void
-UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double noise_pwr, double interf_pwr,
-		double sinr, double ber, double per, bool error)
+UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr,
+		double noise_pwr, double interf_pwr, double sinr, double ber,
+		double per, bool error)
 {
 	module_id = mod_id;
 	stack_id = stck_id;
@@ -85,12 +88,11 @@ UwPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double nois
 	has_error = error;
 }
 
-Stats*
+Stats *
 UwPhysicalStats::clone() const
 {
-	return new UwPhysicalStats( *this );
+	return new UwPhysicalStats(*this);
 }
-
 
 static class UwPhysicalClass : public TclClass
 {
@@ -113,18 +115,17 @@ UnderwaterPhysical::UnderwaterPhysical()
 	, Rx_Time_(0)
 	, Energy_Tx_(0)
 	, Energy_Rx_(0)
+	, Transmitted_bytes_(0)
 	, tx_power_(3.3)
 	, rx_power_(0.620)
-	, Interference_Model("CHUNK")
-	, tot_ctrl_pkts_lost(0)
 	, tot_pkts_lost(0)
-	, Transmitted_bytes_(0)
+	, tot_ctrl_pkts_lost(0)
 	, errorCtrlPktsInterf(0)
 	, collisionDataCTRL(0)
 	, collisionCTRL(0)
 	, collisionDATA(0)
+	, Interference_Model("CHUNK")
 	, interference_(nullptr)
-	// int collisionDATA;
 {
 	bind("rx_power_consumption_", &rx_power_);
 	bind("tx_power_consumption_", &tx_power_);
@@ -144,24 +145,18 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "getTxTime") == 0) {
-			// return Get_Tx_Time();
 			tcl.resultf("%f", Get_Tx_Time());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getRxTime") == 0) {
-			// return Get_Rx_Time();
 			tcl.resultf("%f", Get_Rx_Time());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getConsumedEnergyTx") == 0) {
-			// return Get_Energy_Tx();
 			tcl.resultf("%f", Get_Energy_Tx());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getConsumedEnergyRx") == 0) {
-			// return Get_Energy_Rx();
 			tcl.resultf("%f", Get_Energy_Rx());
-			;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getTransmittedBytes") == 0) {
-			// return Get_Energy_Rx();
 			tcl.resultf("%f", Get_Transmitted_bytes());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getTotPktsLost") == 0) {
@@ -191,20 +186,21 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 							modulation_name_ != "8PSK" &&
 							modulation_name_ != "16PSK" &&
 							modulation_name_ != "32PSK")) {
-				std::cerr << "Empty or wrong name for the modulation scheme"
-						  << std::endl;
+				tcl.result("Empty or wrong name for the modulation scheme");
 				return TCL_ERROR;
 			}
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setInterferenceModel") == 0) {
 			Interference_Model = (std::string) argv[2];
 			if (Interference_Model != "CHUNK" &&
 					Interference_Model != "MEANPOWER") {
-				std::cerr << "Empty or wrong name of the Interference Model: "
-							 "CHUNK or MEANPOWER are valid interference models"
-						  << std::endl;
+				tcl.result(
+						"Empty or wrong name of the Interference Model: "
+						"CHUNK or MEANPOWER are valid interference models");
 				return TCL_ERROR;
 			}
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setInterference") == 0) {
 			interference_ =
@@ -212,19 +208,20 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			if (!interference_) {
 				return TCL_ERROR;
 			}
+
 			return TCL_OK;
 		}
 	}
 	return UnderwaterMPhyBpsk::command(argc, argv);
 } /* UnderwaterPhysical::command */
 
-void UnderwaterPhysical::recv(Packet *p)
+void
+UnderwaterPhysical::recv(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 
-	if (ch->direction() == hdr_cmn::UP)
-	{
+	if (ch->direction() == hdr_cmn::UP) {
 		ph->dstSpectralMask = getRxSpectralMask(p);
 		ph->dstPosition = getPosition();
 		ph->dstAntenna = getRxAntenna(p);
@@ -237,37 +234,28 @@ void UnderwaterPhysical::recv(Packet *p)
 		p->txinfo_.RxPr = 0;
 		p->txinfo_.CPThresh = 0;
 
-		if (ph->Pr > 0)
-		{
+		if (ph->Pr > 0) {
 			ph->Pn = getNoisePower(p);
 
-			if (interference_)
-			{
+			if (interference_) {
 				interference_->addToInterference(p);
 			}
 
 			ph->rxtime = NOW;
 			ph->worth_tracing = true;
 
-			if (isOn == true)
-			{
+			if (isOn == true) {
 				PacketEvent *pe = new PacketEvent(p);
 				Scheduler::instance().schedule(&rxtimer, pe, ph->duration);
 
 				startRx(p);
-			}
-			else
-			{
+			} else {
 				Packet::free(p);
 			}
-		}
-		else
-		{
+		} else {
 			Packet::free(p);
 		}
-	}
-	else
-	{ // Direction DOWN
+	} else { // Direction DOWN
 		assert(isOn);
 
 		ph->Pr = 0;
@@ -301,7 +289,8 @@ void UnderwaterPhysical::recv(Packet *p)
 	}
 } /* UnderwaterPhysical::recv */
 
-void UnderwaterPhysical::endTx(Packet *p)
+void
+UnderwaterPhysical::endTx(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
@@ -326,41 +315,43 @@ UnderwaterPhysical::startRx(Packet *p)
 	sendSyncClMsg(&msg);
 	mac_addr = msg.getAddr();
 
-	if ((PktRx == 0) && (txPending == false)) {
+	if ((PktRx == 0) && !txPending) {
 		// The receiver is is not synchronized on any transmission
 		// so we can sync on this packet
+		std::stringstream log_sstr;
 		double snr_dB = 10 * log10(ph->Pr / ph->Pn);
-		if (debug_)
-			std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-					  << ")::startRx() "
-					  << "snr_dB = " << snr_dB
-					  << "; AcquisitionThreshold_dB_ = "
-					  << getAcquisitionThreshold() << " pr "
-					  << 10 * log10(ph->Pr) << " pn " << 10 * log10(ph->Pn)
-					  << " end " << NOW + ph->duration << " src "
-					  << HDR_CMN(p)->prev_hop_ << " dest "
-					  << HDR_CMN(p)->next_hop() << " size "
-					  << HDR_CMN(p)->size() << std::endl;
+
+		log_sstr << "startRx(Packet *)::"
+				 << "snr_dB = " << snr_dB
+				 << "; AcquisitionThreshold_dB_ = " << getAcquisitionThreshold()
+				 << " pr " << 10 * log10(ph->Pr) << " pn " << 10 * log10(ph->Pn)
+				 << " end " << NOW + ph->duration << " src "
+				 << HDR_CMN(p)->prev_hop_ << " dest " << HDR_CMN(p)->next_hop()
+				 << " size " << HDR_CMN(p)->size();
+		printOnLog(Logger::LogLevel::DEBUG, "UWPHY", log_sstr.str());
+
 		if (snr_dB > getAcquisitionThreshold()) {
 			if (ph->modulationType == modid) {
 				// This is a BPSK packet so we sync on it
 				PktRx = p;
 				// Notify the MAC
 				Phy2MacStartRx(p);
-				if (debug_)
-					std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-							  << ")::startRx() "
-							  << " sync on PktRx = " << PktRx << " end "
-							  << NOW + HDR_CMN(p)->txtime() << " src "
-							  << HDR_CMN(p)->prev_hop_ << " dest "
-							  << HDR_CMN(p)->next_hop() << " size "
-							  << HDR_CMN(p)->size() << std::endl;
+
+				log_sstr.str("");
+				log_sstr << "startRx(Packet *)::"
+						 << "sync on PktRx = " << PktRx << " end "
+						 << NOW + HDR_CMN(p)->txtime() << " src "
+						 << HDR_CMN(p)->prev_hop_ << " dest "
+						 << HDR_CMN(p)->next_hop() << " size "
+						 << HDR_CMN(p)->size();
+				printOnLog(Logger::LogLevel::DEBUG, "UWPHY", log_sstr.str());
+
 				return;
 			} else {
-				if (debug_)
-					std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-							  << ")::startRx() dropping pkt, wrong mod id"
-							  << std::endl;
+				printOnLog(Logger::LogLevel::DEBUG,
+						"UWPHY",
+						"startRx(Packet *)::dropping pkt, wrong modid");
+
 				if ((mach->macDA() == mac_addr) &&
 						(mach->ftype() != MF_CONTROL)) {
 					incrTot_pkts_lost();
@@ -370,10 +361,10 @@ UnderwaterPhysical::startRx(Packet *p)
 				}
 			}
 		} else {
-			if (debug_)
-				std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-						  << ")::startRx() dropping pkt, below threshold"
-						  << std::endl;
+			printOnLog(Logger::LogLevel::DEBUG,
+					"UWPHY",
+					"startRx(Packet *)::dropping pkt, below threshold");
+
 			incrErrorPktsNoise();
 			if (mach->ftype() != MF_CONTROL) {
 				incrTot_pkts_lost();
@@ -381,10 +372,11 @@ UnderwaterPhysical::startRx(Packet *p)
 				incrTotCrtl_pkts_lost();
 			}
 		}
-	} else if (txPending == true) {
-		if (debug_)
-			std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-					  << ")::startRx() dropping pkt, tx pending" << std::endl;
+	} else if (txPending) {
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWPHY",
+				"startRx(Packet *)::dropping pkt, tx pending");
+
 		if (mach->ftype() != MF_CONTROL) {
 			incrTot_pkts_lost();
 		}
@@ -401,17 +393,15 @@ UnderwaterPhysical::startRx(Packet *p)
 } /* UnderwaterPhysical::startRx */
 
 void
-UnderwaterPhysical::endRx(Packet *p){
+UnderwaterPhysical::endRx(Packet *p)
+{
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_mac *mach = HDR_MAC(p);
 	counter interferent_pkts;
 
-	static int mac_addr = -1;
-
 	ClMsgPhy2MacAddr msg;
 	sendSyncClMsg(&msg);
-	mac_addr = msg.getAddr();
 
 	if (PktRx != 0) {
 		if (PktRx == p) {
@@ -435,9 +425,9 @@ UnderwaterPhysical::endRx(Packet *p){
 						error_ni = x <= per_ni;
 					} else {
 						for (PowerChunkList::const_iterator itInterf =
-								 power_chunk_list.begin();
-							 itInterf != power_chunk_list.end();
-							 itInterf++) {
+										power_chunk_list.begin();
+								itInterf != power_chunk_list.end();
+								itInterf++) {
 							int nbits2 = itInterf->second * BitRate_;
 							interference_power = itInterf->first;
 							sinr = ph->Pr / (ph->Pn + itInterf->first);
@@ -457,9 +447,12 @@ UnderwaterPhysical::endRx(Packet *p){
 					ber_ni = getPER(sinr, 1, p);
 					error_ni = x <= per_ni;
 				} else {
-					std::cerr << "Please choose the right interference model "
-								 "to use: CHUNK or MEANPOWER"
-							  << std::endl;
+					printOnLog(Logger::LogLevel::ERROR,
+							"UWPHY",
+							"endRx(Packet *)::Please choose the right "
+							"interference model "
+							"to use: CHUNK or MEANPOWER");
+
 					exit(1);
 				}
 				interferent_pkts = interference_->getCounters(p);
@@ -476,40 +469,49 @@ UnderwaterPhysical::endRx(Packet *p){
 				error_n = error_ni;
 				error_ni = 0; // error transfered on noise
 			}
-			//update stats and trigger the modules that collect the stats
+			// update stats and trigger the modules that collect the stats
 			auto uwphystats = dynamic_cast<UwPhysicalStats *>(stats_ptr);
 			if (uwphystats) {
-				uwphystats->updateStats(getId(),getStackId(), ph->Pr,
-				 ph->Pn, interference_power, sinr, ber_ni, per_ni,
-				(error_n > 0 || error_ni > 0));
+				uwphystats->updateStats(getId(),
+						getStackId(),
+						ph->Pr,
+						ph->Pn,
+						interference_power,
+						sinr,
+						ber_ni,
+						per_ni,
+						(error_n > 0 || error_ni > 0));
 			}
 			ClMsgTriggerStats m = ClMsgTriggerStats();
 			sendSyncClMsg(&m);
 
 			if (time_ready_to_end_rx_ > Scheduler::instance().clock()) {
 				Rx_Time_ = Rx_Time_ + ph->duration - time_ready_to_end_rx_ +
-						   Scheduler::instance().clock();
+						Scheduler::instance().clock();
 			} else {
 				Rx_Time_ += ph->duration;
 			}
 			time_ready_to_end_rx_ =
-				Scheduler::instance().clock() + ph->duration;
+					Scheduler::instance().clock() + ph->duration;
 			Energy_Rx_ += consumedEnergyRx(ph->duration);
 			ch->error() = error_n || error_ni;
 			if (debug_) {
 				if (error_ni == 1) {
-					if (debug_){
-					std::cout
-						<< NOW << "  UnderwaterPhysical(" << mac_addr
-						<< ")::endRx() packet " << ch->uid()
-						<< " contains errors due to noise and interference."
-						<< std::endl;
+					if (debug_) {
+						printOnLog(Logger::LogLevel::ERROR,
+								"UWPHY",
+								"endRx(Packet *)::packet " +
+										to_string(ch->uid()) +
+										" contains errors due to noise and "
+										"interference.");
 					}
 				} else if (error_n == 1) {
-					if (debug_){
-					std::cout << NOW << "  UnderwaterPhysical(" << mac_addr
-							  << ")::endRx() packet " << ch->uid()
-							  << " contains errors due to noise." << std::endl;
+					if (debug_) {
+						printOnLog(Logger::LogLevel::ERROR,
+								"UWPHY",
+								"endRx(Packet *)::packet " +
+										to_string(ch->uid()) +
+										" contains errors due to noise");
 					}
 				}
 			}
@@ -573,31 +575,33 @@ UnderwaterPhysical::getPER(double _snr, int _nbits, Packet *_p)
 				get_prob_error_symbol_mpsk(snr_with_penalty, M);
 	}
 
-	if (_nbits == 1) {return ber_;}
+	if (_nbits == 1) {
+		return ber_;
+	}
 	// PER calculation
 	return 1 - pow(1 - ber_, _nbits);
 } /* UnderwaterPhysical::getPER */
 
-
-int UnderwaterPhysical::recvSyncClMsg(ClMessage* m)
+int
+UnderwaterPhysical::recvSyncClMsg(ClMessage *m)
 {
-	if (m->type() == CLMSG_UWPHY_LOSTPKT)
-	{
-		int lost_packet = ((ClMsgUwPhyGetLostPkts*)m)->isControl() ?
-			getTot_CtrlPkts_lost() : getTot_pkts_lost();
-		((ClMsgUwPhyGetLostPkts*)m)->setLostPkts(lost_packet);
+	if (m->type() == CLMSG_UWPHY_LOSTPKT) {
+		int lost_packet = ((ClMsgUwPhyGetLostPkts *) m)->isControl()
+				? getTot_CtrlPkts_lost()
+				: getTot_pkts_lost();
+		((ClMsgUwPhyGetLostPkts *) m)->setLostPkts(lost_packet);
 		return 0;
 	}
-	if (m->type() == CLMSG_STATS)
-	{
+	if (m->type() == CLMSG_STATS) {
 		updateInstantaneousStats();
-		(dynamic_cast<ClMsgStats*>(m))->setStats(stats_ptr);
+		(dynamic_cast<ClMsgStats *>(m))->setStats(stats_ptr);
 		return 0;
 	}
 	return UnderwaterMPhyBpsk::recvSyncClMsg(m);
 }
 
-void UnderwaterPhysical::updateInstantaneousStats()
+void
+UnderwaterPhysical::updateInstantaneousStats()
 {
 	Packet *temp = Packet::alloc();
 	hdr_MPhy *ph = HDR_MPHY(temp);
@@ -612,7 +616,7 @@ void UnderwaterPhysical::updateInstantaneousStats()
 	ph->srcPosition = getPosition();
 	assert(ph->srcSpectralMask);
 
-	(dynamic_cast<UwPhysicalStats*>(stats_ptr))->instant_noise_power =
-		getNoisePower(temp);
+	(dynamic_cast<UwPhysicalStats *>(stats_ptr))->instant_noise_power =
+			getNoisePower(temp);
 	Packet::free(temp);
 }
