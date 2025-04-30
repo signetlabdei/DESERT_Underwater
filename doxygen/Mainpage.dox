@@ -664,6 +664,17 @@ DESERT compilation and linking is based on autotools, hence to add a new library
 
 \endcode
 
+Once everything is ready, we need to reinstall DESERT to properly add the new module.
+
+Note: After the module is installed, we can recompile it without reinstalling everything. In our case, we would need to do the following:
+\code{.sh}
+
+	cd DESERT_buildCopy_LOCAL/.buildHost/DESERT/physical/uwcoolphy/
+	make && make install
+
+\endcode
+
+
 \subsection cmdMet The command method
 Finally, inside a tcl script we can use our module by:
 
