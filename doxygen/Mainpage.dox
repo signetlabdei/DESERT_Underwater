@@ -698,7 +698,7 @@ It must be declared in this way, in your module class (`uwcoolphy.h`)
 
 \code{.cpp}
 
-	virtual int command(int argc, const char *const *rgv);
+	virtual int command(int argc, const char *const *argv);
 
 \endcode
 And then it should be defined in this way (inside `uwcoolphy.cpp`)
@@ -718,6 +718,84 @@ And then it should be defined in this way (inside `uwcoolphy.cpp`)
 	}
 
 \endcode
+
+\subsection pLog The printOnLog method
+<blockquote>
+Note that this is a new feature (version > 3.5.1), and only the following modules implement it:
+
+- UwCbrModule
+- UwUdp
+- UWIPModule
+- UwStaticRoutingModule
+- CsmaAloha
+- UnderwaterPhysical
+
+Before DESERT 3.5.1: in order to print log messages, you need to define a `debug_` parameter on your module and bind it to tcl inside the constructor.
+Every time you want to print a log message, then you need to check this value is set and then use cout to print your message.
+</blockquote>
+Inside nsmiracle there is a logger class used to print log messages either to console or to a file.
+The main parameter of this class is the `log_level`, which lets you specify the level of messages you want. It takes three possible values:
+
+<small>
+
+	 ERROR: only error messages will be generated.
+	 INFO : general info about the algorithms running and also ERROR messages.
+	 DEBUG: details that allow to understand the execution flow plus both ERROR and INFO messages are shown.
+
+</small>
+
+The PlugIn class provides the APIs to use the logger, in particular, the method `printOnLog`, defined as follows:
+
+\code{.cpp}
+
+	virtual void printOnLog(Logger::LogLevel level, const std::string &module, const std::string &message) const;
+
+\endcode
+
+Note that, since this method is defined in the PlugIn class, every DESERT module will inherit it.
+This method takes three parameter: (i) the log level of the message (if greater than logger `log_level`, the message will be printed), (ii) the name of the module printing it and (iii) a string representing the log message.
+
+As an example, suppose you have a method to handle packets reception that you would like to track, you can do it as follows:
+
+\code{.cpp}
+
+	void
+	UwCoolPhy::startRx(Packet *p)
+	{
+		...
+		printOnLog(Logger:LogLevel:DEBUG, "UWCOOLPHY", "startRX(Packet *)::Received new packet");
+		...
+	}
+
+\endcode
+
+Regarding the tcl side, the PlugIn class provides the following commands:
+
+\code{.cpp}
+	setLogLevel <log_level>				// Set the logger level (1, 2 or 3)
+	setLogFile  <file_name>				// Set the logger file name
+	setLog		<log_level> <file_name>	// Set both the logger level and file name
+	enableLog							// Enable log on a specific module
+	disableLog							// Disable log on a specific module
+\endcode
+
+Note that all the modules in a given simulation, share the same instance of the logger, meaning, that the `log_level` and `log_file` can be set just once.
+For instance, suppose, you have a tcl file, with one transmitting node and one sink node, you can set the logger for the sink physical layer only as follows:
+
+\code{.tcl}
+	proc createSink { } {
+		...
+		set phy_data_sink [new Module/UW/CoolPhy]
+		....
+		$phy_data_sink setLog 3 "log_output"
+		...
+	}
+\endcode
+
+It will print all the `coolphy` log messages inside a file called `log_output`.
+Note that each message has an id associated, which is the ns is of the node and is incremental set, e.g., the first node created will have id 0, the second id 1 and so on.
+
+Note: You can find a thorough example on how to use the logger inside `DESERT/samples/desert_samples/logger/` folder.
 
 \section newheader How to add a new Packet headers
 
@@ -928,7 +1006,7 @@ Let us now have a deeper look at the script. We focus first on the main block:
 
 \endcode
 
-Notice the **host*** directive.
+Notice the ***host*** directive.
 This tells the installation script to compile the libraries for the current host.
 If you need to modify this script to cross-compile for a different target, substitute all lines with the following ones:
 
