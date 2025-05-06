@@ -614,6 +614,7 @@ CsmaAloha::Phy2MacEndRx(Packet *p)
 
 		refreshReason(CSMA_REASON_PKT_ERROR);
 		drop(p, 1, CSMA_DROP_REASON_ERROR);
+		// Next line is needed just to update the current state
 		stateRxPacketNotForMe(NULL);
 	} else {
 		if (dest_mac == addr || dest_mac == MAC_BROADCAST) {
@@ -660,13 +661,15 @@ CsmaAloha::txAck(int dest_addr)
 void
 CsmaAloha::stateRxPacketNotForMe(Packet *p)
 {
-	printOnLog(Logger::LogLevel::ERROR,
-			"CSMA_ALOHA",
-			"stateRxPacketNotForMe(Packet *)::dropping packet for another "
-			"address");
+	// Check if packet already dropped because it was corrupted
+	if (p != NULL) {
+		printOnLog(Logger::LogLevel::ERROR,
+				"CSMA_ALOHA",
+				"stateRxPacketNotForMe(Packet *)::dropping packet for another "
+				"address");
 
-	if (p != NULL)
-		Packet::free(p);
+			Packet::free(p);
+	}
 
 	refreshState(CSMA_STATE_WRONG_PKT_RX);
 
