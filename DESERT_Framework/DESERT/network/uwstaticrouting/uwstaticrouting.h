@@ -103,7 +103,7 @@ public:
 	/**
 	 * Removes all the routing information.
 	 */
-	inline virtual void clearRoutes() { routing_table.clear(); }
+	virtual void clearRoutes() { routing_table.clear(); }
 
 	/**
 	 * Adds a new entry in the routing table.
