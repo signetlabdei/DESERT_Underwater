@@ -42,10 +42,11 @@
 #ifndef _UWUDP_H_
 #define _UWUDP_H_
 
+#include <sstream>
 #include <uwip-module.h>
 
-#include <module.h>
 #include <map>
+#include <module.h>
 #include <set>
 
 #define DROP_UNKNOWN_PORT_NUMBER \
@@ -56,6 +57,8 @@
 #define HDR_UWUDP(P) (hdr_uwudp::access(P))
 
 extern packet_t PT_UWUDP;
+
+typedef std::map<uint8_t, std::set<int>> map_packets_el;
 
 /**
  * <i>hdr_uwudp</i> describes <i>UWUDP</i> packets.
@@ -69,13 +72,13 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static struct hdr_uwudp *
+	static struct hdr_uwudp *
 	access(const Packet *p)
 	{
 		return (struct hdr_uwudp *) p->access(offset_);
@@ -84,7 +87,7 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the sport_ variable.
 	 */
-	inline uint8_t &
+	uint8_t &
 	sport()
 	{
 		return sport_;
@@ -93,7 +96,7 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the dport_ variable.
 	 */
-	inline uint8_t &
+	uint8_t &
 	dport()
 	{
 		return dport_;
@@ -115,14 +118,14 @@ public:
 	/**
 	 * Destructor of UwUdp class.
 	 */
-	virtual ~UwUdp();
+	virtual ~UwUdp() = default;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
-	virtual void recv(Packet *);
+	virtual void recv(Packet *) override;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
@@ -130,7 +133,7 @@ public:
 	 * @param Packet* Pointer to the packet will be received.
 	 * @param Handler* Handler.
 	 */
-	virtual void recv(Packet *, int);
+	virtual void recv(Packet *, int) override;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -142,7 +145,7 @@ public:
 	 * successfully or not.
 	 *
 	 */
-	virtual int command(int, const char *const *);
+	virtual int command(int, const char *const *) override;
 
 	/**
 	 * Associates a module with a port.
@@ -155,7 +158,7 @@ public:
 	/**
 	 * Prints the IDs of the packet's headers defined by UWUDP.
 	 */
-	inline void
+	void
 	printIdsPkts() const
 	{
 		std::cout << "UWUDP packets IDs:" << std::endl;
@@ -164,28 +167,25 @@ public:
 
 protected:
 	uint16_t portcounter; /**< Counter used to generate new port numbers. */
-	map<int, int> port_map; /**< Map: value = port;  key = id. */
-	map<int, int> id_map; /**< Map: value = id;    key = port. */
-
-	typedef std::map<uint8_t, std::set<int> > map_packets_el;
-	std::
-			map<uint16_t, map_packets_el>
-					map_packets; /**< Map used to keep track of the packets
-									received by each port. The key is the port
-									number. The second element
-															contains the saddr
-									IP and a vector used as bucketlist.*/
-
-	int drop_duplicated_packets_; /**< Flat to enable or disable the drop of
+	int drop_duplicated_packets_; /**< Flag to enable or disable the drop of
 									 duplicated packets. */
-	int debug_; /**< Flag to enable or disable dirrefent levels of debug. */
+	int debug_; /**< Flag to enable or disable debug. */
+	std::map<int, int> port_map; /**< Map application module id to port number
+									(id, port_number). */
+	std::map<int, int> id_map; /**< Map port number to application module id
+								  (port_number, id). */
+	std::map<uint16_t, map_packets_el>
+			map_packets; /**< Map used to keep track of the packets received by
+							each port. The key is the port number. The second
+							element contains the saddr IP and a vector used as
+							bucketlist.*/
 
 	/**
 	 * Returns the size in byte of a <i>hdr_uwudp</i> packet header.
 	 *
 	 * @return The size of a <i>hdr_uwudp</i> packet header.
 	 */
-	static inline int
+	static int
 	getUdpHeaderSize()
 	{
 		return sizeof(hdr_uwudp);

@@ -39,19 +39,16 @@
 #ifndef CSMA_H
 #define CSMA_H
 
-#include <mmac.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
 #include <fstream>
+#include <map>
+#include <queue>
+#include <string>
 
 #include <mphy.h>
+#include <mmac.h>
 
 #define CSMA_DROP_REASON_WRONG_STATE                                         \
-	"WST" /**< The protocol cannot receive this kind of packet in this state \
-			 */
+	"WST" /**< Cannot receive packets in this state */
 #define CSMA_DROP_REASON_WRONG_RECEIVER \
 	"WRCV" /**< The packet is for another node */
 #define CSMA_DROP_REASON_UNKNOWN_TYPE \
@@ -75,7 +72,7 @@ public:
 	/**
 	 * Destructor of the CsmaAloha class
 	 */
-	virtual ~CsmaAloha();
+	virtual ~CsmaAloha() = default;
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 *
@@ -86,15 +83,7 @@ public:
 	 *successfully or not.
 	 *
 	 **/
-	virtual int command(int argc, const char *const *argv);
-	/**
-	 * Cross-Layer messages interpreter
-	 *
-	 * @param ClMessage* an instance of ClMessage that represent the message
-	 * received
-	 * @return <i>0</i> if successful.
-	 */
-	virtual int crLayCommand(ClMessage *m);
+	virtual int command(int argc, const char *const *argv) override;
 
 protected:
 	static const double prop_speed; /**< Typical sound propagation speed in
@@ -181,9 +170,7 @@ protected:
 		/**
 		 * Destructor of the AlohaTimer class
 		 */
-		virtual ~AlohaTimer()
-		{
-		}
+		virtual ~AlohaTimer() = default;
 
 		/**
 		 * Freezes the timer
@@ -281,7 +268,6 @@ protected:
 		 * Checks if the timer is ACTIVE
 		 * @return <i>true</i> or <i>false</i>
 		 */
-
 		bool
 		isActive()
 		{
@@ -292,7 +278,6 @@ protected:
 		/**
 		 * Resets the counter of the timer
 		 */
-
 		void
 		resetCounter()
 		{
@@ -302,7 +287,6 @@ protected:
 		/**
 		 * Increments the counter of the timer
 		 */
-
 		void
 		incrCounter()
 		{
@@ -313,9 +297,8 @@ protected:
 		 * Returns the counter of the timer
 		 * @return the value of the counter of the timer
 		 */
-
 		int
-		getCounter()
+		getCounter() const
 		{
 			return counter;
 		}
@@ -325,7 +308,7 @@ protected:
 		 * @return left duration of the timer
 		 */
 		double
-		getDuration()
+		getDuration() const
 		{
 			return left_duration;
 		}
@@ -359,9 +342,7 @@ protected:
 		/**
 		 * Destructor of DataTimer class
 		 */
-		virtual ~BackOffTimer()
-		{
-		}
+		virtual ~BackOffTimer() = default;
 
 	protected:
 		/**
@@ -389,9 +370,7 @@ protected:
 		/**
 		 * Destructor of AckTimer class
 		 */
-		virtual ~AckTimer()
-		{
-		}
+		virtual ~AckTimer() = default;
 
 	protected:
 		/**
@@ -421,9 +400,7 @@ protected:
 		/**
 		 * Destructor of AckTimer class
 		 */
-		virtual ~ListenTimer()
-		{
-		}
+		virtual ~ListenTimer() = default;
 
 	protected:
 		/**
@@ -438,43 +415,52 @@ protected:
 	 * @param Packet* pointer to the packet received
 	 *
 	 */
-	virtual void recvFromUpperLayers(Packet *p);
+	virtual void recvFromUpperLayers(Packet *p) override;
+
 	/**
 	 * Pass the packet to the PHY layer
 	 * @param Packet* Pointer to an object of type Packet that represent the
 	 * Packet to transmit
 	 */
 	virtual void Mac2PhyStartTx(Packet *p);
+
 	/**
 	 * Method called when the PHY layer finish to transmit the packet.
 	 * @param Packet* Pointer to an object of type Packet that represent the
 	 * Packet transmitted
 	 */
-	virtual void Phy2MacEndTx(const Packet *p);
+	virtual void Phy2MacEndTx(const Packet *p) override;
+
 	/**
 	 * Method called when the Phy Layer start to receive a Packet
 	 * @param const Packet* Pointer to an object of type Packet that represent
 	 * the Packet that is in reception
 	 */
-	virtual void Phy2MacStartRx(const Packet *p);
+	virtual void Phy2MacStartRx(const Packet *p) override;
+
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet
 	 * @param Packet* Pointer to an object of type Packet that represent the
 	 * Packet received
 	 */
-	virtual void Phy2MacEndRx(Packet *p);
+	virtual void Phy2MacEndRx(Packet *p) override;
+
 	/**
 	 * Compute the time needed to transmit the packet (using a CrLayerMessage to
 	 * ask the PHY to perform the computation)
 	 * @param CMSA_PKT_TYPE Type of the packet
 	 */
 	virtual double computeTxTime(CSMA_PKT_TYPE type);
+
 	/**
 	 * Init the packet with the MAC address of the receiver and the sender,
 	 * the size of the packet and the type
-	 * @param UWPOLLING_PKT_TYPE the type of the packet
+	 * @param Packet* Pointer to a Packet to initialize
+	 * @param CSMA_PKT_TYPE Type of the packet
+	 * @param int destination address
 	 */
 	virtual void initPkt(Packet *p, CSMA_PKT_TYPE pkt_type, int dest_addr = 0);
+
 	/**
 	 * compute the BackOff time as backoff =
 	 * backoff_tuner*random*2*ACK_timeout*2^(counter)
@@ -483,101 +469,118 @@ protected:
 	 * a multiplier factor chosen by the user
 	 */
 	virtual double getBackoffTime();
+
 	/**
 	 * Transmits the DATA packet (calling Mac2PhyStartTx) and increment the
 	 * counter of transmitted data packets
 	 */
 	virtual void txData();
+
 	/**
 	 * Transmits the ACK packet (calling Mac2PhyStartTx) and increment the
 	 * counter of transmitted ACK packets
 	 * @param in MAC address of the destination of ACK packet
 	 */
 	virtual void txAck(int dest_addr);
+
 	/**
 	 * IDLE state. Each variable is resetted
 	 */
 	virtual void stateIdle();
+
 	/**
 	 * A reception is occuring while the protocol is in IDLE state
 	 */
 	virtual void stateRxIdle();
+
 	/**
 	 * State in which the protocol allows the node to transmit a data packet
 	 */
 	virtual void stateTxData();
+
 	/**
 	 * State in which the protocol set-up the ACK packet to transmit
 	 * @param int MAC address of the destination of the ACK packet
 	 */
 	virtual void stateTxAck(int dest_addr);
+
 	/**
 	 * BackOff STATE. An ACK packet is lost. A backoff timer is set up. When the
 	 * timer expire
 	 * the protocol will re-send the data packet
 	 */
 	virtual void stateBackoff();
+
 	/**
 	 * State in which a reception is occurring while the protocol is in the
 	 * backoff state
 	 */
 	virtual void stateRxBackoff();
+
 	/**
 	 * State in which a DATA packet is sent. The time-out for receiving a ACK is
 	 * set-up
 	 */
 	virtual void stateWaitAck();
+
 	/**
 	 * State in which a reception is occuring while the node is waiting an ACK
 	 */
 	virtual void stateRxWaitAck();
+
 	/**
 	 * State in which the node is listening the channel
 	 */
 	virtual void stateListen();
+
 	/**
 	 * State in which a reception is occuring while the node is listening the
 	 * channel
 	 */
 	virtual void stateRxListen();
+
 	/**
 	 * Checks if the Listen period is expired
 	 */
 	virtual void stateCheckListenExpired();
+
 	/**
 	 * Checks if the ACK reception timer is expired
 	 */
 	virtual void stateCheckAckExpired();
+
 	/**
 	 * Checks if the Backoff period is expired
 	 */
 	virtual void stateCheckBackoffExpired();
+
 	/**
 	 * State in which a DATA packet is received
 	 */
 	virtual void stateRxData(Packet *p);
+
 	/**
 	 * state in which an ACK packet is received
 	 */
 	virtual void stateRxAck(Packet *p);
+
 	/**
 	 * state in which a wrong Packet is received
 	 */
 	virtual void stateRxPacketNotForMe(Packet *p);
+
 	/**
 	 * Prints in a file the textual information of the current state and the
 	 * transitions reasons
 	 * @param double time lapse from the call of the method and the effective
 	 * write process in the file (setted to zero by default)
 	 */
-
 	virtual void printStateInfo(double delay = 0);
+
 	/**
 	 * Initializes the protocol at the beginning of the simulation. This method
 	 * is called by
 	 * a command in tcl.
-	 * @param double delay
-	 * @see command method
 	 */
 	virtual void initInfo();
 
@@ -614,6 +617,7 @@ protected:
 	{
 		session_distance = distance;
 	}
+
 	/**
 	 * Checks if the data packet received is a double packet (using the serial
 	 * number of the packet)
@@ -641,6 +645,7 @@ protected:
 	{
 		curr_tx_rounds = 0;
 	}
+
 	/**
 	 * Update the RTT increasing the number of RTT samples and calculating the
 	 * smoothed RTT using
@@ -655,10 +660,11 @@ protected:
 	 * @return RTT value
 	 */
 	virtual double
-	getRTT()
+	getRTT() const
 	{
 		return (rttsamples > 0) ? sumrtt / rttsamples : 0;
 	}
+
 	/**
 	 * Updates the AckTimeout calling getRTT, where the ACK timeout is computed
 	 * as srtt/rttsamples using the smooth RTT
@@ -691,13 +697,6 @@ protected:
 	 * Resets the current session (e.g. the session distance)
 	 */
 	virtual void resetSession();
-	/**
-	 * Used for debug purposes. (Permit to have a "step by step" behavior of the
-	 * protocol)
-	 */
-	virtual void waitForUser();
-
-	// stats functions
 
 	/**
 	 * Return the number of packets not transmitted (remained in the protocol
@@ -706,7 +705,7 @@ protected:
 	 * @return the size of the queue at the end of the simulation
 	 */
 	virtual int
-	getRemainingPkts()
+	getRemainingPkts() override
 	{
 		return (up_data_pkts_rx - Q.size());
 	}
@@ -715,7 +714,7 @@ protected:
 	 * Increase the number of Data packet Received from the Upper layers
 	 */
 	virtual void
-	incrUpperDataRx()
+	incrUpperDataRx() override
 	{
 		up_data_pkts_rx++;
 	}
@@ -726,7 +725,6 @@ protected:
 		return up_data_pkts_rx;
 	}
 
-	///////////// input
 	int max_tx_tries; /**< Maximum number of transmissions for one packet */
 	double backoff_tuner; /**< Multiplier factor in the calculation of the
 							 backoff */
@@ -740,7 +738,6 @@ protected:
 	double alpha_; /**< smooth factor in the calculation of the RTT */
 	int max_backoff_counter; /**< Number of times a backoff is calculated */
 	double listen_time; /**< Time in which the node sense the channel */
-	//////////////
 
 	std::queue<Packet *> Q; /**< Packet queue */
 	std::queue<int>
@@ -754,17 +751,14 @@ protected:
 
 	bool TxActive; /**< flag that indicates if a transmission is occuring */
 	bool RxActive; /**< flag that indicates if a reception is occuring */
-	bool
-			session_active; /**< flag that indicates if a session (i.e. a
-							   transmission/reception activity is occuring)
-							   between two nodes */
-	bool
-			print_transitions; /**< flag that indicates if the protocol is
-								  enabled to print its state transitions on a
-								  file */
-	bool
-			has_buffer_queue; /**< flag that indicates if a node has a buffer
-								 where store DATA packets */
+	bool session_active; /**< flag that indicates if a session (i.e. a
+							transmission/reception activity is occuring)
+							between two nodes */
+	bool print_transitions; /**< flag that indicates if the protocol is
+							   enabled to print its state transitions on a
+							   file */
+	bool has_buffer_queue; /**< flag that indicates if a node has a buffer
+							  where store DATA packets */
 
 	double start_tx_time; /**< timestamp in which the node stars to transmit a
 							 packet */
@@ -774,7 +768,7 @@ protected:
 	int rttsamples; /**< num of RTT samples */
 
 	int curr_tx_rounds; /**< Number of current transmission of the same packet
-						   */
+						 */
 	int last_data_id_rx; /**< ID of the last DATA packet received */
 
 	Packet *curr_data_pkt; /**< Pointer to the current data packet */

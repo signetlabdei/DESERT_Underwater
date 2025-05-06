@@ -38,6 +38,7 @@
 
 #include "uwgainfromdb.h"
 #include "uwip-module.h"
+#include <climits>
 
 
 

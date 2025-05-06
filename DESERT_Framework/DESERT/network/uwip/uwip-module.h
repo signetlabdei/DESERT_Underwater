@@ -44,7 +44,6 @@
 
 #include <iostream>
 #include <string>
-#include <sstream>
 
 #define NOT_FOR_ME_REASON \
 	"NFM" /**< Reason for a drop in a <i>UWIP</i> module. */
@@ -56,8 +55,6 @@
 	"IDA" /**< Reason for a drop in a <i>UWIP</i> module. */
 
 #define HDR_UWIP(P) (hdr_uwip::access(P))
-
-
 
 static const uint8_t UWIP_BROADCAST = static_cast<uint8_t>(
 		0x000000ff); /**< Variable used to represent a broadcast UWIP. */
@@ -76,13 +73,13 @@ typedef struct hdr_uwip {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static hdr_uwip *
+	static hdr_uwip *
 	access(const Packet *p)
 	{
 		return (hdr_uwip *) p->access(offset_);
@@ -124,7 +121,7 @@ public:
 	/**
 	 * Destructor of UWIPModule class.
 	 */
-	virtual ~UWIPModule();
+	virtual ~UWIPModule() = default;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
@@ -175,7 +172,7 @@ public:
 	/**
 	 * Prints the IDs of the packet's headers defined by UWIP.
 	 */
-	inline void
+	void
 	printIdsPkts() const
 	{
 		std::cout << "UWIP packets IDs:" << std::endl;
@@ -186,8 +183,7 @@ protected:
 	static uint8_t lastIP; /**< Used to set a default IP address. */
 	uint8_t ipAddr_; /**< IP address of the node. */
 	int debug_; /**< Flag to enable or disable dirrefent levels of debug. */
-	bool
-			addr_type_inet; /**< <i>true</i> if the addressing type is
+	bool addr_type_inet; /**< <i>true</i> if the addressing type is
 							   <i>INET</i>, <i>false</i> if it is <i>ILINK</i>.
 							   */
 
@@ -196,7 +192,7 @@ protected:
 	 *
 	 * @return The size of a <i>hdr_sun_data</i> packet header.
 	 */
-	static inline int
+	static int
 	getIpHeaderSize()
 	{
 		return sizeof(hdr_uwip);

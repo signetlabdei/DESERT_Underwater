@@ -39,6 +39,8 @@
 #include "uwahoi-phy.h"
 #include <fstream>
 #include <sstream>
+#include <phymac-clmsg.h>
+#include "mac.h"
 
 /**
  * Adds the module for UwCbrModuleClass in ns2.

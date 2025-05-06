@@ -37,6 +37,8 @@
  */
 
 #include "uwphysicaldb.h"
+#include "rng.h"
+#include <climits>
 
 static class UnderwaterPhysicaldbClass : public TclClass
 {

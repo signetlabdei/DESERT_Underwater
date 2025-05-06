@@ -37,9 +37,8 @@
  * Provides the class implementation of UWSTATICROUTING.
  */
 
-#include <stdlib.h>
-
 #include "uwstaticrouting.h"
+#include <string>
 
 /**
  * Adds the module for UwStaticRoutingModuleClass in ns2.
@@ -65,22 +64,6 @@ UwStaticRoutingModule::UwStaticRoutingModule()
 	clearRoutes();
 }
 
-UwStaticRoutingModule::~UwStaticRoutingModule()
-{
-}
-
-int
-UwStaticRoutingModule::recvSyncClMsg(ClMessage *m)
-{
-	return Module::recvSyncClMsg(m);
-}
-
-void
-UwStaticRoutingModule::clearRoutes()
-{
-	routing_table.clear();
-}
-
 void
 UwStaticRoutingModule::addRoute(const uint8_t &dst, const uint8_t &next)
 {
@@ -90,19 +73,18 @@ UwStaticRoutingModule::addRoute(const uint8_t &dst, const uint8_t &next)
 				  << static_cast<uint32_t>(dst)
 				  << " and next hop: " << static_cast<uint32_t>(next)
 				  << std::endl;
-		exit(EXIT_FAILURE);
+		exit(1);
 	}
+
 	std::map<uint8_t, uint8_t>::iterator it = routing_table.find(dst);
+
 	if (it != routing_table.end()) {
 		it->second = next;
-		return;
 	} else {
 		if (routing_table.size() < IP_ROUTING_MAX_ROUTES) {
 			routing_table.insert(std::pair<uint8_t, uint8_t>(dst, next));
-			return;
 		} else {
 			std::cerr << "The routing table is full!" << std::endl;
-			return;
 		}
 	}
 }
@@ -124,19 +106,24 @@ UwStaticRoutingModule::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "defaultGateway") == 0) {
 			if (static_cast<uint8_t>(atoi(argv[2])) != 0) {
 				default_gateway = static_cast<uint8_t>(atoi(argv[2]));
-			} else {
-				std::cerr << "You are trying to set an invalid address as "
-							 "default gateway. Exiting ..."
-						  << std::endl;
-				exit(EXIT_FAILURE);
+				return TCL_OK;
 			}
-			return TCL_OK;
+
+			tcl.result("invalid address as default gateway. Exiting ...");
+			return TCL_ERROR;
 		}
 
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addroute") == 0) {
-			addRoute(static_cast<uint8_t>(atoi(argv[2])),
-					static_cast<uint8_t>(atoi(argv[3])));
+			int dst = std::atoi(argv[2]);
+			int next = std::atoi(argv[3]);
+
+			if (dst <= 0 || dst > 255 || next <= 0 || next > 255) {
+				tcl.result("invalid destination or next hop address");
+				return TCL_ERROR;
+			}
+
+			addRoute(static_cast<uint8_t>(dst), static_cast<uint8_t>(next));
 			return TCL_OK;
 		}
 	}
@@ -149,58 +136,52 @@ UwStaticRoutingModule::recv(Packet *p)
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *uwiph = HDR_UWIP(p);
 
-	if (debug_) {
-		std::cout << NOW << "::UWSTATICROUTING::RECV"
-				  << "::NEXT_HOP::" << ch->next_hop()
-				  << "::DESTINATION_IP::" << (uint)uwiph->daddr()
-				  << std::endl;
-	}
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWSTATICROUTING",
+			"recv(Packet *)::next hop " + to_string(ch->next_hop()) +
+					" destination ip = " + to_string((uint) uwiph->daddr()));
 
 	if (ch->direction() == hdr_cmn::UP) {
-
 		if (uwiph->daddr() == ch->next_hop() ||
-				uwiph->daddr() ==
-						UWIP_BROADCAST) { /* Packet is arrived at its
-											 destination */
+				uwiph->daddr() == UWIP_BROADCAST) {
 			sendUp(p);
 			return;
 		}
-		/* Forward Packet */
+
 		ch->direction() = hdr_cmn::DOWN;
 		ch->next_hop() = getNextHop(p);
-		if (ch->next_hop() == 0) {
+
+		if (ch->next_hop() == 0)
 			drop(p, 1, DROP_DEST_NO_ROUTE);
-		} else {
+		else
 			sendDown(p);
-		}
-	} else { /* direction DOWN */
+	} else {
 		ch->next_hop() = getNextHop(p);
-		if (ch->next_hop() == 0) {
+
+		if (ch->next_hop() == 0)
 			drop(p, 1, DROP_DEST_NO_ROUTE);
-		} else {
+		else
 			sendDown(p);
-		}
 	}
 }
 
 uint8_t
 UwStaticRoutingModule::getNextHop(const Packet *p) const
 {
-	hdr_uwip *uwiph = HDR_UWIP(p);
-	return getNextHop(uwiph->daddr());
+	return getNextHop(HDR_UWIP(p)->daddr());
 }
 
 uint8_t
 UwStaticRoutingModule::getNextHop(const uint8_t &dst) const
 {
 	std::map<uint8_t, uint8_t>::const_iterator it = routing_table.find(dst);
+
 	if (it != routing_table.end()) {
 		return it->second;
 	} else {
-		if (default_gateway != 0) {
+		if (default_gateway != 0)
 			return default_gateway;
-		} else {
-			return 0;
-		}
+
+		return 0;
 	}
 }

@@ -43,14 +43,11 @@
 #define DROP_DEST_NO_ROUTE \
 	"DNR" /**< Reason for a drop in a <i>UWVBR</i> module. */
 
-#include <uwip-module.h>
 #include <map>
+#include <uwip-module.h>
 
-namespace
-{
 static const uint16_t IP_ROUTING_MAX_ROUTES =
 		254; /**< Maximum number of entries in the routing table of a node. */
-}
 
 /**
  * UwStaticRoutingModule class implements basic routing functionalities.
@@ -66,23 +63,14 @@ public:
 	/**
 	 * Destructor of UwStaticRoutingModule class.
 	 */
-	virtual ~UwStaticRoutingModule();
+	virtual ~UwStaticRoutingModule() = default;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
-	virtual void recv(Packet *);
-
-	/**
-	 * Cross-Layer messages synchronous interpreter.
-	 *
-	 * @param ClMessage* an instance of ClMessage that represent the message
-	 * received
-	 * @return <i>0</i> if successful.
-	 */
-	virtual int recvSyncClMsg(ClMessage *);
+	virtual void recv(Packet *) override;
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -94,7 +82,7 @@ public:
 	 * successfully or not.
 	 *
 	 */
-	virtual int command(int, const char *const *);
+	virtual int command(int, const char *const *) override;
 
 	/**
 	 * Returns the next hop address of a packet passed as input.
@@ -115,20 +103,20 @@ public:
 	/**
 	 * Removes all the routing information.
 	 */
-	virtual void clearRoutes();
+	virtual void clearRoutes() { routing_table.clear(); }
 
 	/**
 	 * Adds a new entry in the routing table.
 	 *
-	 * @param nsaddr_t Address of the destination.
-	 * @param nsaddr_t Address of the next hop.
+	 * @param uint8_t Address of the destination.
+	 * @param uint8_t Address of the next hop.
 	 */
 	virtual void addRoute(const uint8_t &, const uint8_t &);
 
 private:
+	uint8_t default_gateway; /**< Default gateway. */
 	std::map<uint8_t, uint8_t>
 			routing_table; /**< Routing table: destination - next hop. */
-	uint8_t default_gateway; /**< Default gateway. */
 };
 
 #endif // _STATIC_ROUTING_H_
