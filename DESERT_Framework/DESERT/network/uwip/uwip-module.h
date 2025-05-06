@@ -73,13 +73,13 @@ typedef struct hdr_uwip {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static hdr_uwip *
+	static hdr_uwip *
 	access(const Packet *p)
 	{
 		return (hdr_uwip *) p->access(offset_);
@@ -172,7 +172,7 @@ public:
 	/**
 	 * Prints the IDs of the packet's headers defined by UWIP.
 	 */
-	inline void
+	void
 	printIdsPkts() const
 	{
 		std::cout << "UWIP packets IDs:" << std::endl;
@@ -192,7 +192,7 @@ protected:
 	 *
 	 * @return The size of a <i>hdr_sun_data</i> packet header.
 	 */
-	static inline int
+	static int
 	getIpHeaderSize()
 	{
 		return sizeof(hdr_uwip);

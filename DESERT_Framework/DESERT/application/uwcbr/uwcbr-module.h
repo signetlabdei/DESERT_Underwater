@@ -76,13 +76,13 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static struct hdr_uwcbr *
+	static struct hdr_uwcbr *
 	access(const Packet *p)
 	{
 		return (struct hdr_uwcbr *) p->access(offset_);
@@ -91,7 +91,7 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the sn_ variable.
 	 */
-	inline uint16_t &
+	uint16_t &
 	sn()
 	{
 		return sn_;
@@ -100,7 +100,7 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the rftt_valid_ variable.
 	 */
-	inline bool &
+	bool &
 	rftt_valid()
 	{
 		return rftt_valid_;
@@ -109,7 +109,7 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the priority_ variable.
 	 */
-	inline char &
+	char &
 	priority()
 	{
 		return priority_;
@@ -118,7 +118,7 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the rftt_ variable.
 	 */
-	inline float &
+	float &
 	rftt()
 	{
 		return (rftt_);
@@ -127,7 +127,7 @@ typedef struct hdr_uwcbr {
 	/**
 	 * Reference to the rftt_ variable.
 	 */
-	inline uint16_t &
+	uint16_t &
 	traffic_type()
 	{
 		return (traffic_type_);
@@ -255,7 +255,7 @@ public:
 	/**
 	 * Prints the IDs of the packet's headers defined by UWCBR.
 	 */
-	inline void
+	void
 	printIdsPkts() const
 	{
 		std::cout << "UWCBR packets IDs:" << std::endl;
@@ -438,7 +438,7 @@ protected:
 	 *
 	 * @return The size of a <i>hdr_uwcbr</i> packet header.
 	 */
-	static inline int
+	static int
 	getCbrHeaderSize()
 	{
 		return sizeof(hdr_uwcbr);

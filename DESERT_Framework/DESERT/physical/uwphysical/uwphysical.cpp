@@ -315,7 +315,7 @@ UnderwaterPhysical::startRx(Packet *p)
 	sendSyncClMsg(&msg);
 	mac_addr = msg.getAddr();
 
-	if ((PktRx == 0) && !txPending) {
+	if ((PktRx == 0) && (txPending == false)) {
 		// The receiver is is not synchronized on any transmission
 		// so we can sync on this packet
 		std::stringstream log_sstr;
@@ -372,7 +372,7 @@ UnderwaterPhysical::startRx(Packet *p)
 				incrTotCrtl_pkts_lost();
 			}
 		}
-	} else if (txPending) {
+	} else if (txPending == true) {
 		printOnLog(Logger::LogLevel::DEBUG,
 				"UWPHY",
 				"startRx(Packet *)::dropping pkt, tx pending");

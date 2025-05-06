@@ -175,7 +175,7 @@ protected:
 	 * @param const double& time spent by the modem in transmission phase
 	 * @return double& the value of energy in Joule
 	 */
-	inline virtual double
+	virtual double
 	consumedEnergyTx(const double &_duration) const
 	{
 		return (tx_power_ * _duration);
@@ -188,7 +188,7 @@ protected:
 	 * @return double& the value of energy in Joule
 	 *
 	 */
-	inline virtual double
+	virtual double
 	consumedEnergyRx(const double &_duration) const
 	{
 		return (rx_power_ * _duration);
@@ -219,7 +219,7 @@ protected:
 	 * <i>false</i> otherwise.
 	 * @see std::numeric_limits<double>::epsilon()
 	 */
-	inline bool
+	bool
 	isZero(const double &value) const
 	{
 		return std::fabs(value) < std::numeric_limits<double>::epsilon();
@@ -230,7 +230,7 @@ protected:
 	 *
 	 * @return time (in seconds) spent by the node in transmission.
 	 */
-	inline double
+	double
 	Get_Tx_Time() const
 	{
 		return Tx_Time_;
@@ -241,7 +241,7 @@ protected:
 	 *
 	 * @return time (in seconds) spent by the node in reception.
 	 */
-	inline double
+	double
 	Get_Rx_Time() const
 	{
 		return Rx_Time_;
@@ -252,7 +252,7 @@ protected:
 	 *
 	 * @return energy (in Joule) spent by the node in transmission.
 	 */
-	inline double
+	double
 	Get_Energy_Tx() const
 	{
 		return Energy_Tx_;
@@ -263,7 +263,7 @@ protected:
 	 *
 	 * @return energy (in Joule) spent by the node in reception.
 	 */
-	inline double
+	double
 	Get_Energy_Rx() const
 	{
 		return Energy_Rx_;
@@ -274,7 +274,7 @@ protected:
 	 *
 	 * @return the number of bytes transmitted.
 	 */
-	inline double
+	double
 	Get_Transmitted_bytes() const
 	{
 		return Transmitted_bytes_;
@@ -283,7 +283,7 @@ protected:
 	/**
 	 * Increment the number of packets discarded
 	 */
-	inline void
+	void
 	incrTot_pkts_lost()
 	{
 		tot_pkts_lost++;
@@ -292,7 +292,7 @@ protected:
 	/**
 	 * Increment the number of CTRL packets discarded
 	 */
-	inline void
+	void
 	incrTotCrtl_pkts_lost()
 	{
 		tot_ctrl_pkts_lost++;
@@ -301,7 +301,7 @@ protected:
 	/**
 	 * Increment the number of CTRL packets discarded due to interference
 	 */
-	inline void
+	void
 	incrErrorCtrlPktsInterf()
 	{
 		errorCtrlPktsInterf++;
@@ -310,7 +310,7 @@ protected:
 	/**
 	 * Increment the number of collisions DATA/CTRL
 	 */
-	inline void
+	void
 	incrCollisionDATAvsCTRL()
 	{
 		collisionDataCTRL++;
@@ -319,7 +319,7 @@ protected:
 	/**
 	 * Increment the number of CTRL pkts discarded due to a collision
 	 */
-	inline void
+	void
 	incrCollisionCTRL()
 	{
 		collisionCTRL++;
@@ -328,7 +328,7 @@ protected:
 	/**
 	 * Increment the number of DATA pkts discarded due to a collision
 	 */
-	inline void
+	void
 	incrCollisionDATA()
 	{
 		collisionDATA++;
@@ -337,7 +337,7 @@ protected:
 	/**
 	 * @return the total number of packets lost
 	 */
-	inline int
+	int
 	getTot_pkts_lost() const
 	{
 		return tot_pkts_lost;
@@ -347,7 +347,7 @@ protected:
 	 *
 	 * @return the total number of CTRL packets lost
 	 */
-	inline int
+	int
 	getTot_CtrlPkts_lost() const
 	{
 		return tot_ctrl_pkts_lost;
@@ -357,7 +357,7 @@ protected:
 	 *
 	 * @return the total number of CTRL pkts lost due to interference
 	 */
-	inline int
+	int
 	getError_CtrlPktsInterf() const
 	{
 		return errorCtrlPktsInterf;
@@ -367,7 +367,7 @@ protected:
 	 *
 	 * @return the total number of collision between DATA and CTRL
 	 */
-	inline int
+	int
 	getCollisionsDATAvsCTRL() const
 	{
 		return collisionDataCTRL;
@@ -377,7 +377,7 @@ protected:
 	 *
 	 * @return the number of collisions with a CTRL packet
 	 */
-	inline int
+	int
 	getCollisionsCTRL() const
 	{
 		return collisionCTRL;
@@ -387,7 +387,7 @@ protected:
 	 *
 	 * @return the number of collisions with a DATA packet
 	 */
-	inline int
+	int
 	getCollisionsDATA() const
 	{
 		return collisionDATA;
@@ -398,7 +398,7 @@ protected:
 	 * @param _input Input value.
 	 * @return the log base 2 of the input.
 	 */
-	inline double
+	double
 	log2(const double &_input) const
 	{
 		return (log10(_input) / log10(2));
@@ -410,7 +410,7 @@ protected:
 	 * @param _M Number of simbol of the the MPSK
 	 * @return Probability error for the symbol
 	 */
-	inline double
+	double
 	get_prob_error_symbol_mpsk(const double &_snr, const uint32_t _M) const
 	{
 		return erfc(sqrt(_snr * log2(_M)) * sin(M_PI / _M));

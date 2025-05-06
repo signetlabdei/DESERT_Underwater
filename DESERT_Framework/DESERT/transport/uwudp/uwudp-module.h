@@ -72,13 +72,13 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static struct hdr_uwudp *
+	static struct hdr_uwudp *
 	access(const Packet *p)
 	{
 		return (struct hdr_uwudp *) p->access(offset_);
@@ -87,7 +87,7 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the sport_ variable.
 	 */
-	inline uint8_t &
+	uint8_t &
 	sport()
 	{
 		return sport_;
@@ -96,7 +96,7 @@ typedef struct hdr_uwudp {
 	/**
 	 * Reference to the dport_ variable.
 	 */
-	inline uint8_t &
+	uint8_t &
 	dport()
 	{
 		return dport_;
@@ -158,7 +158,7 @@ public:
 	/**
 	 * Prints the IDs of the packet's headers defined by UWUDP.
 	 */
-	inline void
+	void
 	printIdsPkts() const
 	{
 		std::cout << "UWUDP packets IDs:" << std::endl;
@@ -185,7 +185,7 @@ protected:
 	 *
 	 * @return The size of a <i>hdr_uwudp</i> packet header.
 	 */
-	static inline int
+	static int
 	getUdpHeaderSize()
 	{
 		return sizeof(hdr_uwudp);
