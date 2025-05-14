@@ -34,6 +34,7 @@
 #include <uwevologicss2cmodem.h>
 #include <uwphy-clmsg.h>
 #include <uwsocket.h>
+#include <uwserial.h>
 
 #include <cstring>
 #include <iostream>
@@ -200,6 +201,18 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
+		if (!strcmp(argv[1], "setConnector")) {
+			if(!strcmp(argv[2], "SOCKET")) {
+				p_connector.reset(new UwSocket());
+				return TCL_OK;
+			}
+			if(!strcmp(argv[2], "SERIAL")) {
+				p_connector.reset(new UwSerial());
+				return TCL_OK;
+			}
+			fprintf(stderr, "Invalid connector type, choose between SOCKET and SERIAL");
+			return TCL_ERROR;
+		}
 		if (!strcmp(argv[1], "setSourceLevel")) {
 			std::stringstream sl_ss(argv[2]);
 			int sl_;
