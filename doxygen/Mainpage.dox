@@ -526,6 +526,203 @@ The folder structure is composed by two main folders: DESERT_Framework and DESER
 Inside the former, you find all the modules organized according to the ISO/OSI stack and the installer folder.
 While the latter contains external modules which doesn't necessarily fit inside the ISO/OSI stack and/or the DESERT core.
 
+\section howtcl How to create a new tcl script
+In this section we describe how to write a basic DESERT tcl script, following the structure of the tcl found in `DESERT/samples/desert_samples/test_uwcbr.tcl`.
+An empty tcl script skeleton can be found inside `DESERT/samples/desert_samples/ExampleSekelton.tcl`
+
+It is a good practice to start your script with a brief description and a simple draw of the simulated network topology:
+\code{.tcl}
+# ----------------------------------------------------------------------------------
+# This script depicts a very simple but complete stack in which two nodes send data
+# to a common sink. The second node is used by the first one as a relay to send data to the sink.
+# The routes are configured by using UW/STATICROUTING.
+# The application used to generate data is UW/CBR.
+# ----------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# Stack
+#             Node 1                         Node 2                        Sink
+#   +--------------------------+   +--------------------------+   +-------------+------------+
+#   |  7. UW/CBR               |   |  7. UW/CBR               |   |  7. UW/CBR  | UW/CBR     |
+#   +--------------------------+   +--------------------------+   +-------------+------------+
+#   |  6. UW/UDP               |   |  6. UW/UDP               |   |  6. UW/UDP               |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  4. UW/IP                |   |  4. UW/IP                |   |  4. UW/IP                |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  3. UW/MLL               |   |  3. UW/MLL               |   |  3. UW/MLL               |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#            |         |                    |         |                   |         |       
+#   +----------------------------------------------------------------------------------------+
+#   |                                     UnderwaterChannel                                  |
+#   +----------------------------------------------------------------------------------------+
+\endcode
+
+The first thing to do in order to have a working script, is to import the libraries. Note that the order matters and is often a cause of errors.
+You first need to import the ns-miracle libraries in the following order:
+\code{.tcl}
+load libMiracle.so
+load libMiracleBasicMovement.so
+load libmphy.so
+load libmmac.so
+load libUwmStd.so
+\endcode
+Afterwards you can import DESERT libraries you need (in order).
+\code{.tcl}
+load libuwcsmaaloha.so
+load libuwip.so
+load libuwstaticrouting.so
+load libuwmll.so
+load libuwudp.so
+load libuwcbr.so
+\endcode
+
+In order to configure your simulation, some options and variables may be needed.
+A common approach is to use an associative array called. These options may be hardcoded or given to the simulation as bash parameters.
+\code{.tcl}
+set opt(bash_parameters) 0; # Set to 1 to activate bash parameters
+if {$opt(bash_parameters)} {
+	if {$argc != 2} {
+		puts "The script requires two inputs"
+	} else {
+		set opt(pktsize)	[lindex $argv 0]
+		set opt(rngstream)	[lindex $argv 1]
+	} else {
+		set opt(pktsize)	125;	# Bytes
+		set opt(rngstream)	1;		# Needed by the RNG	
+	}
+}
+\endcode
+
+Common simulation options are listed below
+\code{.tcl}
+set opt(nn) 2.0 ;# Number of Nodes
+set opt(starttime) 1
+set opt(stoptime) 1000
+set opt(duration) [expr $opt(stoptime) - $opt(starttime)]
+\endcode
+
+Once you have all the needed libraries and options, you need to initialize the ns-miracle simulator and set the random number generator.
+\code{.tcl}
+set ns [new Simulator]
+$ns use-Miracle
+
+# Set the default random number generator
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+	$defaultRNG next-substream
+}
+\endcode
+
+Next there are the binding of the modules. Here you can set globally the initialization values of the binded variables.
+\code{.tcl}
+Module/UW/CBR set packetSize_		$opt(pktsize)
+# ...
+\endcode
+
+Now you are ready to define a tcl procedure (function) that allows you to create as many different kind of nodes in the network.
+Inside this procedure, you need to create a ns-miracle node and add the modules you need (the whole protocol stack) and configure them.
+Optionally you can initialize and set the node position.
+\code{.tcl}
+proc createNode { id } {
+	# include global variables to use in the procedure
+	global <variables list>
+
+    # build the NS-Miracle node
+	set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
+
+    # define the module(s) you want to put in the node
+	set cbr($id)  [new Module/UW/CBR]
+	set udp($id)  [new Module/UW/UDP]
+	set ipif($id) [new Module/UW/StaticRouting]
+	set ipr($id)  [new Module/UW/IP]
+	set mll($id)  [new Module/UW/MLL]
+	# ...
+
+    # insert the module(s) into the node 
+	# $node addModule <layer> <module> <cl_trace> <tag>
+	$node($id) addModule 7 $cbr($id) 0 "CBR"
+	# ...
+
+    # intra-node module connections
+	# $node setConnection <upper> <lower> <trace>
+	$node($id) setConnection $cbr($id) $udp($id) 0
+	# ...
+
+	# socket configuration
+    set portnum($id) [$udp($id) assignPort $cbr($id) ]
+    $ipif($id) addr  [expr ($id) + 1]
+
+    # add node positions (optional)  
+	set position($id) [new "Position/BM"]
+	$node($id) addPosition $position($id)
+	$position($id) setX_ 0
+	$position($id) setY_ 0
+	$position($id) setZ_ -100
+
+	# ...
+}
+\endcode
+
+You can have as many procedures you want. Typically there is a specific procedure for the sink node (a node which only receives packets).
+Finally, to actually create the nodes you need to call the procedure. Suppose to have `$opt(nn)` nodes in the network, you can do:
+\code{.tcl}
+for {set id 0} {$id < $opt(nn)} {incr id}
+{
+	createNode $id
+}
+createSink; # Suppose to have a procedure to create the sink node
+\endcode
+
+Once you created the nodes you need to connect them, setup the routes and fill the arp tables.
+\code{.tcl}
+proc connectNodes {id1} {
+    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink
+
+    $cbr($id1) set destAddr_ [$ipif_sink addr]
+    $cbr($id1) set destPort_ $portnum_sink($id1)
+    $cbr_sink($id1) set destAddr_ [$ipif($id1) addr]
+    $cbr_sink($id1) set destPort_ $portnum($id1)
+}
+
+# Setup flows
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    connectNodes $id1
+}
+
+# Fill ARP tables
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
+      $mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
+    }   
+    $mll($id1) addentry [$ipif_sink addr] [ $mac_sink addr]
+    $mll_sink addentry [$ipif($id1) addr] [ $mac($id1) addr]
+}
+
+# Setup routing table
+$ipr(0) addRoute [$ipif_sink addr] [$ipif(1) addr]
+$ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
+\endcode
+
+Finally you need to start and stop the modules and the simulation.
+\code{.tcl}
+for {set id1 0} {$id1 < $opt(nn)} {incr id1} {
+	$ns at $opt(starttime) "$cbr($id1) start"
+	$ns at $opt(stoptime) "$cbr($id1) stop"
+
+	# ...
+
+	$ns at $opt(stoptime)  "finish; $ns halt"; # stop simulation and run finish procedure
+	$ns run
+}
+\endcode
+
+Optionally, it is good practice to add a finish procedure where display the simulation settings and compute some statistics.
+
 \section howmod How to add a new module
 In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
 As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named `uwcool_phy`. The procedure to create a new module is described in the following.
@@ -721,7 +918,7 @@ And then it should be defined in this way (inside `uwcoolphy.cpp`)
 
 \subsection pLog The printOnLog method
 <blockquote>
-Note that this is a new feature (version > 3.5.1), and only the following modules implement it:
+NOTE: This is a new feature (version >= 3.6). By now only the following modules implement it:
 
 - UwCbrModule
 - UwUdp
@@ -730,11 +927,12 @@ Note that this is a new feature (version > 3.5.1), and only the following module
 - CsmaAloha
 - UnderwaterPhysical
 
-Before DESERT 3.5.1: in order to print log messages, you need to define a `debug_` parameter on your module and bind it to tcl inside the constructor.
-Every time you want to print a log message, then you need to check this value is set and then use cout to print your message.
+All the other modules use the ns-way of logging: 
+You need to define a `debug_` parameter on your module and bind it to tcl inside the constructor (see the previous section).
+Every time you want to print a log message, then you need to check if debug parameter is set and print to console your message.
 </blockquote>
-Inside nsmiracle there is a logger class used to print log messages either to console or to a file.
-The main parameter of this class is the `log_level`, which lets you specify the level of messages you want. It takes three possible values:
+Each DESERT module inherits a static logger parameter, shared among all the modules in a simulation istance.
+It lets you specify the level of logging messages you want. There are three possible values:
 
 <small>
 
@@ -744,7 +942,7 @@ The main parameter of this class is the `log_level`, which lets you specify the 
 
 </small>
 
-The PlugIn class provides the APIs to use the logger, in particular, the method `printOnLog`, defined as follows:
+In particular, it gives you the method `printOnLog`, defined as follows:
 
 \code{.cpp}
 
@@ -752,8 +950,7 @@ The PlugIn class provides the APIs to use the logger, in particular, the method 
 
 \endcode
 
-Note that, since this method is defined in the PlugIn class, every DESERT module will inherit it.
-This method takes three parameter: (i) the log level of the message (if greater than logger `log_level`, the message will be printed), (ii) the name of the module printing it and (iii) a string representing the log message.
+This method takes three parameter: (i) the log level of the message, (ii) the name of the module printing the message and (iii) a string representing the log message.
 
 As an example, suppose you have a method to handle packets reception that you would like to track, you can do it as follows:
 
@@ -769,7 +966,7 @@ As an example, suppose you have a method to handle packets reception that you wo
 
 \endcode
 
-Regarding the tcl side, the PlugIn class provides the following commands:
+To enable and configure the log messages in your simulation, you can use the following commands:
 
 \code{.cpp}
 	setLogLevel <log_level>				// Set the logger level (1, 2 or 3)
@@ -779,7 +976,7 @@ Regarding the tcl side, the PlugIn class provides the following commands:
 	disableLog							// Disable log on a specific module
 \endcode
 
-Note that all the modules in a given simulation, share the same instance of the logger, meaning, that the `log_level` and `log_file` can be set just once.
+Remember that all the modules in a given simulation, share the same instance of the logger, meaning, that the `log_level` and `log_file` can be set just once.
 For instance, suppose, you have a tcl file, with one transmitting node and one sink node, you can set the logger for the sink physical layer only as follows:
 
 \code{.tcl}
@@ -787,15 +984,15 @@ For instance, suppose, you have a tcl file, with one transmitting node and one s
 		...
 		set phy_data_sink [new Module/UW/CoolPhy]
 		....
-		$phy_data_sink setLog 3 "log_output"
+		$phy_data_sink setLog 3 "log_output.txt"
 		...
 	}
 \endcode
 
-It will print all the `coolphy` log messages inside a file called `log_output`.
-Note that each message has an id associated, which is the ns is of the node and is incremental set, e.g., the first node created will have id 0, the second id 1 and so on.
+It will print all the `coolphy` log messages inside a file called `log_output.txt`.
+Each message has an `id` associated with it, which is the ns id of the node and is incremental set, e.g., the first node created will have `id` 0, the second `id` 1 and so on.
 
-Note: You can find a thorough example on how to use the logger inside `DESERT/samples/desert_samples/logger/` folder.
+Note: You can find a complete example on how to use the logging system inside `DESERT/samples/desert_samples/logger/` folder.
 
 \section newheader How to add a new Packet headers
 
