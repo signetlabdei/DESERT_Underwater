@@ -160,7 +160,7 @@ Module/UW/CBR set debug_               0
 
 ### TDMA MAC ###
 Module/UW/TDMA set frame_duration   3.5
-Module/UW/TDMA set debug_           -7
+Module/UW/TDMA set debug_           0
 Module/UW/TDMA set sea_trial_       1
 Module/UW/TDMA set fair_mode        0
 # FAIR Modality on
@@ -235,7 +235,6 @@ proc createNode { id } {
         $node($id) setConnection $cbr($id,$cnt)   $udp($id)   0
         set portnum($id,$cnt) [$udp($id) assignPort $cbr($id,$cnt) ]
     }
-
     $node($id) setConnection $udp($id)   $ipr($id)   1
     $node($id) setConnection $ipr($id)   $ipif($id)  1
     $node($id) setConnection $ipif($id)  $mll($id)   1
@@ -405,7 +404,7 @@ proc finish {} {
 
     	for {set j 0} {$j < $opt(nn)} {incr j} {
     	    if {$i != $j} {
-    		set cbr_throughput        [$cbr($i,$j) getthr]
+                set cbr_throughput   [$cbr($i,$j) getthr]
                 set sent_pkts        [$cbr($i,$j) getsentpkts]
                 set recv_pkts        [$cbr($i,$j) getrecvpkts]
                 set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
