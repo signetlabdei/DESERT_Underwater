@@ -4,15 +4,15 @@
 
 \image html ./desert.png
 
-@version {{version}}
+@version 3.6.0
 
-@authors <b> Project supervisor: </b> Filippo Campagnaro - campagn1@dei.unipd.it
+@authors <b> Project supervisor: </b> Filippo Campagnaro - filippo.campagnaro@unipd.it
 
-@authors <b> Maintainers: </b> Federico Favaro - federico.favaro@dei.unipd.it, Federico Guerra - federico@guerra-tlc.com, Roberto Francescon - francescon.roberto@gmail.com, Antonio Montanari - montanar@dei.unipd.it
+@authors <b> Maintainers: </b> Federico Favaro - federico.favaro@dei.unipd.it, Federico Guerra - federico@guerra-tlc.com, Roberto Francescon - francescon.roberto@gmail.com, Antonio Montanari - montanar@dei.unipd.it, Vincenzo Cimino - vincenzo.cimino@unipd.it, Filippo Donegà - filippo.donega@unipd.it
 
-@authors <b> Contributors: </b> <A HREF="https://www1.coe.neu.edu/~sarafalleni/">Sara Falleni</A> - falleni.s@northeastern.edu, Riccardo Tumiati - riccardo.tumiati@studenti.unipd.it, Vincenzo Cimino 
+@authors <b> Contributors: </b> <A HREF="https://www1.coe.neu.edu/~sarafalleni/">Sara Falleni</A> - falleni.s@northeastern.edu, Riccardo Tumiati - riccardo.tumiati@studenti.unipd.it
 
-@authors <b> Former contributors and members: </b> Riccardo Masiero, Saiful Azad, Ivano Calabrese, Cristiano Tapparello, Alberto Signori, Loris Brolo, \link Giovanni Giovanni Toso
+@authors <b> Former contributors and members: \link Giovanni Giovanni Toso
 
 <br>
 
@@ -26,7 +26,7 @@ Among the components of DESERT, some libraries and tools help speed up the trans
 
 DESERT is based on ns2 <b>[2]</b> and NS-MIRACLE <b>[3]</b>. In particular, DESERT follows the modular approach of the latter. Other than network protocols, DESERT provides additional libraries and tools to help simulate underwater networks realistically. These tools include mobility models that reproduce realistic mobility patterns, energy consumption models, and channel models. The most advanced model available is provided via a close interaction between DESERT and WOSS <b>[4]</b>.
 
-The last DESERT version can be cross-compiled for Raspberry PI Zero 2 W and last EvoLogics modem's sandbox. DESERT supports real data transmission via EvoLogics, ahoi modems, and all devices that provide an Ethernet transparent interface (such as Ethernet switches and many commercial optical modems).
+DESERT can be cross-compiled for Raspberry Pi (e.g., Zero 2 W, 4, 5) and last EvoLogics modem's sandbox. DESERT supports real data transmission via EvoLogics <b>[5]</b>, ahoi modems <b>[6]</b>, SuM modems <b>[7]</b>, and all devices that provide an Ethernet transparent interface (such as Ethernet switches and many commercial optical modems).
 Altogether, the many proof-of-concept implementations and complex tests carried out with DESERT so far make DESERT an effective solution for realizing underwater networking experiments by reusing the same protocol code already written for simulations.
 
 DESERT Underwater has been adopted in several real life <A HREF="http://desert-underwater.dei.unipd.it/index.php/field-experiments/">sea-trials</A>. You can find more on brand new <A HREF="http://desert-underwater.dei.unipd.it">website</A> of the project
@@ -36,11 +36,11 @@ DESERT Underwater has been adopted in several real life <A HREF="http://desert-u
 
 A considerable amount of work has been done in order to make the installation of the software automatic via a modular installation script, that includes a fully-guided wizard mode.
 At the same time, the installation is organized into separate modules. An experienced users can easily extend the process to accommodate specific requirements, new functionalities, or even to make DESERT part of larger projects.
-As a further help for users wishing to experiment with real hardware using DESERT, we also provide different installer modules, suitable for different compact/embedded hardware platforms, starting from <A HREF="http://www.raspberrypi.org/">Raspberry Pi</A>, and <A HREF="http://www.evologics.com/">EvoLogics</A> modem sandbox.
+As a further help for users wishing to experiment with real hardware using DESERT, we also provide different installer modules, suitable for different compact/embedded hardware platforms, starting from <A HREF="https://www.raspberrypi.org/">Raspberry Pi</A>, and <A HREF="https://www.evologics.com/">EvoLogics</A> modem sandbox.
 This set will be extended in the future.
-In order to use DESERT more and more in real environments, uwApplication is provided. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication trough a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
+In order to use DESERT more and more in real environments, uwApplication is provided. This module permits to transmit real payloads among nodes with tunable dimension. Moreover, real data can be transmitted to uwApplication through a TCP or UDP socket at a given port. Using this feature, you can implement a very simple "underwater chat," or connect a sensor or device that will transmit its data to uwApplication through a socket. uwApplication encapsulates the payload with control headers and delivers packet to the lower layers.
 Finally, the functionalities offered by DESERT have been extended with a control framework that provides a set of primitives to remotely control the hardware modems, and thus the network operations.
-All these features are released constantly on our <A HREF="https://github.com/uwsignet/DESERT_Underwater">GitHub</A> repository
+All these features are released constantly on our <A HREF="https://github.com/signetlabdei/DESERT_Underwater">GitHub</A> repository
 
 <br>
 
@@ -48,41 +48,47 @@ All these features are released constantly on our <A HREF="https://github.com/uw
 
 <b>[1]</b> R. Masiero, P. Casari, M. Zorzi, "The NAUTILUS project: Physical Parameters, Architectures and Network Scenarios," <i>Proc. MTS/IEEE OCEANS</i>, Kona, HI, 2011.
 
-<b>[2]</b> The Network Simulator - ns2. http://nsnam.isi.edu/nsnam/index.php/Main_Page
+<b>[2]</b> The Network Simulator - ns2. https://www.isi.edu/websites/nsnam/ns/
 
-<b>[3]</b> N. Baldo, M. Miozzo, F. Guerra, M. Rossi, and M. Zorzi, "Miracle: the multi-interface cross-layer extension of ns2," EURASIP J. of Wireless Commun. and Networking, 2010. [Online]. Available: http://www.hindawi.com/journals/wcn/aip.761792.html
+<b>[3]</b> N. Baldo, M. Miozzo, F. Guerra, M. Rossi, and M. Zorzi, "Miracle: the multi-interface cross-layer extension of ns2," EURASIP J. of Wireless Commun. and Networking, 2010. [Online]. Available: https://dl.acm.org/doi/10.1155/2010/761792
 
 <b>[4]</b> WOSS - World Ocean Simulation System. https://woss.dei.unipd.it
 
-<b>[5]</b> EvoLogics GmbH web site. http://www.evologics.de/
+<b>[5]</b> EvoLogics GmbH web site. https://www.evologics.de/
 
-<b>[6]</b> Woods Hole Oceanographic Institution web site. http://www.whoi.edu/
+<b>[6]</b> Ahoi modem web site. http://bcrenner.de/?ahoi-modem
 
-<b>[7]</b> The Goby Underwater Autonomy Project web site. http://gobysoft.com/
+<b>[7]</b> SubSeaPulse SRL web site. https://www.subseapulse.com/
 
-<b>[8]</b> Develogic Subsea Systems. http://www.develogic.de/
+<b>[8]</b> Woods Hole Oceanographic Institution web site. https://www.whoi.edu/
 
-<b>[9]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007.
+<b>[9]</b> The Goby Underwater Autonomy Project web site. https://gobysoft.com/
 
-<b>[10]</b> N. Abramson, "Development of the ALOHANET," <i>IEEE Transactions on Information Theory</i>, vol. 31, num. 2, pp. 119-123, 1985.
+<b>[10]</b> Develogic Subsea Systems. https://www.develogic.de/
 
-<b>[11]</b> X. Guo, M. R. Frater and M. J. Ryan, "A propagation-delay-tolerant collision avoidance protocol for underwater acoustic sensor networks," <i>Proc. OES/IEEE OCEANS</i>, Singapore, May 2006.
+<b>[11]</b> W. Liang, H. Yu, L. Liu, B. Li and C. Che, "Information-Carrying Based Routing Protocol for Underwater Acoustic Sensor Network," <i>Proc. ICMA</i>, Takamatsu, Japan, Aug. 2007.
 
-<b>[12]</b> B. Peleato and M. Stojanovic, "Distance aware collision avoidance protocol for ad-hoc underwater acoustic sensor networks," <i>IEEE Communications Letters</i>, vol. 11, num. 12, pp. 1025-1027, 2007.
+<b>[12]</b> N. Abramson, "Development of the ALOHANET," <i>IEEE Transactions on Information Theory</i>, vol. 31, num. 2, pp. 119-123, 1985.
 
-<b>[13]</b> F. Favaro, P. Casari, F. Guerra, M. Zorzi, "Data Upload from a Static Underwater Network to an AUV: Polling or Random Access?", <i>Proc. MTS/IEEE OCEANS</i>, Yeosu, South Korea, May 2012.
+<b>[13]</b> X. Guo, M. R. Frater and M. J. Ryan, "A propagation-delay-tolerant collision avoidance protocol for underwater acoustic sensor networks," <i>Proc. OES/IEEE OCEANS</i>, Singapore, May 2006.
 
-<b>[14]</b> A. Syed, W. Ye and J. Heidemann, "T-Lohi: A new class of MAC protocols for underwater acoustic sensor networks," <i>IEEE INFOCOM</i>, Phoenix, AZ, Apr. 2008.
+<b>[14]</b> B. Peleato and M. Stojanovic, "Distance aware collision avoidance protocol for ad-hoc underwater acoustic sensor networks," <i>IEEE Communications Letters</i>, vol. 11, num. 12, pp. 1025-1027, 2007.
 
-<b>[15]</b> S. Azad, P. Casari, M. Zorzi, The Underwater Selective Repeat Error Control Protocol for Multiuser Acoustic Networks: Design and Parameter Optimization," <i>IEEE Transactions on Wireless Communications</i>, vol. 12, no. 10, pp. 4866-4877, Oct. 2013.
+<b>[15]</b> F. Favaro, P. Casari, F. Guerra, M. Zorzi, "Data Upload from a Static Underwater Network to an AUV: Polling or Random Access?", <i>Proc. MTS/IEEE OCEANS</i>, Yeosu, South Korea, May 2012.
 
-<b>[16]</b> F. Favaro, L. Brolo, G. Toso, P. Casari, M. Zorzi, "A Study on Data Retrieval Strategies in Underwater Acoustic Networks", <i>Proc. MTS/IEEE OCEANS</i>, San Diego, CA, Sep. 2013.
+<b>[16]</b> A. Syed, W. Ye and J. Heidemann, "T-Lohi: A new class of MAC protocols for underwater acoustic sensor networks," <i>IEEE INFOCOM</i>, Phoenix, AZ, Apr. 2008.
 
-<b>[17]</b> C. Tapparello, P. Casari, G. Toso, I. Calabrese, R. Otnes, P. van Walree, M. Goetz, I. Nissen, M. Zorzi, "Performance Evaluation of Forwarding Protocols for the RACUN Network," Proc. of ACM WUWNet, Kaohsiung, Taiwan, Nov. 2013.
+<b>[17]</b> S. Azad, P. Casari, M. Zorzi, "The Underwater Selective Repeat Error Control Protocol for Multiuser Acoustic Networks: Design and Parameter Optimization," <i>IEEE Transactions on Wireless Communications</i>, vol. 12, no. 10, pp. 4866-4877, Oct. 2013.
 
-<b>[18]</b> B. Liang and Z. Haas, "Predictive distance-based mobility management for PCS networks," <i>Proc. IEEE INFOCOM</i>, New York, NY, Mar. 1999.
+<b>[18]</b> F. Favaro, L. Brolo, G. Toso, P. Casari, M. Zorzi, "A Study on Data Retrieval Strategies in Underwater Acoustic Networks", <i>Proc. MTS/IEEE OCEANS</i>, San Diego, CA, Sep. 2013.
 
-<b>[19]</b> F. Campagnaro, R. Francescon, F. Guerra, F. Favaro, P. Casari, R. Diamant, M. Zorzi, "The DESERT underwater framework v2: Improved capabilities and extension tools," <i>Proc. IEEE UCOMMS</i>, Lerici, Italy, Oct. 2016.
+<b>[19]</b> C. Tapparello, P. Casari, G. Toso, I. Calabrese, R. Otnes, P. van Walree, M. Goetz, I. Nissen, M. Zorzi, "Performance Evaluation of Forwarding Protocols for the RACUN Network," Proc. of ACM WUWNet, Kaohsiung, Taiwan, Nov. 2013.
+
+<b>[20]</b> B. Liang and Z. Haas, "Predictive distance-based mobility management for PCS networks," <i>Proc. IEEE INFOCOM</i>, New York, NY, Mar. 1999.
+
+<b>[21]</b> F. Campagnaro, R. Francescon, F. Guerra, F. Favaro, P. Casari, R. Diamant, M. Zorzi, "The DESERT underwater framework v2: Improved capabilities and extension tools," <i>Proc. IEEE UCOMMS</i>, Lerici, Italy, Oct. 2016.
+
+<b>[22]</b> R. Francescon, R. Francescon, F. Favaro, F. Guerra, M. Zorzi, "Software Defined Underwater Communications: an Experimental Platform for Research" <i>OCEANS 2023 - Limerick</i>, Limerick, Ireland, 2023
 
 
 
@@ -90,7 +96,7 @@ All these features are released constantly on our <A HREF="https://github.com/uw
 
 /** \page INSTALL1 Installation Guidelines
 
-\section requirements Installation requirements: Ubuntu
+\section requirements Installation requirements
 
 Before installing the DESERT framework, please check that your host device has the following packages installed:
 
@@ -111,7 +117,8 @@ Before installing the DESERT framework, please check that your host device has t
 </BLOCKQUOTE>
 </SMALL>
 
-If you are using a Debian-based Linux distribution, you can type this command in a terminal
+\subsection debian Debian
+If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, etc...) , you can type the following command in a terminal, in order to install all dependencies above:
 
 <small>
 
@@ -119,11 +126,18 @@ If you are using a Debian-based Linux distribution, you can type this command in
 
 </small>
 
-in order to install all dependencies above.
+\subsection arch-requirements Archlinux
+If you are using an Arch Linux based distribution, youy can type the following command in a terminal:
 
-\section fed-requirements Installation requirements: Fedora
+<small>
 
-DESERT Underwater was successfully installed on Fedora 23 and following releases. Before installing the DESERT framework in Fedora, please check that your host device has the following packages installed:
+    sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake libtool patch patchutils
+
+</small>
+
+\subsection fed-requirements Fedora
+
+Before installing the DESERT framework in Fedora, check that your host device has the following packages installed:
 
 <SMALL>
 <BLOCKQUOTE>
@@ -136,7 +150,7 @@ DESERT Underwater was successfully installed on Fedora 23 and following releases
 </BLOCKQUOTE>
 </SMALL>
 
-Please note that main C develoment tools are installed by installing the package group "C Development Tools and Libraries". To install all the software requirements you can run the following commands in a terminal:
+Note that main C develoment tools are installed by installing the package group "C Development Tools and Libraries". To install all the software requirements you can run the following commands in a terminal:
 
 <small>
 
@@ -150,7 +164,16 @@ Please note that main C develoment tools are installed by installing the package
 
 </small>
 
-\section install Installation procedures
+\section download-install Download and install
+The latest version of DESERT can be cloned from the github repository, as follows:
+
+<small>
+
+    git clone https://github.com/signetlabdei/DESERT_Underwater
+
+</small>
+
+Alternatively, you can download the source code of a specific version from: https://github.com/signetlabdei/DESERT_Underwater/releases
 
 To install DESERT Underwater, you can choose between two different approaches:
 
@@ -161,19 +184,11 @@ The wizard mode implements an interactive installation procedure. As such, it is
 The command-line mode is recommended for more experienced users.
 Note that, after completing an installation with the wizard, you will be also provided a command-line string. You can note down this string and enter it at the command prompt in order to reproduce exactly the same installation steps (with the same options, the same packages installed, etc.). When you become more comfortable with DESERT's installation options, you can also modify the automatically generated command-line string to reflect your desired configuration.
 
-To launch the installation in wizard mode, once you have downloaded and unpacked the framework, you have to cd into the framework folder by using:
+To launch the installation in wizard mode, once you have downloaded DESERT, you have to cd into the framework folder by using:
 
 <small>
 
     cd DESERT_Underwater/DESERT_Framework
-
-</small>
-
-set the executable flag of the installer:
-
-<small>
-
-    chmod +x ./install.sh
 
 </small>
 
@@ -190,7 +205,7 @@ The procedure will guide you through 6 steps:
 - setting of the installation-target
 - setting of the installation mode
 - setting of the destination folder
-- choice whether or not to install the WOSS libraries
+- choose whether or not to install the WOSS libraries
 - setting of possible custom parameters (OPTIONAL)
 - selection of the addons to be installed (OPTIONAL)
 
@@ -217,7 +232,7 @@ Here is a list of all options currently available:
         From the point of view of the installation tool, passing the target option
         is equivalent to choosing the specific installation script to be used after
         the preliminary settings. The installation scripts are located in
-        .../DESERT_Underwater/DESERT_Framework/Installation/.
+        DESERT_Underwater/DESERT_Framework/Installation/.
         If you create a custom installation script, you must put it in this folder.
         Targets available:
             - LOCAL
@@ -244,10 +259,12 @@ Here is a list of all options currently available:
     --addons <list-of-the-DESERT-addons>
         Only for command-line. This option specifies which addons to Desert Underwater
         should be installed. The available addons are usually found in
-        .../DESERT_Underwater/DESERT_Addons/
+        DESERT_Underwater/DESERT_Addons/
         The <list-of-the-DESERT-addons> parameter is composed by the names of any addons
-        separated by a white space and enclosed in quotes, e.g.,
-        "ADDON1 ADDON2 ADDON3"
+        separated by a white space e.g.,
+        ADDON1 ADDON2 ADDON3
+        Or if you want to install all of them you can just type
+        ALL
 
     --custom_par <list-of-parameters>
         Only for command-line. This option provides a useful means of passing a variable
@@ -258,11 +275,19 @@ Here is a list of all options currently available:
 
 </small>
 
-If you encounter any problem while building this library, you can refer to github and open a dedicated issue, that we will investigate
+For instance, the following command will install DESERT on your local machine in development mode with all the addons:
+
+<small>
+
+    ./install.sh --target LOCAL --inst_mode development --dest_folder <destination-folder-path> --addons ALL
+
+</small>
+
+If you encounter any problem while building this library, you can refer to github and open a dedicated issue, that we will investigate.
 
 <br>
 
-\section todoafter After the installation has been completed
+\subsection todoafter After the installation has been completed
 
 When the installation of DESERT Underwater has been successfully completed, you need to update your environment variables by exporting the paths to the bin/ and lib/ folders created in the path specified during the installation. This is required in order to correctly use DESERT and its dependencies (ns, ns-miracle, etc.).
 This operation is made simpler via the <i>environment</i> file generated at the end of the installation session in the <destination-folder-path> only for the "development" installation-mode. So, by running the following command:
@@ -284,17 +309,54 @@ With the "release" installation-mode, instead, you can set the environment via t
 </small>
 
 before updating your environment variables. The "make_environment.sh" script is particularly useful after the DESERT framework has been cross-compiled and copied into the target device: in this case, the script dynamically generates the environment file in agreement with the destination folder path within the target device.
+
+In order to make the environment update persistant even after you close the terminal, you need to append the source command to your bash configuration file, as follows:
+
+<small>
+
+    echo "source <destination-folder-path>/environment" >> $HOME/.bashrc
+
+</small>
 <br>
+
+\section docker-install Use Docker
+Alternatively to the manual installation, DESERT provide an automatic installation using docker.
+
+You will need to cd to the dockerfile directory
+
+<small>
+
+    cd DESERT_Underwater/DESERT_Framework/Docker/ubuntu_dockerfile_with_desert/
+
+</small>
+
+And build it
+
+<small>
+
+    docker build -t docker_desert .
+
+</small>
+
+It will create a container with Ubuntu 22.04 LTS, download all the dependencies and install DESERT with WOSS and all the addons.
+Finally run the just created container
+
+<small>
+
+    docker run -it docker_desert
+
+</small>
+
 
 */
 
-/** \page CROSS-COMPILE-RPI How to cross-compile DESERT for Raspberry Pi Zero
+/** \page CROSS-COMPILE-RPI How to cross-compile DESERT for Raspberry Pi Zero (32bit)
 \section CROSS-COMPILE-RPI-bare  Cross-compilation on Debian/Ubuntu workstation
 To download the appropriate toolchain, you can use the script provided inside
 
 <small>
 
-    .../DESERT_Framework/Installer/make-rpi-toolchain.sh
+    <your-desert-path>/DESERT_Underwater/DESERT_Framework/Installer/make-rpi-toolchain.sh
 
 </small>
 
@@ -302,20 +364,22 @@ To download the appropriate toolchain, you can use the script provided inside
 NOTE: this script requires sudo capabilities and workstation should be connected to the internet.
 </BLOCKQUOTE>
 
-After script correctly finished, you can compile DESERT for Raspberry Pi Zero selecting the appropriate arch and selecting *"release"* modality when asked during wizard procedure in order not to copy unnecessary files.
+After script correctly finished, you can compile DESERT for Raspberry Pi Zero selecting the appropriate arch and selecting "release" mode when asked during wizard procedure in order not to copy unnecessary files.
+
+Alternatively to the wizard, you can run the following command:
 
 
 <small>
 
-    ./install.sh --target Raspberry-Pi-zero-Raspbian --inst_mode release --dest_folder /home/yourhome/DESERT_Underwater/DESERT_buildCopy_Raspberry-Pi-zero-Raspbian
+    ./install.sh --target Raspberry-Pi-zero-Raspbian --inst_mode release --dest_folder <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_Raspberry-Pi-zero-Raspbian
 
 </small>
 
-After installation has been correctly completed, you can copy *_buildCopy* folder inside your Raspberry, source the environment files and run you tcl files inside the Raspberry.
+After installation has been correctly completed, you can copy *_buildCopy* folder inside your Raspberry, set the environment files and run you tcl files inside the Raspberry.
 
 <small>
 
-    scp -r /home/yourhome/DESERT_Underwater/DESERT_buildCopy_Raspberry-Pi-zero-Raspbian pi@<your-raspi-ip-address>:~
+    scp -r <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_Raspberry-Pi-zero-Raspbian pi@<your-raspi-ip-address>:~
 
 </small>
 
@@ -323,18 +387,19 @@ you can now get access via ssh to your Raspberry and source the DESERT env file 
 
 <small>
 
-    ssh root@<your-modem-ip-address>
-    source .../DESERT_buildCopy_Raspberry-Pi-zero-Raspbian/environment
+    ssh <user>@<your-modem-ip-address>
+    cd ~/DESERT_buildCopy_Raspberry-Pi-zero-Raspbian/ && ./make_environment.sh
+	source environment
 
 </small>
 
 
 \section CROSS-COMPILE-RPI-docker Use docker
 
-In order to simplify the cross-compilation process, a Dockerfile is present in .../DESERT_Framework/Docker/xcompile folder, which prepares for you the right environment to cross-compile DESERT on Raspberry
+In order to simplify the cross-compilation process, a Dockerfile is present in DESERT_Framework/Docker/xcompile folder, which prepares for you the right environment to cross-compile DESERT on Raspberry
 
 <BLOCKQUOTE>
-NOTE: The following section requires Docker to be installed and working on workstation
+NOTE: The following section requires Docker to be installed and working on workstation.
 </BLOCKQUOTE>
 
 You have to first build your docker image
@@ -345,7 +410,7 @@ You have to first build your docker image
 
 </small>
 
-You can now use the just built docker image to run a container and build DESERT inside it. To run that container you can use the provided script inside .../DESERT_Framework/Docker/xcompile
+You can now use the just build the docker image to run a container and compile DESERT inside it. To run that container you can use the provided script inside DESERT_Framework/Docker/xcompile
 
 
 <small>
@@ -355,7 +420,7 @@ You can now use the just built docker image to run a container and build DESERT 
 </small>
 
 You will have a shell inside the running container with DESERT framework mounted on its filesystem, and you can now proceed to compile DESERT as in the previous section. At the end of the installation,
-you can exit the docker container shell (container will now die) and copy the *_buildCopy* folder inside your Raspberry, as explained in the previous section
+you can exit the docker container shell (container will now stop) and copy the *_buildCopy* folder inside your Raspberry, as explained in the previous section.
 
 
 */
@@ -380,7 +445,7 @@ After script correctly finished, you can compile DESERT for EvoLogics sandbox se
 
 <small>
 
-    ./install.sh --target EvoLogics-sandbox-debian_armhf --inst_mode release --dest_folder /home/yourhome/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf
+    ./install.sh --target EvoLogics-sandbox-debian_armhf --inst_mode release --dest_folder <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf
 
 </small>
 
@@ -388,7 +453,7 @@ After installation has been correctly completed, you can copy *_buildCopy* folde
 
 <small>
 
-    scp -r /home/yourhome/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf root@<your-modem-ip-address>:~
+    scp -r <your-desert-path>/DESERT_Underwater/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf root@<your-modem-ip-address>:~
 
 </small>
 
@@ -396,8 +461,9 @@ you can now get access via ssh to your modem sandbox and source the DESERT env f
 
 <small>
 
-    ssh root@<your-modem-ip-address>
-    source .../DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/environment
+	ssh root@<your-modem-ip-address>
+	cd ~/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/ && ./make_environment.sh
+	source ~/DESERT_buildCopy_EvoLogics-sandbox-debian_armhf/environment
 
 </small>
 
@@ -432,67 +498,675 @@ you can exit the docker container shell (container will now die) and copy the *_
 
 */
 
+/** \page ROS ROS Integration for DESERT
+
+\section FRAMEWORK ROS middleware
+
+The DESERT framework can be combined with an easy-to-use and efficient ROS middleware module that enables robotic applications to communicate through an underwater acoustic channel by leveraging the DESERT protocol stack. With a specific focus on the unique characteristics of underwater networks, this module provides an open-source interface that can be used for any robotic project involving submerged devices.
+
+While the ROS ecosystem has seen the implementation of various Data Distribution Services for inter-node communication, none of them are inherently suitable for the specific challenges of acoustic transmission. The goal of this integration is to expand the potential of the ROS framework to new application scenarios, and more detailed information and usage instructions can be found on the [wiki](https://github.com/signetlabdei/rmw_desert/wiki).
+
+This middleware, provides:
+- A communication bridge between ROS applications and underwater acoustic networks via DESERT protocols,
+- Simplifies the development of underwater robotic applications integrated with DESERT,
+- Offers a flexible and open-source interface for various types of automated underwater projects,
+- Bridges the gap between traditional ROS DDS and the unique requirements of underwater acoustic communication,
+- Expands the possibilities for using ROS in marine and underwater environments.
+
+*/
+
 /** \page DEV Developer guide
 
-\section DESMod Structure of a DESERT module
+\section desstruct	DESERT Structure
+The DESERT underwater framework is an extension of [ns-miracle](https://signet.dei.unipd.it/dgt/ns/miracle/doxygen/index.html), thus it inherits its modular structure and can directly use all the modules of such framework.
+Each DESERT module extends from the ns-miracle class Module, which in turn extends from the class PlugIn.
+They provide basic APIs to (i) send packets to upper/lower layers, (ii) communicate via crosslayer messages with other layers of the stack and (iii) configure the layer via tcl script (command and bind).
 
-Each DESERT module derives either from another DESERT or ns-miracle module (e.g., UnderwaterPhysical derives from ns2-miracle UnderwaterMPhyBpsk) or from the base ns2-miracle Module class. In order to use it with tcl, in the cpp file you always need to create a static class that derives from TclClass and gives the name that will be used from tcl to create and bind an object of that module. For instance UnderwaterPhysical is “converted” in tcl using the following class
+The folder structure is composed by two main folders: DESERT_Framework and DESERT_Addons.
+Inside the former, you find all the modules organized according to the ISO/OSI stack and the installer folder.
+While the latter contains external modules which doesn't necessarily fit inside the ISO/OSI stack and/or the DESERT core.
 
-<small> 
+\section howtcl How to create a new tcl script
+In this section we describe how to write a basic DESERT tcl script, following the structure of the tcl found in `DESERT/samples/desert_samples/test_uwcbr.tcl`.
 
-    static class UwPhysicalClass : public TclClass
+It is a good practice to start your script with a brief description and a simple draw of the simulated network topology:
+\code{.tcl}
+# ----------------------------------------------------------------------------------
+# This script depicts a very simple but complete stack in which two nodes send data
+# to a common sink. The second node is used by the first one as a relay to send data to the sink.
+# The routes are configured by using UW/STATICROUTING.
+# The application used to generate data is UW/CBR.
+# ----------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
+# Stack
+#             Node 1                         Node 2                        Sink
+#   +--------------------------+   +--------------------------+   +-------------+------------+
+#   |  7. UW/CBR               |   |  7. UW/CBR               |   |  7. UW/CBR  | UW/CBR     |
+#   +--------------------------+   +--------------------------+   +-------------+------------+
+#   |  6. UW/UDP               |   |  6. UW/UDP               |   |  6. UW/UDP               |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  4. UW/IP                |   |  4. UW/IP                |   |  4. UW/IP                |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  3. UW/MLL               |   |  3. UW/MLL               |   |  3. UW/MLL               |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |
+#   +--------------------------+   +--------------------------+   +--------------------------+
+#            |         |                    |         |                   |         |       
+#   +----------------------------------------------------------------------------------------+
+#   |                                     UnderwaterChannel                                  |
+#   +----------------------------------------------------------------------------------------+
+\endcode
+
+The first thing to do in order to have a working script, is to import the libraries. Note that the order matters and is often a cause of errors.
+You first need to import the ns-miracle libraries in the following order:
+\code{.tcl}
+load libMiracle.so
+load libMiracleBasicMovement.so
+load libmphy.so
+load libmmac.so
+load libUwmStd.so
+\endcode
+Afterwards you can import DESERT libraries you need (in order).
+\code{.tcl}
+load libuwcsmaaloha.so
+load libuwip.so
+load libuwstaticrouting.so
+load libuwmll.so
+load libuwudp.so
+load libuwcbr.so
+\endcode
+
+In order to configure your simulation, some options and variables may be needed.
+A common approach is to use an associative array called. These options may be hardcoded or given to the simulation as bash parameters.
+\code{.tcl}
+set opt(bash_parameters) 0; # Set to 1 to activate bash parameters
+if {$opt(bash_parameters)} {
+	if {$argc != 2} {
+		puts "The script requires two inputs"
+	} else {
+		set opt(pktsize)	[lindex $argv 0]
+		set opt(rngstream)	[lindex $argv 1]
+	} else {
+		set opt(pktsize)	125;	# Bytes
+		set opt(rngstream)	1;		# Needed by the RNG	
+	}
+}
+\endcode
+
+Common simulation options are listed below
+\code{.tcl}
+set opt(nn) 2.0 ;# Number of Nodes
+set opt(starttime) 1
+set opt(stoptime) 1000
+set opt(duration) [expr $opt(stoptime) - $opt(starttime)]
+\endcode
+
+Once you have all the needed libraries and options, you need to initialize the ns-miracle simulator and set the random number generator.
+\code{.tcl}
+set ns [new Simulator]
+$ns use-Miracle
+
+# Set the default random number generator
+global defaultRNG
+for {set k 0} {$k < $opt(rngstream)} {incr k} {
+	$defaultRNG next-substream
+}
+\endcode
+
+Next there are the binding of the modules. Here you can set globally the initialization values of the binded variables.
+\code{.tcl}
+Module/UW/CBR set packetSize_		$opt(pktsize)
+# ...
+\endcode
+
+Now you are ready to define a tcl procedure (function) that allows you to create as many different kind of nodes in the network.
+Inside this procedure, you need to create a ns-miracle node and add the modules you need (the whole protocol stack) and configure them.
+Optionally you can initialize and set the node position.
+\code{.tcl}
+proc createNode { id } {
+	# include global variables to use in the procedure
+	global <variables list>
+
+    # build the NS-Miracle node
+	set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
+
+    # define the module(s) you want to put in the node
+	set cbr($id)  [new Module/UW/CBR]
+	set udp($id)  [new Module/UW/UDP]
+	set ipif($id) [new Module/UW/StaticRouting]
+	set ipr($id)  [new Module/UW/IP]
+	set mll($id)  [new Module/UW/MLL]
+	# ...
+
+    # insert the module(s) into the node 
+	# $node addModule <layer> <module> <cl_trace> <tag>
+	$node($id) addModule 7 $cbr($id) 0 "CBR"
+	# ...
+
+    # intra-node module connections
+	# $node setConnection <upper> <lower> <trace>
+	$node($id) setConnection $cbr($id) $udp($id) 0
+	# ...
+
+	# socket configuration
+    set portnum($id) [$udp($id) assignPort $cbr($id) ]
+    $ipif($id) addr  [expr ($id) + 1]
+
+    # add node positions (optional)  
+	set position($id) [new "Position/BM"]
+	$node($id) addPosition $position($id)
+	$position($id) setX_ 0
+	$position($id) setY_ 0
+	$position($id) setZ_ -100
+
+	# ...
+}
+\endcode
+
+You can have as many procedures you want. Typically there is a specific procedure for the sink node (a node which only receives packets).
+Finally, to actually create the nodes you need to call the procedure. Suppose to have `$opt(nn)` nodes in the network, you can do:
+\code{.tcl}
+for {set id 0} {$id < $opt(nn)} {incr id}
+{
+	createNode $id
+}
+createSink; # Suppose to have a procedure to create the sink node
+\endcode
+
+Once you created the nodes you need to connect them, setup the routes and fill the arp tables.
+\code{.tcl}
+proc connectNodes {id1} {
+    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink
+
+    $cbr($id1) set destAddr_ [$ipif_sink addr]
+    $cbr($id1) set destPort_ $portnum_sink($id1)
+    $cbr_sink($id1) set destAddr_ [$ipif($id1) addr]
+    $cbr_sink($id1) set destPort_ $portnum($id1)
+}
+
+# Setup flows
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    connectNodes $id1
+}
+
+# Fill ARP tables
+for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
+    for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
+      $mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
+    }   
+    $mll($id1) addentry [$ipif_sink addr] [ $mac_sink addr]
+    $mll_sink addentry [$ipif($id1) addr] [ $mac($id1) addr]
+}
+
+# Setup routing table
+$ipr(0) addRoute [$ipif_sink addr] [$ipif(1) addr]
+$ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
+\endcode
+
+Finally you need to start and stop the modules and the simulation.
+\code{.tcl}
+for {set id1 0} {$id1 < $opt(nn)} {incr id1} {
+	$ns at $opt(starttime) "$cbr($id1) start"
+	$ns at $opt(stoptime) "$cbr($id1) stop"
+
+	# ...
+
+	$ns at $opt(stoptime)  "finish; $ns halt"; # stop simulation and run finish procedure
+	$ns run
+}
+\endcode
+
+Optionally, it is good practice to add a finish procedure where display the simulation settings and compute some statistics.
+
+\section howmod How to add a new module
+In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
+As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named `uwcool_phy`. The procedure to create a new module is described in the following.
+
+The folder structure aims to follow ISO/OSI structure.
+First of all, identify where your module can be logically placed and give  it a name, in this case, our new `uwcool_phy` physical layer module should stay inside  `DESERT_Framework/DESERT/physical` folder, therefore you need to cd to that directory and create a folder named `uwcool_phy`.
+This folder will contain your new library.
+
+Create two files called `uwcoolphy.h` and `uwcoolphy.cpp` files containing your class definition `UwCoolPhy`.
+For this class to work, some types of binding are necessary.
+Moreover you will need to create the following files:
+
+- `initlib.cpp`,
+- `Makefile.am`,
+- `uwcoolphy-default.tcl`.
+
+In order to use your class with tcl, in the cpp file you always need to create a **static** class that derives from `TclClass` and gives the name that will be used from tcl to create and bind an object of that module.
+In our example it would be done via the following code:
+
+\code{cpp} 
+
+    static class UwCoolPhyClass : public TclClass
     {
     public:
-        UwPhysicalClass()
-            : TclClass("Module/UW/PHYSICAL")
+        UwCoolPhyClass()
+            : TclClass("Module/UW/CoolPhy")
         {
         }
         TclObject *
         create(int, const char *const *)
         {
-            return (new UnderwaterPhysical);
+            return (new UwCoolPhy);
         }
-    } class_module_uwphysical;
+    } class_module_uwcoolphy;
+
+\endcode
+
+Then we need to link class parameters to tcl variables, this is usually done in the cpp constructor, using the `bind()` function.
+This function take as input a string representing a tcl variable which is bound to the second input, which represents a cpp class parameter.
+
+\code{.cpp}
+
+	bind("debug", (int *) &debug_);			// inside uwcoolphy.cpp
+
+\endcode
+\code{.tcl}
+
+	Module/UW/CoolPhy set debug 1			# inside uwcoolphy-init.tcl
+
+\endcode
+
+The `initlib.cpp` file make *the connection* between the cpp library of your module and the tcl representing your scenario under simulation/emulation.
+You need to define an extern variable representing an **EmbeddedTcl** object, which has a specific name structure: `<ModuleNameInCamelCase><TclCode>`.
+You need also to define a function with fixed naming, which is the name of your module with the first capital letter and `_Init` suffix.
+Following our example, your `initlib.cc` will look like this:
+
+\code{.cpp}
+
+	#include <tclcl.h>
+	
+	extern EmbeddedTcl UwCoolPhyTclCode;
+	
+	extern "C" int
+	Uwcoolphy_Init()
+	{
+		UwCoolPhyTclCode.load();
+		return 0;
+	}
+
+\endcode
+
+All bound variables need to be initialized to a default value in the `uwcoolphy-defaults.tcl` file.
+An example of it would be
+
+\code{.tcl}
+
+	Module/UW/CoolPhy set BitRate					32500
+	Module/UW/CoolPhy set AcquisitionThreshold_dB_	10.0
+	Module/UW/CoolPhy set debug_					0
+
+\endcode
+
+Finally, to compile your module, you need to fill the `Makefile.am` file:
+- There should be the definition of your library. The name of your library should always contain *lib* prefix, i.e., `libuwcoolphy`.
+- Specify the list of sources (`libuwcool_phy_la_SOURCES`), which should contain only the cpp files located in the `uwcool_phy` folder.
+- Remember to define the `CPPFLAGS`, `LDFLAGS` and `LIBADD` where needed.
+- Define the tcl files variables defaults which are specified inside `uwcool-phy-default.tcl`.
+
+Your `Makefile.am` should look like this:
+
+\code{.am}
+
+	AM_CXXFLAGS = -Wall -ggdb3
+	
+	lib_LTLIBRARIES = libuwcoolphy.la
+	libuwcoolphy_la_SOURCES = initlib.cpp uwcoolphy.cpp
+	
+	libuwcoolphy_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+	libuwcoolphy_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+	libuwcoolphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+	
+	nodist_libuwcoolphy_la_SOURCES = InitTcl.cc
+	BUILT_SOURCES = InitTcl.cc
+	CLEANFILES = InitTcl.cc
+	
+	TCL_FILES =  uwcoolphy-default.tcl
+	
+	InitTcl.cc: Makefile $(TCL_FILES)
+	                cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwCoolPhyTclCode > InitTcl.cc
+	
+	EXTRA_DIST = $(TCL_FILES)
+
+\endcode
+
+DESERT compilation and linking is based on autotools, hence to add a new library you need to modify the top-level `DESERT_Framework/DESERT/Makefile.am` and `DESERT_Framework/DESERT/configure.ac` files as follows:
+- `Makefile.am`: we need to add our folder to the subdirectories list (SUBDIRS) using \ as a separator
+- `configure.ac`: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
+
+\code{.am}
+
+		… \
+        physical/uwcool_phy
+
+\endcode
+
+\code{.ac}
+
+    […]
+    DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
+    […]
+    AC_CONFIG_FILES=([
+    [...]
+    physical/uwcool_phy
+    [...]
+    ])
+
+\endcode
+
+Once everything is ready, we need to reinstall DESERT to properly add the new module.
+
+Note: After the module is installed, we can recompile it without reinstalling everything. In our case, we would need to do the following:
+\code{.sh}
+
+	cd DESERT_buildCopy_LOCAL/.buildHost/DESERT/physical/uwcoolphy/
+	make && make install
+
+\endcode
+
+
+\subsection cmdMet The command method
+Finally, inside a tcl script we can use our module by:
+
+1. Setting its parameter, 
+2. instantiating an object, 
+3. connecting or calling the necessary methods on it.
+
+To set the parameters and instantiate the object we can write
+
+\code{.tcl}
+	
+	Module/UW/CoolPhy set BitRate_				   32500
+	Module/UW/CoolPhy set AcquisitionThreshold_dB_ 10.0
+
+	set phy [new Module/UW/CoolPhy]
+
+\endcode
+
+To enable the communciation between the cpp class and the tcl script we need to overwrite the command method, for example to get and set parameters of a module object.
+It must be declared in this way, in your module class (`uwcoolphy.h`)
+
+\code{.cpp}
+
+	virtual int command(int argc, const char *const *argv);
+
+\endcode
+And then it should be defined in this way (inside `uwcoolphy.cpp`)
+
+\code{.cpp}
+
+	UwCoolPhy::command(int argc, const char *const *argv) {
+		if (argc == 2) {
+			if (strcmp(argv[1], "Method1") == 0) {
+				method1();
+				return TCL_OK;
+			}
+		}
+		else if (argc == 3) { .... }
+		
+		return Module::command(argc, argv)
+	}
+
+\endcode
+
+\subsection pLog The printOnLog method
+<blockquote>
+NOTE: This is a new feature (version >= 3.6). By now only the following modules implement it:
+
+- UwCbrModule
+- UwUdp
+- UWIPModule
+- UwStaticRoutingModule
+- CsmaAloha
+- UnderwaterPhysical
+
+All the other modules use the ns-way of logging: 
+You need to define a `debug_` parameter on your module and bind it to tcl inside the constructor (see the previous section).
+Every time you want to print a log message, then you need to check if debug parameter is set and print to console your message.
+</blockquote>
+Each DESERT module inherits a static logger parameter, shared among all the modules in a simulation istance.
+It lets you specify the level of logging messages you want. There are three possible values:
+
+<small>
+
+	 ERROR: only error messages will be generated.
+	 INFO : general info about the algorithms running and also ERROR messages.
+	 DEBUG: details that allow to understand the execution flow plus both ERROR and INFO messages are shown.
 
 </small>
 
-The name "Module/UW/PHYSICAL" is the one that will be used in TCL to create and bind objects of type UnderwaterPhysical.
+In particular, it gives you the method `printOnLog`, defined as follows:
 
-You can pass variables to and from tcl script and C++ class, by means of bind function, inside the constructor of your module class.
-To bind a variable you need to use the bind function inside the constructor of your module class. 
-In example,  in UnderwaterPhysical we bind the rx_power_ with 
-bind("rx_power_consumption_", &rx_power_);
-All bound variables need to be initialized to a default value in the *-defaults.tcl inside your folder.
+\code{.cpp}
 
-Another way to communicate with the tcl script is to overwrite the command method, for example to get and set parameters of a module object. For more details, just check the UnderwaterPhysical::command method. It is usually best practice to call the father class’ command method at the end.
+	virtual void printOnLog(Logger::LogLevel level, const std::string &module, const std::string &message) const;
+
+\endcode
+
+This method takes three parameter: (i) the log level of the message, (ii) the name of the module printing the message and (iii) a string representing the log message.
+
+As an example, suppose you have a method to handle packets reception that you would like to track, you can do it as follows:
+
+\code{.cpp}
+
+	void
+	UwCoolPhy::startRx(Packet *p)
+	{
+		...
+		printOnLog(Logger:LogLevel:DEBUG, "UWCOOLPHY", "startRX(Packet *)::Received new packet");
+		...
+	}
+
+\endcode
+
+To enable and configure the log messages in your simulation, you can use the following commands:
+
+\code{.cpp}
+	setLogLevel <log_level>				// Set the logger level (1, 2 or 3)
+	setLogFile  <file_name>				// Set the logger file name
+	setLog		<log_level> <file_name>	// Set both the logger level and file name
+	enableLog							// Enable log on a specific module
+	disableLog							// Disable log on a specific module
+\endcode
+
+Remember that all the modules in a given simulation, share the same instance of the logger, meaning, that the `log_level` and `log_file` can be set just once.
+For instance, suppose, you have a tcl file, with one transmitting node and one sink node, you can set the logger for the sink physical layer only as follows:
+
+\code{.tcl}
+	proc createSink { } {
+		...
+		set phy_data_sink [new Module/UW/CoolPhy]
+		....
+		$phy_data_sink setLog 3 "log_output.txt"
+		...
+	}
+\endcode
+
+It will print all the `coolphy` log messages inside a file called `log_output.txt`.
+Each message has an `id` associated with it, which is the ns id of the node and is incremental set, e.g., the first node created will have `id` 0, the second `id` 1 and so on.
+
+Note: You can find a complete example on how to use the logging system inside `DESERT/samples/desert_samples/logger/` folder.
+
+\section newheader How to add a new Packet headers
+
+In the case your module needs its own **packet header**, a few things need to be performed:
+
+Define a header *struct*, for example `hdr_uwmyprotocol` inside a file `myproto-hdr.h` with your parameters plus the offset field required by the *packet header manager*:
+
+\code{.cpp}
+
+	typedef struct hdr_uwmyprotocol 
+	{
+		uint8_t param;
+		static int offset_;
+
+		inline uint8_t & param() { return param_ }
+		inline static int& offset() {return offset_;}
+
+		inline static struct hdr_uwmyprotocol *
+		access(const Packet *p)
+		{ 
+			return (struct hdr_uwmyprotocol *) p->access(offset_); 
+		}
+	} hdr_uwmyprotocol;
+
+\endcode
+
+To simplify the access of your *header* from the *packet* class, at the beginning of the source file where your header is defined you can define the following macro
+
+\code{.cpp}
+
+    #define HDR_UWMYPROTOCOL(p) (hdr_uwmyprotocol::access(p))
+
+\endcode
+
+Just after the macro, at the beginning of the file, you need to define a new *packet* type with
+
+<small>
+
+    extern packet_t PT_MYPACKET;
+
+</small>
+
+Inside initlib.cpp you need to 
+- Include your header file and define the offset and the packet type
+
+\code{.cpp}
+
+	#include<myproto-hdr.h>
+	...
+
+	int hdr_uwmyprotocol::ofset_;
+	packet_t PT_MYPACKET;
+
+\endcode
+
+- Add a static class
+
+\code{.cpp}
+
+    static class MyProtoHeaderClass : public PacketHeaderClass
+    {
+    public:
+        MyProtoHeaderClass()
+            : PacketHeaderClass("PacketHeader/MYPROTO", sizeof(hdr_uwmyprotocol))
+        {
+            this->bind();
+            bind_offset(&hdr_uwmyprotocol::offset_);
+        }
+    }
+
+
+\endcode
+
+- Add the packet inside the `init` function (before the `load` function call), using the same name of the extern
+
+\code{.cpp}
+
+    PT_MYPACKET = p_info::addPacket("MYPROTO");
+
+\endcode
+
+Finally, inside the *-default.tcl you need to add the packet to the packet manager, with
+
+\code{.tcl}
+
+    PacketHeaderManager set tab_(PacketHeader/MYPROTO) 1
+
+\endcode
+
+This last step is really important to have the right memory allocation done. Missing it could lead to unpredictable behavior, usually really hard to troubleshoot.
+
+
+\section newaddon How to add a new DESERT Add-on
+
+In this section we describe how to add a new module as a DESERT addon.
+An addon, is an external autotools project that depends on DESERT, ns-miracle and, in some cases, WOSS or even other addons, so we don’t need to modify the DESERT toplevel `Makefile.am` and `configure.ac`.
+We need to create just the addon internal `Makefile.am` and a dedicated `configure.ac` with `m4` folder to resolve the dependencies. 
+The complete procedure is described in the following.
+
+Inside the `DESERT_Addons` folder, create your addon folder, say `cool-addon`.
+Inside that folder, create the basic files for a properly cpp module, i.e., `cool-addon.h` and `cool-addon.cpp` and the `initlib.cpp` as well.
+
+Similarly to what you did for the adding a module, your `initlib.cpp` will look like
+
+\code{.cpp}
+
+	#include <tclcl.h>
+
+	extern EmbeddedTcl CoolAddonTclCode;
+
+	extern "C" int
+	Cooladdon_Init()
+	{
+		CoolAddonTclCode.load();
+		return 0;
+	}
+
+\endcode
+
+To make the addon compilable and complete, we also need:
+- A `Makefile.am`,
+- a `configure.ac` config file,
+- an initialization file for the tcl, i.e., `cool-addon-init.tcl`,
+- the `autogen.sh` script,
+- and a `m4` folder
+
+The `Makefile.am` can be taken from another addon or module and modified according to your addond needs, similarly to what what we did for a module.
+Just note that in case of a *WOSS* dependent addon, it is better to take the `Makefile.am` from another *WOSS*-based addon, such as `wossgmmob3D` or `wossgroupmob3D`.
+Similarly, in case your addon is based on another existing addon, take it from `uwswarm_control` or `ms2c_evologics_lowlev` addons.
+
+Also for the `configure.ac` you take one from another addon and copy into your folder.
+You just need to modify the `AC_INIT` with the name of your addon.
+Also in this case if you need WOSS functionalities take it from a WOSS-based addon.
+
+The `autogen.sh` file is needed to compile your addon and can be copied from any other addon and doesn't need any modification.
+
+Add all the variables that you have *binded* in your addon class inside the `cool-addon-init.tcl` files as youd did for the module.
+
+The `m4` folder contains the `desert.m4` file and the `desertAddon.m4` and `woss.m4` files if the addon depend from another addon or woss.
+Also in this case, it is easier to copy from another addon and modify the dependencies wee ned for our addon.
+Those are directories listed in `dir` and `lib` portion of the given `m4` file.
+
+Finally, to have your addon visible during installation, modify the installation file `DESERT_Framework/.addon.list` adding the name of your addon folder.
 
 \section HowTo How to add a new custom installer
+<BLOCKQUOTE>
+NOTE: When you see a pathname preceded by three dots, this refers to a well-known but unspecified top-level directory. The top-level directory is context-dependent, but almost always refers to top-level DESERT source directory.
+For example, `.../DESERT_Underwater/DESERT_Framework/Installer/installDESERT_LOCAL.sh` refers to the `installDESERT_LOCAL.sh` file located in the architecture branch of a DESERT framework source tree.
+The actual path might be something like `/home/foo/DESERT_Underwater/DESERT_Framework/Installer/installDESERT_LOCAL.sh`.
+</BLOCKQUOTE>
 
 First of all, enter the installation folder:
 
-<small>
+\code{.sh}
 
     cd .../DESERT_Underwater/DESERT_Framework/Installation/
 
-<BLOCKQUOTE>
-NOTE: When you see a pathname preceded by three dots, this refers to a well-known but unspecified top-level directory. The top-level directory is context-dependent, but almost universally refers to top-level DESERT source directory. For example, <tt>.../DESERT_Underwater/DESERT_Framework/Installer/installDESERT_PC.sh</tt> refers to the <tt>installDESERT_PC.sh</tt> file located in the architecture branch of a DESERT framework source tree.
-The actual path might be something like <tt>/home/foo/DESERT_Underwater/DESERT_Framework/Installer/installDESERT_PC.sh</tt>.
-</BLOCKQUOTE>
-</small>
+\endcode
 
-At this point, create a new script. We suggest to copy an existing installation script (e.g. <tt>installDESERT_PC.sh</tt>):
+Now, create a new script.
+We suggest to copy an existing installation script (e.g. `installDESERT_LOCAL.sh`):
 
-<small>
+\code{.sh}
 
-    cp installDESERT_PC.sh installDESERT_<your-custom-installation-target>.sh
+    cp installDESERT_LOCAL.sh installDESERT_<your-custom-installation-target>.sh
 
-</small>
+\endcode
 
-Please note the <tt><your-custom-installation-target></tt> label: this will be the same parameter you will pas later as an option to the installation script when indicating which installation-target to choose. We remark that these steps are very easy but also very important, since the only way to call the correct installation script for <tt><your-custom-installation-target></tt> is that the script <tt>installDESERT_<your-custom-installation-target>.sh</tt> exists in the folder <tt>.../DESERT_Underwater/DESERT_Framework/Installation/</tt>
+Please note the `<your-custom-installation-target>` label:
+this will be the same parameter you will pas later as an option to the installation script when indicating which installation-target to choose.
+We remark that these steps are very easy but also very important, since the only way to call the correct installation script for `<your-custom-installation-target>` is that the script `installDESERT_<your-custom-installation-target>.sh` exists in the folder `.../DESERT_Underwater/DESERT_Framework/Installation/`
 
 Let us now have a deeper look at the script. We focus first on the main block:
 
-<small>
+\code{.sh}
 
     main() {
         #******************************************************************************
@@ -507,8 +1181,8 @@ Let us now have a deeper look at the script. We focus first on the main block:
 
         handle_package host ZLIB
         handle_package host TCL
-        export PATH="${BUILD_HOST}/bin:$PATH"
-        export LD_LIBRARY_PATH="${BUILD_HOST}/lib"
+        export PATH=${BUILD_HOST}/bin:$PATH
+        export LD_LIBRARY_PATH=${BUILD_HOST}/lib
         handle_package host OTCL
         handle_package host TCLCL
         handle_package host NS
@@ -526,13 +1200,13 @@ Let us now have a deeper look at the script. We focus first on the main block:
         #******************************************************************************
     }
 
-</small>
+\endcode
 
-Notice the "host" directive. This tells the installation script to compile the
-libraries for the current host. If you need to modify this script to cross-compile
-for a different target, substitute all lines with the following ones:
+Notice the ***host*** directive.
+This tells the installation script to compile the libraries for the current host.
+If you need to modify this script to cross-compile for a different target, substitute all lines with the following ones:
 
-<small>
+\code{.sh}
 
     main() {
         #******************************************************************************
@@ -567,14 +1241,11 @@ for a different target, substitute all lines with the following ones:
         #******************************************************************************
     }
 
-</small>
+\endcode
 
 With these changes we instructed the installer to compile some modules only for the
-host ("host" directive), some for both the host and the target ("host/target"
-directive) and the remaining ones only for the target ("target" directive).
-This step is crucial, because some libraries must be compiled for the host,
-in order to correctly cross-compile DESERT and its addons for
-<tt><your-custom-installation-target></tt>.
+host, some for both the host and the target and the remaining ones only for the target (***target*** directive).
+This step is crucial, because some libraries must be compiled for the host, in order to correctly cross-compile DESERT and its addons for `<your-custom-installation-target>`.
 
 <small>
 
@@ -585,129 +1256,6 @@ in order to correctly cross-compile DESERT and its addons for
 
 We remark that you need the <b>TOOLCHAIN</b> of <tt><your-custom-installation-target></tt> in order to
 correctly complete the installation.
-
-\section newmod How to add a new DESERT module
-
-In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
-As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named uwcool_phy. The procedure to create a new module is described as follows:
-- The folder structure aims to follow ISO/OSI structure. Identify where your module can be logically placed and give  it a name ( i.e., our new uwcool_phy physical layer module should stay inside  DESERT_Framework/DESERT/physical, therefore you need to create a folder DESERT_Framework/DESERT/physical/uwcool_phy: this folder will contain your new library.
-- Add your .h and .cpp files containing your class definition, called, for instance UwCoolPhy: this point will be discussed more in detail later.
-- Add the file initlib.cpp: this file is really standard and you can use an existing one (i.e., an existing physical layer module) as an example.
-This is the file that make “the connection” between the C++ library of your module and the tcl representing your scenario under simulation/emulation. You need to define an extern variable representing an EmbeddedTcl object, which has a specific name structure: <ModuleNameInCameCase><InitTclCode>.
-You need also to define a function with fixed naming, which is the name of your module with the first capital letter and _Init suffix
-Following our example, the variable should be named UwCoolPhyInitTclCode and the function should be Uwcoolphy_Init. Some of those initlib files has also support to Cygwin. If you are not planning to use it, you can get rid of it.
-- Add the tcl for default initialization, called uwcool-phy-default.tcl, which will contain the initialization of your tcl binded variables. You can take a look at uwphysical module to have an example of it
-- Add to your folder the internal Makefile.am: here there should be the definition of your library. The name of your library should always contain lib prefix, i.e. libuwcoolphy. Since the structure of the Makefiles is really standard you can take, for example, the uwphysical module’s one and modify some parts of it:
-the word libuwphysical should be changed EVERYWHERE with the name of your library, e.g., libuwcoolphy
-the word UwPhysicalInitTclCode should be changed to UwCoolPhyInitTclCode 
-the list of sources (libuwcool_phy_la_SOURCES) should contain only the cpp files located in the uwcool_phy folder
-the TCL_FILES should be equal to uwcool-phy-default.tcl
-- Modify top-level Makefile.am and configure.ac: DESERT compilation and linking is based on autotools, hence to add a new library you need to modify and DESERT_Framework/DESERT/Makefile.am and DESERT_Framework/DESERT/configure.ac as follows:
-    1. Makefile.am: we need to add our folder to the subdirectories list (SUBDIS) using \ as a separator
-<small>
-
-    … \
-        physical/uwcool_phy
-
-</small>
-    2. configure.ac: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
-<small>
-
-    […]
-    DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
-    […]
-    AC_CONFIG_FILES=([
-    [...]
-    physical/uwcool_phy
-    [...]
-    ])
-
-</small>
-
-\section newaddon How to add a new DESERT Add-on
-
-In this section we describe how to add a new module as a DESERT add-on, inside the folder DESERT_Addons. An addon is an external autotools project that depends on DESERT, ns2miracle and, in some cases, WOSS, so we don’t need to modify the DESERT toplevel Makefile.am and configure.ac, but we need to create just the addon internal Makefile.am and a dedicated configure.ac with m4 folder to resolve the dependencies. The complete procedure is described as follows.
-- Add your folder inside DESERT_Addons/
-- Add your .h and .cpp files like in point 2 of the previous section
-- Add iniltib.cpp like in point 3 of the previous section
-- Add the tcl file for the default initialization of your module like in point 3 of the previous section
-- Add the Makefile.am like in point 5 of the previous section
-- add in your folder the file autogen.sh: you can copy and paste is from another addon: this file should not be modified
-- copy from another addon the file configure.ac and modify the AC_INIT writing the name of your module, e.g., . In the case your module uses WOSS, copy the configure.ac from an addon that uses WOSS as well (e.g., wossgmmob3D), otherwise copy it from an addon that does not (e.g., one of the packer)
-- copy the folder m4 from another addon
-- inside the folded m4, change desert.m4 according to the DESERT dependencies of your module. e.g., you need to list in dir and in lib the directories and libraries your module uses.
-- in the case your module uses some woss dependencies, you need to do the same with woss.m4
-
-\section newheader How to add a new Packet headers
-
-In the case your module needs its own packet header, a few things need to be performed:
-define a header struct, for example hdr_MY inside a file my_hdr.h with your parameters plus the following members:
-
-<small>
-
-    public static int offser_ member 
-    inline static int& offset() {return offset_;}
-    inline static struct hdr_MY * access(const Packet *p) { 
-    return (struct hdr_MY *) p->access(offset_); 
-    }
-
-</small>
-
-to simplify the access of your header from the packet, at the beginning of the source file where your header is defined you can define a macro
-
-<small>
-
-    define HDR_MY(p) (hdr_MY::access(p))
-
-</small>
-
-just after the macro, at the beginning of the file, you need to define a new packet type with 
-
-<small>
-
-    extern packet_t PT_MY;
-
-</small>
-
-Inside initlib.cpp you need to 
-
-- add a static class
-
-<small>
-
-    static class MY_HeaderClass : public PacketHeaderClass
-    {
-    public:
-        MY_HeaderClass()
-            : PacketHeaderClass("PacketHeader/MY", sizeof(hdr_MY))
-        {
-            this->bind();
-            bind_offset(&hdr_MY::offset_);
-        }
-    } class_MY_HeaderClass;
-
-
-</small>
-
-- add the packet in the init function (before the load), using the same name of the extern
-
-<small>
-
-    PT_MY = p_info::addPacket("UWPROTOCOL/MY");
-
-</small>
-
-where PROTOCOL is the name of the protocol
-
-Finally, inside the *-default.tcl you need to add the packet to the packet manager, with
-
-<small>
-
-    PacketHeaderManager set tab_(PacketHeader/MY) 1
-
-</small>
-
-This last step is really important to have the right memory allocation done. Missing it could lead to unpredictable behavior, usually really hard to troubleshoot.
 
 
 
