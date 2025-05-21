@@ -4,7 +4,7 @@
 
 \image html ./desert.png
 
-@version 3.5.1
+@version 3.6.0
 
 @authors <b> Project supervisor: </b> Filippo Campagnaro - filippo.campagnaro@unipd.it
 
@@ -528,7 +528,6 @@ While the latter contains external modules which doesn't necessarily fit inside 
 
 \section howtcl How to create a new tcl script
 In this section we describe how to write a basic DESERT tcl script, following the structure of the tcl found in `DESERT/samples/desert_samples/test_uwcbr.tcl`.
-An empty tcl script skeleton can be found inside `DESERT/samples/desert_samples/ExampleSekelton.tcl`
 
 It is a good practice to start your script with a brief description and a simple draw of the simulated network topology:
 \code{.tcl}
