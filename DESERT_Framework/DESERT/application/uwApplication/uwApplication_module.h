@@ -39,43 +39,45 @@
 #ifndef UWAPPLICATION_MODULE_H
 #define UWAPPLICATION_MODULE_H
 
+#include <mutex>
+#include <thread>
 #include <uwip-module.h>
 #include <uwudp-module.h>
 
-#include <module.h>
-#include <iostream>
-#include <sstream>
-#include <climits>
-#include <time.h>
-#include <math.h>
 #include <assert.h>
+#include <climits>
 #include <errno.h>
+#include <iostream>
+#include <math.h>
+#include <module.h>
+#include <sstream>
 #include <stddef.h>
+#include <time.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <fcntl.h>
 #include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include <signal.h>
 
-#include <unistd.h>
-#include <syslog.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
+#include <chrono>
 #include <deque>
+#include <fstream>
 #include <list>
+#include <ostream>
 #include <queue>
 #include <rng.h>
-#include <fstream>
-#include <ostream>
-#include <chrono>
 
 #define UWAPPLICATION_DROP_REASON_UNKNOWN_TYPE \
 	"DPUT" /**< Drop the packet. Packet received is an unknown type*/
@@ -83,7 +85,6 @@
 	"DPD" /**< Drop the packet. Packet received is already analyzed*/
 #define UWAPPLICATION_DROP_REASON_OUT_OF_SEQUENCE \
 	"DOOS" /**< Drop the packet. Packet received is out of sequence. */
-
 
 extern packet_t
 		PT_DATA_APPLICATION; /**< Trigger packet type for UFetch protocol */
@@ -129,12 +130,16 @@ public:
 	 */
 	virtual void handleTCPclient(int clnSock);
 
+	virtual bool listenTCP();
+	virtual void acceptTCP();
+	virtual void readFromTCP(int clnSock);
+
 	// virtual void handleUDPclient(int clnSock);
 
 	/**
- * Increase the number of DATA packets stored in the Server queue. This DATA
- * packets will be sent to the below levels of ISO/OSI stack protocol.
- */
+	 * Increase the number of DATA packets stored in the Server queue. This DATA
+	 * packets will be sent to the below levels of ISO/OSI stack protocol.
+	 */
 	virtual void
 	incrPktsPushQueue()
 	{
@@ -148,10 +153,12 @@ public:
 	inline unsigned long int
 	getEpoch()
 	{
-	  unsigned long int timestamp =
-		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
-			  std::chrono::system_clock::now().time_since_epoch()).count() );
-	  return timestamp;
+		unsigned long int timestamp =
+				(unsigned long int) (std::chrono::duration_cast<
+						std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch())
+								.count());
+		return timestamp;
 	}
 
 	int servSockDescr; /**< socket descriptor for server */
@@ -159,14 +166,12 @@ public:
 	struct sockaddr_in servAddr; /**< Server address */
 	struct sockaddr_in clnAddr; /**< Client address */
 	int servPort; /**< Server port*/
-	std::queue<Packet *>
-			queuePckReadTCP; /**< Queue that store the DATA packets recevied
-								from the client by the server using a TCP
-								protocol*/
-	std::queue<Packet *>
-			queuePckReadUDP; /**< Queue that store the DATA packets recevied
-								from the client by the server using a UDP
-								protocol*/
+	std::queue<Packet *> queuePckReadTCP; /**< Queue that store the DATA packets
+											 recevied from the client by the
+											 server using a TCP protocol*/
+	std::queue<Packet *> queuePckReadUDP; /**< Queue that store the DATA packets
+											 recevied from the client by the
+											 server using a UDP protocol*/
 	std::ofstream out_log; /**< Variable that handle the file in which the
 							  protocol write the statistics */
 	bool logging;
@@ -576,6 +581,12 @@ protected:
 	double sumbytes; /**< Sum of bytes received. */
 	double sumdt; /**< Sum of the delays. */
 	int hrsn; /**< Highest received sequence number. */
+
+	/**Object with the rx thread */
+	std::thread rx_thread;
+
+	/** Mutex associated with the transmission queue */
+	std::mutex rx_mutex;
 
 }; // end uwApplication_module class
 #endif /* UWAPPLICATION_MODULE_H */

@@ -36,11 +36,12 @@
  *
  */
 
+#include "uwApplication_module.h"
+#include "uwApplication_cmn_header.h"
 #include <rng.h>
 #include <sstream>
+#include <sys/socket.h>
 #include <time.h>
-#include "uwApplication_cmn_header.h"
-#include "uwApplication_module.h"
 
 uint uwApplicationModule::MAX_READ_LEN = 64;
 
@@ -127,7 +128,9 @@ uwApplicationModule::uwApplicationModule()
 	for (int i = 0; i < USHRT_MAX; i++) {
 		sn_check[i] = false;
 	}
-	servPort = port_num;
+
+	// TODO: useless?
+	// servPort = port_num;
 } // end uwApplicationModule() Method
 
 uwApplicationModule::~uwApplicationModule()
@@ -148,7 +151,18 @@ uwApplicationModule::command(int argc, const char *const *argv)
 				// The communication take place with the use of sockets
 				if (useTCP()) {
 					// Generate DATA packets using TCP connection
-					uwApplicationModule::openConnectionTCP();
+					// uwApplicationModule::openConnectionTCP();
+					if (!bindTCPListenServer()) {
+						std::cout << "error listen" << std::endl;
+
+						return TCL_ERROR;
+					}
+
+					rx_thread =
+							std::thread(&uwApplicationModule::acceptTCP, this);
+
+					chkTimerPeriod.resched(getPeriod());
+
 				} else {
 					// Generate DATA packets using UDP connection
 					uwApplicationModule::openConnectionUDP();
@@ -394,6 +408,8 @@ uwApplicationModule::statistics(Packet *p)
 		out_log << left << "[" << getEpoch() << "]::" << NOW
 				<< "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_ << endl;
 
+	// TODO: questo fa la stessa cosa di 28 righe sopra ma invece che cout
+	// stampa in file
 	if (logging && !withoutSocket()) {
 		out_log << left << "::" << NOW
 				<< "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
@@ -403,7 +419,9 @@ uwApplicationModule::statistics(Packet *p)
 		out_log << std::endl;
 	}
 	if (clnSockDescr) {
-		write(clnSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size());
+		write(clnSockDescr,
+				uwApph->payload_msg,
+				(size_t) uwApph->payload_size());
 	}
 	Packet::free(p);
 } // end statistics method
@@ -527,8 +545,23 @@ uwApplicationModule::stop()
 	} else {
 		// Close the connection
 		if (useTCP()) {
+			if (clnSockDescr >= 0) {
+				shutdown(clnSockDescr, SHUT_RDWR);
+				close(servSockDescr);
+				clnSockDescr = -1;
+			}
+
+			if (servSockDescr >= 0) {
+				shutdown(servSockDescr, SHUT_RDWR);
+				close(servSockDescr);
+				servSockDescr = -1;
+			}
+
+			if (rx_thread.joinable()) {
+				rx_thread.join();
+			}
+
 			chkTimerPeriod.force_cancel();
-			close(servSockDescr);
 		}
 	}
 } // end stop() method

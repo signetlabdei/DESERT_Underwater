@@ -37,17 +37,13 @@
  *
  */
 
-#include <sstream>
-#include <time.h>
 #include "uwApplication_cmn_header.h"
 #include "uwApplication_module.h"
-#include <error.h>
 #include <errno.h>
+#include <error.h>
 
-pthread_mutex_t mutex_tcp = PTHREAD_MUTEX_INITIALIZER;
-
-int
-uwApplicationModule::openConnectionTCP()
+bool
+uwApplicationModule::listenTCP()
 {
 	int sockoptval = 1;
 
@@ -63,14 +59,19 @@ uwApplicationModule::openConnectionTCP()
 					<< "::UWAPPLICATION::OPEN_CONNECTION_TCP::SOCKET_CREATION_"
 					   "FAILED"
 					<< endl;
-		exit(1);
+		return false;
 	}
 
-	if (setsockopt(servSockDescr, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int)) == -1) {
-		if(debug_ >=0)
-			std::cout << getEpoch() << "::" << NOW 
-					  << "::UWAPPLICATION::ERROR::REUSABLE_FAIL"
-					  << std::endl;
+	if (setsockopt(servSockDescr,
+				SOL_SOCKET,
+				SO_REUSEADDR,
+				&sockoptval,
+				sizeof(int)) == -1) {
+		if (debug_ >= 0)
+			std::cout << getEpoch() << "::" << NOW
+					  << "::UWAPPLICATION::ERROR::REUSABLE_FAIL" << std::endl;
+
+		return false;
 	}
 
 	if (debug_ >= 2)
@@ -95,7 +96,7 @@ uwApplicationModule::openConnectionTCP()
 			out_log << left << getEpoch() << "::" << NOW
 					<< "::UWAPPLICATION::OPEN_CONNECTION_TCP::BINDING_FAILED_"
 					<< strerror(errno) << endl;
-		exit(1);
+		return false;
 	}
 
 	// Listen for incoming connections
@@ -108,79 +109,60 @@ uwApplicationModule::openConnectionTCP()
 			out_log << left << getEpoch() << "::" << NOW
 					<< "::UWAPPLICATION::OPEN_CONNECTION_TCP::LISTEN_FAILED"
 					<< endl;
-		exit(1);
+		return false;
 	}
 	if (debug_ >= 2)
 		std::cout << getEpoch() << "::" << NOW
 				  << "::UWAPPLICATION::OPEN_CONNECTION_TCP::SERVER_READY"
 				  << endl;
 
-	chkTimerPeriod.resched(getPeriod());
-	pthread_t pth;
-	if (pthread_create(&pth, NULL, read_process_TCP, (void *) this) != 0) {
-		if (debug_ >= 0)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::OPEN_CONNECTION_TCP::CANNOT_CREATE_"
-						 "PARRALEL_THREAD"
-					  << endl;
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::OPEN_CONNECTION_TCP::CANNOT_CREATE_"
-					   "PARRALEL_"
-					   "THREAD"
-					<< endl;
-		exit(1);
-	}
+	return true;
+}
 
-	return servSockDescr;
-} // end openConnectionTCP() method
-
-void *
-read_process_TCP(void *arg)
+void
+uwApplicationModule::acceptTCP()
 {
-	uwApplicationModule *obj = (uwApplicationModule *) arg;
-	int debug_ = 1;
-	// struct sockaddr_in clnAddr;
-
 	socklen_t clnLen = sizeof(sockaddr_in);
-	// int clnSockDescr;
 
-	clnLen = sizeof(obj->clnAddr);
+	clnLen = sizeof(clnAddr);
 
 	while (true) {
-		if ((obj->clnSockDescr = accept(obj->servSockDescr,
-					 (struct sockaddr *) &(obj->clnAddr),
+		if ((clnSockDescr = accept(servSockDescr,
+					 (struct sockaddr *) &(clnAddr),
 					 (socklen_t *) &clnLen)) < 0) {
 			if (debug_ >= 0)
-			    std::cout << obj->getEpoch() << "::" << NOW
+				std::cout << getEpoch() << "::" << NOW
 						  << "::UWAPPLICATION::READ_PROCESS_TCP::CONNECTION_"
 							 "NOT_ACCEPTED"
 						  << endl;
 		}
 		if (debug_ >= 1)
-			std::cout << obj->getEpoch() << "::" << NOW
+			std::cout << getEpoch() << "::" << NOW
 					  << "::UWAPPLICATION::READ_PROCESS_TCP::NEW_CLIENT_IP_"
-					  << inet_ntoa(obj->clnAddr.sin_addr) << std::endl;
-		if (obj->logging)
-			obj->out_log << left << obj->getEpoch() << "::" << NOW
-						 << "::UWAPPLICATION::READ_PROCESS_TCP::NEW_CLIENT_IP_"
-						 << inet_ntoa(obj->clnAddr.sin_addr) << std::endl;
-		obj->handleTCPclient(obj->clnSockDescr);
-	}
+					  << inet_ntoa(clnAddr.sin_addr) << std::endl;
+		if (logging)
+			out_log << left << getEpoch() << "::" << NOW
+					<< "::UWAPPLICATION::READ_PROCESS_TCP::NEW_CLIENT_IP_"
+					<< inet_ntoa(clnAddr.sin_addr) << std::endl;
 
-} // end read_process_TCP() method
+		readFromTCP(clnSockDescr);
+	}
+}
 
 void
-uwApplicationModule::handleTCPclient(int clnSock)
+uwApplicationModule::readFromTCP(int clnSock)
 {
 	while (true) {
 		int recvMsgSize = 0;
 		char buffer_msg[MAX_LENGTH_PAYLOAD];
 		Packet *p = Packet::alloc();
 		hdr_DATA_APPLICATION *hdr_Appl = HDR_DATA_APPLICATION(p);
+		hdr_cmn *ch = HDR_CMN(p);
+
 		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
 			buffer_msg[i] = 0;
 		}
+
 		if ((recvMsgSize = read(clnSock, buffer_msg, MAX_READ_LEN)) < 0) {
 			if (debug_ >= 0)
 				std::cout << getEpoch() << "::" << NOW
@@ -190,66 +172,55 @@ uwApplicationModule::handleTCPclient(int clnSock)
 						  << endl;
 			break;
 		}
+
 		if (recvMsgSize == 0) { // client disconnected
-			shutdown(clnSock, 2);
+			shutdown(clnSock, SHUT_RDWR);
 			break;
-		} else {
-			int status = pthread_mutex_lock(&mutex_tcp);
-			if (status != 0) {
-				if (debug_ >= 0)
-					std::cout << getEpoch() << "::" << NOW
-							  << "::UWAPPLICATION::PTHREAD_MUTEX_LOCK_FAILED "
-							  << endl;
-			}
-			if (debug_ >= 0) {
-				std::cout << getEpoch() << "::" << NOW
-						  << "::UWAPPLICATION::READ_PROCESS_TCP::PAYLOAD_"
-							 "MESSAGE--> ";
-				for (int i = 0; i < recvMsgSize; i++) {
-					cout << buffer_msg[i];
-				}
-			}
-			if (logging)
-				out_log << left << getEpoch() << "::" << NOW
-						<< "::UWAPPLICATION::READ_PROCESS_UDP::NEW_PACKET_"
-						   "CREATED"
-						<< endl;
+		}
+
+		std::unique_lock<std::mutex> lk(rx_mutex);
+
+		if (debug_ >= 0) {
+			std::cout << getEpoch() << "::" << NOW
+					  << "::UWAPPLICATION::READ_PROCESS_TCP::PAYLOAD_"
+						 "MESSAGE--> ";
 			for (int i = 0; i < recvMsgSize; i++) {
-				hdr_Appl->payload_msg[i] = buffer_msg[i];
-			}
-			hdr_cmn *ch = HDR_CMN(p);
-			ch->size() = recvMsgSize;
-			hdr_Appl->payload_size() = recvMsgSize;
-			queuePckReadTCP.push(p);
-			incrPktsPushQueue();
-			status = pthread_mutex_unlock(&mutex_tcp);
-			if (status != 0) {
-				if (debug_ >= 0)
-					std::cout << getEpoch() << "::" << NOW
-							  << "::UWAPPLICATION::PTHREAD_MUTEX_UNLOCK_FAILED "
-							  << endl;
+				cout << buffer_msg[i];
 			}
 		}
+		if (logging)
+			out_log << left << getEpoch() << "::" << NOW
+					<< "::UWAPPLICATION::READ_PROCESS_UDP::NEW_PACKET_"
+					   "CREATED"
+					<< endl;
+		for (int i = 0; i < recvMsgSize; i++) {
+			hdr_Appl->payload_msg[i] = buffer_msg[i];
+		}
+		ch->size() = recvMsgSize;
+		hdr_Appl->payload_size() = recvMsgSize;
+		queuePckReadTCP.push(p);
+		incrPktsPushQueue();
+		lk.unlock();
 	}
 }
 
 void
 uwApplicationModule::init_Packet_TCP()
 {
-	if (queuePckReadTCP.empty()) {
-	} else {
+	if (!queuePckReadTCP.empty()) {
 		Packet *ptmp = queuePckReadTCP.front();
 		queuePckReadTCP.pop();
+
 		hdr_cmn *ch = HDR_CMN(ptmp);
-		hdr_uwudp *uwudph = hdr_uwudp::access(ptmp);
 		hdr_uwip *uwiph = hdr_uwip::access(ptmp);
+		hdr_uwudp *uwudph = hdr_uwudp::access(ptmp);
 		hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(ptmp);
-		
+
 		// Common header fields
 		ch->uid_ = uidcnt++;
 		ch->ptype_ = PT_DATA_APPLICATION;
 		ch->direction_ = hdr_cmn::DOWN;
-		ch->timestamp() = Scheduler::instance().clock();
+		ch->timestamp() = NOW;
 
 		// Transport header fields
 		uwudph->dport() = port_num;
