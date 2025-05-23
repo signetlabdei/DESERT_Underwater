@@ -38,6 +38,7 @@
  */
 
 #include "uwApplication_module.h"
+#include <iostream>
 
 bool
 uwApplicationModule::listenTCP()
@@ -76,13 +77,11 @@ uwApplicationModule::listenTCP()
 				  << "::UWAPPLICATION::OPEN_CONNECTION_TCP::SOCKET_CREATED"
 				  << endl;
 
-	// Fill the members of sockaddr_in structure
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_port = htons(servPort);
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	// Bind to the local address
 	if (::bind(servSockDescr, (struct sockaddr *) &servAddr, sizeof(servAddr)) <
 			0) {
 		if (debug_ >= 0)
@@ -96,7 +95,6 @@ uwApplicationModule::listenTCP()
 		return false;
 	}
 
-	// Listen for incoming connections
 	if (listen(servSockDescr, 1)) {
 		if (debug_ >= 0)
 			std::cout << getEpoch() << "::" << NOW
@@ -123,6 +121,7 @@ uwApplicationModule::acceptTCP()
 
 	clnLen = sizeof(clnAddr);
 
+	// TODO: add atomic variable condition
 	while (true) {
 		if ((clnSockDescr = accept(servSockDescr,
 					 (struct sockaddr *) &(clnAddr),
@@ -170,7 +169,8 @@ uwApplicationModule::readFromTCP(int clnSock)
 			break;
 		}
 
-		if (recvMsgSize == 0) { // client disconnected
+		// client disconnected
+		if (recvMsgSize == 0) {
 			shutdown(clnSock, SHUT_RDWR);
 			break;
 		}
@@ -190,13 +190,16 @@ uwApplicationModule::readFromTCP(int clnSock)
 					<< "::UWAPPLICATION::READ_PROCESS_UDP::NEW_PACKET_"
 					   "CREATED"
 					<< endl;
+
 		for (int i = 0; i < recvMsgSize; i++) {
 			hdr_Appl->payload_msg[i] = buffer_msg[i];
 		}
 		ch->size() = recvMsgSize;
 		hdr_Appl->payload_size() = recvMsgSize;
+
 		queuePckReadTCP.push(p);
 		incrPktsPushQueue();
+
 		lk.unlock();
 	}
 }

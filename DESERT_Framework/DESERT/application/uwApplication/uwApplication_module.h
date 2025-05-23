@@ -42,30 +42,24 @@
 #define UWAPPLICATION_MODULE_H
 
 #include <uwApplication_cmn_header.h>
-#include <uwip-module.h>
-#include <uwudp-module.h>
 
+#include <arpa/inet.h>
 #include <assert.h>
 #include <climits>
-#include <math.h>
-#include <module.h>
-#include <stddef.h>
-
 #include <fcntl.h>
 #include <fstream>
-#include <stdlib.h>
-#include <sys/stat.h>
-
+#include <module.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
 
-#include <arpa/inet.h>
 #include <chrono>
-#include <fstream>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -90,10 +84,6 @@ public:
 		: TimerHandler()
 	{
 		module = m;
-	}
-
-	virtual ~uwSendTimerAppl()
-	{
 	}
 
 protected:
@@ -129,26 +119,129 @@ public:
 	virtual int command(int argc, const char *const *argv) override;
 
 	/**
-	 * Handle the communication between server and client
-	 *
-	 * @param clnSock socket obtained after the accept function and use for the
-	 *                communication between server and client
-	 */
-
-	/**
 	 * Performs the reception of packets from upper and lower layers.
 	 *
 	 * @param Packet* Pointer to the packet will be received.
 	 */
 	virtual void recv(Packet *) override;
 
-	virtual bool listenTCP();
-	virtual void acceptTCP();
-	virtual void readFromTCP(int clnSock);
-	virtual void readFromUDP();
+	virtual double GetFTT() const;
 	/**
-	 * Calculate the epoch of the event. Used in sea-trial mode
-	 * @return the epoch of the system
+	 * Return the standard deviation of the Forward Trip Time calculated
+	 *
+	 * @return the standard deviation of the Forward Trip Time calculated
+	 */
+
+	virtual double GetFTTstd() const;
+	/**
+	 * Rerturn the Packet Error Rate calculated
+	 *
+	 * @return the Packet Error Rate calculated
+	 */
+
+	virtual double GetPER() const;
+
+	/**
+	 * Return the Throughput calculated [bps]
+	 *
+	 * @return Throughput [bps]
+	 */
+	virtual double GetTHR() const;
+
+	/**
+	 * Returns the average Round Trip Time
+	 *
+	 * @return the average Round Trip Time
+	 */
+	virtual double GetRTT() const;
+
+	/**
+	 * Return the standard deviation of the Round Trip Time calculated
+	 *
+	 * @return the standard deviation of the Round Trip Time calculated
+	 */
+	virtual double GetRTTstd() const;
+
+	/**
+	 * return the number of packets sent by the server
+	 *
+	 * @return txsn
+	 */
+	virtual int
+	getPktSent() const
+	{
+		return txsn - 1;
+	}
+
+	/**
+	 * return the number of DATA packets lost by the server
+	 *
+	 * @return pkts_lost
+	 */
+	virtual int
+	getPktLost() const
+	{
+		return pkts_lost;
+	}
+
+	/**
+	 * return the number of DATA packet correctly received by the server
+	 *
+	 * @return pkts_recv
+	 */
+	virtual int
+	getPktRecv() const
+	{
+		return pkts_recv;
+	}
+
+	/**
+	 * return the number of DATA packets received out of order by the server
+	 *
+	 * @return pkts_ooseq
+	 */
+	virtual int
+	getPktsOOSequence() const
+	{
+		return pkts_ooseq;
+	}
+
+	/**
+	 * return the number of DATA packets received with error by the server
+	 *
+	 * @return pkts_invalid
+	 */
+	virtual int
+	getPktsInvalidRx() const
+	{
+		return pkts_invalid;
+	}
+
+	/**
+	 * Return the number of DATA packets sorted in the server queue.
+	 *
+	 * @return pkts_push_queue
+	 */
+	virtual int
+	getPktsPushQueue() const
+	{
+		return pkts_push_queue;
+	}
+
+	/**
+	 * Return period generation time.
+	 *
+	 * @return period
+	 */
+	virtual double
+	getPeriod() const
+	{
+		return period;
+	}
+
+	/**
+	 * Calculate the epoch of the event. Used in sea-trial mode.
+	 * @return the epoch of the system.
 	 */
 	unsigned long int
 	getEpoch() const
@@ -161,33 +254,12 @@ public:
 		return timestamp;
 	}
 
-	int servSockDescr; /**< socket descriptor for server */
-	int clnSockDescr; /**< *socket descriptor for client */
-	struct sockaddr_in servAddr; /**< Server address */
-	struct sockaddr_in clnAddr; /**< Client address */
-	int servPort; /**< Server port*/
-	std::queue<Packet *> queuePckReadTCP; /**< Queue that store the DATA packets
-											 recevied from the client by the
-											 server using a TCP protocol*/
-	std::queue<Packet *> queuePckReadUDP; /**< Queue that store the DATA packets
-											 recevied from the client by the
-											 server using a UDP protocol*/
-	std::ofstream out_log; /**< Variable that handle the file in which the
-							  protocol write the statistics */
+	std::ofstream out_log;
 	bool logging;
 	int node_id;
 	int exp_id;
 
-	/** Maximum size (bytes) of a single read of the socket */
-	static uint MAX_READ_LEN;
-
 protected:
-	/**
-	 * Comupte some statistics as the number of packets sent and receive between
-	 * two layer, or control if the packet received is out of sequence.
-	 */
-	virtual void statistics(Packet *p);
-
 	/**
 	 * Set all the field of the DATA packet that must be send down after the
 	 * creation
@@ -197,12 +269,41 @@ protected:
 	 */
 	virtual void transmit();
 
+	/** Method that binds the listening TCP socket.
+	 *
+	 * @return true if the listening socket is bind and open.
+	 */
+	virtual bool listenTCP();
+
+	/**
+	 * Method that puts in place a listening TCP socket.
+	 *
+	 */
+	virtual void acceptTCP();
+
+	/**
+	 * Method that reads a TCP byte stream from external application and
+	 * converts it to a Packet.
+	 *
+	 * @param clnSock int client file descriptor.
+	 */
+	virtual void readFromTCP(int clnSock);
+
 	/**
 	 * When socket communication is used, this method establish a connection
 	 * between client and server. This is required because a UDP protocol is
 	 * used.
+	 *
+	 * @return true if the  socket is bind.
 	 */
 	virtual bool openConnectionUDP();
+
+	/**
+	 * Method that waits for UDP packets from external application and converts
+	 * it to a Packet.
+	 *
+	 */
+	virtual void readFromUDP();
 
 	/**
 	 * Close the socket connection in the case the communication take place with
@@ -245,7 +346,6 @@ protected:
 	virtual bool
 	usePoissonTraffic()
 	{
-		// return poisson_traffic;
 		return (poisson_traffic == 1) ? true : false;
 	}
 
@@ -317,77 +417,6 @@ protected:
 	}
 
 	/**
-	 * return the number of packets sent by the server
-	 *
-	 * @return txsn
-	 */
-	virtual int
-	getPktSent() const
-	{
-		return txsn - 1;
-	}
-	/**
-	 * return the number of DATA packets lost by the server
-	 *
-	 * @return pkts_lost
-	 */
-	virtual int
-	getPktLost() const
-	{
-		return pkts_lost;
-	}
-	/**
-	 * return the number of DATA packet correctly received by the server
-	 *
-	 * @return pkts_recv
-	 */
-	virtual int
-	getPktRecv() const
-	{
-		return pkts_recv;
-	}
-	/**
-	 * return the number of DATA packets received out of order by the server
-	 *
-	 * @return pkts_ooseq
-	 */
-	virtual int
-	getPktsOOSequence() const
-	{
-		return pkts_ooseq;
-	}
-	/**
-	 * return the number of DATA packets received with error by the server
-	 *
-	 * @return pkts_invalid
-	 */
-	virtual int
-	getPktsInvalidRx() const
-	{
-		return pkts_invalid;
-	}
-	/**
-	 * return the number of DATA packets sotred in the server queue
-	 *
-	 * @return pkts_push_queue
-	 */
-	virtual int
-	getPktsPushQueue() const
-	{
-		return pkts_push_queue;
-	}
-	/**
-	 * return period generation time
-	 *
-	 * @return period
-	 */
-	virtual double
-	getPeriod() const
-	{
-		return period;
-	}
-
-	/**
 	 * Compute the DATA generation rate, that can be constant and equal to the
 	 * period established by the user, or can occur with a Poisson process.
 	 *
@@ -396,25 +425,11 @@ protected:
 	virtual double getTimeBeforeNextPkt();
 
 	/**
-	 * Returns the average Round Trip Time
-	 *
-	 * @return the average Round Trip Time
-	 */
-	virtual double GetRTT() const;
-
-	/**
-	 * Return the standard deviation of the Round Trip Time calculated
-	 *
-	 * @return the standard deviation of the Round Trip Time calculated
-	 */
-	virtual double GetRTTstd() const;
-
-	/**
 	 * Update the RTT after the reception of a new packet
 	 *
 	 * @param RTT of the current packet received
 	 */
-	virtual void updateRTT(const double &rtt);
+	virtual void updateRTT(double rtt);
 
 	/**
 	 * Returns the average Forward Trip Time
@@ -423,42 +438,19 @@ protected:
 	 *
 	 */
 
-	virtual double GetFTT() const;
-	/**
-	 * Return the standard deviation of the Forward Trip Time calculated
-	 *
-	 * @return the standard deviation of the Forward Trip Time calculated
-	 */
-
-	virtual double GetFTTstd() const;
-	/**
-	 * Rerturn the Packet Error Rate calculated
-	 *
-	 * @return the Packet Error Rate calculated
-	 */
-
-	virtual double GetPER() const;
-
-	/**
-	 * Return the Throughput calculated [bps]
-	 *
-	 * @return Throughput [bps]
-	 */
-	virtual double GetTHR() const;
-
 	/**
 	 * Update the FTT after the reception of a new packet
 	 *
 	 * @param FTT of the current packet received
 	 */
-	virtual void updateFTT(const double &ftt);
+	virtual void updateFTT(double ftt);
 
 	/**
 	 * Update the Throughput after the reception of a new packet
 	 *
 	 * @param Throughput of the current packet received
 	 */
-	virtual void updateThroughput(const int &bytes, const double &dt);
+	virtual void updateThroughput(int bytes, double dt);
 
 	int debug_; /**< Used for debug purposes <i>1</i> debug activated <i>0</i>
 				   debug not activated*/
@@ -472,16 +464,12 @@ protected:
 					 service */
 	int drop_out_of_order; /**< Enable or not the ordering of data packet
 							  received <i>1</i> enabled <i>0</i> not enabled*/
-	// int TCP_CMN; /**< Enable or not the use of TCP protocol when is used the
-	// socket communication <i>1</i> use TCP <i>0</i> use UDP*/
 	uint8_t dst_addr; /**< IP destination address. */
 
-	// TIMER VARIABLES
 	uwSendTimerAppl
 			chkTimerPeriod; /**< Timer that schedule the period between two
 							   successive generation of DATA packets*/
 
-	// STATISTICAL VARIABLES
 	bool socket_active;
 	bool socket_tcp; // true tcp, udp otherwise
 	bool *sn_check; /**< Used to keep track of the packets already received. */
@@ -524,5 +512,19 @@ protected:
 	/** Mutex associated with the transmission queue */
 	std::mutex rx_mutex;
 
-}; // end uwApplication_module class
+	int servSockDescr; /**< socket descriptor for server */
+	int clnSockDescr; /**< *socket descriptor for client */
+	struct sockaddr_in servAddr; /**< Server address */
+	struct sockaddr_in clnAddr; /**< Client address */
+	int servPort; /**< Server port*/
+	std::queue<Packet *> queuePckReadTCP; /**< Queue that store the DATA packets
+											 recevied from the client by the
+											 server using a TCP protocol*/
+	std::queue<Packet *> queuePckReadUDP; /**< Queue that store the DATA packets
+											 recevied from the client by the
+											 server using a UDP protocol*/
+
+	/** Maximum size (bytes) of a single read of the socket */
+	static uint MAX_READ_LEN;
+};
 #endif /* UWAPPLICATION_MODULE_H */

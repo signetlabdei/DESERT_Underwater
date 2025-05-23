@@ -37,8 +37,11 @@
  */
 
 #include "uwApplication_module.h"
-#include "uwudp-module.h"
+#include <uwip-module.h>
+#include <uwudp-module.h>
 #include <rng.h>
+#include <iostream>
+#include <fstream>
 
 uint uwApplicationModule::MAX_READ_LEN = 64;
 
@@ -66,14 +69,7 @@ public:
 } class_module_uwapplicationmodule;
 
 uwApplicationModule::uwApplicationModule()
-	: servSockDescr(0)
-	, clnSockDescr(0)
-	, servAddr()
-	, clnAddr()
-	, servPort(0)
-	, queuePckReadTCP()
-	, queuePckReadUDP()
-	, out_log()
+	: out_log()
 	, logging(false)
 	, node_id(0)
 	, exp_id(0)
@@ -107,6 +103,13 @@ uwApplicationModule::uwApplicationModule()
 	, sumbytes(0)
 	, sumdt(0)
 	, hrsn(0)
+	, servSockDescr(0)
+	, clnSockDescr(0)
+	, servAddr()
+	, clnAddr()
+	, servPort(0)
+	, queuePckReadTCP()
+	, queuePckReadUDP()
 {
 	bind("debug_", (int *) &debug_);
 	bind("period_", (double *) &period);
@@ -132,7 +135,7 @@ uwApplicationModule::uwApplicationModule()
 	for (int i = 0; i < USHRT_MAX; i++) {
 		sn_check[i] = false;
 	}
-} // end uwApplicationModule() Method
+}
 
 int
 uwApplicationModule::command(int argc, const char *const *argv)
@@ -175,45 +178,58 @@ uwApplicationModule::command(int argc, const char *const *argv)
 
 				chkTimerPeriod.resched(getPeriod());
 			}
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "stop") == 0) {
 			stop();
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getsentpkts") == 0) {
 			tcl.resultf("%d", getPktSent());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "lostpkts") == 0) {
 			tcl.resultf("%f", getPktLost());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrecvpkts") == 0) {
 			tcl.resultf("%d", getPktRecv());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "outofsequencepkts") == 0) {
 			tcl.resultf("%f", getPktsOOSequence());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "notknownpktrx") == 0) {
 			tcl.resultf("%f", getPktsInvalidRx());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrecvpktsqueue") == 0) {
 			tcl.resultf("%d", getPktsPushQueue());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrtt") == 0) {
 			tcl.resultf("%f", GetRTT());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrttstd") == 0) {
 			tcl.resultf("%f", GetRTTstd());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getftt") == 0) {
 			tcl.resultf("%f", GetFTT());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getfttstd") == 0) {
 			tcl.resultf("%f", GetFTTstd());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getper") == 0) {
 			tcl.resultf("%f", GetPER());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "print_log") == 0) {
 			std::stringstream stat_file;
@@ -223,6 +239,7 @@ uwApplicationModule::command(int argc, const char *const *argv)
 			out_log << left << "[" << getEpoch() << "]::" << NOW
 					<< "::UWAPPLICATION::FILE_CREATED" << endl;
 			logging = true;
+
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
@@ -243,7 +260,7 @@ uwApplicationModule::command(int argc, const char *const *argv)
 		}
 	}
 	return Module::command(argc, argv);
-} // end command() Method
+}
 
 void
 uwApplicationModule::recv(Packet *p)
@@ -275,13 +292,6 @@ uwApplicationModule::recv(Packet *p)
 		}
 	}
 
-	// TODO: split in separate methods
-	statistics(p);
-}; // end recv() Method
-
-void
-uwApplicationModule::statistics(Packet *p)
-{
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(p);
 
@@ -294,16 +304,18 @@ uwApplicationModule::statistics(Packet *p)
 			out_log << left << "[" << getEpoch() << "]::" << NOW
 					<< "::UWAPPLICATION::DROP_PACKET_NOT_APPLICATION_TYPE"
 					<< endl;
+
 		drop(p, 1, UWAPPLICATION_DROP_REASON_UNKNOWN_TYPE);
-		incrPktInvalid(); // Increment the number of packet received invalid
+		incrPktInvalid();
+
 		return;
 	}
-	esn = hrsn + 1; // Increase the expected sequence number
 
-	// Verify if the data packet is already processed.
+	esn = hrsn + 1;
+
 	if (useDropOutOfOrder()) {
-		if (sn_check[uwApph->sn_ &
-					0x00ffffff]) { // Packet already processed: drop it
+		// Packet already processed: drop it
+		if (sn_check[uwApph->sn_ & 0x00ffffff]) {
 			if (debug_ >= 0)
 				std::cout << "[" << getEpoch() << "]::" << NOW
 						  << "::UWAPPLICATION::DROP_PACKET_PACKET_ALREADY_"
@@ -314,23 +326,24 @@ uwApplicationModule::statistics(Packet *p)
 						<< "::UWAPPLICATION::DROP_PACKET_PACKET_ALREADY_"
 						   "PROCESSED_ID_"
 						<< (int) uwApph->sn_ << endl;
+
 			incrPktInvalid();
 			drop(p, 1, UWAPPLICATION_DROP_REASON_DUPLICATED_PACKET);
+
 			return;
 		}
 	}
+
 	// The data packet with this particular SN is not already processed
 	// Set true sn_check. In this way we assume that these sn are already
 	// processed by the node
 	sn_check[uwApph->sn_ & 0x00ffffff] = true;
 
-	// The data packet received is out of order
 	if (useDropOutOfOrder()) {
-		if (uwApph->sn_ <
-				esn) { // packet is out of sequence and is to be discarded
-			incrPktOoseq(); // Increase the number of data packets receive out
-							// of
-			// sequence.
+		// packet is out of sequence and is to be discarded
+		if (uwApph->sn_ < esn) {
+			incrPktOoseq();
+
 			if (debug_ >= 0)
 				std::cout << "[" << getEpoch() << "]::" << NOW
 						  << "::UWAPPLICATION::DROP_PACKET_PACKET_OOS_ID_"
@@ -339,24 +352,24 @@ uwApplicationModule::statistics(Packet *p)
 				out_log << left << "[" << getEpoch() << "]::" << NOW
 						<< "::UWAPPLICATION::DROP_PACKET_PACKET_OOS_ID_"
 						<< (int) uwApph->sn_ << "_LAST_SN_" << hrsn << endl;
+
 			drop(p, 1, UWAPPLICATION_DROP_REASON_OUT_OF_SEQUENCE);
+
 			return;
 		}
 	}
 
-	// Compute the Forward Trip time
 	rftt = NOW - ch->timestamp();
 	if ((uwApph->rftt_valid_) / 10000) {
 		double rtt = rftt + uwApph->rftt();
 		updateRTT(rtt);
 	}
+	updateFTT(rftt);
 
-	updateFTT(rftt); // Update the forward trip time
+	hrsn = uwApph->sn_;
 
-	hrsn = uwApph->sn_; // Update the highest sequence number received
-
-	// Verify if a packet is lost
 	if (useDropOutOfOrder()) {
+		// Verify if a packet is lost
 		if (uwApph->sn_ > esn) {
 			if (debug_ >= 0)
 				std::cout << "[" << getEpoch() << "]::" << NOW
@@ -367,18 +380,17 @@ uwApplicationModule::statistics(Packet *p)
 				out_log << left << "[" << getEpoch() << "]::" << NOW
 						<< "::UWAPPLICATION::PACKET_LOST_ID_RECEIVED"
 						<< (int) uwApph->sn_ << "_ID_EXPECTED_" << esn << endl;
+
 			incrPktLost(uwApph->sn_ - (esn));
 		}
 	}
 
-	double dt = Scheduler::instance().clock() - lrtime;
-	// updateThroughput(ch->size(), dt); //Update Throughput
+	double dt = NOW - lrtime;
 	updateThroughput(uwApph->payload_size(), dt);
-	incrPktRecv(); // Increase the number of data packets received
+	incrPktRecv();
+	lrtime = NOW;
 
-	lrtime = Scheduler::instance().clock(); // Update the time in which the last
-											// packet is received.
-	if (debug_ >= 0 && socket_active) {
+	if (debug_ >= 0 && !withoutSocket()) {
 		std::cout << "[" << getEpoch() << "]::" << NOW
 				  << "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
 		for (int i = 0; i < uwApph->payload_size(); i++) {
@@ -387,16 +399,12 @@ uwApplicationModule::statistics(Packet *p)
 	}
 	if (debug_ >= 0)
 		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_
+				  << "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn()
 				  << endl;
 	if (debug_ >= 0)
 		std::cout << "[" << getEpoch() << "]::" << NOW
 				  << "::UWAPPLICATION::PAYLOAD_SIZE_RECEIVED_"
 				  << (int) uwApph->payload_size() << endl;
-	if (debug_ >= 1 && !withoutSocket())
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::PAYLOAD_RECEIVED_" << uwApph->payload_msg
-				  << endl;
 
 	if (logging)
 		out_log << left << "[" << getEpoch() << "]::" << NOW
@@ -406,8 +414,6 @@ uwApplicationModule::statistics(Packet *p)
 		out_log << left << "[" << getEpoch() << "]::" << NOW
 				<< "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_ << endl;
 
-	// TODO: questo fa la stessa cosa di 28 righe sopra ma invece che cout
-	// stampa in file
 	if (logging && !withoutSocket()) {
 		out_log << left << "::" << NOW
 				<< "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
@@ -416,14 +422,14 @@ uwApplicationModule::statistics(Packet *p)
 		}
 		out_log << std::endl;
 	}
-	// TODO: check se socket_active?
-	if (clnSockDescr) {
+
+	if (!withoutSocket() && clnSockDescr)
 		write(clnSockDescr,
 				uwApph->payload_msg,
 				(size_t) uwApph->payload_size());
-	}
+
 	Packet::free(p);
-} // end statistics method
+};
 
 void
 uwApplicationModule::transmit()
@@ -560,13 +566,14 @@ uwApplicationModule::stop()
 			}
 		}
 
+		// TODO: unset av to stop while loop
 		if (rx_thread.joinable()) {
 			rx_thread.join();
 		}
 
 		chkTimerPeriod.force_cancel();
 	}
-} // end stop() method
+}
 
 double
 uwApplicationModule::getTimeBeforeNextPkt()
@@ -613,72 +620,67 @@ uwApplicationModule::GetRTTstd() const
 		double var =
 				(sumrtt2 - (sumrtt * sumrtt / rttsamples)) / (rttsamples - 1);
 		return (sqrt(var));
-	} else
-		return 0;
-} // end GetRTTstd() method
+	}
+
+	return 0;
+}
 
 void
-uwApplicationModule::updateRTT(const double &rtt)
+uwApplicationModule::updateRTT(double rtt)
 {
 	sumrtt += rtt;
 	sumrtt2 += rtt * rtt;
 	rttsamples++;
-} // end updateRTT() method
+}
 
 double
 uwApplicationModule::GetFTT() const
 {
 	return (fttsamples > 0) ? sumftt / fttsamples : 0;
-} // end getFTT() method
+}
 
 double
 uwApplicationModule::GetFTTstd() const
 {
 	if (fttsamples > 1) {
-		double var = 0;
-		var = (sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
-		if (var > 0)
-			return (sqrt(var));
-		else
-			return 0;
-	} else {
-		return 0;
+		double var =
+				(sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
+
+		return (var > 0) ? sqrt(var) : 0;
 	}
-} // end getFTT() method
+
+	return 0;
+}
 
 double
 uwApplicationModule::GetPER() const
 {
 	if (drop_out_of_order) {
-		if ((pkts_recv + pkts_lost) > 0) {
+		if ((pkts_recv + pkts_lost) > 0)
 			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-		} else {
-			return 0;
-		}
 	} else {
 		if (esn > 1)
 			return (1 - (double) pkts_recv / (double) (esn - 1));
-		else
-			return 0;
 	}
-} // end getPER() method
+	return 0;
+}
 
 double
 uwApplicationModule::GetTHR() const
 {
 	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
-} // end GetTHR() method
+}
 
 void
-uwApplicationModule::updateFTT(const double &ftt)
+uwApplicationModule::updateFTT(double ftt)
 {
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-} // end updateFTT() method
+}
 
 void
-uwApplicationModule::updateThroughput(const int &bytes, const double &dt)
+uwApplicationModule::updateThroughput(int bytes, double dt)
 {
 	sumbytes += bytes;
 	sumdt += dt;
