@@ -32,36 +32,29 @@
  * @author Federico Favaro
  * @version 1.1.0
  *
- * \brief Provides the definition of uwApplicationmodule class
+ * \brief Provides the definition of uwApplicationModule class.
+ * This class allows to connect external application with DESERT.
+ * Alternatively it can be used as a constant bitrate application.
  *
  */
 
 #ifndef UWAPPLICATION_MODULE_H
 #define UWAPPLICATION_MODULE_H
 
-#include <mutex>
-#include <thread>
+#include <uwApplication_cmn_header.h>
 #include <uwip-module.h>
 #include <uwudp-module.h>
 
 #include <assert.h>
 #include <climits>
-#include <errno.h>
-#include <iostream>
 #include <math.h>
 #include <module.h>
-#include <sstream>
 #include <stddef.h>
-#include <time.h>
 
 #include <fcntl.h>
 #include <fstream>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-
-#include <signal.h>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -72,12 +65,10 @@
 
 #include <arpa/inet.h>
 #include <chrono>
-#include <deque>
 #include <fstream>
-#include <list>
-#include <ostream>
+#include <mutex>
 #include <queue>
-#include <rng.h>
+#include <thread>
 
 #define UWAPPLICATION_DROP_REASON_UNKNOWN_TYPE \
 	"DPUT" /**< Drop the packet. Packet received is an unknown type*/
@@ -86,21 +77,45 @@
 #define UWAPPLICATION_DROP_REASON_OUT_OF_SEQUENCE \
 	"DOOS" /**< Drop the packet. Packet received is out of sequence. */
 
-extern packet_t
-		PT_DATA_APPLICATION; /**< Trigger packet type for UFetch protocol */
+class uwApplicationModule;
+
+/**
+ * uwSendTimerAppl is used to handle the scheduling period of
+ * uwApplicationModule packets.
+ */
+class uwSendTimerAppl : public TimerHandler
+{
+public:
+	uwSendTimerAppl(uwApplicationModule *m)
+		: TimerHandler()
+	{
+		module = m;
+	}
+
+	virtual ~uwSendTimerAppl()
+	{
+	}
+
+protected:
+	virtual void expire(Event *e);
+	uwApplicationModule *module;
+};
 
 class uwApplicationModule : public Module
 {
-	// friend class uwSendTimerAppl;
+	friend class uwSendTimerAppl;
+
 public:
 	/**
 	 * Constructor of uwApplicationModule class
 	 */
 	uwApplicationModule();
+
 	/**
 	 * Destructor of uwApplicationModule class
 	 */
-	virtual ~uwApplicationModule();
+	virtual ~uwApplicationModule() = default;
+
 	/**
 	 * TCL command interpreter. It implements the following OTCL methods:
 	 *
@@ -111,16 +126,7 @@ public:
 	 *successfully or not.
 	 *
 	 **/
-	virtual int command(int argc, const char *const *argv);
-
-	/**
-	 * Cross-Layer messages interpreter
-	 *
-	 * @param ClMessage* an instance of ClMessage that represent the message
-	 *received
-	 * @return <i>0</i> if successful.
-	 */
-	virtual int crLayCommand(ClMessage *m);
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
 	 * Handle the communication between server and client
@@ -128,30 +134,24 @@ public:
 	 * @param clnSock socket obtained after the accept function and use for the
 	 *                communication between server and client
 	 */
-	virtual void handleTCPclient(int clnSock);
+
+	/**
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void recv(Packet *) override;
 
 	virtual bool listenTCP();
 	virtual void acceptTCP();
 	virtual void readFromTCP(int clnSock);
-
-	// virtual void handleUDPclient(int clnSock);
-
-	/**
-	 * Increase the number of DATA packets stored in the Server queue. This DATA
-	 * packets will be sent to the below levels of ISO/OSI stack protocol.
-	 */
-	virtual void
-	incrPktsPushQueue()
-	{
-		pkts_push_queue++;
-	}
-
+	virtual void readFromUDP();
 	/**
 	 * Calculate the epoch of the event. Used in sea-trial mode
 	 * @return the epoch of the system
 	 */
-	inline unsigned long int
-	getEpoch()
+	unsigned long int
+	getEpoch() const
 	{
 		unsigned long int timestamp =
 				(unsigned long int) (std::chrono::duration_cast<
@@ -182,45 +182,12 @@ public:
 	static uint MAX_READ_LEN;
 
 protected:
-	/**< uwSenderTimer class that manage the timer */
-	class uwSendTimerAppl : public TimerHandler
-	{
-	public:
-		uwSendTimerAppl(uwApplicationModule *m)
-			: TimerHandler()
-		{
-			m_ = m;
-		}
-
-		virtual ~uwSendTimerAppl()
-		{
-		}
-
-	protected:
-		virtual void expire(Event *e);
-		uwApplicationModule *m_;
-	}; // End uwSendTimer class
-
-	/**************************************************************************
-	 *                          METHODS                                       *
-	 **************************************************************************/
-	/**
-	 * Handle the transmission of DATA packets between CBR layer and the below
-	 * level
-	 */
-	virtual void recv(Packet *);
 	/**
 	 * Comupte some statistics as the number of packets sent and receive between
 	 * two layer, or control if the packet received is out of sequence.
 	 */
 	virtual void statistics(Packet *p);
-	/**
-	 * Start the process to generate DATA packets without sockets. In this case
-	 * the payload of DATA packets are filled with a randomly sequence or with
-	 * a pattern sequence.
-	 */
-	// virtual void start_generation_pck_wth_socket();
-	virtual void start_generation();
+
 	/**
 	 * Set all the field of the DATA packet that must be send down after the
 	 * creation
@@ -228,36 +195,15 @@ protected:
 	 * in
 	 * a random way.
 	 */
-	// virtual void initialize_DATA_pck_wth_socket();
-	virtual void init_Packet();
-	/**
-	 * When socket communication is used, this method establish a connection
-	 * between client and server. This is required because a TCP protocol is
-	 * used.
-	 */
-	virtual int openConnectionTCP();
-	/**
-	 * Set all the field of DATA packet and take from the specific queue the
-	 * payload of DATA packet that will be transmitted. After that put down to
-	 * the
-	 * layer below
-	 */
-	// virtual void initialize_DATA_pck_wth_TCP();
-	virtual void init_Packet_TCP();
+	virtual void transmit();
+
 	/**
 	 * When socket communication is used, this method establish a connection
 	 * between client and server. This is required because a UDP protocol is
 	 * used.
 	 */
-	virtual int openConnectionUDP();
-	/**
-	 * Set all the field of DATA packet and take from the specific queue the
-	 * payload of DATA packet that will be transmitted. After that put down to
-	 * the
-	 * layer below
-	 */
-	// virtual void initialize_DATA_pck_wth_UDP();
-	virtual void init_Packet_UDP();
+	virtual bool openConnectionUDP();
+
 	/**
 	 * Close the socket connection in the case the communication take place with
 	 * socket, otherwise stop the execution of the process, so force the
@@ -265,97 +211,80 @@ protected:
 	 * of period time generation.
 	 */
 	virtual void stop();
+
 	/**
-	 * Verify if the communication take place with socket or the data payload is
-	 * generated in a randomly way.
+	 * Check if the communication take place without socket.
 	 *
-	 * @return <i>true</i> communication without socket
-	 *          <i>false</i> communication with socket
+	 * @return <i>true</i> if communication without socket <i>false</i>
+	 * otherwise.
 	 */
-	// virtual bool withoutSocket() {bool test;SOCKET_CMN == 0 ? test = true :
-	// test = false; return test;}
-	// virtual bool withoutSocket() {bool test; socket_active == false ? test =
-	// true : test = false; return test;}
 	virtual bool
 	withoutSocket()
 	{
-		bool test;
-		socket_active == false ? test = true : test = false;
-		return test;
+		return !socket_active;
 	}
+
 	/**
-	 * If the communication take place using sockets verify if the protocol used
-	 * is TCP or UDP.
+	 * Check if the socket protocol is TCP or UDP.
 	 *
-	 * @return <i>true</i> socket use TCP protocol
-	 *          <i>false</i> socket use UDP protocol
+	 * @return <i>true</i> if socket uses TCP protocol <i>false</i> if uses UDP.
 	 */
-	// virtual bool useTCP() {bool test;TCP_CMN == 1 ? test = true : test =
-	// false; return test;}
 	virtual bool
 	useTCP()
 	{
-		bool test;
-		tcp_udp == 1 ? test = true : test = false;
-		return test;
-	}
-	/**
-	 * If the communication take place without sockets verify if the data
-	 *generation
-	 * period is constant or is choiche in according to a poisson process
-	 *
-	 * @return <i>true</i> use a Poisson process to generate data
-	 *          <i>false</i> use a constant period data generation
-	 */
-	virtual inline bool
-	usePoissonTraffic()
-	{
-		bool test;
-		poisson_traffic == 1 ? test = true : test = false;
-		return test;
-	}
-	/**
-	 * If the communication take place without sockets verify if the data
-	 *packets
-	 * received by the server is out of order or not. In the first case discard
-	 *the
-	 * data packet
-	 *
-	 * @return <i>true</i> enable drop out of order
-	 *          <i>false</i> not enabled drop out of order
-	 */
-	virtual inline bool
-	useDropOutOfOrder()
-	{
-		bool test;
-		drop_out_of_order == 1 ? test = true : test = false;
-		return test;
+		return socket_tcp;
 	}
 
-	/**************************************************************************
-	 *                       METHODS GET and SET                              *
-	 **************************************************************************/
+	/**
+	 * If the communication take place without sockets verify if the data
+	 * generation period is constant or a poisson random process
+	 *
+	 * @return <i>true</i> if use a Poisson process <i>false</i> if use a
+	 * constant period data generation
+	 */
+	virtual bool
+	usePoissonTraffic()
+	{
+		// return poisson_traffic;
+		return (poisson_traffic == 1) ? true : false;
+	}
+
+	/**
+	 * If the communication take place without sockets verify if the data
+	 * packets received by the server is out of order or not.
+	 * In the first case discard the data packet.
+	 *
+	 * @return <i>true</i> if enable drop out of order <i>false</i> otherwise.
+	 */
+	virtual bool
+	useDropOutOfOrder()
+	{
+		return (drop_out_of_order == 1) ? true : false;
+	}
+
 	/**
 	 * Increase the sequence number and so the number of packets sent by the
 	 * server
 	 */
-	virtual inline void
+	virtual void
 	incrPktSent()
 	{
 		txsn++;
 	}
+
 	/**
 	 * Increase the number of DATA packets lost by the server
 	 */
-	virtual inline void
-	incrPktLost(const int &npkts)
+	virtual void
+	incrPktLost(int npkts)
 	{
 		pkts_lost += npkts;
 	}
+
 	/**
 	 * Increase the number of DATA packet correctly received by the server
 	 */
-	virtual inline void
+	virtual void
 	incrPktRecv()
 	{
 		pkts_recv++;
@@ -363,7 +292,7 @@ protected:
 	/**
 	 * Increase the number of DATA packets received out of order by the server
 	 */
-	virtual inline void
+	virtual void
 	incrPktOoseq()
 	{
 		pkts_ooseq++;
@@ -371,18 +300,29 @@ protected:
 	/**
 	 * Increse the number of DATA packets received with error by the server
 	 */
-	virtual inline void
+	virtual void
 	incrPktInvalid()
 	{
 		pkts_invalid++;
 	}
+
+	/**
+	 * Increase the number of DATA packets stored in the Server queue. This DATA
+	 * packets will be sent to the below levels of ISO/OSI stack protocol.
+	 */
+	virtual void
+	incrPktsPushQueue()
+	{
+		pkts_push_queue++;
+	}
+
 	/**
 	 * return the number of packets sent by the server
 	 *
 	 * @return txsn
 	 */
-	virtual inline int
-	getPktSent()
+	virtual int
+	getPktSent() const
 	{
 		return txsn - 1;
 	}
@@ -391,8 +331,8 @@ protected:
 	 *
 	 * @return pkts_lost
 	 */
-	virtual inline int
-	getPktLost()
+	virtual int
+	getPktLost() const
 	{
 		return pkts_lost;
 	}
@@ -401,8 +341,8 @@ protected:
 	 *
 	 * @return pkts_recv
 	 */
-	virtual inline int
-	getPktRecv()
+	virtual int
+	getPktRecv() const
 	{
 		return pkts_recv;
 	}
@@ -411,8 +351,8 @@ protected:
 	 *
 	 * @return pkts_ooseq
 	 */
-	virtual inline int
-	getPktsOOSequence()
+	virtual int
+	getPktsOOSequence() const
 	{
 		return pkts_ooseq;
 	}
@@ -421,8 +361,8 @@ protected:
 	 *
 	 * @return pkts_invalid
 	 */
-	virtual inline int
-	getPktsInvalidRx()
+	virtual int
+	getPktsInvalidRx() const
 	{
 		return pkts_invalid;
 	}
@@ -431,89 +371,88 @@ protected:
 	 *
 	 * @return pkts_push_queue
 	 */
-	virtual inline int
-	getPktsPushQueue()
+	virtual int
+	getPktsPushQueue() const
 	{
 		return pkts_push_queue;
 	}
 	/**
 	 * return period generation time
 	 *
-	 * @return PERIOD
+	 * @return period
 	 */
-	virtual inline double
-	getPeriod()
+	virtual double
+	getPeriod() const
 	{
-		return PERIOD;
-	}
-	/**
-	 * return the size of DATA packet payload
-	 *
-	 * @return payloadsize
-	 */
-	virtual inline int
-	getpayloadsize()
-	{
-		return payloadsize;
+		return period;
 	}
 
 	/**
 	 * Compute the DATA generation rate, that can be constant and equal to the
-	 *PERIOD
-	 * established by the user, or can occur with a Poisson process.
+	 * period established by the user, or can occur with a Poisson process.
 	 *
 	 * @return generation period for DATA packets
 	 */
 	virtual double getTimeBeforeNextPkt();
+
 	/**
 	 * Returns the average Round Trip Time
 	 *
 	 * @return the average Round Trip Time
 	 */
 	virtual double GetRTT() const;
+
 	/**
 	 * Return the standard deviation of the Round Trip Time calculated
 	 *
 	 * @return the standard deviation of the Round Trip Time calculated
 	 */
 	virtual double GetRTTstd() const;
+
 	/**
 	 * Update the RTT after the reception of a new packet
 	 *
 	 * @param RTT of the current packet received
 	 */
 	virtual void updateRTT(const double &rtt);
+
 	/**
 	 * Returns the average Forward Trip Time
 	 *
 	 * @return the average Forward Trip Time
 	 *
 	 */
+
 	virtual double GetFTT() const;
 	/**
 	 * Return the standard deviation of the Forward Trip Time calculated
 	 *
 	 * @return the standard deviation of the Forward Trip Time calculated
 	 */
+
 	virtual double GetFTTstd() const;
 	/**
 	 * Rerturn the Packet Error Rate calculated
 	 *
 	 * @return the Packet Error Rate calculated
 	 */
+
 	virtual double GetPER() const;
+
 	/**
 	 * Return the Throughput calculated [bps]
 	 *
 	 * @return Throughput [bps]
 	 */
 	virtual double GetTHR() const;
+
 	/**
 	 * Update the FTT after the reception of a new packet
 	 *
 	 * @param FTT of the current packet received
 	 */
 	virtual void updateFTT(const double &ftt);
+
 	/**
 	 * Update the Throughput after the reception of a new packet
 	 *
@@ -521,16 +460,10 @@ protected:
 	 */
 	virtual void updateThroughput(const int &bytes, const double &dt);
 
-	/**************************************************************************
-	 *                          VARIABLES                                     *
-	 **************************************************************************/
-	// TCL VARIABLES
 	int debug_; /**< Used for debug purposes <i>1</i> debug activated <i>0</i>
 				   debug not activated*/
-	double PERIOD; /**< Interval time between two successive generation data
+	double period; /**< Interval time between two successive generation data
 				   packets */
-	// int SOCKET_CMN; /**< Enable or not the communication with socket <i>1</i>
-	// enabled <i>0</i> not enabled*/
 	int poisson_traffic; /**< Enable or not the Poisson process for generation
 							of data packets <i>1</i> enabled <i>0</i> not
 							enabled*/
@@ -550,8 +483,7 @@ protected:
 
 	// STATISTICAL VARIABLES
 	bool socket_active;
-	string socket_protocol;
-	int tcp_udp; // 1 for tcp, 0 for udp, -1 for none
+	bool socket_tcp; // true tcp, udp otherwise
 	bool *sn_check; /**< Used to keep track of the packets already received. */
 	int uidcnt; /**< Identifier counter that identify uniquely the DATA packet
 				   generated*/
@@ -583,6 +515,10 @@ protected:
 	int hrsn; /**< Highest received sequence number. */
 
 	/**Object with the rx thread */
+	// union {
+	// 	std::thread rx_thread;
+	// 	std::thread udp_thread;
+	// };
 	std::thread rx_thread;
 
 	/** Mutex associated with the transmission queue */
@@ -590,10 +526,3 @@ protected:
 
 }; // end uwApplication_module class
 #endif /* UWAPPLICATION_MODULE_H */
-extern "C" {
-void *read_process_TCP(void *arg);
-}
-
-extern "C" {
-void *read_process_UDP(void *arg);
-}

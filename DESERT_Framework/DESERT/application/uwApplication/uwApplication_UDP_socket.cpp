@@ -94,7 +94,7 @@ uwApplicationModule::openConnectionUDP()
 	}
 
 	return true;
-}; // end openConnectionUDP() method
+}
 
 void
 uwApplicationModule::readFromUDP()
@@ -178,79 +178,4 @@ uwApplicationModule::readFromUDP()
 		lk.unlock();
 	}
 
-} // end read_process_UDP() method
-
-void
-uwApplicationModule::init_Packet_UDP()
-{
-	if (!queuePckReadUDP.empty()) {
-		Packet *ptmp = queuePckReadUDP.front();
-		queuePckReadUDP.pop();
-		hdr_cmn *ch = HDR_CMN(ptmp);
-		hdr_uwudp *uwudph = hdr_uwudp::access(ptmp);
-		hdr_uwip *uwiph = hdr_uwip::access(ptmp);
-		hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(ptmp);
-
-		ch->uid_ = uidcnt++;
-		ch->ptype_ = PT_DATA_APPLICATION;
-		ch->direction_ = hdr_cmn::DOWN;
-		ch->timestamp() = NOW;
-
-		uwudph->dport() = port_num;
-
-		uwiph->daddr() = dst_addr;
-
-		uwApph->sn_ = txsn++; // Sequence number to the data packet
-		if (rftt >= 0) {
-			uwApph->rftt_ = (int) (rftt * 10000); // Forward Trip Time
-			uwApph->rftt_valid_ = true;
-		} else {
-			uwApph->rftt_valid_ = false;
-		}
-		uwApph->priority_ = 0; // Priority of the message
-
-		if (debug_ >= 2)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::UID_" << ch->uid_
-					  << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::DEST_"
-					  << (int) uwiph->daddr() << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SIZE_"
-					  << (int) uwApph->payload_size() << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SN_"
-					  << (int) uwApph->sn_ << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SEND_DOWN_PACKET"
-					  << endl;
-
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::UID_" << ch->uid_
-					<< endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::DEST_"
-					<< (int) uwiph->daddr() << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SIZE_"
-					<< (int) uwApph->payload_size() << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SN_"
-					<< (int) uwApph->sn_ << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SEND_DOWN_PACKET"
-					<< endl;
-
-		sendDown(ptmp);
-	}
-} // end init_Packet_UDP() method
+}

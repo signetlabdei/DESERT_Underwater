@@ -37,10 +37,7 @@
  *
  */
 
-#include "uwApplication_cmn_header.h"
 #include "uwApplication_module.h"
-#include <errno.h>
-#include <error.h>
 
 bool
 uwApplicationModule::listenTCP()
@@ -156,8 +153,8 @@ uwApplicationModule::readFromTCP(int clnSock)
 		int recvMsgSize = 0;
 		char buffer_msg[MAX_LENGTH_PAYLOAD];
 		Packet *p = Packet::alloc();
-		hdr_DATA_APPLICATION *hdr_Appl = HDR_DATA_APPLICATION(p);
 		hdr_cmn *ch = HDR_CMN(p);
+		hdr_DATA_APPLICATION *hdr_Appl = HDR_DATA_APPLICATION(p);
 
 		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
 			buffer_msg[i] = 0;
@@ -201,87 +198,5 @@ uwApplicationModule::readFromTCP(int clnSock)
 		queuePckReadTCP.push(p);
 		incrPktsPushQueue();
 		lk.unlock();
-	}
-}
-
-void
-uwApplicationModule::init_Packet_TCP()
-{
-	if (!queuePckReadTCP.empty()) {
-		Packet *ptmp = queuePckReadTCP.front();
-		queuePckReadTCP.pop();
-
-		hdr_cmn *ch = HDR_CMN(ptmp);
-		hdr_uwip *uwiph = hdr_uwip::access(ptmp);
-		hdr_uwudp *uwudph = hdr_uwudp::access(ptmp);
-		hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(ptmp);
-
-		// Common header fields
-		ch->uid_ = uidcnt++;
-		ch->ptype_ = PT_DATA_APPLICATION;
-		ch->direction_ = hdr_cmn::DOWN;
-		ch->timestamp() = NOW;
-
-		// Transport header fields
-		uwudph->dport() = port_num;
-
-		// IP header fields
-		uwiph->daddr() = dst_addr;
-
-		// uwApplication packet header fields
-		uwApph->sn_ = txsn++; // Sequence number to the data packet
-		if (rftt >= 0) {
-			uwApph->rftt_ = (int) (rftt * 10000); // Forward Trip Time
-			uwApph->rftt_valid_ = true;
-		} else {
-			uwApph->rftt_valid_ = false;
-		}
-		uwApph->priority_ = 0; // Priority of the message
-		if (debug_ >= 2)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_TCP::UID_" << ch->uid_
-					  << endl;
-		if (debug_ >= 0)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_TCP::DEST_"
-					  << (int) uwiph->daddr() << endl;
-		if (debug_ >= 0)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_TCP::SIZE_"
-					  << (int) uwApph->payload_size() << endl;
-		if (debug_ >= 0)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_TCP::SN_"
-					  << (int) uwApph->sn_ << endl;
-		if (debug_ >= 0)
-			std::cout << getEpoch() << "::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_TCP::INIT_PACKET_TCP::"
-						 "SEND_"
-						 "DOWN_PACKET"
-					  << endl;
-
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_TCP::UID_" << ch->uid_
-					<< endl;
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_TCP::DEST_"
-					<< (int) uwiph->daddr() << endl;
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_TCP::SIZE_"
-					<< (int) uwApph->payload_size() << endl;
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_TCP::SN_"
-					<< (int) uwApph->sn_ << endl;
-		if (logging)
-			out_log << left << getEpoch() << "::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_TCP::INIT_PACKET_TCP::"
-					   "SEND_DOWN_"
-					   "PACKET"
-					<< endl;
-		sendDown(ptmp);
 	}
 }
