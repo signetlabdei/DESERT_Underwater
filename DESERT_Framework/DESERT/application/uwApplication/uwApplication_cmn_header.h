@@ -39,16 +39,12 @@
 #ifndef UWAPPLICATION_CMH_HEADER_H
 #define UWAPPLICATION_CMH_HEADER_H
 
-#include <module.h>
 #include <packet.h>
-#include <pthread.h>
 
 #define MAX_LENGTH_PAYLOAD 4096
 #define HDR_DATA_APPLICATION(p)    \
 	(hdr_DATA_APPLICATION::access( \
-			p)) /**< alias defined to access the TRIGGER HEADER */
-
-// pthread_mutex_t mutex_udp = PTHREAD_MUTEX_INITIALIZER;
+			p)) /**< alias defined to access the DATA HEADER */
 
 extern packet_t PT_DATA_APPLICATION; /**< DATA packet type */
 
