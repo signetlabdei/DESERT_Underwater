@@ -41,23 +41,14 @@
 #ifndef UWAPPLICATION_MODULE_H
 #define UWAPPLICATION_MODULE_H
 
-#include <string>
 #include <uwApplication_cmn_header.h>
+#include <module.h>
 
 #include <arpa/inet.h>
-#include <assert.h>
-#include <climits>
-#include <fcntl.h>
-#include <module.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <stddef.h>
-#include <stdlib.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/types.h>
-#include <syslog.h>
-#include <unistd.h>
 
 #include <atomic>
 #include <chrono>

@@ -37,12 +37,13 @@
  */
 
 #include "uwApplication_module.h"
-#include <iostream>
 #include <rng.h>
-#include <string>
-#include <strings.h>
 #include <uwip-module.h>
 #include <uwudp-module.h>
+
+#include <climits>
+#include <iostream>
+#include <string>
 
 uint uwApplicationModule::MAX_READ_LEN = 64;
 

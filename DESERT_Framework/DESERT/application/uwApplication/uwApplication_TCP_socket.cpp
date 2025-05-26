@@ -38,7 +38,6 @@
  */
 
 #include "uwApplication_module.h"
-#include <cstring>
 
 bool
 uwApplicationModule::listenTCP()

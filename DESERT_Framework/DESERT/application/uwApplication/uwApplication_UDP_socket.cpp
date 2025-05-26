@@ -38,7 +38,6 @@
  */
 
 #include "uwApplication_module.h"
-#include <iostream>
 
 bool
 uwApplicationModule::openConnectionUDP()
