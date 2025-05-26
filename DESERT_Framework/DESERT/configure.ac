@@ -112,6 +112,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwrandomlib'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwsmposition'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwsmwpposition'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
@@ -207,6 +208,7 @@ AC_CONFIG_FILES([
     mobility/uwgmposition/Makefile
     mobility/uwrandomlib/Makefile
     mobility/uwsmposition/Makefile
+    mobility/uwsmwpposition/Makefile
     interference/uwinterference/Makefile
     interference/uwinterferenceofdm/Makefile
     propagation/uwoptical_propagation/Makefile
