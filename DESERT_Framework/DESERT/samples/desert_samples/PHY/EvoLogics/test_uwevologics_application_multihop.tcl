@@ -46,15 +46,15 @@ set opt(traffic)  		 60
 set opt(app_port) 		 22222
 set opt(ip)       		 "10.42.171.1"
 set opt(port)     		 9200
-set opt(exp_ID)   		 1
 set opt(payload_size)	 16
 set opt(rngstream)    	 1
+
 ##############################
 # Terminal's parameter check #
 ##############################
 if {$opt(bash_parameters)} {
   if {$opt(AppSocket) == 1} {
-    if {$argc < 13} {
+    if {$argc < 12} {
       puts "The script needs 10 input to work"
       puts "1 - ID of the node"
       puts "2 - ID of the source node"
@@ -67,8 +67,7 @@ if {$opt(bash_parameters)} {
       puts "9 - IP of the modem"
       puts "10 - Port of the modem"
       puts "11 - Application socket port"
-      puts "12 - Experiment ID"
-      puts "13 - Random generator stream"
+      puts "12 - Random generator stream"
       puts "Please try again."
       exit
     } else {
@@ -85,8 +84,7 @@ if {$opt(bash_parameters)} {
       set opt(ip)          [lindex $argv [expr $opt(n_relay)+7]]
       set opt(port)        [lindex $argv [expr $opt(n_relay)+8]]
       set opt(app_port)    [lindex $argv [expr $opt(n_relay)+9]]
-      set opt(exp_ID)      [lindex $argv [expr $opt(n_relay)+10]]
-      set opt(rngstream)   [lindex $argv [expr $opt(n_relay)+11]]
+      set opt(rngstream)   [lindex $argv [expr $opt(n_relay)+10]]
     }
   } else {
 	  puts "Set AppSocket to 1"
@@ -215,17 +213,15 @@ UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
 UW/APP/uwApplication/Packer set debug_ 10
 
-Module/UW/APPLICATION set debug_ 1
 Module/UW/APPLICATION set period_ $opt(traffic)
-Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
   Module/UW/APPLICATION set Socket_Port_ $opt(app_port)
 } else {
   Module/UW/APPLICATION set Payload_size_ $opt(payload_size)
 }
+Module/UW/APPLICATION set PoissonTraffic_ 0
 Module/UW/APPLICATION set drop_out_of_order_ 0    
-Module/UW/APPLICATION set pattern_sequence_ 0     
-Module/UW/APPLICATION set EXP_ID_ $opt(exp_ID)
+Module/UW/APPLICATION set sea_trial_ 1
 
 # variables for the S2C modem's interface
 Module/UW/UwModem/EvoLogicsS2C set debug_		 0
@@ -300,6 +296,15 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
+	# Enable log for uwapplication module
+	$app_ setLog 3 "uwapplication_$opt(node)_log"
+
+    if {$opt(AppSocket) == 1} {
+        $app_ setSocketProtocol $opt(protocol)
+        $app_ set Socket_Port_ $opt(app_port)
+    }
+    $app_ set node_ID_  $opt(node)
+
 	# assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
@@ -311,7 +316,6 @@ proc createNode { } {
     $modem_ set ID_ $opt(node)
 	$modem_ setModemAddress $address
     $modem_ setLogLevel DBG
-    # $modem_ setBurstMode
 
     # set packer for Adaptation Layer
     set packer_ [new UW/AL/Packer]
@@ -330,21 +334,10 @@ proc createNode { } {
     $packer_ addPacker $packer_payload2
     $packer_ addPacker $packer_payload3
     $packer_ addPacker $packer_payload4
-    if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol $opt(protocol)
-        $app_ set Socket_Port_ $opt(app_port)
-    } else {
-      $app_ setSocketProtocol "NONE"
-    }
-    $app_ set node_ID_  $opt(node)
-    $app_ print_log
 
     $uwal_ linkPacker $packer_
     
     $uwal_ set nodeID $opt(node)
-
-    # $mac_ setNoAckMode
-    # $mac_ initialize
 }
 
 #################

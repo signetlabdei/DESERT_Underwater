@@ -35,7 +35,6 @@ set opt(AppSocket)  1;
 # Protocol to use for the Application socket, TCP or UDP
 set opt(protocol) "TCP" ;
 
-set opt(n_node) 5
 set opt(node)     1
 set opt(dest)     3
 set opt(start)    1
@@ -44,7 +43,6 @@ set opt(traffic)  60
 set opt(app_port)    22223
 set opt(ip)       "10.42.144.1"
 set opt(port)     9200
-set opt(exp_ID)   1
 set opt(payload_size) 16
 set opt(rngstream)    1
 ##############################
@@ -52,8 +50,8 @@ set opt(rngstream)    1
 ##############################
 if {$opt(bash_parameters)} {
   if {$opt(AppSocket) == 1} {
-    if {$argc != 10} {
-      puts "The script needs 10 input to work"
+    if {$argc != 9} {
+      puts "The script needs 9 input to work"
       puts "1 - ID of the node"
       puts "2 - ID of the receiver"
       puts "3 - Start time"
@@ -62,25 +60,23 @@ if {$opt(bash_parameters)} {
       puts "6 - IP of the modem"
       puts "7 - Port of the modem"
       puts "8 - Application socket port"
-      puts "9 - Experiment ID"
-      puts "10 - Random generator stream"
+      puts "9 - Random generator stream"
       puts "Please try again."
       exit
     } else {
-      set opt(node)     [lindex $argv 0]
-      set opt(dest)     [lindex $argv 1]
-      set opt(start)    [lindex $argv 2]
-      set opt(stop)     [lindex $argv 3]
-      set opt(traffic)  [lindex $argv 4]
-      set opt(ip)       [lindex $argv 5]
-      set opt(port)     [lindex $argv 6]
-      set opt(app_port) [lindex $argv 7]
-      set opt(exp_ID) [lindex $argv 8]
-      set opt(rngstream)    [lindex $argv 9]
+      set opt(node)       [lindex $argv 0]
+      set opt(dest)       [lindex $argv 1]
+      set opt(start)      [lindex $argv 2]
+      set opt(stop)       [lindex $argv 3]
+      set opt(traffic)    [lindex $argv 4]
+      set opt(ip)         [lindex $argv 5]
+      set opt(port)       [lindex $argv 6]
+      set opt(app_port)   [lindex $argv 7]
+      set opt(rngstream)  [lindex $argv 8]
     }
   } else {
-    if {$argc != 10} {
-      puts "The script needs 10 input to work"
+    if {$argc != 9} {
+      puts "The script needs 9 input to work"
       puts "1 - ID of the node"
       puts "2 - ID of the receiver"
       puts "3 - Start time"
@@ -89,21 +85,19 @@ if {$opt(bash_parameters)} {
       puts "6 - IP of the modem"
       puts "7 - Port of the modem"
       puts "8 - Payload size (byte)"
-      puts "9 - Experiment ID"
-      puts "10 - rngstream"
+      puts "9 - rngstream"
       puts "Please try again."
       exit
     } else {
-      set opt(node)     [lindex $argv 0]
-      set opt(dest)     [lindex $argv 1]
-      set opt(start)    [lindex $argv 2]
-      set opt(stop)     [lindex $argv 3]
-      set opt(traffic)  [lindex $argv 4]
-      set opt(ip)       [lindex $argv 5]
-      set opt(port)     [lindex $argv 6]
-      set opt(payload_size) [lindex $argv 7]
-      set opt(exp_ID) [lindex $argv 8]
-      set opt(rngstream)    [lindex $argv 9]
+      set opt(node)          [lindex $argv 0]
+      set opt(dest)          [lindex $argv 1]
+      set opt(start)         [lindex $argv 2]
+      set opt(stop)          [lindex $argv 3]
+      set opt(traffic)       [lindex $argv 4]
+      set opt(ip)            [lindex $argv 5]
+      set opt(port)          [lindex $argv 6]
+      set opt(payload_size)  [lindex $argv 7]
+      set opt(rngstream)     [lindex $argv 8]
     }
   }
 }
@@ -226,19 +220,17 @@ UW/APP/uwApplication/Packer set RFFT_FIELD_ 5
 UW/APP/uwApplication/Packer set RFFTVALID_FIELD_ 2
 UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
-UW/APP/uwApplication/Packer set debug_ 10
+UW/APP/uwApplication/Packer set debug_ 0
 
-Module/UW/APPLICATION set debug_ -1              
 Module/UW/APPLICATION set period_ $opt(traffic)
-Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
   Module/UW/APPLICATION set Socket_Port_ $opt(app_port)
 } else {
   Module/UW/APPLICATION set Payload_size_ $opt(payload_size)
 }
-Module/UW/APPLICATION set drop_out_of_order_ 1    
-Module/UW/APPLICATION set pattern_sequence_ 0     
-Module/UW/APPLICATION set EXP_ID_ $opt(exp_ID)
+Module/UW/APPLICATION set PoissonTraffic_ 0
+Module/UW/APPLICATION set drop_out_of_order_ 0
+Module/UW/APPLICATION set sea_trial_ 1
 
 # variables for the S2C modem's interface
 Module/UW/UwModem/EvoLogicsS2C set debug_		 1
@@ -284,7 +276,7 @@ proc createNode { } {
 
     puts "Creating node..."
 
-        # insert the module(s) into the node
+    # insert the module(s) into the node
     $node_ addModule 8 $app_ 1 "UWA"
     $node_ addModule 7 $transport_ 1 "UDP"
     $node_ addModule 6 $routing_ 1 "IPR"
@@ -302,6 +294,17 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
+	# Enable log for uwapplication module
+	$app_ setLog 3 "uwapplication_$opt(node)_log"
+	# $app_ setLogLevel 3
+
+    if {$opt(AppSocket) == 1} {
+        $app_ setSocketProtocol $opt(protocol)
+        $app_ set Socket_Port_ $opt(app_port)
+    }
+    $app_ set node_ID_  $opt(node)
+
+
     # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
@@ -309,13 +312,9 @@ proc createNode { } {
     $modem_ set ID_ $opt(node)
     $modem_ setModemAddress $address
     $modem_ setLogLevel DBG
-    $modem_ enableExtProtoMode
-    $modem_ enableIMAck
-    # $modem_ setBurstMode
 
     # set packer for Adaptation Layer
     set packer_ [new UW/AL/Packer]
-
     set packer_payload0 [new NS2/COMMON/Packer]  
     set packer_payload1 [new NS2/MAC/Packer]
     set packer_payload2 [new UW/IP/Packer]
@@ -327,14 +326,6 @@ proc createNode { } {
     $packer_ addPacker $packer_payload2
     $packer_ addPacker $packer_payload3
     $packer_ addPacker $packer_payload4
-    if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol $opt(protocol)
-        $app_ set Socket_Port_ $opt(app_port)
-    } else {
-      $app_ setSocketProtocol "NONE"
-    }
-    $app_ set node_ID_  $opt(node)
-    $app_ print_log
 
     $uwal_ linkPacker $packer_
     

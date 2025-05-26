@@ -42,44 +42,15 @@ set opt(traffic)  60
 set opt(app_port)    22223
 set opt(ip)       "10.42.144.1"
 set opt(port)     22222
-set opt(exp_ID)   1
 set opt(max_read) 16
 set opt(payload_size) 16
 set opt(rngstream)    1
+
 ##############################
 # Terminal's parameter check #
 ##############################
 if {$opt(bash_parameters)} {
   if {$opt(AppSocket) == 1} {
-    if {$argc != 11} {
-      puts "The script needs 11 input to work"
-      puts "1 - ID of the node"
-      puts "2 - ID of the receiver"
-      puts "3 - Start time"
-      puts "4 - Stop time"
-      puts "5 - Packet generation period (0 if the node doesn't generate data)"
-      puts "6 - IP of the modem"
-      puts "7 - Port of the modem"
-      puts "8 - Application socket port"
-      puts "9 - Maximum read size"
-      puts "10 - Experiment ID"
-      puts "11 - Random generator stream"
-      puts "Please try again."
-      exit
-    } else {
-      set opt(node)     [lindex $argv 0]
-      set opt(dest)     [lindex $argv 1]
-      set opt(start)    [lindex $argv 2]
-      set opt(stop)     [lindex $argv 3]
-      set opt(traffic)  [lindex $argv 4]
-      set opt(ip)       [lindex $argv 5]
-      set opt(port)     [lindex $argv 6]
-      set opt(app_port) [lindex $argv 7]
-      set opt(max_read) [lindex $argv 8]
-      set opt(exp_ID) [lindex $argv 9]
-      set opt(rngstream)    [lindex $argv 10]
-    }
-  } else {
     if {$argc != 10} {
       puts "The script needs 10 input to work"
       puts "1 - ID of the node"
@@ -89,22 +60,47 @@ if {$opt(bash_parameters)} {
       puts "5 - Packet generation period (0 if the node doesn't generate data)"
       puts "6 - IP of the modem"
       puts "7 - Port of the modem"
-      puts "8 - Payload size (byte)"
-      puts "9 - Experiment ID"
+      puts "8 - Application socket port"
+      puts "9 - Maximum read size"
       puts "10 - Random generator stream"
       puts "Please try again."
       exit
     } else {
-      set opt(node)     [lindex $argv 0]
-      set opt(dest)     [lindex $argv 1]
-      set opt(start)    [lindex $argv 2]
-      set opt(stop)     [lindex $argv 3]
-      set opt(traffic)  [lindex $argv 4]
-      set opt(ip)       [lindex $argv 5]
-      set opt(port)     [lindex $argv 6]
+      set opt(node)       [lindex $argv 0]
+      set opt(dest)       [lindex $argv 1]
+      set opt(start)      [lindex $argv 2]
+      set opt(stop)       [lindex $argv 3]
+      set opt(traffic)    [lindex $argv 4]
+      set opt(ip)         [lindex $argv 5]
+      set opt(port)       [lindex $argv 6]
+      set opt(app_port)   [lindex $argv 7]
+      set opt(max_read)   [lindex $argv 8]
+      set opt(rngstream)  [lindex $argv 9]
+    }
+  } else {
+    if {$argc != 9} {
+      puts "The script needs 9 input to work"
+      puts "1 - ID of the node"
+      puts "2 - ID of the receiver"
+      puts "3 - Start time"
+      puts "4 - Stop time"
+      puts "5 - Packet generation period (0 if the node doesn't generate data)"
+      puts "6 - IP of the modem"
+      puts "7 - Port of the modem"
+      puts "8 - Payload size (byte)"
+      puts "9 - Random generator stream"
+      puts "Please try again."
+      exit
+    } else {
+      set opt(node)         [lindex $argv 0]
+      set opt(dest)         [lindex $argv 1]
+      set opt(start)        [lindex $argv 2]
+      set opt(stop)         [lindex $argv 3]
+      set opt(traffic)      [lindex $argv 4]
+      set opt(ip)           [lindex $argv 5]
+      set opt(port)         [lindex $argv 6]
       set opt(payload_size) [lindex $argv 7]
-      set opt(exp_ID) [lindex $argv 8]
-      set opt(rngstream)    [lindex $argv 9]
+      set opt(rngstream)    [lindex $argv 8]
     }
   }
 }
@@ -228,18 +224,16 @@ UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
 UW/APP/uwApplication/Packer set debug_ 0
 
-Module/UW/APPLICATION set debug_ -1              
 Module/UW/APPLICATION set period_ $opt(traffic)
-Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
   Module/UW/APPLICATION set Socket_Port_ $opt(app_port)
   Module/UW/APPLICATION set max_read_length $opt(max_read)
 } else {
   Module/UW/APPLICATION set Payload_size_ $opt(payload_size)
 }
-Module/UW/APPLICATION set drop_out_of_order_ 1    
-Module/UW/APPLICATION set pattern_sequence_ 0     
-Module/UW/APPLICATION set EXP_ID_ $opt(exp_ID)
+Module/UW/APPLICATION set PoissonTraffic_ 0
+Module/UW/APPLICATION set drop_out_of_order_ 1
+Module/UW/APPLICATION set sea_trial_ 1
 
 # variables for the CSA modem's interface
 Module/UW/UwModem/ModemCSA set debug_		 0
@@ -296,7 +290,7 @@ proc createNode { } {
 
 	puts "Creating node..."
 
-	    # insert the module(s) into the node
+	# insert the module(s) into the node
 	$node_ addModule 8 $app_ 1 "UWA"
 	$node_ addModule 7 $transport_ 1 "UDP"
 	$node_ addModule 6 $routing_ 1 "IPR"
@@ -313,6 +307,12 @@ proc createNode { } {
     $node_ setConnection $mll_ $mac_ trace
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
+
+    if {$opt(AppSocket) == 1} {
+        $app_ setSocketProtocol $opt(protocol)
+        $app_ set Socket_Port_ $opt(app_port)
+    }
+    $app_ set node_ID_  $opt(node)
 
 	# assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
@@ -342,14 +342,6 @@ proc createNode { } {
     $packer_ addPacker $packer_payload2
     $packer_ addPacker $packer_payload3
     $packer_ addPacker $packer_payload4
-    if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol $opt(protocol)
-        $app_ set Socket_Port_ $opt(app_port)
-    } else {
-      $app_ setSocketProtocol "NONE"
-    }
-    $app_ set node_ID_  $opt(node)
-    # $app_ print_log
 
     $uwal_ linkPacker $packer_
     
