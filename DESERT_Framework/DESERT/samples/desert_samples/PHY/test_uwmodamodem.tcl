@@ -40,7 +40,7 @@ set opt(AppSocket)  1;
 # Terminal's parameter check #
 ##############################
 if {$opt(AppSocket) == 1} {
-    if {$argc != 9} {
+    if {$argc != 8} {
         puts "The script needs 10 input to work"
         puts "1 - ID of the node"
         puts "2 - ID of the receiver"
@@ -50,7 +50,6 @@ if {$opt(AppSocket) == 1} {
         puts "6 - IP of the modem"
         puts "7 - Port of the modem"
         puts "8 - Application socket port"
-        puts "9 - Experiment ID"
         puts "Please try again."
         exit
     } else {
@@ -62,11 +61,10 @@ if {$opt(AppSocket) == 1} {
         set opt(address)  [lindex $argv 5]
         set opt(port)     [lindex $argv 6]
         set opt(app_port) [lindex $argv 7]
-        set opt(exp_ID)   [lindex $argv 8]
     }
 } else {
-    if {$argc != 9} {
-        puts "The script needs 10 input to work"
+    if {$argc != 8} {
+        puts "The script needs 8 input to work"
         puts "1 - ID of the node"
         puts "2 - ID of the receiver"
         puts "3 - Start time"
@@ -75,19 +73,17 @@ if {$opt(AppSocket) == 1} {
         puts "6 - IP address of the modem"
         puts "7 - Port of the modem"
         puts "8 - Payload size (byte)"
-        puts "9 - Experiment ID"
         puts "Please try again."
         exit
     } else {
-        set opt(node)     [lindex $argv 0]
-        set opt(dest)     [lindex $argv 1]
-        set opt(start)    [lindex $argv 2]
-        set opt(stop)     [lindex $argv 3]
-        set opt(traffic)  [lindex $argv 4]
-        set opt(address)  [lindex $argv 5]
-        set opt(port)     [lindex $argv 6]
-        set opt(payload_size) [lindex $argv 7]
-        set opt(exp_ID)   [lindex $argv 8]
+        set opt(node)          [lindex $argv 0]
+        set opt(dest)          [lindex $argv 1]
+        set opt(start)         [lindex $argv 2]
+        set opt(stop)          [lindex $argv 3]
+        set opt(traffic)       [lindex $argv 4]
+        set opt(address)       [lindex $argv 5]
+        set opt(port)          [lindex $argv 6]
+        set opt(payload_size)  [lindex $argv 7]
     }
 }
 
@@ -211,17 +207,15 @@ UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
 UW/APP/uwApplication/Packer set debug_ 0
 
-Module/UW/APPLICATION set debug_ 0
 Module/UW/APPLICATION set period_ $opt(traffic)
-Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
     Module/UW/APPLICATION set Socket_Port_ $opt(app_port)
 } else {
     Module/UW/APPLICATION set Payload_size_ $opt(payload_size)
 }
+Module/UW/APPLICATION set PoissonTraffic_ 0
 Module/UW/APPLICATION set drop_out_of_order_ 0
-Module/UW/APPLICATION set pattern_sequence_ 0     
-Module/UW/APPLICATION set EXP_ID_  $opt(exp_ID)
+Module/UW/APPLICATION set sea_trial_ 1
 
 # variables for the MODA modem interface
 Module/UW/UwModem/MODA set debug_	 1
@@ -285,6 +279,15 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
+	# Enable log for uwapplication module
+	$app_ setLog 3 "uwapplication_$opt(node)_log"
+
+    if {$opt(AppSocket) == 1} {
+        $app_ setSocketProtocol $opt(protocol)
+        $app_ set Socket_Port_ $opt(app_port)
+    }
+    $app_ set node_ID_  $opt(node)
+
     # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
@@ -308,14 +311,6 @@ proc createNode { } {
     $packer_ addPacker $packer_payload2
     $packer_ addPacker $packer_payload3
     $packer_ addPacker $packer_payload4
-    if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol "TCP"
-        $app_ set Socket_Port_ $opt(app_port)
-    } else {
-        $app_ setSocketProtocol "NONE"
-    }
-    $app_ set node_ID_  $opt(node)
-    $app_ print_log
 
     $uwal_ linkPacker $packer_
     

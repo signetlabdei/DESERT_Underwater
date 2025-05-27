@@ -40,8 +40,8 @@ set opt(AppSocket)  1;
 # Terminal's parameter check #
 ##############################
 if {$opt(AppSocket) == 1} {
-    if {$argc < 12} {
-        puts "The script needs 10 input to work"
+    if {$argc < 11} {
+        puts "The script needs (at least) 11 inputs to work"
 		puts "1 - ID of the node"
       	puts "2 - ID of the source node"
       	puts "3 - ID of the receiver node"
@@ -53,10 +53,9 @@ if {$opt(AppSocket) == 1} {
         puts "9 - IP of the modem"
         puts "10 - Port of the modem"
         puts "11 - Application socket port"
-        puts "12 - Experiment ID"
         puts "Please try again."
         puts "Example:"
-        puts "ns test_uwmdoamodem_multihop.tcl 1 1 4 2 2 3 1 10000 10 10.42.0.1 55555 44444 1"
+        puts "ns test_uwmdoamodem_multihop.tcl 1 1 4 2 2 3 1 10000 10 10.42.0.1 55555 44444"
         exit
     } else {
 		set opt(node)        [lindex $argv 0]
@@ -72,7 +71,6 @@ if {$opt(AppSocket) == 1} {
       	set opt(address)   [lindex $argv [expr $opt(n_relay)+7]]
       	set opt(port)      [lindex $argv [expr $opt(n_relay)+8]]
       	set opt(app_port)  [lindex $argv [expr $opt(n_relay)+9]]
-      	set opt(exp_ID)    [lindex $argv [expr $opt(n_relay)+10]]
     }
 }
 
@@ -196,17 +194,15 @@ UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
 UW/APP/uwApplication/Packer set debug_ 0
 
-Module/UW/APPLICATION set debug_ 10
 Module/UW/APPLICATION set period_ $opt(traffic)
-Module/UW/APPLICATION set PoissonTraffic_ 0
 if {$opt(AppSocket) == 1} {
     Module/UW/APPLICATION set Socket_Port_ $opt(app_port)
 } else {
     Module/UW/APPLICATION set Payload_size_ $opt(payload_size)
 }
+Module/UW/APPLICATION set PoissonTraffic_ 0
 Module/UW/APPLICATION set drop_out_of_order_ 0
-Module/UW/APPLICATION set pattern_sequence_ 0     
-Module/UW/APPLICATION set EXP_ID_  $opt(exp_ID)
+Module/UW/APPLICATION set sea_trial_ 1
 
 Module/UW/CSMA_ALOHA set debug_	0
 Module/UW/CSMA_ALOHA set max_tx_tries_	3
@@ -275,6 +271,17 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
+	# Enable log for uwapplication module
+	$app_ setLog 3 "uwapplication_$opt(node)_log"
+
+    if {$opt(AppSocket) == 1} {
+        $app_ setSocketProtocol "TCP"
+        $app_ set Socket_Port_ $opt(app_port)
+    } else {
+        $app_ setSocketProtocol "NONE"
+    }
+    $app_ set node_ID_  $opt(node)
+
     # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
@@ -298,14 +305,6 @@ proc createNode { } {
     $packer_ addPacker $packer_payload2
     $packer_ addPacker $packer_payload3
     $packer_ addPacker $packer_payload4
-    if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol "TCP"
-        $app_ set Socket_Port_ $opt(app_port)
-    } else {
-        $app_ setSocketProtocol "NONE"
-    }
-    $app_ set node_ID_  $opt(node)
-    $app_ print_log
 
     $uwal_ linkPacker $packer_
     

@@ -32,28 +32,23 @@
  * @author Federico Favaro
  * @version 1.1.0
  *
- * \brief Provides the headers of the data packet
+ * \brief Provides the headers of the DATA packet.
  *
  */
 
 #ifndef UWAPPLICATION_CMH_HEADER_H
 #define UWAPPLICATION_CMH_HEADER_H
 
-#include <module.h>
 #include <packet.h>
-#include <pthread.h>
 
 #define MAX_LENGTH_PAYLOAD 4096
-#define HDR_DATA_APPLICATION(p)    \
-	(hdr_DATA_APPLICATION::access( \
-			p)) /**< alias defined to access the TRIGGER HEADER */
-
-// pthread_mutex_t mutex_udp = PTHREAD_MUTEX_INITIALIZER;
+/** Alias defined to access the DATA HEADER */
+#define HDR_DATA_APPLICATION(p) (hdr_DATA_APPLICATION::access(p))
 
 extern packet_t PT_DATA_APPLICATION; /**< DATA packet type */
 
 /**
- * Content header of TRIGGER packet
+ * Content header of DATA packet
  */
 typedef struct hdr_DATA_APPLICATION {
 	uint16_t sn_; /**< Serial number of the packet. */
@@ -78,10 +73,10 @@ typedef struct hdr_DATA_APPLICATION {
 	}
 
 	/**
-	  *  Reference to the rftt_ variable.
-	  *
-	  * @return float rftt_
-	  */
+	 *  Reference to the rftt_ variable.
+	 *
+	 * @return float rftt_
+	 */
 	inline int &
 	rftt()
 	{
@@ -100,10 +95,10 @@ typedef struct hdr_DATA_APPLICATION {
 	}
 
 	/**
-	  *  Reference to the priority variable.
-	  *
-	  * @return char priority_
-	  */
+	 *  Reference to the priority variable.
+	 *
+	 * @return char priority_
+	 */
 	inline uint8_t &
 	priority()
 	{

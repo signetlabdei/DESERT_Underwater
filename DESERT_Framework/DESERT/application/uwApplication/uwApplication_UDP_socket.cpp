@@ -37,45 +37,36 @@
  *
  */
 
-#include <sstream>
-#include <time.h>
-#include "uwApplication_cmn_header.h"
 #include "uwApplication_module.h"
-#include <error.h>
-#include <errno.h>
 
-pthread_mutex_t mutex_udp = PTHREAD_MUTEX_INITIALIZER;
-
-int
+bool
 uwApplicationModule::openConnectionUDP()
 {
 	int sockoptval = 1;
+
 	// Create socket for incoming connections
 	if ((servSockDescr = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::OPEN_CONNECTION_UDP::SOCKET_"
-						 "CREATION_FAILED"
-					  << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::OPEN_CONNECTION_UDP::SOCKET_CREATION_"
-					   "FAILED"
-					<< endl;
-		exit(1);
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWAPPLICATION",
+				"openConnectionUDP()::Socket creation failed");
+
+		return false;
 	}
 
-	if (setsockopt(servSockDescr, SOL_SOCKET, SO_REUSEADDR, &sockoptval, sizeof(int)) == -1) {
-		if(debug_ >=0)
-			std::cout << "[" << getEpoch() << "]::" << NOW 
-					  << "UWAPPLICATION::ERROR::REUSABLE_FAIL"
-					  << std::endl;
+	if (setsockopt(servSockDescr,
+				SOL_SOCKET,
+				SO_REUSEADDR,
+				&sockoptval,
+				sizeof(int)) == -1) {
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWAPPLICATION",
+				"openConnectionUDP()::Set socket failed");
 	}
 
-	if (debug_ >= 2)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::OPEN_CONNECTION_UDP::SOCKET_CREATED"
-				  << endl;
+	printOnLog(Logger::LogLevel::INFO,
+			"UWAPPLICATION",
+			"openConnectionUDP()::Socket created");
+
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_port = htons(servPort);
@@ -83,190 +74,62 @@ uwApplicationModule::openConnectionUDP()
 
 	if (::bind(servSockDescr, (struct sockaddr *) &servAddr, sizeof(servAddr)) <
 			0) {
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::OPEN_CONNECTION_UDP::BINDING_FAILED_"
-					  << strerror(errno) << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::OPEN_CONNECTION_UDP::BINDING_FAILED_"
-					<< strerror(errno) << endl;
-		exit(1);
-	}
-	pthread_t pth;
-	if (pthread_create(&pth, NULL, read_process_UDP, (void *) this) != 0) {
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::OPEN_CONNECTION_UDP::CANNOT_CREATE_"
-						 "PARRALEL_THREAD"
-					  << endl;
-		exit(1);
-	}
-	chkTimerPeriod.resched(getPeriod());
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWAPPLICATION",
+				"openConnectionUDP()::Socket binding failed: " +
+						std::string(strerror(errno)));
 
-	return servSockDescr;
-}; // end openConnectionUDP() method
+		return false;
+	}
 
-void *
-read_process_UDP(void *arg)
+	return true;
+}
+
+void
+uwApplicationModule::readFromUDP()
 {
-	int debug_ = 1;
-	char buffer_msg[MAX_LENGTH_PAYLOAD]; // Buffer in which the DATA packets
-	// payload are stored
-	int recvMsgSize; // Size of the DATA payload received;
-	uwApplicationModule *obj = (uwApplicationModule *) arg;
-
+	char buffer_msg[MAX_LENGTH_PAYLOAD];
+	int recvMsgSize;
 	socklen_t clnLen = sizeof(sockaddr_in);
 
-	while (true) {
-		clnLen = sizeof(obj->clnAddr);
-		// Put the message to 0
+	while (receiving.load()) {
+		clnLen = sizeof(clnAddr);
 		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
 			buffer_msg[i] = 0;
 		}
-		// Block until receive message from a client
-		if ((recvMsgSize = recvfrom(obj->servSockDescr,
+
+		if ((recvMsgSize = recvfrom(servSockDescr,
 					 buffer_msg,
 					 MAX_LENGTH_PAYLOAD,
 					 0,
-					 (struct sockaddr *) &(obj->clnAddr),
+					 (struct sockaddr *) &(clnAddr),
 					 &clnLen)) < 0) {
-			if (debug_ >= 0)
-				std::cout << "[" << obj->getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::READ_PROCESS_UDP::CONNECTION_"
-							 "NOT_ACCEPTED"
-						  << endl;
-			if (obj->logging)
-				obj->out_log << left << "[" << obj->getEpoch() << "]::" << NOW
-							 << "::UWAPPLICATION::READ_PROCESS_UDP::CONNECTION_"
-								"NOT_ACCEPTED"
-							 << endl;
+
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWAPPLICATION",
+					"readFromUDP()::Receive from socket failed");
+
+			continue;
 		}
-		if (debug_ >= 1)
-			std::cout << "[" << obj->getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::READ_PROCESS_TCP::NEW_CLIENT_IP_"
-					  << inet_ntoa(obj->clnAddr.sin_addr) << std::endl;
-		if (obj->logging)
-			obj->out_log << left << "[" << obj->getEpoch() << "]::" << NOW
-						 << "::UWAPPLICATION::READ_PROCESS_UDP::NEW_CLIENT_IP_"
-						 << inet_ntoa(obj->clnAddr.sin_addr) << std::endl;
-		int status = pthread_mutex_lock(&mutex_udp);
-		if (status != 0) {
-			if (debug_ >= 0)
-				std::cout << "[" << obj->getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::PTHREAD_MUTEX_LOCK_FAILED "
-						  << endl;
-		}
+
 		if (recvMsgSize > 0) {
+			std::unique_lock<std::mutex> lk(socket_mutex);
 			Packet *p = Packet::alloc();
 			hdr_cmn *ch = HDR_CMN(p);
 			hdr_DATA_APPLICATION *hdr_Appl = HDR_DATA_APPLICATION(p);
-			hdr_Appl->payload_size() = recvMsgSize;
+
+			printOnLog(Logger::LogLevel::DEBUG,
+					"UWAPPLICATION",
+					"readFromUDP()::Socket payload received : " +
+							std::string(buffer_msg));
+
+			for (int i = 0; i < recvMsgSize; i++)
+				hdr_Appl->payload_msg[i] = buffer_msg[i];
 			ch->size() = recvMsgSize;
-			if (debug_ >= 0) {
-				std::cout << "[" << obj->getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::READ_PROCESS_UDP::NEW_PACKET_"
-							 "CREATED--> "
-						  << endl;
-				if (obj->logging)
-					obj->out_log << left << "[" << obj->getEpoch()
-								 << "]::" << NOW
-								 << "::UWAPPLICATION::READ_PROCESS_UDP::NEW_"
-									"PACKET_CREATED"
-								 << endl;
-				std::cout << "[" << obj->getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::READ_PROCESS_UDP::PAYLOAD_"
-							 "MESSAGE--> ";
-				for (int i = 0; i < recvMsgSize; i++) {
-					hdr_Appl->payload_msg[i] = buffer_msg[i];
-					cout << buffer_msg[i];
-				}
-			}
-			obj->queuePckReadUDP.push(p);
-			obj->incrPktsPushQueue();
-		}
-		status = pthread_mutex_unlock(&mutex_udp);
-		if (status != 0) {
-			if (debug_ >= 0)
-				std::cout << "[" << obj->getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::PTHREAD_MUTEX_UNLOCK_FAILED "
-						  << endl;
+			hdr_Appl->payload_size() = recvMsgSize;
+
+			queuePckReadUDP.push(p);
+			incrPktsPushQueue();
 		}
 	}
-
-} // end read_process_UDP() method
-
-void
-uwApplicationModule::init_Packet_UDP()
-{
-	if (!queuePckReadUDP.empty()) {
-		Packet *ptmp = queuePckReadUDP.front();
-		queuePckReadUDP.pop();
-		hdr_cmn *ch = HDR_CMN(ptmp);
-		hdr_uwudp *uwudph = hdr_uwudp::access(ptmp);
-		hdr_uwip *uwiph = hdr_uwip::access(ptmp);
-		hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(ptmp);
-
-		ch->uid_ = uidcnt++;
-		ch->ptype_ = PT_DATA_APPLICATION;
-		ch->direction_ = hdr_cmn::DOWN;
-		ch->timestamp() = Scheduler::instance().clock();
-
-		uwudph->dport() = port_num;
-
-		uwiph->daddr() = dst_addr;
-
-		uwApph->sn_ = txsn++; // Sequence number to the data packet
-		if (rftt >= 0) {
-			uwApph->rftt_ = (int) (rftt * 10000); // Forward Trip Time
-			uwApph->rftt_valid_ = true;
-		} else {
-			uwApph->rftt_valid_ = false;
-		}
-		uwApph->priority_ = 0; // Priority of the message
-
-		if (debug_ >= 2)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::UID_" << ch->uid_
-					  << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::DEST_"
-					  << (int) uwiph->daddr() << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SIZE_"
-					  << (int) uwApph->payload_size() << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SN_"
-					  << (int) uwApph->sn_ << endl;
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::INIT_PACKET_UDP::SEND_DOWN_PACKET"
-					  << endl;
-
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::UID_" << ch->uid_
-					<< endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::DEST_"
-					<< (int) uwiph->daddr() << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SIZE_"
-					<< (int) uwApph->payload_size() << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SN_"
-					<< (int) uwApph->sn_ << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::INIT_PACKET_UDP::SEND_DOWN_PACKET"
-					<< endl;
-
-		sendDown(ptmp);
-	}
-} // end init_Packet_UDP() method
+}

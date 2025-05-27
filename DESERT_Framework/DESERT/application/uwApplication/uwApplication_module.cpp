@@ -32,15 +32,18 @@
  * @author Federico Favaro
  * @version 1.1.0
  *
- * \brief Provides the implementation of uwApplicationmodule class
+ * \brief Provides the implementation of uwApplicationModule class.
  *
  */
 
-#include <rng.h>
-#include <sstream>
-#include <time.h>
-#include "uwApplication_cmn_header.h"
 #include "uwApplication_module.h"
+#include <rng.h>
+#include <uwip-module.h>
+#include <uwudp-module.h>
+
+#include <climits>
+#include <iostream>
+#include <string>
 
 uint uwApplicationModule::MAX_READ_LEN = 64;
 
@@ -68,30 +71,16 @@ public:
 } class_module_uwapplicationmodule;
 
 uwApplicationModule::uwApplicationModule()
-	: servSockDescr(0)
-	, clnSockDescr(0)
-	, servAddr()
-	, clnAddr()
-	, servPort(0)
-	, queuePckReadTCP()
-	, queuePckReadUDP()
-	, out_log()
-	, logging(false)
-	, node_id(0)
-	, exp_id(0)
-	, debug_(0)
-	, PERIOD(5)
+	: socket_active(false)
+	, socket_tcp(true)
+	, sn_check()
+	, dst_addr(0)
 	, poisson_traffic(0)
 	, payloadsize(16)
 	, port_num(55550)
 	, drop_out_of_order(0)
-	, dst_addr(0)
-	, chkTimerPeriod(this)
-	, socket_active(false)
-	, socket_protocol("")
-	, tcp_udp(-1)
-	, sn_check()
 	, uidcnt(0)
+	, hrsn(0)
 	, txsn(1)
 	, rftt(0)
 	, pkts_lost(0)
@@ -99,39 +88,57 @@ uwApplicationModule::uwApplicationModule()
 	, pkts_ooseq(0)
 	, pkts_invalid(0)
 	, pkts_last_reset(0)
+	, sea_trial(0)
+	, node_id(0)
+	, servSockDescr(0)
+	, clnSockDescr(0)
+	, servPort(0)
+	, esn(0)
+	, rttsamples(0)
+	, fttsamples(0)
+	, period(10)
 	, lrtime(0)
 	, sumrtt(0)
 	, sumrtt2(0)
-	, rttsamples(0)
 	, sumftt(0)
 	, sumftt2(0)
-	, fttsamples(0)
-	, esn(0)
 	, sumbytes(0)
 	, sumdt(0)
-	, hrsn(0)
+	, servAddr()
+	, clnAddr()
+	, socket_thread()
+	, receiving(false)
+	, queuePckReadTCP()
+	, queuePckReadUDP()
 {
-	bind("debug_", (int *) &debug_);
-	bind("period_", (double *) &PERIOD);
-	bind("node_ID_", (int *) &node_id);
-	bind("EXP_ID_", (int *) &exp_id);
-	bind("PoissonTraffic_", (int *) &poisson_traffic);
+	bind("period_", (double *) &period);
+	bind("Socket_Port_", (int *) &servPort);
 	bind("Payload_size_", (int *) &payloadsize);
+	bind("PoissonTraffic_", (int *) &poisson_traffic);
+	bind("drop_out_of_order_", (int *) &drop_out_of_order);
+	bind("node_ID_", (int *) &node_id);
+	bind("max_read_length", (uint *) &uwApplicationModule::MAX_READ_LEN);
+	bind("sea_trial_", (int *) &sea_trial);
 	bind("destAddr_", (int *) &dst_addr);
 	bind("destPort_", (int *) &port_num);
-	bind("Socket_Port_", (int *) &servPort);
-	bind("drop_out_of_order_", (int *) &drop_out_of_order);
-	bind("max_read_length", (uint *) &uwApplicationModule::MAX_READ_LEN);
+
+	if (period < 0) {
+		std::cout << "UWAPPLICATION::uwApplicationModule()::Period < 0, "
+					 "default to 10."
+				  << endl;
+
+		period = 10;
+	}
 
 	sn_check = new bool[USHRT_MAX];
 	for (int i = 0; i < USHRT_MAX; i++) {
 		sn_check[i] = false;
 	}
-	servPort = port_num;
-} // end uwApplicationModule() Method
+}
 
 uwApplicationModule::~uwApplicationModule()
 {
+	stop();
 }
 
 int
@@ -141,441 +148,338 @@ uwApplicationModule::command(int argc, const char *const *argv)
 
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "start") == 0) {
-			if (withoutSocket()) {
-				// Generate DATA packets without the use of sockets
-				start_generation();
-			} else {
-				// The communication take place with the use of sockets
+			if (!withoutSocket()) {
+				receiving.store(true);
+
 				if (useTCP()) {
-					// Generate DATA packets using TCP connection
-					uwApplicationModule::openConnectionTCP();
+					if (!listenTCP())
+						return TCL_ERROR;
+
+					socket_thread = std::thread(&uwApplicationModule::acceptTCP, this);
+
 				} else {
-					// Generate DATA packets using UDP connection
-					uwApplicationModule::openConnectionUDP();
+					if (!openConnectionUDP())
+						return TCL_ERROR;
+
+					socket_thread = std::thread(&uwApplicationModule::readFromUDP, this);
 				}
 			}
+
+			chkTimerPeriod = new uwSendTimerAppl(this);
+			chkTimerPeriod->resched(getTimeBeforeNextPkt());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "stop") == 0) {
 			stop();
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getsentpkts") == 0) {
 			tcl.resultf("%d", getPktSent());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "lostpkts") == 0) {
 			tcl.resultf("%f", getPktLost());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrecvpkts") == 0) {
 			tcl.resultf("%d", getPktRecv());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "outofsequencepkts") == 0) {
 			tcl.resultf("%f", getPktsOOSequence());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "notknownpktrx") == 0) {
 			tcl.resultf("%f", getPktsInvalidRx());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrecvpktsqueue") == 0) {
 			tcl.resultf("%d", getPktsPushQueue());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrtt") == 0) {
 			tcl.resultf("%f", GetRTT());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getrttstd") == 0) {
 			tcl.resultf("%f", GetRTTstd());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getftt") == 0) {
 			tcl.resultf("%f", GetFTT());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getfttstd") == 0) {
 			tcl.resultf("%f", GetFTTstd());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getper") == 0) {
 			tcl.resultf("%f", GetPER());
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "print_log") == 0) {
-			std::stringstream stat_file;
-			stat_file << "UWAPPLICATION_LOG_NODE_ID_" << node_id << "_EXP_ID_"
-					  << exp_id << ".out";
-			out_log.open(stat_file.str().c_str(), std::ios_base::app);
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::FILE_CREATED" << endl;
-			logging = true;
+
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "SetSocketProtocol") == 0) {
-			string protocol = argv[2];
-			if (strcasecmp(protocol.c_str(), "UDP") == 0) {
-				socket_active = true;
-				tcp_udp = 0;
-			} else if (strcasecmp(protocol.c_str(), "TCP") == 0) {
-				socket_active = true;
-				tcp_udp = 1;
+			std::string protocol = argv[2];
+
+			if (protocol == "TCP") {
+				socket_tcp = true;
+			} else if (protocol == "UDP") {
+				socket_tcp = false;
 			} else {
-				socket_active = false;
-				tcp_udp = -1;
+				tcl.result("Invalid socket protocol.");
+				return TCL_ERROR;
 			}
+			socket_active = true;
+
 			return TCL_OK;
 		}
 	}
-	return Module::command(argc, argv);
-} // end command() Method
 
-int
-uwApplicationModule::crLayCommand(ClMessage *m)
-{
-	switch (m->type()) {
-		default:
-			return Module::crLayCommand(m);
-	}
-} // end crLayCommand() Method
+	return Module::command(argc, argv);
+}
 
 void
 uwApplicationModule::recv(Packet *p)
-{
-	if (withoutSocket()) {
-		if (debug_ >= 1)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::RECV_PACKET_WITHOUT_SOCKET_MODE"
-					  << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::RECV_PACKET_WITHOUT_SOCKET_MODE"
-					<< endl;
-		statistics(p);
-	} else {
-		// Communication take place with sockets
-		if (useTCP()) {
-			if (debug_ >= 1)
-				std::cout << "[" << getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::RECV_PACKET_USING_TCP" << endl;
-			if (logging)
-				out_log << left << "[" << getEpoch() << "]::" << NOW
-						<< "::UWAPPLICATION::RECV_PACKET_USING_TCP" << endl;
-			statistics(p);
-		} else {
-			if (debug_ >= 1)
-				std::cout << "[" << getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::RECV_PACKET_USING_UDP" << endl;
-			if (logging)
-				out_log << left << "[" << getEpoch() << "]::" << NOW
-						<< "::UWAPPLICATION::RECV_PACKET_USING_UDP" << endl;
-			statistics(p);
-		}
-	}
-}; // end recv() Method
-
-void
-uwApplicationModule::statistics(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(p);
 
 	if (ch->ptype_ != PT_DATA_APPLICATION) {
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::DROP_PACKET_NOT_APPLICATION_TYPE"
-					  << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::DROP_PACKET_NOT_APPLICATION_TYPE"
-					<< endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWAPPLICATION",
+				"recv(Packet *)::Drop packet, wrong type");
+
 		drop(p, 1, UWAPPLICATION_DROP_REASON_UNKNOWN_TYPE);
-		incrPktInvalid(); // Increment the number of packet received invalid
+		incrPktInvalid();
+
 		return;
 	}
-	esn = hrsn + 1; // Increase the expected sequence number
 
-	// Verify if the data packet is already processed.
+	esn = hrsn + 1;
+
 	if (useDropOutOfOrder()) {
-		if (sn_check[uwApph->sn_ &
-					0x00ffffff]) { // Packet already processed: drop it
-			if (debug_ >= 0)
-				std::cout << "[" << getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::DROP_PACKET_PACKET_ALREADY_"
-							 "PROCESSED_ID_"
-						  << (int) uwApph->sn_ << endl;
-			if (logging)
-				out_log << left << "[" << getEpoch() << "]::" << NOW
-						<< "::UWAPPLICATION::DROP_PACKET_PACKET_ALREADY_"
-						   "PROCESSED_ID_"
-						<< (int) uwApph->sn_ << endl;
+		// Packet already processed: drop it
+		if (sn_check[uwApph->sn_ & 0x00ffffff]) {
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWAPPLICATION",
+					"recv(Packet *)::Drop packet with sn " +
+							to_string((int) uwApph->sn_) +
+							", already processed");
+
 			incrPktInvalid();
 			drop(p, 1, UWAPPLICATION_DROP_REASON_DUPLICATED_PACKET);
+
 			return;
 		}
 	}
+
 	// The data packet with this particular SN is not already processed
 	// Set true sn_check. In this way we assume that these sn are already
 	// processed by the node
 	sn_check[uwApph->sn_ & 0x00ffffff] = true;
 
-	// The data packet received is out of order
 	if (useDropOutOfOrder()) {
-		if (uwApph->sn_ <
-				esn) { // packet is out of sequence and is to be discarded
-			incrPktOoseq(); // Increase the number of data packets receive out
-							// of
-			// sequence.
-			if (debug_ >= 0)
-				std::cout << "[" << getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::DROP_PACKET_PACKET_OOS_ID_"
-						  << (int) uwApph->sn_ << "_LAST_SN_" << hrsn << endl;
-			if (logging)
-				out_log << left << "[" << getEpoch() << "]::" << NOW
-						<< "::UWAPPLICATION::DROP_PACKET_PACKET_OOS_ID_"
-						<< (int) uwApph->sn_ << "_LAST_SN_" << hrsn << endl;
+		// packet is out of sequence and is to be discarded
+		if (uwApph->sn_ < esn) {
+			incrPktOoseq();
+
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWAPPLICATION",
+					"recv(Packet *)::Drop packet with sn " +
+							to_string((int) uwApph->sn_) + ", out of sequence");
+
 			drop(p, 1, UWAPPLICATION_DROP_REASON_OUT_OF_SEQUENCE);
+
 			return;
 		}
 	}
 
-	// Compute the Forward Trip time
-	rftt = Scheduler::instance().clock() - ch->timestamp();
+	rftt = NOW - ch->timestamp();
 	if ((uwApph->rftt_valid_) / 10000) {
 		double rtt = rftt + uwApph->rftt();
 		updateRTT(rtt);
 	}
+	updateFTT(rftt);
 
-	updateFTT(rftt); // Update the forward trip time
+	hrsn = uwApph->sn_;
 
-	hrsn = uwApph->sn_; // Update the highest sequence number received
-
-	// Verify if a packet is lost
 	if (useDropOutOfOrder()) {
+		// Verify if a packet is lost
 		if (uwApph->sn_ > esn) {
-			if (debug_ >= 0)
-				std::cout << "[" << getEpoch() << "]::" << NOW
-						  << "::UWAPPLICATION::PACKET_LOST_ID_RECEIVED"
-						  << (int) uwApph->sn_ << "_ID_EXPECTED_" << esn
-						  << endl;
-			if (logging)
-				out_log << left << "[" << getEpoch() << "]::" << NOW
-						<< "::UWAPPLICATION::PACKET_LOST_ID_RECEIVED"
-						<< (int) uwApph->sn_ << "_ID_EXPECTED_" << esn << endl;
+			printOnLog(Logger::LogLevel::DEBUG,
+					"UWAPPLICATION",
+					"recv(Packet *)::Packet lost. Received has sn " +
+							to_string((int) uwApph->sn_) +
+							", expected has sn " + to_string(esn));
+
 			incrPktLost(uwApph->sn_ - (esn));
 		}
 	}
 
-	double dt = Scheduler::instance().clock() - lrtime;
-	// updateThroughput(ch->size(), dt); //Update Throughput
+	double dt = NOW - lrtime;
 	updateThroughput(uwApph->payload_size(), dt);
-	incrPktRecv(); // Increase the number of data packets received
+	incrPktRecv();
+	lrtime = NOW;
 
-	lrtime = Scheduler::instance().clock(); // Update the time in which the last
-											// packet is received.
-	if (debug_ >= 0 && socket_active) {
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
-		for (int i = 0; i < uwApph->payload_size(); i++) {
-			cout << uwApph->payload_msg[i];
-		}
-	}
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_
-				  << endl;
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::PAYLOAD_SIZE_RECEIVED_"
-				  << (int) uwApph->payload_size() << endl;
-	if (debug_ >= 1 && !withoutSocket())
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::PAYLOAD_RECEIVED_" << uwApph->payload_msg
-				  << endl;
+	if (!withoutSocket())
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWAPPLICATION",
+				"recv(Packet *)::Payload received : " +
+						std::string(uwApph->payload_msg));
 
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::PAYLOAD_SIZE_RECEIVED_"
-				<< (int) uwApph->payload_size() << endl;
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::SN_RECEIVED_" << (int) uwApph->sn_ << endl;
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"recv(Packet *)::Payload size : " +
+					to_string((int) uwApph->payload_size()));
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"recv(Packet *)::Sequence number : " +
+					to_string((int) uwApph->sn()));
 
-	if (logging && !withoutSocket()) {
-		out_log << left << "::" << NOW
-				<< "::UWAPPLICATION::PAYLOAD_RECEIVED--> ";
-		for (int i = 0; i < uwApph->payload_size(); i++) {
-			out_log << uwApph->payload_msg[i];
-		}
-		out_log << std::endl;
-	}
-	if (clnSockDescr) {
-		write(clnSockDescr, uwApph->payload_msg, (size_t)uwApph->payload_size());
-	}
+	if (!withoutSocket() && clnSockDescr)
+		write(clnSockDescr,
+				uwApph->payload_msg,
+				(size_t) uwApph->payload_size());
+
 	Packet::free(p);
-} // end statistics method
+};
 
 void
-uwApplicationModule::start_generation()
+uwApplicationModule::transmit()
 {
-	if (debug_ >= 1)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::START_GENERATION_DATA" << endl;
-	if (logging)
-		out_log << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::START_GENERATION_DATA" << endl;
-	chkTimerPeriod.resched(getTimeBeforeNextPkt());
-} // end start_generation() method
+	Packet *p;
 
-void
-uwApplicationModule::init_Packet()
-{
-	Packet *p = Packet::alloc();
+	if (withoutSocket()) {
+		p = Packet::alloc();
+	} else {
+		if (useTCP()) {
+			if (queuePckReadTCP.empty()) {
+				chkTimerPeriod->resched(getTimeBeforeNextPkt());
+				return;
+			}
 
-	double delay = 0;
+			p = queuePckReadTCP.front();
+			queuePckReadTCP.pop();
+		} else {
+			if (queuePckReadUDP.empty()) {
+				chkTimerPeriod->resched(getTimeBeforeNextPkt());
+				return;
+			}
 
-	hdr_cmn *ch = hdr_cmn::access(p);
-	hdr_uwudp *uwudp = hdr_uwudp::access(p);
-	hdr_uwip *uwiph = hdr_uwip::access(p);
+			p = queuePckReadUDP.front();
+			queuePckReadUDP.pop();
+		}
+	}
+
+	hdr_cmn *ch = HDR_CMN(p);
+	hdr_uwudp *uwudp = HDR_UWUDP(p);
+	hdr_uwip *uwiph = HDR_UWIP(p);
 	hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(p);
 
-	// Common header fields
-	ch->uid() = uidcnt++; // Increase the id of data packet
-	ch->ptype_ = PT_DATA_APPLICATION; // Assign the type of packet that is being
-									  // created
-	ch->size() = payloadsize; // Assign the size of data payload
-	uwApph->payload_size() = payloadsize;
-	ch->direction() = hdr_cmn::DOWN; // The packet must be forward at the level
-									 // above of him
+	ch->uid() = uidcnt++;
+	ch->ptype() = PT_DATA_APPLICATION;
+	ch->direction() = hdr_cmn::DOWN;
+	ch->timestamp() = NOW;
 
-	// Transport header fields
-	uwudp->dport() = port_num; // Set the destination port
+	uwudp->dport() = port_num;
+	uwiph->daddr() = dst_addr;
 
-	// IP header fields
-	uwiph->daddr() = dst_addr; // Set the IP destination address
+	if (withoutSocket()) {
+		ch->size() = payloadsize;
+		uwApph->payload_size() = payloadsize;
 
-	// Application header fields
+		if (payloadsize < MAX_LENGTH_PAYLOAD) {
+			for (int i = 0; i < payloadsize; i++) {
+				(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
+			}
+			for (int i = payloadsize; i < MAX_LENGTH_PAYLOAD; i++) {
+				(*uwApph).payload_msg[i] = '0';
+			}
+		} else {
+			for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
+				(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
+			}
+		}
+	}
 	incrPktSent();
-	uwApph->sn_ = txsn; // Sequence number to the data packet
-
+	uwApph->sn() = txsn;
 	if (rftt >= 0) {
-		uwApph->rftt_ = (int) (rftt * 10000); // Forward Trip Time
-		uwApph->rftt_valid_ = true;
+		uwApph->rftt() = (int) (rftt * 10000);
+		uwApph->rftt_valid() = true;
 	} else {
-		uwApph->rftt_valid_ = false;
+		uwApph->rftt_valid() = false;
 	}
-	uwApph->priority_ = 0; // Priority of the message
+	uwApph->priority() = 0;
 
-	// Create the payload message
-	if (getpayloadsize() < MAX_LENGTH_PAYLOAD) {
-		for (int i = 0; i < getpayloadsize(); i++) {
-			(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
-		}
-		for (int i = getpayloadsize(); i < MAX_LENGTH_PAYLOAD; i++) {
-			(*uwApph).payload_msg[i] = '0';
-		}
-	} else {
-		for (int i = 0; i < MAX_LENGTH_PAYLOAD; i++) {
-			(*uwApph).payload_msg[i] = RNG::defaultrng()->uniform(26) + 'a';
-		}
-	}
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"transmit()::Unique id : " + to_string(ch->uid()));
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"transmit()::Dest addr : " + to_string((int) uwiph->daddr()));
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"transmit()::Payload size : " +
+					to_string((int) uwApph->payload_size()));
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"transmit()::Sequence number : " + to_string((int) uwApph->sn()));
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWAPPLICATION",
+			"transmit()::Send down packet");
 
-	// Show the DATA payload generated
-	ch->timestamp() = Scheduler::instance().clock();
-
-	// Show some DATA packet information
-	if (debug_ >= 2)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::INIT_PACKET::UID_" << ch->uid_ << endl;
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::INIT_PACKET::DEST_"
-				  << (int) uwiph->daddr() << endl;
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::INIT_PACKET::SIZE_"
-				  << (int) uwApph->payload_size() << endl;
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::INIT_PACKET::SN_" << (int) uwApph->sn_
-				  << endl;
-	if (debug_ >= 0)
-		std::cout << "[" << getEpoch() << "]::" << NOW
-				  << "::UWAPPLICATION::INIT_PACKET::SEND_DOWN_PACKET" << endl;
-
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::INIT_PACKET::UID_" << ch->uid_ << endl;
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::INIT_PACKET::DEST_" << (int) uwiph->daddr()
-				<< endl;
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::INIT_PACKET::SIZE_"
-				<< (int) uwApph->payload_size() << endl;
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::INIT_PACKET::SN_" << (int) uwApph->sn_
-				<< endl;
-	if (logging)
-		out_log << left << "[" << getEpoch() << "]::" << NOW
-				<< "::UWAPPLICATION::INIT_PACKET::SEND_DOWN_PACKET" << endl;
-	sendDown(p, delay);
-	chkTimerPeriod.resched(
-			getTimeBeforeNextPkt()); // schedule next transmission
-} // end init_Packet() method
+	sendDown(p);
+	chkTimerPeriod->resched(getTimeBeforeNextPkt());
+}
 
 void
 uwApplicationModule::stop()
 {
-	if (withoutSocket()) {
-		chkTimerPeriod.force_cancel();
-	} else {
-		// Close the connection
-		if (useTCP()) {
-			chkTimerPeriod.force_cancel();
+	if (!withoutSocket()) {
+		receiving.store(false);
+
+		if (clnSockDescr >= 0) {
+			shutdown(clnSockDescr, SHUT_RDWR);
 			close(servSockDescr);
+			clnSockDescr = -1;
+		}
+
+		if (servSockDescr >= 0) {
+			shutdown(servSockDescr, SHUT_RDWR);
+			close(servSockDescr);
+			servSockDescr = -1;
+		}
+
+		if (socket_thread.joinable()) {
+			socket_thread.join();
 		}
 	}
-} // end stop() method
+
+	chkTimerPeriod->force_cancel();
+}
 
 double
 uwApplicationModule::getTimeBeforeNextPkt()
 {
-	if (getPeriod() < 0) {
-		if (debug_ >= 0)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::ERROR_TIMER SET TO NEGATIVE VALUE"
-					  << endl;
-		exit(1);
-	}
-	if (usePoissonTraffic()) {
-		// Data packets are generated with a Poisson process
+	if (withoutSocket() && usePoissonTraffic()) {
 		double u = RNG::defaultrng()->uniform_double();
-		double lambda = 1.0 / PERIOD;
-		if (debug_ >= 2)
-			std::cout
-					<< "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::PACKET_GENERATED_WITH_POISSON_PERIOD_"
-					<< PERIOD << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::PACKET_GENERATED_WITH_POISSON_PERIOD_"
-					<< PERIOD << endl;
+		double lambda = 1.0 / period;
+
 		return (-log(u) / lambda);
-	} else {
-		// Data packets are generated wit a costant bit rate
-		if (debug_ >= 2)
-			std::cout << "[" << getEpoch() << "]::" << NOW
-					  << "::UWAPPLICATION::PACKET_GENERATED_WITH_FIXED_PERIOD_"
-					  << PERIOD << endl;
-		if (logging)
-			out_log << left << "[" << getEpoch() << "]::" << NOW
-					<< "::UWAPPLICATION::PACKET_GENERATED_WITH_FIXED_PERIOD_"
-					<< PERIOD << endl;
-		return PERIOD;
 	}
-} // end getTimeBeforeNextPkt() Method
+
+	return period;
+}
 
 double
 uwApplicationModule::GetRTT() const
 {
 	return (rttsamples > 0) ? sumrtt / rttsamples : 0;
-} // end GetRTT() method
+}
 
 double
 uwApplicationModule::GetRTTstd() const
@@ -584,93 +488,74 @@ uwApplicationModule::GetRTTstd() const
 		double var =
 				(sumrtt2 - (sumrtt * sumrtt / rttsamples)) / (rttsamples - 1);
 		return (sqrt(var));
-	} else
-		return 0;
-} // end GetRTTstd() method
+	}
+
+	return 0;
+}
 
 void
-uwApplicationModule::updateRTT(const double &rtt)
+uwApplicationModule::updateRTT(double rtt)
 {
 	sumrtt += rtt;
 	sumrtt2 += rtt * rtt;
 	rttsamples++;
-} // end updateRTT() method
+}
 
 double
 uwApplicationModule::GetFTT() const
 {
 	return (fttsamples > 0) ? sumftt / fttsamples : 0;
-} // end getFTT() method
+}
 
 double
 uwApplicationModule::GetFTTstd() const
 {
 	if (fttsamples > 1) {
-		double var = 0;
-		var = (sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
-		if (var > 0)
-			return (sqrt(var));
-		else
-			return 0;
-	} else {
-		return 0;
+		double var =
+				(sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
+
+		return (var > 0) ? sqrt(var) : 0;
 	}
-} // end getFTT() method
+
+	return 0;
+}
 
 double
 uwApplicationModule::GetPER() const
 {
 	if (drop_out_of_order) {
-		if ((pkts_recv + pkts_lost) > 0) {
+		if ((pkts_recv + pkts_lost) > 0)
 			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-		} else {
-			return 0;
-		}
 	} else {
 		if (esn > 1)
 			return (1 - (double) pkts_recv / (double) (esn - 1));
-		else
-			return 0;
 	}
-} // end getPER() method
+	return 0;
+}
 
 double
 uwApplicationModule::GetTHR() const
 {
 	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
-} // end GetTHR() method
+}
 
 void
-uwApplicationModule::updateFTT(const double &ftt)
+uwApplicationModule::updateFTT(double ftt)
 {
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-} // end updateFTT() method
+}
 
 void
-uwApplicationModule::updateThroughput(const int &bytes, const double &dt)
+uwApplicationModule::updateThroughput(int bytes, double dt)
 {
 	sumbytes += bytes;
 	sumdt += dt;
-} // end updateThroughput() method
+}
 
 void
-uwApplicationModule::uwSendTimerAppl::expire(Event *e)
+uwSendTimerAppl::expire(Event *e)
 {
-	if (m_->withoutSocket()) {
-		// Using a random sequence for data payload
-		m_->init_Packet();
-	} else {
-		// Communication take placing with sockets
-		if (m_->useTCP()) {
-			// The protocol that the system is using is TCP
-			m_->init_Packet_TCP();
-			m_->chkTimerPeriod.resched(m_->PERIOD);
-		} else {
-			// The protocol that the system is using is UDP
-			m_->init_Packet_UDP();
-			m_->chkTimerPeriod.resched(m_->PERIOD);
-		}
-	}
-} // end expire();
+	module->transmit();
+}

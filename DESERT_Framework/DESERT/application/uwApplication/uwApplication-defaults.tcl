@@ -26,24 +26,22 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# @file   uwmsg-defaults.tcl
-# @author Loris Brolo
+# @file   uwApplication-defaults.tcl
+# @author Federico Favaro
 # @version 1.1.0
 
 
 PacketHeaderManager set tab_(PacketHeader/DATA_APPLICATION) 1
 
-Scheduler/RealTime set adjust_new_width_interval_ 0
-Scheduler/RealTime set min_bin_width_ 0
+Module/UW/APPLICATION set period_               10
+Module/UW/APPLICATION set Socket_Port_          4000
+Module/UW/APPLICATION set Payload_size_         16
+Module/UW/APPLICATION set PoissonTraffic_       0
+Module/UW/APPLICATION set drop_out_of_order_    0
+Module/UW/APPLICATION set node_ID_              1
+Module/UW/APPLICATION set max_read_length       64
+Module/UW/APPLICATION set sea_trial_            0
 
-Module/UW/APPLICATION set debug_ 				-1
-Module/UW/APPLICATION set period_ 				30
-Module/UW/APPLICATION set PoissonTraffic_ 		1
-Module/UW/APPLICATION set Payload_size_			10
-Module/UW/APPLICATION set drop_out_of_order_ 	1
-Module/UW/APPLICATION set Socket_Port_ 			4000	
-Module/UW/APPLICATION set node_ID_ 				1
-Module/UW/APPLICATION set EXP_ID_ 				1
 
 
 
