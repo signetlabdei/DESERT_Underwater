@@ -96,7 +96,7 @@ uwApplicationModule::uwApplicationModule()
 	, esn(0)
 	, rttsamples(0)
 	, fttsamples(0)
-	, period(5)
+	, period(10)
 	, lrtime(0)
 	, sumrtt(0)
 	, sumrtt2(0)
@@ -155,15 +155,13 @@ uwApplicationModule::command(int argc, const char *const *argv)
 					if (!listenTCP())
 						return TCL_ERROR;
 
-					socket_thread =
-							std::thread(&uwApplicationModule::acceptTCP, this);
+					socket_thread = std::thread(&uwApplicationModule::acceptTCP, this);
 
 				} else {
 					if (!openConnectionUDP())
 						return TCL_ERROR;
 
-					socket_thread = std::thread(
-							&uwApplicationModule::readFromUDP, this);
+					socket_thread = std::thread(&uwApplicationModule::readFromUDP, this);
 				}
 			}
 

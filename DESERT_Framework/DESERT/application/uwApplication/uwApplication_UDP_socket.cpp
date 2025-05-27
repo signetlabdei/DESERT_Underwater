@@ -112,9 +112,8 @@ uwApplicationModule::readFromUDP()
 			continue;
 		}
 
-		std::unique_lock<std::mutex> lk(socket_mutex);
-
 		if (recvMsgSize > 0) {
+			std::unique_lock<std::mutex> lk(socket_mutex);
 			Packet *p = Packet::alloc();
 			hdr_cmn *ch = HDR_CMN(p);
 			hdr_DATA_APPLICATION *hdr_Appl = HDR_DATA_APPLICATION(p);
@@ -132,6 +131,5 @@ uwApplicationModule::readFromUDP()
 			queuePckReadUDP.push(p);
 			incrPktsPushQueue();
 		}
-		lk.unlock();
 	}
 }
