@@ -40,9 +40,6 @@
 #include "uwsmposition.h"
 #include <iostream>
 
-/* ======================================================================
-   TCL Hooks for the simulator
-   ====================================================================== */
 static class UWSMPositionClass : public TclClass
 {
 public:
@@ -60,33 +57,30 @@ public:
 UWSMPosition::UWSMPosition()
 	: Position()
 	, trgTime_(-1)
-	, Xsorg_(0)
-	, Ysorg_(0)
-	, Zsorg_(0)
+	, lastUpdateTime_(0)
 	, Xdest_(0)
 	, Ydest_(0)
 	, Zdest_(0)
+	, Xsorg_(0)
+	, Ysorg_(0)
+	, Zsorg_(0)
 	, speed_(0)
-	, lastUpdateTime_(0)
 {
 	bind("debug_", &debug_);
-}
-
-UWSMPosition::~UWSMPosition()
-{
 }
 
 int
 UWSMPosition::command(int argc, const char *const *argv)
 {
-	Tcl &tcl = Tcl::instance();
 	if (argc == 6) {
 		if (strcasecmp(argv[1], "setdest") == 0) {
 			if (debug_)
 				cerr << NOW << "UWSMPosition::command(setdest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ", " << argv[5]
 					 << ")" << endl;
+
 			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+
 			return TCL_OK;
 		}
 	} else if (argc == 5) {
@@ -94,36 +88,44 @@ UWSMPosition::command(int argc, const char *const *argv)
 			if (debug_)
 				cerr << NOW << "UWSMPosition::command(setdest, " << argv[2]
 					 << ", " << argv[3] << ", " << argv[4] << ")" << endl;
+
 			setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]));
+
 			return TCL_OK;
 		}
 	} else if (argc == 2) {
 		if (strcasecmp(argv[1], "update") == 0) {
 			double now = Scheduler::instance().clock();
+
 			update(now);
+
 			return TCL_OK;
 		}
 	}
+
 	return Position::command(argc, argv);
 }
 
 void
-UWSMPosition::setdest(
-		double x_dest, double y_dest, double z_dest, double spead_setted)
+UWSMPosition::setdest(double x_dest, double y_dest, double z_dest, double speed)
 {
 	double now = Scheduler::instance().clock();
+
 	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
+
 	trgTime_ = now;
 	if (trgTime_ < 0.0)
 		cerr << "Warning: calling set dest at time < 0 will not work" << endl;
+
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
-	speed_ = spead_setted;
+	speed_ = speed;
 	Xsorg_ = x_;
 	Ysorg_ = y_;
 	Zsorg_ = z_;
+
 	if (debug_)
 		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), "
 			   "source(%f,%f,%f), speed %f\n",
@@ -143,17 +145,21 @@ void
 UWSMPosition::setdest(double x_dest, double y_dest, double z_dest)
 {
 	double now = Scheduler::instance().clock();
+
 	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
+
 	trgTime_ = now;
 	if (trgTime_ < 0.0)
 		cerr << "Warning: calling set dest at time < 0 will not work" << endl;
+
 	Xdest_ = x_dest;
 	Ydest_ = y_dest;
 	Zdest_ = z_dest;
 	Xsorg_ = x_;
 	Ysorg_ = y_;
 	Zsorg_ = z_;
+
 	if (debug_)
 		printf("UWSMPosition::setdest pos (%f,%f,%f), dest(%f,%f,%f), "
 			   "source(%f,%f,%f), speed %f\n",
@@ -174,25 +180,32 @@ UWSMPosition::update(double now)
 {
 	if ((trgTime_ < 0.) || (now < lastUpdateTime_ + 1e-6))
 		return;
+
 	double gamma;
 	double theta;
-	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0) +
-			pow(Xdest_ - Xsorg_, 2.0) + pow(Zdest_ - Zsorg_, 2.0));
+	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0)
+						 + pow(Xdest_ - Xsorg_, 2.0)
+						 + pow(Zdest_ - Zsorg_, 2.0));
+
 	if (theta_den == 0) {
 		x_ = Xsorg_;
 		y_ = Ysorg_;
 		z_ = Zsorg_;
 	} else {
 		theta = acos((Zdest_ - Zsorg_) / theta_den);
+
 		if (Xdest_ - Xsorg_ == 0)
 			gamma = pi / 2 * sgn(Ydest_ - Ysorg_);
 		else
 			gamma = atan((Ydest_ - Ysorg_) / (Xdest_ - Xsorg_));
+
 		if ((Xdest_ - Xsorg_) < 0.0)
 			gamma += (Ysorg_ - Ydest_) >= 0.0 ? pi : -pi;
+
 		x_ = Xsorg_ + (speed_ * (now - trgTime_)) * sin(theta) * cos(gamma);
 		y_ = Ysorg_ + (speed_ * (now - trgTime_)) * sin(theta) * sin(gamma);
 		z_ = Zsorg_ + (speed_ * (now - trgTime_)) * cos(theta);
+
 		if (pow(Ydest_ - Ysorg_, 2.0) + pow(Xdest_ - Xsorg_, 2.0) +
 						pow(Zdest_ - Zsorg_, 2.0) <
 				pow(x_ - Xsorg_, 2.0) + pow(y_ - Ysorg_, 2.0) +
@@ -201,6 +214,7 @@ UWSMPosition::update(double now)
 			y_ = Ydest_;
 			z_ = Zdest_;
 		}
+
 		if (debug_)
 			printf("New pos (%f,%f,%f), dest(%f,%f,%f), source(%f,%f,%f), "
 				   "speed %f sen(%f)=%f\n",
@@ -224,8 +238,9 @@ UWSMPosition::update(double now)
 bool
 UWSMPosition::isDestReached() const
 {
-	double dist = std::sqrt(pow(Xdest_ - x_, 2.0) + pow(Ydest_ - y_, 2.0) +
-			pow(Zdest_ - z_, 2.0));
+	double dist = std::sqrt(pow(Xdest_ - x_, 2.0)
+						 + pow(Ydest_ - y_, 2.0)
+						 + pow(Zdest_ - z_, 2.0));
 
 	if (std::fabs(dist) < 1e-6)
 		return true;
@@ -237,8 +252,10 @@ double
 UWSMPosition::getX()
 {
 	double now = Scheduler::instance().clock();
+
 	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
+
 	return (x_);
 }
 
@@ -263,12 +280,15 @@ UWSMPosition::setZ(double z)
 	Zdest_ = z;
 	Zsorg_ = z;
 }
+
 double
 UWSMPosition::getY()
 {
 	double now = Scheduler::instance().clock();
+
 	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
+
 	return (y_);
 }
 
@@ -276,8 +296,10 @@ double
 UWSMPosition::getZ()
 {
 	double now = Scheduler::instance().clock();
+
 	if ((trgTime_ >= 0.) && (now > lastUpdateTime_ + 1e-6))
 		update(now);
+
 	return (z_);
 }
 
