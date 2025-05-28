@@ -36,8 +36,6 @@
  * Provides the initialization of uwsmposition libraries.
  */
 
-#include "uwsmposition.h"
-
 #include <tclcl.h>
 
 extern EmbeddedTcl UwSMPositionTclCode;
@@ -53,4 +51,5 @@ extern "C" int
 Cygsmposition_Init()
 {
 	Uwsmposition_Init();
+	return 0;
 }

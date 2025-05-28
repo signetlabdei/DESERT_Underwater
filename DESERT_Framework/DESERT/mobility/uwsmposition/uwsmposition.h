@@ -35,13 +35,12 @@
  * \brief Provides the definition of the class <i>UWSMPosition</i>.
  *
  * Provides the definition of the class <i>UWSMPosition</i>.
- * This class implements the a simple movement behaviour: it is possible to
- *define
- * the direction and the speed of the linear movement thanks to a TCL command
- * in which the user has to define the destination point an the speed of the
- * movement required.
- * NOTE: the destination point is used to define the direction od the node and
- * when it is reached the node will proceed for the same direction
+ * This class implements a simple movement behaviour: it is possible to
+ * define the direction and the speed of a linear movement with a TCL
+ * command in which the user has to define the destination point and the speed
+ * of the movement required.
+ * NOTE: the destination point is used to define the direction of the node and
+ * when it is reached the node will proceed on the same direction.
  *
  * @see NodeCore, Position
  **/
@@ -58,104 +57,155 @@ class UWSMPosition : public Position
 {
 public:
 	/**
-	* Constructor
-	*/
+	 * UWSMPosition constructor
+	 */
 	UWSMPosition();
-	/**
-	* Destructor
-	*/
-	virtual ~UWSMPosition();
-	/**
-	* Method that return the current projection of the node on the x-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-	virtual double getX();
-	/**
-	* Method that return the current projection of the node on the y-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-	virtual double getY();
 
 	/**
-	* Method that return the current projection of the node on the z-axis.
-	* If it's necessary (updating time ia expired), update the position values
-	* before returns it.
-	*/
-	virtual double getZ();
+	 * UWSMPosition destructor
+	 */
+	virtual ~UWSMPosition() = default;
 
 	/**
-	* Method that return the x cooridnate of the destination point.
-	*/
+	 * Get the current projection on x-axis of the node postion
+	 * If necessary (updating time expired), update the position values.
+	 *
+	 * @return double Current projection on x-axis of the node postion
+	 */
+	virtual double getX() override;
+
+	/**
+	 * Get the current projection on y-axis of the node postion
+	 * If necessary (updating time expired), update the position values.
+	 *
+	 * @return double Current projection on y-axis of the node postion
+	 */
+	virtual double getY() override;
+
+	/**
+	 * Get the current projection on z-axis of the node postion
+	 * If necessary (updating time expired), update the position values.
+	 *
+	 * @return double Current projection on z-axis of the node postion
+	 */
+	virtual double getZ() override;
+
+	/**
+	 * Get the x coordinate of the destination point
+	 *
+	 * @return double Coordinate along x-axis of destination point
+	 */
 	virtual double getXdest() const;
 
 	/**
-	* Method that return the y cooridnate of the destination point.
-	*/
+	 * Get the y coordinate of the destination point
+	 *
+	 * @return double Coordinate along y-axis of destination point
+	 */
 	virtual double getYdest() const;
 
 	/**
-	* Method that return the z cooridnate of the destination point.
-	*/
+	 * Get the z coordinate of the destination point
+	 *
+	 * @return double Coordinate along z-axis of destination point
+	 */
 	virtual double getZdest() const;
 
 	/**
-	* Method that return the actual speed.
-	*/
+	 * Get the current speed of the node.
+	 *
+	 * @return double Current speed of the node
+	 */
 	double getSpeed() const;
 
 	/**
-	* TCL command interpreter
-	*  <li><b>setdest &lt;<i>integer value</i>&gt;<i>integer
-	*value</i>&gt;<i>integer value</i>&gt;</b>:
-	*  	set the movement pattern: the firts two values define the point to be
-	*reached (i.e., the
-	*  	direction of the movement) and the third value defines the speed to be
-	*used
-	* </ul>
-	*
-	* Moreover it inherits all the OTcl method of Position
-	*
-	*
-	* @param argc number of arguments in <i>argv</i>
-	* @param argv array of strings which are the comand parameters (Note that
-	*argv[0] is the name of the object)
-	*
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched
-	*succesfully or no
-	*
-	**/
-	virtual int command(int argc, const char *const *argv);
-	virtual void setdest(
-			double x_dest, double y_dest, double z_dest, double spead);
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 * <ul>
+	 * <li><b>setdest &lt;<i>x</i>&gt; &lt;<i>y</i>&gt; &lt;<i>z</i>&gt; &lt;<i>speed</i>&gt;</b>
+	 * <li><b>setdest &lt;<i>x</i>&gt;&lt; <i>y</i>&gt;&lt; <i>z</i>&gt;</b>
+	 * <li><b>update</b>
+	 * </ul>
+	 * Moreover it inherits all the OTcl method of Position
+	 *
+	 * @param argc number of arguments in <i>argv</i>
+	 * @param argv array of strings which are the comand parameters (Note that
+	 * argv[0] is the name of the object)
+	 *
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * succesfully or not.
+	 *
+	 */
+	virtual int command(int argc, const char *const *argv) override;
+
+	/*
+	 * Set the destination of the node with a constant speed.
+	 *
+	 * @param double Coordinate along x-axis of destination point
+	 * @param double Coordinate along y-axis of destination point
+	 * @param double Coordinate along z-axis of destination point
+	 * @param double Speed of the node
+	 */
+	virtual void setdest(double x_dest, double y_dest, double z_dest, double speed);
+
+	/*
+	 * Set the destination of the node with default speed.
+	 *
+	 * @param double Coordinate along x-axis of destination point
+	 * @param double Coordinate along y-axis of destination point
+	 * @param double Coordinate along z-axis of destination point
+	 * @param double Speed of the node
+	 */
 	virtual void setdest(double x_dest, double y_dest, double z_dest);
+
+	/*
+	 * Check if the set destination is reached or not.
+	 *
+	 * @return bool True if reached, false otherwise
+	 */
 	virtual bool isDestReached() const;
-	virtual void setX(double x);
-	virtual void setY(double y);
-	virtual void setZ(double z);
+
+	/**
+	 * Set the projection on x-axis of the node postion
+	 *
+	 * @param double Projection on the x-axis of the node position
+	 * 
+	 **/
+	virtual void setX(double x) override;
+
+	/**
+	 * Set the projection on y-axis of the node postion
+	 *
+	 * @param double Projection on the y-axis of the node position
+	 * 
+	 **/
+	virtual void setY(double y) override;
+
+	/**
+	 * Set the projection on z-axis of the node postion
+	 *
+	 * @param double Projection on the z-axis of the node position
+	 * 
+	 **/
+	virtual void setZ(double z) override;
 
 private:
 	/**
-	* Method that updates both the position coordinates
-	*/
+	 * Update both the current position coordinates.
+	 *
+	 * @param double Time when to update position
+	 */
 	virtual void update(double now);
 
-	double trgTime_; /// time in which the TCL command <i>setdest</i> is invoked
-	double lastUpdateTime_; /// time last updated of the coordinates was
-							/// computed
-	double Xdest_; /// position on the x-axis of the destination point
-	double Ydest_; /// position on the y-axis of the destination point
-	double Zdest_; /// position on the z-axis of the destination point
-	double Xsorg_; /// position on the x-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double Ysorg_; /// position on the y-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double Zsorg_; /// position on the z-axis of the starting point (when the
-				   /// TCL command <i>setdest</i> is invoked)
-	double speed_; /// speed of the node
-
 	int debug_;
+	double trgTime_; /**< Time when the TCL command <i>setdest</i> is invoked. */
+	double lastUpdateTime_; /**< Time when last update of the coordinates was computed. */
+	double Xdest_; /**< Position along x-axis of the destination point. */
+	double Ydest_; /**< Position along y-axis of the destination point. */
+	double Zdest_; /**< Position along z-axis of the destination point. */
+	double Xsorg_; /**< Position along x-axis of the starting point. */
+	double Ysorg_; /**< Position along y-axis of the starting point. */
+	double Zsorg_; /**< Position along z-axis of the starting point. */
+	double speed_; /**< Speed of the node. */
 };
 
 #endif
