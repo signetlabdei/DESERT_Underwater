@@ -527,8 +527,8 @@ uwApplicationModule::GetPER() const
 		if ((pkts_recv + pkts_lost) > 0)
 			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
 	} else {
-		if (esn > 1)
-			return (1 - (double) pkts_recv / (double) (esn - 1));
+		if (esn > 0)
+			return (1 - (double) pkts_recv / (double) esn);
 	}
 	return 0;
 }

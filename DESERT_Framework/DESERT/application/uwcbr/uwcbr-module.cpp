@@ -365,8 +365,8 @@ UwCbrModule::recv(Packet *p)
 	esn = hrsn + 1; // expected sn
 
 	if (!drop_out_of_order_) {
-		if (sn_check[uwcbrh->sn() &
-					0x00ffffff]) { // Packet already processed: drop it
+		if (sn_check[uwcbrh->sn() & 0x00ffffff]) {
+			 // Packet already processed: drop it
 			incrPktInvalid();
 			drop(p, 1, UWCBR_DROP_REASON_DUPLICATED_PACKET);
 			return;
@@ -391,7 +391,7 @@ UwCbrModule::recv(Packet *p)
 		}
 	}
 
-	rftt = Scheduler::instance().clock() - ch->timestamp();
+	rftt = NOW - ch->timestamp();
 
 	if (uwcbrh->rftt_valid()) {
 		double rtt = rftt + uwcbrh->rftt();
@@ -478,8 +478,12 @@ UwCbrModule::GetFTTstd() const
 double
 UwCbrModule::GetPER() const
 {
-	if ((pkts_recv + pkts_lost) > 0) {
-		return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
+	if (drop_out_of_order_) {
+		if ((pkts_recv + pkts_lost) > 0)
+			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
+	} else {
+		if (esn > 0)
+			return (1 - (double) pkts_recv / (double) esn);
 	}
 
 	return 0;
