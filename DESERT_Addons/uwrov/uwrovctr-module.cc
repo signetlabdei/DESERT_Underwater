@@ -65,27 +65,6 @@ public:
 	}
 } class_module_uwROV_ctr;
 
-UwROVCtrModule::UwROVCtrModule(Position p)
-	: UwCbrModule()
-	, sn(0)
-	, adaptiveRTO(0)
-	, adaptiveRTO_parameter(0.5)
-	, speed(1)
-	, posit(p)
-	, pkt()
-{
-	bind("adaptiveRTO_", (int *) &adaptiveRTO);
-	if (adaptiveRTO == 1) {
-		bind("adaptiveRTO_parameter_", (double *) &adaptiveRTO_parameter);
-	}
-
-	if (adaptiveRTO_parameter < 0) {
-		cerr << NOW << "Invalid adaptive RTO parameter < 0, set to 0.5 "
-			 << "by default " << std::endl;
-		adaptiveRTO_parameter = 0.5;
-	}
-}
-
 UwROVCtrModule::UwROVCtrModule()
 	: UwCbrModule()
 	, sn(0)
@@ -210,12 +189,6 @@ UwROVCtrModule::transmit()
 void
 UwROVCtrModule::start()
 {
-}
-
-void
-UwROVCtrModule::setPosition(Position p)
-{
-	posit = p;
 }
 
 void

@@ -49,7 +49,6 @@
 #include "uwrov-packet.h"
 
 #include <fstream>
-#include <queue>
 
 #define UWROV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define UWROV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
@@ -90,13 +89,6 @@ public:
 	 * Default Constructor of UwROVModule class.
 	 */
 	UwROVModule();
-
-	/**
-	 * Constructor with position setting of UwROVModule class.
-	 *
-	 * @param UWSMPosition* p Pointer to the ROV position
-	 */
-	UwROVModule(UWSMPosition *p);
 
 	/**
 	 * Destructor of UwROVModule class.
@@ -140,24 +132,6 @@ public:
 	virtual void recv(Packet *p, Handler *h) override;
 
 	/**
-	 * Sets the position of the ROV.
-	 *
-	 * @param UWSMPosition * Pointer to the ROV position
-	 */
-	virtual void setPosition(UWSMPosition *p);
-
-	/**
-	 * Returns the position of the ROV.
-	 *
-	 * @return the current ROV position
-	 */
-	UWSMPosition *
-	getPosition() const
-	{
-		return posit;
-	}
-
-	/**
 	 * Returns the size in byte of a <i>hdr_uwROV_monitoring</i> packet header.
 	 *
 	 * @return The size of a <i>hdr_uwROV_monitoring</i> packet header.
@@ -195,7 +169,6 @@ protected:
 	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
 	UWSMPosition *posit; /**< ROV position.*/
 	UwROVSendAckTimer ackTimer_; /**< Timer to schedule ACK transmission.*/
-	std::queue<Packet *> buffer; /**< Packets buffer.*/
 	/** Flag to set the policy for ACK transimission,
 	 * ACK_PIGGYBACK: ACK is always sent in piggyback,
 	 * ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated packet after the reception of CTR packet,

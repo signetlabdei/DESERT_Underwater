@@ -98,38 +98,6 @@ UwROVModule::UwROVModule()
 	}
 }
 
-UwROVModule::UwROVModule(UWSMPosition *p)
-	: UwCbrModule()
-	, last_sn_confirmed(0)
-	, ack(0)
-	, ackPriority(0)
-	, ackNotPgbk(0)
-	, drop_old_waypoints(0)
-	, ackTimeout(10)
-	, posit(p)
-	, ackTimer_(this)
-	, ackPolicy(ACK_PIGGYBACK)
-	, log_flag(0)
-	, out_file_stats(0)
-{
-	bind("ackTimeout_", (int *) &ackTimeout);
-	bind("ackPriority_", (int *) &ackPriority);
-	bind("drop_old_waypoints_", (int *) &drop_old_waypoints);
-	bind("log_flag_", (int *) &log_flag);
-
-	if (ackTimeout < 0) {
-		cerr << NOW << " Invalide ACK timout < 0, timeout set to 10 by defaults"
-			 << std::endl;
-		ackTimeout = 10;
-	}
-}
-
-void
-UwROVModule::setPosition(UWSMPosition *p)
-{
-	posit = p;
-}
-
 int
 UwROVModule::command(int argc, const char *const *argv)
 {

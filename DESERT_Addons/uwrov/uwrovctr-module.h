@@ -88,11 +88,6 @@ public:
 	UwROVCtrModule();
 
 	/**
-	 * Constructor of UwROVCtrModule class with position setting.
-	 */
-	UwROVCtrModule(Position p);
-
-	/**
 	 * Destructor of UwROVCtrModule class.
 	 */
 	virtual ~UwROVCtrModule() = default;
@@ -126,40 +121,6 @@ public:
 	{
 		pkt = nullptr;
 		sendTmr_.force_cancel();
-	}
-
-	/**
-	 * Set the position of the ROVCtr.
-	 *
-	 * @param Position * p Pointer to the ROVCtr position
-	 */
-	virtual void setPosition(Position p);
-
-	/**
-	 * Returns the position of the ROVCtr.
-	 *
-	 * @return the current ROVCtr position
-	 */
-	Position
-	getPosition() const
-	{
-		return posit;
-	}
-
-	/**
-	 * Returns the last ROV position monitored
-	 *
-	 * @return the last ROV position monitored
-	 */
-	Position
-	getMonitoredROVPosition()
-	{
-		Position monitored_p_rov;
-		monitored_p_rov.setX(x_rov);
-		monitored_p_rov.setY(y_rov);
-		monitored_p_rov.setZ(z_rov);
-
-		return monitored_p_rov;
 	}
 
 	/**
