@@ -60,42 +60,42 @@ typedef struct hdr_uwROV_ctr {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static struct hdr_uwROV_ctr *
+	static struct hdr_uwROV_ctr *
 	access(const Packet *p)
 	{
 		return (struct hdr_uwROV_ctr *) p->access(offset_);
 	}
 
-	inline float &
+	float &
 	x()
 	{
 		return x_;
 	}
 
-	inline float &
+	float &
 	y()
 	{
 		return y_;
 	}
 
-	inline float &
+	float &
 	z()
 	{
 		return z_;
 	}
 
-	inline float &
+	float &
 	speed()
 	{
 		return speed_;
 	}
-	inline double &
+	double &
 	sn()
 	{
 		return sn_;
@@ -119,37 +119,37 @@ typedef struct hdr_uwROV_monitoring {
 	/**
 	 * Reference to the offset_ variable.
 	 */
-	inline static int &
+	static int &
 	offset()
 	{
 		return offset_;
 	}
 
-	inline static struct hdr_uwROV_monitoring *
+	static struct hdr_uwROV_monitoring *
 	access(const Packet *p)
 	{
 		return (struct hdr_uwROV_monitoring *) p->access(offset_);
 	}
 
-	inline float &
+	float &
 	x()
 	{
 		return x_;
 	}
 
-	inline float &
+	float &
 	y()
 	{
 		return y_;
 	}
 
-	inline float &
+	float &
 	z()
 	{
 		return z_;
 	}
 
-	inline double &
+	double &
 	ack()
 	{
 		return ack_;

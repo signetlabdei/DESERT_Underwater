@@ -155,7 +155,7 @@ public:
 	 *
 	 * @return The size of a <i>hdr_uwROV_monitoring</i> packet header.
 	 */
-	static inline int
+	static int
 	getROVMonHeaderSize()
 	{
 		return sizeof(hdr_uwROV_monitoring);
@@ -166,7 +166,7 @@ public:
 	 *
 	 * @return The size of a <i>hdr_uwROV_monitoring</i> packet header.
 	 */
-	static inline int
+	static int
 	getROVCTRHeaderSize()
 	{
 		return sizeof(hdr_uwROV_ctr);
