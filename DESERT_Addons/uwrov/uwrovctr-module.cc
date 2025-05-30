@@ -71,7 +71,7 @@ UwROVCtrModule::UwROVCtrModule()
 	, adaptiveRTO(0)
 	, adaptiveRTO_parameter(0.5)
 	, speed(1)
-	, posit(Position())
+	, posit()
 	, pkt()
 {
 	bind("adaptiveRTO_", (int *) &adaptiveRTO);
@@ -100,15 +100,15 @@ UwROVCtrModule::command(int argc, const char *const *argv)
 
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getX") == 0) {
-			tcl.resultf("%f", posit.getX());
+			tcl.resultf("%f", posit->getX());
 
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getY") == 0) {
-			tcl.resultf("%f", posit.getY());
+			tcl.resultf("%f", posit->getY());
 
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getZ") == 0) {
-			tcl.resultf("%f", posit.getZ());
+			tcl.resultf("%f", posit->getZ());
 
 			return TCL_OK;
 		}
@@ -117,7 +117,7 @@ UwROVCtrModule::command(int argc, const char *const *argv)
 			Position *p = dynamic_cast<Position *>(tcl.lookup(argv[2]));
 
 			if(p) {
-				posit = *p;
+				posit = p;
 
 				return TCL_OK;
 			}

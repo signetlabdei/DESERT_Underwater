@@ -183,7 +183,7 @@ protected:
 	float newY; /**< Y of the new position sent to the ROV.*/
 	float newZ; /**< Z of the new position sent to the ROV.*/
 	float speed; /**< Moving speed sent to the ROV.*/
-	Position posit; /**< Controller position.*/
+	Position* posit; /**< Controller position.*/
 	Packet *pkt;
 };
 
