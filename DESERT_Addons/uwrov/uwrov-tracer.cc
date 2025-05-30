@@ -58,8 +58,6 @@ void UWROVTracer::format(Packet *p, SAP *sap) {
 
     if (ch->ptype() != PT_UWCBR)
         return;
-
-    hdr_uwROV_monitoring *uwROVh = HDR_UWROV_MONITORING(p);
 }
 
 extern "C" int UwROVtracer_Init() {
