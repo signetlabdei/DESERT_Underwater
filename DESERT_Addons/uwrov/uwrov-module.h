@@ -27,167 +27,155 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwrov-module.h
-* @author Filippo Campagnaro
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UWROV</i>.
-*
-* Provides the definition of the class <i>UWROV</i>, based on <i>UwCbr</i>.
-* <i>UWROV</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWROV</i> sends periodically monitoring packets containing information about
-* the current position and acknowledges the last control packet received.
-* Each control packet contains the next waypoint that has to be reach.
-*/
+ * @file uwrov-module.h
+ * @author Filippo Campagnaro
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UWROV</i>.
+ *
+ * Provides the definition of the class <i>UWROV</i>, based on <i>UwCbr</i>.
+ * <i>UWROV</i> can manage no more than 2^16 packets. If a module generates more
+ * than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
+ * <i>UWROV</i> sends periodically monitoring packets containing information
+ * about the current position and acknowledges the last control packet received.
+ * Each control packet contains the next waypoint that has to be reach.
+ */
 
 #ifndef UWROV_MODULE_H
 #define UWROV_MODULE_H
-#include <uwcbr-module.h>
-#include <uwrov-packet.h>
+
 #include "uwsmposition.h"
-#include <queue>
+#include "uwcbr-module.h"
+#include "uwrov-packet.h"
+
 #include <fstream>
+
 #define UWROV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define UWROV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define UWROV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
 #define HDR_UWROV_CTR(p) (hdr_uwROV_ctr::access(p))
 
-using namespace std;
-
 class UwROVModule;
 
 /**
-* UwSendTimer class is used to handle the scheduling period of <i>UWROV</i> packets.
-*/
-class UwROVSendAckTimer : public TimerHandler 
+ * UwROVSendACKTimer class is used to handle the scheduling period of
+ * <i>UWROV</i> packets.
+ */
+class UwROVSendAckTimer : public TimerHandler
 {
 public:
-	UwROVSendAckTimer(UwROVModule *m) : TimerHandler() { 
+	UwROVSendAckTimer(UwROVModule *m)
+		: TimerHandler()
+	{
 		module = m;
 	}
+
 protected:
 	virtual void expire(Event *e);
 	UwROVModule *module;
 };
 
 /**
-* UwROVModule class is used to manage <i>UWROV</i> packets and to collect statistics about them.
-*/
-class UwROVModule : public UwCbrModule {
+ * UwROVModule class is used to manage <i>UWROV</i> packets and to collect
+ * statistics about them.
+ */
+class UwROVModule : public UwCbrModule
+{
 	friend class UwROVSendAckTimer;
-public:
 
+public:
 	/**
-	* Default Constructor of UwROVModule class.
-	*/
+	 * Default Constructor of UwROVModule class.
+	 */
 	UwROVModule();
 
 	/**
-	* Constructor with position setting of UwROVModule class.
-	*
-	* @param UWSMPosition* p Pointer to the ROV position
-	*/
-	UwROVModule(UWSMPosition* p);
+	 * Destructor of UwROVModule class.
+	 */
+	virtual ~UwROVModule() = default;
 
 	/**
-	* Destructor of UwROVModule class.
-	*/
-	virtual ~UwROVModule();
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
+	 **/
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   * 
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-   * 
-   **/
-	virtual int command(int argc, const char*const* argv);
+	 * Initializes a monitoring data packet passed as argument with the default
+	 * values.
+	 *
+	 * @param Packet* Pointer to a packet already allocated to fill with the
+	 * right values.
+	 */
+	virtual void initPkt(Packet *p) override;
 
 	/**
-   * Initializes a monitoring data packet passed as argument with the default values.
-   * 
-   * @param Packet* Pointer to a packet already allocated to fill with the right values.
-   */
-	virtual void initPkt(Packet* p) ;
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void recv(Packet *) override;
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void recv(Packet*);
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 * @param Handler* Handler.
+	 */
+	virtual void recv(Packet *p, Handler *h) override;
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	* @param Handler* Handler.
-	*/
-	virtual void recv(Packet* p, Handler* h);
+	 * Returns the size in byte of a <i>hdr_uwROV_monitoring</i> packet header.
+	 *
+	 * @return The size of a <i>hdr_uwROV_monitoring</i> packet header.
+	 */
+	static int
+	getROVMonHeaderSize()
+	{
+		return sizeof(hdr_uwROV_monitoring);
+	}
 
 	/**
-	* Sets the position of the ROV
-	*
-	* @param UWSMPosition * p Pointer to the ROV position
-	*/
-	virtual void setPosition(UWSMPosition* p);
+	 * Returns the size in byte of a <i>hdr_uwROV_ctr</i> packet header.
+	 *
+	 * @return The size of a <i>hdr_uwROV_ctr</i> packet header.
+	 */
+	static int
+	getROVCTRHeaderSize()
+	{
+		return sizeof(hdr_uwROV_ctr);
+	}
 
 	/**
-	* Returns the position of the ROV
-	*
-	* @return the current ROV position
-	*/
-  inline UWSMPosition* getPosition() { return posit; }
-
-	/**
-	* Returns the size in byte of a <i>hdr_uwROV_monitoring</i> packet header.
-	*
-	* @return The size of a <i>hdr_uwROV_monitoring</i> packet header.
-	*/
-	static inline int getROVMonHeaderSize() { return sizeof(hdr_uwROV_monitoring); }
-
-	/**
-	* Returns the size in byte of a <i>hdr_uwROV_ctr</i> packet header.
-	*
-	* @return The size of a <i>hdr_uwROV_ctr</i> packet header.
-	*/
-	static inline int getROVCTRHeaderSize() { return sizeof(hdr_uwROV_ctr); }
-
-	/**
-	* Sends ACK if ackTimeout expire;
-	*
-	*/
+	 * Sends ACK if ackTimeout expire;
+	 */
 	virtual void sendAck();
 
 protected:
-
 	enum UWROV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
-	UWSMPosition* posit; /**< ROV position.*/
-	int last_sn_confirmed;/**< Sequence number of the last command Packete received.*/
-	int ack; /**< If not zero, contains the ACK to the last command Packete received.*/
-	//int send_ack_immediately; /**< Flag either to send acks immediately or not.*/
-	std::queue<Packet*> buffer; /**< Packets buffer.*/
-	UWROV_ACK_POLICY ackPolicy; /**< Flag to set the policy for ACK transimission,
-					ACK_PIGGYBACK:   ACK is always sent in piggyback,
-					ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated 
-									 packet after the reception of CTR packet
-					ACK_PGBK_OR_TO:  ACK is sent in piggyback if a ROV packet is generated 
-									 before a ackTimeout otherwise ACK is sent with a 
-									 dedicated packet after the acKTimeout.*/
-	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
-	UwROVSendAckTimer ackTimer_; /**<Timer to schedule ACK transmission.*/
-	int ackPriority; /** < Flag to give higher priority to ACK or not.*/
+	int last_sn_confirmed; /**< Sequence number of the last command packet received.*/
+	int ack; /**< If not zero, contains the ACK to the last command packet received.*/
+	int ackPriority; /**< Flag to give higher priority to ACK or not.*/
 	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
-	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number 
-								lower or equal than last_sn_confirmed.*/
-
+	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number lower or equal than last_sn_confirmed.*/
+	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
+	UWSMPosition *posit; /**< ROV position.*/
+	UwROVSendAckTimer ackTimer_; /**< Timer to schedule ACK transmission.*/
+	/** Flag to set the policy for ACK transimission,
+	 * ACK_PIGGYBACK: ACK is always sent in piggyback,
+	 * ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated packet after the reception of CTR packet,
+	 * ACK_PGBK_OR_TO:  ACK is sent in piggyback if a ROV packet is generated before an ackTimeout otherwise ACK is sent with a dedicated packet after the acKTimeout. */
+	UWROV_ACK_POLICY ackPolicy;
 
 	int log_flag; /**< Flag to enable log file writing.*/
-
 	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
 };
 
