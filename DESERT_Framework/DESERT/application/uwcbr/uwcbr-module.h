@@ -213,12 +213,14 @@ public:
 	 * @return Forward Trip Time.
 	 */
 	virtual double GetFTT() const;
+
 	/**
 	 * Returns the mean transmission time.
 	 *
 	 * @return transmission time.
 	 */
 	virtual double GetTxTime() const;
+
 	/**
 	 * Returns the mean Packet Error Rate.
 	 *
