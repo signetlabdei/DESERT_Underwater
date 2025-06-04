@@ -121,7 +121,7 @@ uwApplicationModule::readFromUDP()
 			printOnLog(Logger::LogLevel::DEBUG,
 					"UWAPPLICATION",
 					"readFromUDP()::Socket payload received : " +
-							std::string(buffer_msg));
+							std::string(buffer_msg, recvMsgSize));
 
 			for (int i = 0; i < recvMsgSize; i++)
 				hdr_Appl->payload_msg[i] = buffer_msg[i];

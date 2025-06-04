@@ -329,7 +329,7 @@ uwApplicationModule::recv(Packet *p)
 		printOnLog(Logger::LogLevel::DEBUG,
 				"UWAPPLICATION",
 				"recv(Packet *)::Payload received : " +
-						std::string(uwApph->payload_msg, MAX_LENGTH_PAYLOAD));
+						std::string(uwApph->payload_msg, uwApph->payload_size()));
 
 	printOnLog(Logger::LogLevel::DEBUG,
 			"UWAPPLICATION",

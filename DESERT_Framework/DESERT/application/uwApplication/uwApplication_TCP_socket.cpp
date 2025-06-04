@@ -163,7 +163,7 @@ uwApplicationModule::readFromTCP(int clnSock)
 		printOnLog(Logger::LogLevel::DEBUG,
 				"UWAPPLICATION",
 				"readFromTCP(int)::Socket payload received : " +
-						std::string(buffer_msg, MAX_LENGTH_PAYLOAD));
+						std::string(buffer_msg, recvMsgSize));
 
 		for (int i = 0; i < recvMsgSize; i++)
 			hdr_Appl->payload_msg[i] = buffer_msg[i];
