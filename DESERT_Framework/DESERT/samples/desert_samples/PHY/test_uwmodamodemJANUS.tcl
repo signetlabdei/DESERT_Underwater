@@ -83,8 +83,6 @@ set opt(starttime)          5
 
 set opt(stoptime)           400
 
-set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
-
 set opt(rngstream)          1
 set opt(pktsize)            64
 set opt(cbr_period)         0.5
@@ -101,7 +99,7 @@ set opt(app_port)           4000
 set opt(exp_ID)             1
 
 if {$opt(bash_parameters)} {
-    if {$argc != 9} {
+    if {$argc != 8} {
         puts "The script needs 10 input to work"
         puts "1 - ID of the node"
         puts "2 - ID of the receiver"
@@ -111,7 +109,6 @@ if {$opt(bash_parameters)} {
         puts "6 - IP of the modem"
         puts "7 - Port of the modem"
         puts "8 - Application socket port"
-        puts "9 - Experiment ID"
         puts "Please try again."
         exit
     } else {
@@ -123,7 +120,6 @@ if {$opt(bash_parameters)} {
         set opt(address)      [lindex $argv 5]
         set opt(port)         [lindex $argv 6]
         set opt(app_port)     [lindex $argv 7]
-        set opt(exp_ID)       [lindex $argv 8]
     }
 } 
 
@@ -225,9 +221,8 @@ Module/UW/UwModem/ModemCSA set max_read_size 2048
 ################################
 proc createNode { } {
 
-    global propagation data_mask ns app_ position node udp_ portnum ipr_ ipif_ uwal_ address
-    global phy_ posdb opt rvposx mll_ mac_ db_manager
-    global node_coordinates
+    global ns app_  node_ udp_ portnum_ ipr_ ipif_ uwal_ address
+    global phy_ opt  mll_ mac_
     
     set node_ [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 
@@ -259,12 +254,12 @@ proc createNode { } {
 
     set portnum_ [$udp_ assignPort $app_ ]
     
-    set general_adderss_ $opt(node)
-    $ipif_ addr $general_adderss_
-    $mac_ setMacAddr $general_adderss_
+    set general_address_ $opt(node)
+    $ipif_ addr $general_address_
+    $mac_ setMacAddr $general_address_
     $mac_ setSlotNumber $opt(node)
     $phy_ setTCP
-    $phy_ set ID_ $general_adderss_
+    $phy_ set ID_ $general_address_
     $phy_ setModemAddress $address
     $phy_ setLogLevel DBG
     
@@ -287,10 +282,10 @@ proc createNode { } {
 
     $app_ set Socket_Port_  $opt(app_port)
     $app_ setSocketProtocol "TCP"
-    $app_ set node_ID_  $general_adderss_
+    $app_ set node_ID_  $general_address_
 
     $uwal_ linkPacker $packer_
-    $uwal_ set nodeID $general_adderss_
+    $uwal_ set nodeID $general_address_
 }
 
 #################
@@ -315,10 +310,6 @@ $mll_ addentry  $opt(dest) $opt(dest)
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt
-    global mac propagation app_ mac_ phy_ channel db_manager propagation
-    global node_coordinates
-    global ipr_ ipif_ udp_ app_ phy_
-    global node_stats tmp_node_stats sink_stats tmp_sink_stats
   
     $ns flush-trace
     close $opt(tracefile)
