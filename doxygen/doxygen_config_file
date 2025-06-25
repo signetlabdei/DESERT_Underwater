@@ -36,7 +36,7 @@ PROJECT_NAME	       = DESERT
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER	     = 3.5.1
+PROJECT_NUMBER	     = 3.6.0
 
 # The INPUT tag can be used to specify the files and/or directories that contain
 # documented source files. You may enter file names like "myfile.cpp" or
