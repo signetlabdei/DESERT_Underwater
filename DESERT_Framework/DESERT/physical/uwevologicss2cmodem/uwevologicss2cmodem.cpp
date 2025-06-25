@@ -204,10 +204,12 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 		if (!strcmp(argv[1], "setConnector")) {
 			if(!strcmp(argv[2], "SOCKET")) {
 				p_connector.reset(new UwSocket());
+				p_interpreter->setTerminator("\n");
 				return TCL_OK;
 			}
 			if(!strcmp(argv[2], "SERIAL")) {
 				p_connector.reset(new UwSerial());
+				p_interpreter->setTerminator("\r");
 				return TCL_OK;
 			}
 			fprintf(stderr, "Invalid connector type, choose between SOCKET and SERIAL");

@@ -234,6 +234,15 @@ public:
          */
        std::shared_ptr<USBLInfo> getUSBLInfo();
 
+
+        /** Method that sets the terminator for the AT commands wrtten to device
+         * @param[in] terminator type of the terminator
+         */
+       void setTerminator(std::string terminator)
+       {
+              w_term = terminator;
+       };
+
 private:
 	std::string sep; /**< Separator for paramters fo the commands: a comma */
 	std::string r_term; /**<Terminating sequence for commands read from device*/
