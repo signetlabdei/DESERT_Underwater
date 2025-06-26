@@ -279,11 +279,11 @@ proc createNode { } {
     $node_ setConnection $mac_ $uwal_ trace
     $node_ setConnection $uwal_ $modem_ trace
 
-	# Enable log for uwapplication module
-	$app_ setLog 3 "uwapplication_$opt(node)_log"
+    # Enable log for uwapplication module
+    $app_ setLog 3 "uwapplication_$opt(node)_log"
 
     if {$opt(AppSocket) == 1} {
-        $app_ setSocketProtocol $opt(protocol)
+        $app_ setSocketProtocol "TCP"
         $app_ set Socket_Port_ $opt(app_port)
     }
     $app_ set node_ID_  $opt(node)
