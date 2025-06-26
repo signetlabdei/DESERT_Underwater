@@ -7,7 +7,7 @@ rm -rf .unpacked_folder
 rm -rf $BUILD_DIR
 
 source commonVariables.sh
-./install.sh --target LOCAL --inst_mode release --dest_folder $BUILD_DIR --addons ALL
+./install.sh --target LOCAL --inst_mode release --dest_folder $BUILD_DIR --addons ALL --with-woss
 
 ARCH=$(dpkg-architecture -q DEB_BUILD_ARCH)
 CODENAME=$(lsb_release -sc)
