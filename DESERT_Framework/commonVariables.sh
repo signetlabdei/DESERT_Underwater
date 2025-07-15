@@ -85,7 +85,7 @@ export NS_VERSION=2.34
 export NS_TAR_FILE=${ROOT_DESERT}/ns-${NS_VERSION}.tar.gz
 export NS_DIR=ns-${NS_VERSION}
 
-export NSMIRACLE_VERSION=1.1.6
+export NSMIRACLE_VERSION=1.1.7
 export NSMIRACLE_TAR_FILE=${ROOT_DESERT}/nsmiracle-${NSMIRACLE_VERSION}.tar.gz
 export NSMIRACLE_DIR=nsmiracle-${NSMIRACLE_VERSION}
 
@@ -108,7 +108,7 @@ export WOSS_VERSION=1.14.0
 export WOSS_TAR_FILE=${ROOT_DESERT}/woss-${WOSS_VERSION}.tar.gz
 export WOSS_DIR=woss-${WOSS_VERSION}
 
-export DESERT_VERSION=3.6.0
+export DESERT_VERSION=3.6.1
 export DESERT_DIR=DESERT
 
 export UNPACKED_FOLDER="${ROOT_DESERT}/.unpacked_folder"
