@@ -268,14 +268,14 @@ build_OTCL() {
     mv configure.in configure.ac
     #---
     autoreconf >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
-    CFLAGS=-I../tcl-${TCL_VERSION}/unix/
 
     info_L2 "configure  [$*]"
+    CFLAGS="-I../tcl-${TCL_VERSION}/unix/ -I../tcl-${TCL_VERSION}/generic/" \
     ./configure --target=${ARCH}                  \
                 --host=${ARCH}                    \
                 --build=${HOST}                   \
                 --with-tcl=../tcl-${TCL_VERSION}/ \
-                --with-tcl-ver=8.4                \
+                --with-tcl-ver=8.5                \
                 --exec-prefix=${DEST_FOLDER}      \
                 >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
@@ -329,13 +329,13 @@ build_TCLCL() {
     #---
     info_L2 "autoreconf [$*]"
     autoreconf >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
-    CFLAGS=-I../tcl-${TCL_VERSION}/unix/
     info_L2 "configure  [$*]"
+    CFLAGS="-I../tcl-${TCL_VERSION}/unix/ -I../tcl-${TCL_VERSION}/generic/" \
     ./configure --target=${ARCH}                    \
                 --host=${ARCH}                      \
                 --build=${HOST}                     \
                 --with-tcl=../tcl-${TCL_VERSION}/   \
-                --with-tcl-ver=8.4                  \
+                --with-tcl-ver=8.5                  \
                 --with-zlib=${DEST_FOLDER} \
                 --exec-prefix=${DEST_FOLDER}        \
                 >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
@@ -400,7 +400,7 @@ build_NS() {
                 --host=${ARCH}                                         \
                 --build=${HOST}                                        \
                 --with-tcl=${currentBuildLog}/tcl-${TCL_VERSION}       \
-                --with-tcl-ver=8.4                                     \
+                --with-tcl-ver=8.5                                     \
                 --with-otcl=${currentBuildLog}/otcl-${OTCL_VERSION}    \
                 --with-tclcl=${currentBuildLog}/tclcl-${TCLCL_VERSION} \
                 --prefix=${DEST_FOLDER}                                \
