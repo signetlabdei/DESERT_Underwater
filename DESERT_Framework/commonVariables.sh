@@ -69,7 +69,7 @@ export ZLIB_VERSION=1.2.11
 export ZLIB_TAR_FILE=${ROOT_DESERT}/zlib-${ZLIB_VERSION}.tar.gz
 export ZLIB_DIR=zlib-${ZLIB_VERSION}
 
-export TCL_VERSION=8.4.20
+export TCL_VERSION=8.5.19
 export TCL_TAR_FILE=${ROOT_DESERT}/tcl-${TCL_VERSION}.tar.gz
 export TCL_DIR=tcl-${TCL_VERSION}
 
