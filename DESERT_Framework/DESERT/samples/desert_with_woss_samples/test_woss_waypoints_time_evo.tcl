@@ -42,7 +42,6 @@ load libMiracleBasicMovement.so
 load libUwmStd.so
 load libWOSS.so
 load libWOSSPhy.so
-load libUwmStdPhyBpskTracer.so
 load libuwip.so
 load libuwstaticrouting.so
 load libuwmll.so
