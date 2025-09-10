@@ -42,7 +42,8 @@ libuwhmmphysical_la_SOURCES = initlib.cpp\
 
 libuwhmmphysical_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwhmmphysical_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwhmmphysical_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwhmmphysical_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+			     $(top_builddir)/physical/uwphysical/libuwphysical.la
 
 nodist_libuwhmmphysical_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

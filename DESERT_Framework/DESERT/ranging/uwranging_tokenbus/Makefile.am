@@ -42,7 +42,8 @@ libuwranging_tokenbus_la_SOURCES = initlib.cpp\
 
 libuwranging_tokenbus_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwranging_tokenbus_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwranging_tokenbus_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwranging_tokenbus_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+								  $(top_builddir)/data_link/uwtokenbus/libuwtokenbus.la
 
 nodist_libuwranging_tokenbus_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

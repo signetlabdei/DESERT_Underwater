@@ -35,7 +35,8 @@ libuwranging_tdma_la_SOURCES = uwranging_tdma.cpp initlib.cpp
 
 libuwranging_tdma_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwranging_tdma_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwranging_tdma_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwranging_tdma_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							  $(top_builddir)/data_link/uwtdma/libuwtdma.la
 
 nodist_libuwranging_tdma_la_SOURCES = initTcl.cc
 

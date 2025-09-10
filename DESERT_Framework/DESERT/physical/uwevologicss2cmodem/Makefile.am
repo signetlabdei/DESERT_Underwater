@@ -41,7 +41,11 @@ libuwevologicss2c_la_SOURCES = initlib.cpp \
 
 libuwevologicss2c_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwevologicss2c_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwevologicss2c_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwevologicss2c_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							  $(top_builddir)/physical/uwphy_clmsgs/libuwphy_clmsgs.la \
+							  $(top_builddir)/physical/uw-al/libuwal.la \
+							  $(top_builddir)/physical/uwmodem/libuwmodem.la \
+							  $(top_builddir)/physical/uwconnector/libuwconnector.la
 
 nodist_libuwevologicss2c_la_SOURCES = initTcl.cc
 BUILT_SOURCES = initTcl.cc

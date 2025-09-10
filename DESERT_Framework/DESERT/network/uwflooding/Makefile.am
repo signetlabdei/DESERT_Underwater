@@ -42,7 +42,8 @@ libuwflooding_la_SOURCES = initlib.cpp\
 
 libuwflooding_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwflooding_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwflooding_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwflooding_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						  $(top_builddir)/application/uwcbr/libuwcbr.la
 
 nodist_libuwflooding_la_SOURCES = InitTcl.cc
 

@@ -35,7 +35,8 @@ libuwtdma_frame_la_SOURCES = uwtdma-frame.cpp  initlib.cpp
 
 libuwtdma_frame_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwtdma_frame_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwtdma_frame_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwtdma_frame_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							$(top_builddir)/data_link/uwtdma/libuwtdma.la
 
 nodist_libuwtdma_frame_la_SOURCES = initTcl.cc
 

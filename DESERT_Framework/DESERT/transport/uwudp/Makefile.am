@@ -40,7 +40,8 @@ libuwudp_la_SOURCES = initlib.cpp\
 
 libuwudp_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwudp_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwudp_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwudp_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+					 $(top_builddir)/network/uwip/libuwip.la
 
 nodist_libuwudp_la_SOURCES = InitTcl.cc
 

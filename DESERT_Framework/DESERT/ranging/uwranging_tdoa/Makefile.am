@@ -35,7 +35,11 @@ libuwranging_tdoa_la_SOURCES = uwranging_tdoa.cpp initlib.cpp
 
 libuwranging_tdoa_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwranging_tdoa_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwranging_tdoa_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwranging_tdoa_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							  $(top_builddir)/physical/uwphysical/libuwphysical.la \
+							  $(top_builddir)/statistics/uwstats_utilities/libuwstats_utilities.la \
+							  $(top_builddir)/application/uwcbr/libuwcbr.la \
+							  $(top_builddir)/ranging/uwtap/libuwtap.la
 
 nodist_libuwranging_tdoa_la_SOURCES = initTcl.cc
 

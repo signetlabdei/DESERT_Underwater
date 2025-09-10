@@ -40,7 +40,10 @@ libuwphysical_la_SOURCES = initlib.cpp\
 
 libuwphysical_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwphysical_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwphysical_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwphysical_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						  $(top_builddir)/physical/uwphy_clmsgs/libuwphy_clmsgs.la \
+						  $(top_builddir)/interference/uwinterference/libuwinterference.la \
+						  $(top_builddir)/statistics/uwstats_utilities/libuwstats_utilities.la
 
 nodist_libuwphysical_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc
