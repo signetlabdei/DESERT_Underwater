@@ -89,7 +89,6 @@ load libUwmStd.so
 load libuwstats_utilities.so
 load libuwmmac_clmsgs.so
 load libuwcsmaaloha.so
-load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwphysical.so
 load libuwahoi_phy.so

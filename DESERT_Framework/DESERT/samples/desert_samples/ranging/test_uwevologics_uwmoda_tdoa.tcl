@@ -128,7 +128,6 @@ load libmmac.so
 load libuwcbr.so
 load libuwinterference.so
 load libUwmStd.so
-load libUwmStdPhyBpskTracer.so
 load libuwstats_utilities.so
 load libuwsmposition.so
 load libuwphysical.so

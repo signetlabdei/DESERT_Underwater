@@ -49,7 +49,6 @@ load libWOSS.so
 load libWOSSPhy.so
 
 load libcbrtracer.so
-load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwinterference.so
 load libuwphysical.so
