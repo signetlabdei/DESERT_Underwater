@@ -41,7 +41,8 @@ libuwtokenbus_la_SOURCES = initlib.cpp\
 
 libuwtokenbus_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwtokenbus_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwtokenbus_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwtokenbus_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						  $(top_builddir)/application/uwcbr/libuwcbr.la
 
 nodist_libuwtokenbus_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

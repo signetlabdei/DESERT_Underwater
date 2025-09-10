@@ -35,7 +35,8 @@ libuwoptical_phy_la_SOURCES = initlib.cpp uwoptical-phy.cpp
 
 libuwoptical_phy_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwoptical_phy_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwoptical_phy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwoptical_phy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							 $(top_builddir)/propagation/uwoptical_propagation/libuwoptical_propagation.la
 
 nodist_libuwoptical_phy_la_SOURCES = InitTcl.cc
 

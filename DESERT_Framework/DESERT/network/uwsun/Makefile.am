@@ -49,7 +49,8 @@ libsun_la_SOURCES = initlib.cpp\
 
 libsun_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libsun_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libsun_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libsun_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+				   $(top_builddir)/application/uwcbr/libuwcbr.la
 
 nodist_libsun_la_SOURCES = InitTcl.cc
 

@@ -39,7 +39,9 @@ libuwphysicalnoise_la_SOURCES = initlib.cpp uwphysicalnoise.cpp soundlevels.cpp
 
 libuwphysicalnoise_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwphysicalnoise_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwphysicalnoise_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwphysicalnoise_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							   $(top_builddir)/mobility/uwsmposition/libuwsmposition.la \
+							   $(top_builddir)/physical/uwphysical/libuwphysical.la
 
 nodist_libuwphysicalnoise_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

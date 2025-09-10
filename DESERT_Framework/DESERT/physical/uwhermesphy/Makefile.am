@@ -40,7 +40,8 @@ libuwhermesphy_la_SOURCES = initlib.cpp\
 
 libuwhermesphy_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwhermesphy_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwhermesphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwhermesphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						   $(top_builddir)/physical/uwphysical/libuwphysical.la
 
 nodist_libuwhermesphy_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

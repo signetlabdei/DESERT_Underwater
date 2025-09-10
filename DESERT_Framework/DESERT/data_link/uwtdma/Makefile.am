@@ -35,7 +35,9 @@ libuwtdma_la_SOURCES = uwtdma.cpp initlib.cpp
 
 libuwtdma_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwtdma_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwtdma_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwtdma_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+					  $(top_builddir)/data_link/uwmmac_clmsgs/libuwmmac_clmsgs.la \
+					  $(top_builddir)/application/uwcbr/libuwcbr.la
 
 nodist_libuwtdma_la_SOURCES = initTcl.cc
 

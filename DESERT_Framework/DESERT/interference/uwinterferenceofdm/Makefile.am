@@ -40,7 +40,9 @@ libuwinterferenceofdm_la_SOURCES = initlib.cpp \
 
 libuwinterferenceofdm_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwinterferenceofdm_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwinterferenceofdm_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwinterferenceofdm_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+								  $(top_builddir)/interference/uwinterference/libuwinterference.la \
+								  $(top_builddir)/physical/uwofdmphy/libuwofdmphy.la
 
 nodist_libuwinterferenceofdm_la_SOURCES = UwInterferenceOfdmInitTcl.cc
 
