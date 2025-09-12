@@ -48,24 +48,13 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
                         AC_MSG_WARN([could not find ${withval}/nsmiracle/module.h, is --with-nsmiracle=${withval} correct?])
                     fi
 
-                    for dir in     \
-                        nsmiracle  \
-                        cbr        \
-                        ip         \
-                        link       \
-                        mac802_11  \
-                        marq       \
-                        mobility   \
-                        mphy       \
-                        mmac       \
-                        phy802_11  \
-                        port       \
-                        tcp        \
-                        wirelessch \
-                        aodv       \
-                        mll        \
-                        routing    \
-                        aodv       \
+                    for dir in \
+                        nsmiracle \
+                        cbr \
+                        ip \
+                        mobility \
+                        mphy \
+                        mmac \
                         uwm
                     do
                         #echo "considering dir \"$dir\""
@@ -76,21 +65,11 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
 
                     for lib in               \
                         MiracleBasicMovement \
-                        miracletcp           \
-                        MiracleWirelessCh    \
+                        Miracle              \
                         miraclecbr           \
                         MiracleIp            \
-                        MiraclePhy802_11     \
-                        MiracleMac802_11     \
-                        miracleport          \
-                        Miracle              \
                         mphy                 \
-                        marq                 \
                         mmac                 \
-                        mll                  \
-                        miraclelink          \
-                        MiracleRouting       \
-                        MiracleAodv          \
                         UwmStd               \
                         UwmStdPhyBpskTracer
                     do
@@ -155,35 +134,3 @@ AC_DEFUN([AC_CHECK_NSMIRACLE],[
 
     AC_LANG_POP(C++)
 ])
-
-# AC_DEFUN([AC_PATH_NSMIRACLE], [
-# AC_REQUIRE(AC_PATH_NS_ALLINONE)
-
-# ########################################################
-# # checking if ns-allinone path has been setup correctly
-# ########################################################
-
-# # temporarily add NS_CPPFLAGS and NSMIRACLE_CPPFLAGS to CPPFLAGS
-# BACKUP_CPPFLAGS=$CPPFLAGS
-# CPPFLAGS="$CPPFLAGS $NS_CPPFLAGS NSMIRACLE_CPPFLAGS"
-
-# AC_MSG_CHECKING([if programs can be compiled against ns-miracle headers])
-# AC_PREPROC_IFELSE(
-# 	[AC_LANG_PROGRAM([[
-# 		#include<cltracer.h>
-# 		ClMessageTracer* t; 
-# 		]],[[
-# 		]]  )],
-#         [AC_MSG_RESULT([yes])],
-#         [
-# 	  AC_MSG_RESULT([no])
-# 	  AC_MSG_ERROR([could not compile a test program against ns-miracle headers. Is --with-ns-miracle set correctly? ])
-#         ])
-
-# # AC_CHECK_HEADERS([cltracer.h],,AC_MSG_ERROR([you must specify ns-miracle installation path using --with-ns-miracle=PATH]))
-
-# # Restoring to the initial value
-# CPPFLAGS=$BACKUP_CPPFLAGS
-# ])
-#
-#

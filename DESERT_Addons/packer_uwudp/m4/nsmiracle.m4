@@ -32,7 +32,7 @@
 
 AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
     NSMIRACLE_PATH=''
-    NSMIRACLE_CPPLAGS=''
+    NSMIRACLE_CPPFLAGS=''
     NSMIRACLE_LDFLAGS=''
     NSMIRACLE_LIBADD=''
 
@@ -48,24 +48,13 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
                         AC_MSG_WARN([could not find ${withval}/nsmiracle/module.h, is --with-nsmiracle=${withval} correct?])
                     fi
 
-                    for dir in     \
-                        nsmiracle  \
-                        cbr        \
-                        ip         \
-                        link       \
-                        mac802_11  \
-                        marq       \
-                        mobility   \
-                        mphy       \
-                        mmac       \
-                        phy802_11  \
-                        port       \
-                        tcp        \
-                        wirelessch \
-                        aodv       \
-                        mll        \
-                        routing    \
-                        aodv       \
+                    for dir in \
+                        nsmiracle \
+                        cbr \
+                        ip \
+                        mobility \
+                        mphy \
+                        mmac \
                         uwm
                     do
                         #echo "considering dir \"$dir\""
@@ -76,21 +65,11 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
 
                     for lib in               \
                         MiracleBasicMovement \
-                        miracletcp           \
-                        MiracleWirelessCh    \
+                        Miracle              \
                         miraclecbr           \
                         MiracleIp            \
-                        MiraclePhy802_11     \
-                        MiracleMac802_11     \
-                        miracleport          \
-                        Miracle              \
                         mphy                 \
-                        marq                 \
                         mmac                 \
-                        mll                  \
-                        miraclelink          \
-                        MiracleRouting       \
-                        MiracleAodv          \
                         UwmStd               \
                         UwmStdPhyBpskTracer
                     do
