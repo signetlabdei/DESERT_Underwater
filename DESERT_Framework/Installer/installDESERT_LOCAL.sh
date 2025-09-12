@@ -898,16 +898,17 @@ build_WOSS() {
     info_L1 "woss-$WOSS_VERSION"
     start="$(date +%s)"
 
+    info_L2 "patch      [$*]"
     if [ -f Makefile ]; then
         make distclean > "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     fi
-    # In case of patches...
-    #patch -p1 -i $PATCHES_DIR/woss-1.2.0-fix-gcc-4.7.patch >> "$LOG_DIR/woss.log" 2>&0
-    #if [ $? -ne 0 ]
-    #then
+
+    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/woss-remove-nsmiracle-extra-deps.patch >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"  2>&1
+    # if [ $? -ne 0 ]
+    # then
     #    print_error "woss-$WOSS_VERSION error during patching! Exiting ..."
     #    exit
-    #fi
+    # fi
     ./autogen.sh >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     printf ">>>\n" >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"
     ./autogen.sh >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
