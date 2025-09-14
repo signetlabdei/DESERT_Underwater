@@ -40,12 +40,8 @@
 #define UW_ALOHA_Q_SYNC_SINK_H
 
 #include <mmac.h>
-#include <queue>
-#include <deque>
 #include <iostream>
 #include <assert.h>
-#include <sstream>
-#include <fstream>
 #include <sys/time.h>
 #include <vector>
 
@@ -101,12 +97,15 @@ public:
 	/**
 	 * Destructor of the UwAloha_Q_Sync_SINK class
 	 */
-	virtual ~UwAloha_Q_Sync_SINK();
+	virtual ~UwAloha_Q_Sync_SINK() = default;
 	
 	virtual int recvSyncClMsg(ClMessage* m);
 
 protected:
 	
+	/**
+	* Triggered upon timer expiration event
+	**/
 	virtual void handleTimerExpiration();
 	
 	/**
@@ -184,26 +183,19 @@ protected:
 	 */
 	enum UWALOHAQ_SINK_SLOT_STATUS { RECV_PERIOD, TRANSMIT_PERIOD};
 
-	UWALOHAQ_SINK_STATUS
-	sink_status;
+	UWALOHAQ_SINK_STATUS sink_status; /**<Variable that holds 
+								UWALOHAQ_SINK_STATUS*/
 	
-	UWALOHAQ_SINK_SLOT_STATUS
-	sink_slot_status;
+	UWALOHAQ_SINK_SLOT_STATUS sink_slot_status; /**<Variable that holds 
+								UWALOHAQ_SINK_SLOT_STATUS*/
 	
 	double start_time; /**<Time to wait before starting the protocol*/
 	
 	UwAlohaQSyncTimerSink alohaq_sync_sink_timer; /**<UwAlohaQ Sink Timer*/
 	
-	std::ofstream out_file_stats; /**<File stream for the log file*/
-	
-	int max_queue_size; /**< Maximum dimension of Queue */
-	
-	std::string name_label_; /**<label added in the log file, empty string by default*/
-	
 	int debug_; /**<Debug variable: 0 for no info,
 				> 1 for detailed info*/
 				
-	std::deque<Packet *> buffer; /**<Buffer of the MAC node*/
 	int sea_trial_; /**<Written log variable*/
 	int ACK_size; /**<Size of the ACK HDR if any*/
 	int HDR_size; /**<Size of the HDR if any*/

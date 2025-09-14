@@ -26,12 +26,18 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test UW-ALOHAQ_SYNC protocol
 #
-# N.B.: UnderwaterChannel and UW/PHYSICAL are used for PHY layer and channel
 #
 # Authors: Aleksa Albijanic
 # Version: 1.0.0
+#
+#
+# This script is used to test UW-ALOHA_Q_SYNC protocol - papaer reference below
+# A. Albijanic, S. Tomovic and I. Radusinovic, "Reinforcement Learning-Based
+# ALOHA-Q Protocol with Slot Subdivision for Underwater Acoustic Sensor Networks,"
+# 2025 29th International Conference on Information Technology (IT),
+# Zabljak, Montenegro, 2025, pp. 1-4,
+# doi: 10.1109/IT64745.2025.10930271.
 #
 # NOTE: tcl sample tested on Ubuntu 22.04, 64 bits OS
 #
@@ -122,23 +128,23 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(nn)                 15;# Number of Nodes
+set opt(nn)                 10;# Number of Nodes
 set opt(starttime)          0;
-set opt(stoptime)           1500;
-set opt(max_dist)	    1000;
+set opt(stoptime)           2000;
+set opt(max_dist)	    750.000;
 set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)] ;# Duration of the simulation
-set opt(txpower)            173;#Power transmitted in dB re uPa 185.8 is the maximum
-set opt(propagation_speed)  1500;# m/s
+set opt(txpower)            165;#Power transmitted in dB re uPa 185.8 is the maximum
+set opt(propagation_speed)  1524;# m/s
 
 set opt(maxinterval_)       20
 set opt(freq)               25000.0 ;#Frequency used in Hz
 set opt(bw)                 5000.0 ;#Bandwidth used in Hz
-set opt(bitrate)            9200;#bitrate in bps
-set opt(cbr_period)         0.1
-set opt(pktsize)  	    130.5
+set opt(bitrate)            600;#bitrate in bps
+set opt(cbr_period)         5
+set opt(pktsize)  	    28.000
 
 set opt(subslot_num)          5
-set opt(slot_duration_factor) 1.2
+set opt(slot_duration_factor) 1.6
 
 
 set opt(rngstream)	    1
@@ -199,11 +205,11 @@ Module/UW/CBR set period_              $opt(cbr_period)
 Module/UW/CBR set PoissonTraffic_      1
 Module/UW/CBR set debug_               0
 
-set T_dp [expr $opt(pktsize) * 8 / $opt(bitrate)]
+set T_dp [expr ($opt(pktsize) + 4) * 8 / $opt(bitrate)]
 set t_p [expr $opt(max_dist) / $opt(propagation_speed)]
 
 ### TDMA MAC ###
-Module/UW/ALOHAQ_SYNC_NODE  set debug_ 	             0
+Module/UW/ALOHAQ_SYNC_NODE  set debug_ 	             -5
 Module/UW/ALOHAQ_SYNC_NODE  set HDR_size_ 	     0
 Module/UW/ALOHAQ_SYNC_NODE  set wait_constant_       0.1
 Module/UW/ALOHAQ_SYNC_NODE  set nn      	      $opt(nn)

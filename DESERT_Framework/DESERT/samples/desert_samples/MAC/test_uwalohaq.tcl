@@ -26,11 +26,18 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test UW-ALOHA_Q protocol
 #
 #
 # Authors: Aleksa Albijanic
 # Version: 1.0.0
+#
+# This script is used to test UW-ALOHA_Q protocol - papaer reference below
+# A. Albijanic, S. Tomovic and I. Radusinovic, "Simulation Analysis of the 
+# Impact of Underwater Channel Reliability on Machine Learning-Optimized 
+# Framed-Aloha MAC protocols," 
+# 2024 28th International Conference on Information Technology (IT), 
+# Zabljak, Montenegro, 2024, pp. 1-4,
+# doi: 10.1109/IT61232.2024.10475776.
 #
 # NOTE: tcl sample tested on Ubuntu 22.04, 64 bits OS
 #
@@ -124,7 +131,7 @@ $ns use-Miracle
 ##################
 # Tcl variables  #
 ##################
-set opt(nn)                 15;# Number of Nodes
+set opt(nn)                 10;# Number of Nodes
 set opt(starttime)          0;
 set opt(stoptime)           1500;
 set opt(max_dist)	    500.0;#Maximal distance between sensor nodes and sink
@@ -197,6 +204,15 @@ $data_mask_ack setFreq              $opt(freq_ack)
 $data_mask_ack setBandwidth         $opt(bw_ack)
 $data_mask_ack setPropagationSpeed  $opt(propagation_speed)
 
+
+set phy_data_tag "PHY"
+set phy_ack_tag "APHY"
+
+set runi [new RandomVariable/Uniform]
+$runi set min_ 0.0
+$runi set max_ 1.0
+$runi use-rng $defaultRNG
+
 #########################
 # Module Configuration  #
 #########################
@@ -223,8 +239,6 @@ Module/UW/ALOHAQ_NODE set tot_slots            $total_slots
 Module/UW/ALOHAQ_NODE set max_packet_per_slot  2
 Module/UW/ALOHAQ_NODE set slot_duration        $slot_dur
 Module/UW/ALOHAQ_NODE set queue_size_          10
-Module/UW/ALOHAQ_NODE set drop_old_            0
-Module/UW/ALOHAQ_NODE set checkPriority_       0
 Module/UW/ALOHAQ_NODE set mac2phy_delay_       [expr 1.0e-9]
 Module/UW/ALOHAQ_NODE set sea_trial_ 	       1
 Module/UW/ALOHAQ_NODE set start_time 	       $opt(starttime)
@@ -278,7 +292,7 @@ Module/UW/PHYSICAL  set debug_                      0
 ################################
 proc createNode { id } {
 
-    global channel ns cbr position node udp portnum ipr ipif
+    global channel ns cbr position node udp portnum ipr ipif phy_data_tag phy_ack_tag runi
     global phy_data opt mll mac propagation data_mask interf_data data_mask_ack phy_ack ack_channel
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
@@ -294,15 +308,14 @@ proc createNode { id } {
     set phy_data($id) [new Module/UW/PHYSICAL]  
     set phy_ack($id)  [new Module/UW/PHYSICAL]
     
-    
     $node($id) addModule 8 $cbr($id)   1  "CBR"
     $node($id) addModule 7 $udp($id)   1  "UDP"
     $node($id) addModule 6 $ipr($id)   1  "IPR"
     $node($id) addModule 5 $ipif($id)  1  "IPF"   
     $node($id) addModule 4 $mll($id)   1  "MLL"
     $node($id) addModule 3 $mac($id)   1  "MAC"
-    $node($id) addModule 2 $phy_data($id)   1  "PHY"
-    $node($id) addModule 1 $phy_ack($id)   1  "APHY"
+    $node($id) addModule 2 $phy_data($id)   1  $phy_data_tag
+    $node($id) addModule 1 $phy_ack($id)   1  $phy_ack_tag
 
     $node($id) setConnection $cbr($id)   $udp($id)   1
     $node($id) setConnection $udp($id)   $ipr($id)   1
@@ -333,9 +346,9 @@ proc createNode { id } {
    
     	
     	set dist [expr sqrt($opt(max_dist) * $opt(max_dist) / 6)]
-    	set random_x [expr rand()]
-    	set random_y [expr rand()]
-    	set random_z [expr rand()]
+    	set random_x [$runi value]
+    	set random_y [$runi value]
+    	set random_z [$runi value]
     	$position($id) setX_ [expr ($random_x * 2 * $dist) - $dist]
    	$position($id) setY_ [expr ($random_y * 2 * $dist) - $dist]
    	$position($id) setZ_ [expr (((-1) * 2 * $dist) * $random_z)]
@@ -348,6 +361,8 @@ proc createNode { id } {
     	
     
     $mac($id) setStartTime    0
+    
+    $mac($id) setPhyDataTag $phy_data_tag
 
     #Interference model
     set interf_data($id)  [new "Module/UW/INTERFERENCE"]
@@ -375,7 +390,7 @@ proc createNode { id } {
 
 proc createSink { } {
 
-    global channel propagation smask data_mask ns cbr_sink position_sink node_sink udp_sink portnum_sink interf_data_sink data_mask_ack
+    global channel propagation smask data_mask ns cbr_sink position_sink node_sink udp_sink portnum_sink interf_data_sink data_mask_ack phy_data_tag phy_ack_tag
     global phy_data_sink posdb_sink opt mll_sink mac_sink ipr_sink ipif_sink bpsk interf_sink channel_estimator phy_data_sink phy_ack_sink ack_channel
 
     set node_sink [$ns create-M_Node $opt(tracefile) $opt(cltracefile)]
@@ -401,8 +416,8 @@ proc createSink { } {
     $node_sink addModule 5 $ipif_sink      1 "IPF"   
     $node_sink addModule 4 $mll_sink       1 "MLL"
     $node_sink addModule 3 $mac_sink       1  "MAC"
-    $node_sink addModule 2 $phy_data_sink       1  "PHY"
-    $node_sink addModule 1 $phy_ack_sink        1  "APHY"
+    $node_sink addModule 2 $phy_data_sink   1  $phy_data_tag
+    $node_sink addModule 1 $phy_ack_sink   1  $phy_ack_tag
 
     for { set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
         $node_sink setConnection $cbr_sink($cnt)  $udp_sink      1   
@@ -423,6 +438,8 @@ proc createSink { } {
             exit
         }    
     }
+    
+    $mac_sink setPhyAckTag $phy_ack_tag
     
     $ipif_sink addr 253
     

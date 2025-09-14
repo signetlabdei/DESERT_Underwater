@@ -40,13 +40,9 @@
 #define UW_ALOHA_Q_SINK_H
 
 #include <mmac.h>
-#include <queue>
-#include <deque>
 #include <iostream>
 #include <assert.h>
-#include <sstream>
-#include <fstream>
-#include <sys/time.h>
+#include <string>
 
 #include <mphy.h>
 
@@ -74,8 +70,8 @@ public:
 
 protected:
 	enum UWALOHAQ_PKT_TYPE{
-	UWALOHAQ_ACK_PKT,
-	UWALOHAQ_DATA_PKT
+		UWALOHAQ_ACK_PKT,
+		UWALOHAQ_DATA_PKT
 	};
 	
 	/**
@@ -143,14 +139,11 @@ protected:
 
 	UWALOHAQ_SINK_STATUS
 	sink_status; /**<Variable holding the status enum type*/
-	std::ofstream out_file_stats; /**<File stream for the log file*/
 	
 	int packet_sent_curr_slot_; /**<counter of packet has been sent in the
 								current slot */
-	int max_queue_size; /**< Maximum dimension of Queue */
 	
-	
-	std::string name_label_; /**<label added in the log file, empty string by default*/
+
 	
 	int debug_; /**<Debug variable: 0 for no info,
 				>-5 for small info, <-5 for complete info*/
@@ -162,6 +155,7 @@ protected:
 	int ack_phy_id;
 	//bool enable;
 
+	std::string phy_ack_tag;
 	
 	
 };

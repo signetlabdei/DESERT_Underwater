@@ -51,7 +51,6 @@ Module/UW/ALOHAQ_SYNC_SINK set ACK_size_ 	    2
 Module/UW/ALOHAQ_SYNC_SINK set wait_constant_       0.1
 Module/UW/ALOHAQ_SYNC_SINK set MAC_addr_ 	    0
 Module/UW/ALOHAQ_SYNC_SINK set sea_trial_ 	    0  
-Module/UW/ALOHAQ_SYNC_SINK set max_queue_size_      10
 Module/UW/ALOHAQ_SYNC_SINK set mac2phy_delay_       [expr 1.0e-9]
 Module/UW/ALOHAQ_SYNC_SINK set nn                   5
 Module/UW/ALOHAQ_SYNC_SINK set slot_duration_factor 1.5

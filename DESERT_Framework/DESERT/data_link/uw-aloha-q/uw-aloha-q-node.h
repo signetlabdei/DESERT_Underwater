@@ -40,22 +40,20 @@
 #define UW_ALOHA_Q_NODE_H
 
 #include <mmac.h>
-#include <queue>
 #include <deque>
 #include <iostream>
 #include <assert.h>
-#include <sstream>
-#include <fstream>
 #include <sys/time.h>
+#include <string>
 
 #include <mphy.h>
 
 #include <vector>
 
+extern packet_t PT_MMAC_ACK;
+
 #define UW_ALOHAQ_STATUS_MY_SLOT 1 /**< Status slot active>*/
 #define UW_ALOHAQ_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/
-
-extern packet_t PT_MMAC_ACK;
 
 class UwAloha_Q_NODE;
 
@@ -105,21 +103,21 @@ public:
 	/**
 	 * Destructor of the UW_Aloha_Q_NODE class
 	 */
-	virtual ~UwAloha_Q_NODE();
+	virtual ~UwAloha_Q_NODE() = default;
 
 
-  /**
-   * Cross-Layer messages synchronous interpreter.
-   * 
-   * @param ClMessage* an instance of ClMessage that represent the message received
-   * @return <i>0</i> if successful.
-   */
+	/**
+	* Cross-Layer messages synchronous interpreter.
+	* 
+	* @param ClMessage* an instance of ClMessage that represent the message received
+	* @return <i>0</i> if successful.
+	*/
 	virtual int recvSyncClMsg(ClMessage* m);
 
 protected:
 	enum UWALOHAQ_PKT_TYPE{
-	UWALOHAQ_ACK_PKT,
-	UWALOHAQ_DATA_PKT
+		UWALOHAQ_ACK_PKT,
+		UWALOHAQ_DATA_PKT
 	};
 	
 	/**Decide if backoff should be applied in the following slot*/
@@ -157,7 +155,7 @@ protected:
 	 * @param Packet* pointer to the packet received
 	 *
 	 */
-	virtual void recvFromUpperLayers(Packet *p);
+	virtual void recvFromUpperLayers(Packet *p) override;
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
@@ -188,15 +186,6 @@ protected:
 	 * Packet in transmission
 	 */
 	virtual void initPkt(Packet *p);
-	/**
-	 * Calculate the epoch of the event. Used in sea-trial mode
-	 * @return the epoch of the system
-	 */
-	inline unsigned long int
-	getEpoch()
-	{
-		return time(NULL);
-	}
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -228,15 +217,10 @@ protected:
 	double slot_duration; /**Slot duration*/
 	std::vector <double> Q_table {};
 	double start_time; /**<Time to wait before starting the protocol*/
-	UWALOHAQ_STATUS 
-	transceiver_status;
-	UWALOHAQ_ACK_STATUS
-	ack_status;
-	UWALOHAQ_BACKOFF_STATUS
-	backoff_status;
-	UWALOHAQ_BACKOFF_MODE
-	backoff_mode;
-	std::ofstream out_file_stats; /**<File stream for the log file*/
+	UWALOHAQ_STATUS transceiver_status; /**<Variable holding transceiver status*/
+	UWALOHAQ_ACK_STATUS ack_status; /**<Variable holding ack status*/
+	UWALOHAQ_BACKOFF_STATUS backoff_status; /**<Variable holding backoff status*/
+	UWALOHAQ_BACKOFF_MODE backoff_mode; /**<Variable holding backoff mode*/
 	double guard_time; /**<Guard time between slots*/
 	int tot_slots; /**<Number of slots in the frame */
 	
@@ -247,12 +231,8 @@ protected:
 	int packet_sent_curr_frame; /**<counter of packet has been sent in the
 								current frame */
 	int max_queue_size; /**< Maximum dimension of Queue */
-	int drop_old_; /**<flag to set the drop packet policy in case of buffer overflow: 
-					if 0 (default) drops the new packet, if 1 the oldest*/
+
 	bool enable;
-	std::string name_label_;
-	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with priority,
-						set to 0 otherwise. Priority can be used only with UWCBR module */
 	
 	int debug_; /**<Debug variable: 0 for no info,
 				1 for displaying debug info*/
@@ -263,6 +243,8 @@ protected:
 	int my_curr_slot; /**<Node's current slot in the ongoing frame*/
 	int data_phy_id; /**<Data channel identifier*/
 	int decide_backoff;  /**<Dercide about triggering backoff*/
+	
+	std::string phy_data_tag;
 };
 
 #endif

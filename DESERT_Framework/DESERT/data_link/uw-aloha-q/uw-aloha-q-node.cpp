@@ -42,13 +42,9 @@
 #include <stdint.h>
 #include <clmsg-discovery.h>
 #include <mac.h>
+#include <rng.h>
 #include <uwmmac-clmsg.h>
 #include <uwcbr-module.h>
-#include <cstdlib>
-#include <cmath>
-#include <iomanip>
-#include <ctime>
-#include <queue>
 #include <vector>
 #include <algorithm>
 
@@ -91,15 +87,12 @@ UwAloha_Q_NODE::UwAloha_Q_NODE()
 	, transceiver_status(IDLE)
 	, ack_status(ACK_NOT_RECEIVED)
 	, backoff_status(HALT)
-	, out_file_stats(0)
 	, HDR_size(0)
 	, max_packet_per_slot(1)
 	, packet_sent_curr_slot_(0)
 	, packet_sent_curr_frame(0)
-	, drop_old_(0)
 	, enable(true)
 	, name_label_("")
-	, checkPriority(0)
 	, curr_slot(0)
 	, my_curr_slot(1)
 	, data_phy_id(0)
@@ -113,8 +106,6 @@ UwAloha_Q_NODE::UwAloha_Q_NODE()
 	bind("max_packet_per_slot", (int *) &max_packet_per_slot);
 	bind("slot_duration", (double *) &slot_duration);
 	bind("start_time", (double *) &start_time);
-	bind("drop_old_", (int *) &drop_old_);
-	bind("checkPriority_", (int *) &checkPriority);
 	bind("mac2phy_delay_", (double *) &mac2phy_delay_);
 	bind("guard_time", (double *) &guard_time);
 	bind("tot_slots", (int *) &tot_slots);
@@ -122,59 +113,52 @@ UwAloha_Q_NODE::UwAloha_Q_NODE()
 
 
 	if (max_queue_size < 0) {
-		cerr << NOW << " UwALOHAQ() not valid max_queue_size < 0!! set to 1 by default " 
+		std::cerr << NOW << " UwALOHAQ() not valid max_queue_size < 0!! set to 1 by default " 
 			 << std::endl;
 		max_queue_size = 1;
 	}
 	if (max_packet_per_slot < 0) {
-		cerr << NOW << " UwALOHAQ() not valid max_packet_per_slot < 0!! set to 1 by default " 
+		std::cerr << NOW << " UwALOHAQ() not valid max_packet_per_slot < 0!! set to 1 by default " 
 			 << std::endl;
 		max_packet_per_slot = 1;
 	}
 	if (slot_duration < 0) {
-		cerr << NOW << " UwALOHAQ() not valid slot_duration < 0!! set to 0.1 by default " 
+		std::cerr << NOW << " UwALOHAQ() not valid slot_duration < 0!! set to 0.1 by default " 
 			 << std::endl;
 		slot_duration = 0.1;
 	}
-	if (drop_old_ == 1 && checkPriority == 1) {
-		cerr << NOW << " UwALOHAQ() drop_old_ and checkPriority cannot be set both to 1!! "
-			 << "checkPriority set to 0 by default " << std::endl;
-		checkPriority = 0; 
-	}
 	if (mac2phy_delay_ <= 0) {
-		cerr << NOW << " UwALOHAQ() not valid mac2phy_delay_ < 0!! set to 1e-9 by default "
+		std::cerr << NOW << " UwALOHAQ() not valid mac2phy_delay_ < 0!! set to 1e-9 by default "
 			 << std::endl; 
 		mac2phy_delay_ = 1e-9;
 	}
 	if (guard_time <= 0) {
-		cerr << NOW << " UwALOHAQ() not valid guard_time < 0!! set to 0 by default "
+		std::cerr << NOW << " UwALOHAQ() not valid guard_time < 0!! set to 0 by default "
 			 << std::endl; 
 		guard_time = 0;
 	}
 	if (tot_slots <= 0) {
-		cerr << NOW << " UwALOHAQ() not valid tot_slots < 0!! set to 1 by default "
+		std::cerr << NOW << " UwALOHAQ() not valid tot_slots < 0!! set to 1 by default "
 			 << std::endl; 
 		tot_slots = 1;
 	}
 	
 }
 
-UwAloha_Q_NODE::~UwAloha_Q_NODE()
-{
-}
 
 int 
-UwAloha_Q_NODE::getLayerIdFromTag(const std::string& tag) {
-  ClMsgDiscovery m;
-  m.addSenderData((const PlugIn*) this, getLayer(), getId(),
+UwAloha_Q_NODE::getLayerIdFromTag(const std::string& tag) 
+{
+	ClMsgDiscovery m;
+	m.addSenderData((const PlugIn*) this, getLayer(), getId(),
 	getStackId(), name() , getTag());
-  sendSyncClMsgDown(&m);
-  DiscoveryStorage low_layer_storage = m.findTag(tag.c_str());
-  if (low_layer_storage.getSize() == 1) {
-    DiscoveryData low_layer = (*low_layer_storage.begin()).second;
-    return low_layer.getId();
-}
-  return (-1); // not found
+	sendSyncClMsgDown(&m);
+	DiscoveryStorage low_layer_storage = m.findTag(tag.c_str());
+	if (low_layer_storage.getSize() == 1) {
+		DiscoveryData low_layer = (*low_layer_storage.begin()).second;
+		return low_layer.getId();
+	}
+  	return (-1); // not found
 }
 
 int
@@ -193,7 +177,7 @@ int
 UwAloha_Q_NODE::findMySlot()
 {
 	
-	vector<int> max_arr = {};
+	vector<int> max_arr;
 	
 	double max = *std::max_element(Q_table.begin(), Q_table.end());
 	int i;
@@ -208,7 +192,7 @@ UwAloha_Q_NODE::findMySlot()
 	if (max_arr.size() == 1) {
 		my_slot = max_arr[0];
 	} else {
-		int pos = (rand() % max_arr.size());
+		int pos = RNG::defaultrng()->uniform(0, max_arr.size());
 		my_slot = max_arr[pos];
 	}
 	
@@ -239,7 +223,7 @@ UwAloha_Q_NODE::recvFromUpperLayers(Packet *p)
 		initPkt(p);
 		buffer.push_back(p);
  	} else {
-		Packet::free(p);
+		drop(p, 1, "BUFFER_OVERLOAD");
 	}
 }
 
@@ -253,12 +237,9 @@ UwAloha_Q_NODE::txData()
 				Packet *p = buffer.front();
 				buffer.pop_front();
 				//sendDown(p);
-				data_phy_id = getLayerIdFromTag("PHY");
+				data_phy_id = getLayerIdFromTag(phy_data_tag);
 				Mac2PhyTurnOn(data_phy_id);
 				Mac2PhyStartTx(data_phy_id, p);
-				
-				out_file_stats << NOW << " ::AlohaQ - started transmitting the packet"
-						<< std::endl;
 				
 				transceiver_status = TRANSMITTING;
 				if(debug_){
@@ -294,7 +275,7 @@ UwAloha_Q_NODE::Phy2MacEndTx(const Packet *p)
 {
 	transceiver_status = WAIT_ACK;
 	packet_sent_curr_slot_++;
-	if(debug_) {
+	if (debug_) {
 		std::cout << NOW << " ALOHAQ NODE -  " << addr << 
 				" Packet transmitted ----- Phy2MacEndTx" << std::endl;
 	}
@@ -328,7 +309,7 @@ UwAloha_Q_NODE::Phy2MacEndRx(Packet *p)
 					 << src_mac << std::endl;
 
 			incrErrorPktsRx();
-			Packet::free(p);
+			drop(p, 1, "CORRUPTED_PKT");
 		} else {
 			if (dest_mac != addr) {
 				rxPacketNotForMe(p);
@@ -348,7 +329,7 @@ UwAloha_Q_NODE::Phy2MacEndRx(Packet *p)
 							<< " : Received NOT ACK " << src_mac << "   " << rx_pkt_type 
 							<< std::endl;
 				}
-			 	Packet::free(p);
+			 	drop(p, 1, "RECEIVED_NOT_ACK");
                         }
 		}
 
@@ -358,14 +339,13 @@ UwAloha_Q_NODE::Phy2MacEndRx(Packet *p)
 		if (debug_)
 			std::cout << NOW << " ID " << addr
 					  << ": Received packet while transmitting, dropping " << std::endl;
-		Packet::free(p);	
+		drop(p, 1, "TRANSCEIVER NOT IDLE");	
 	}
 }
 
 void UwAloha_Q_NODE::stateRxAck(Packet *p)
 {	
 	if(slot_status == UW_ALOHAQ_STATUS_MY_SLOT) {
-		out_file_stats << NOW << "::AlohaQ - received ACK in current slot" << std::endl;
 		incrDataPktsRx();
 		if(debug_) {
 			std::cout << NOW << " ID " << addr
@@ -373,15 +353,12 @@ void UwAloha_Q_NODE::stateRxAck(Packet *p)
 		}
 		ack_status = ACK_RECEIVED;
 		updateQ_table(1);
-		
-		Packet::free(p);
 	} else {
-		out_file_stats << NOW << "::AlohaQ - received ACK in current slot" << std::endl;
 		if(debug_) {
 			std::cout << NOW << " ID " << addr
 					<< ": Received ACK in another slot " << std::endl;
 		}
-		Packet::free(p);
+		drop(p, 1, "RECEIVED OUTSIDE MY SLOT");
 	}
 	
 	transceiver_status = IDLE;
@@ -392,11 +369,8 @@ UwAloha_Q_NODE::initPkt(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_mac *mach = HDR_MAC(p);
-
-	int curr_size = ch->size();
 	
-	ch->size() = curr_size + HDR_size;
-	
+	ch->size() += HDR_size;	
 }
 
 void
@@ -406,7 +380,7 @@ UwAloha_Q_NODE::rxPacketNotForMe(Packet *p)
 		std::cout << NOW << "Node ID: " << addr <<  "Packet not for me " << std::endl;
 	}
 	if (p != NULL)
-		Packet::free(p);
+		drop(p, 1, "PACKET_NOT_FOR_ME");
 }
 
 void
@@ -419,8 +393,6 @@ UwAloha_Q_NODE::handleTimerExpiration()
 		slot_status = UW_ALOHAQ_STATUS_NOT_MY_SLOT;
 		if ( ack_status == ACK_NOT_RECEIVED) {
 			updateQ_table(-1);
-			out_file_stats << NOW << "::AlohaQ - Frame finished, did not receive ACK" 
-					<< std::endl;
 					
 			decide_backoff = decide_if_backoff(curr_slot);
 			if (backoff_mode == B2 && decide_backoff == 1) {
@@ -456,15 +428,15 @@ UwAloha_Q_NODE::handleTimerExpiration()
 		slot_status = UW_ALOHAQ_STATUS_MY_SLOT;
 		txData();
 		std::cout << NOW << " ON node id " << addr << std::endl;
-		}
-	else {
+	} else {
 		std::cout << NOW << " still OFF node id " << addr << std::endl;
 	}
 	
 	ack_status = ACK_NOT_RECEIVED;
 	
-	if (backoff_status == ADD_BACKOFF) {	
-		alohaq_timer.resched(slot_duration + (((double) rand() / RAND_MAX) * slot_duration));
+	if (backoff_status == ADD_BACKOFF) {
+		double rnd = RNG::defaultrng()->uniform_double();
+		alohaq_timer.resched(slot_duration + rnd);
 	} else {
 		alohaq_timer.resched(slot_duration);
 	}
@@ -475,13 +447,6 @@ UwAloha_Q_NODE::start(double delay)
 {
 
 	enable = true;
-	srand((unsigned) (time(0) + addr));
-	if (sea_trial_) {
-		std::stringstream stat_file;
-		stat_file << "./ALOHAQ_node_" << addr << "_" << name_label_ << ".out";
-		std::cout << stat_file.str().c_str() << std::endl;
-		out_file_stats.open(stat_file.str().c_str(), std::ios_base::app);
-	}
 
 	vector <double> Q_table_template(tot_slots, 0);
 	Q_table = Q_table_template;
@@ -522,15 +487,47 @@ UwAloha_Q_NODE::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "setStartTime") == 0) {
-			start_time = atof(argv[2]);
+			try {
+				start_time = std::stof(argv[2]);
+				
+				if (start_time < 0){
+					std::cerr << "Error: negative number" << std::endl;
+					return 1;
+				}
+				
+			} catch (const std::invalid_argument&){
+				std::cerr << "Error: invalid number" << std::endl;
+				return 1;
+			} catch (const std::out_of_range&){
+				std::cerr << "Error: number out of range" << std::endl;
+				return 1;
+			}
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
-			addr = atoi(argv[2]);
+			try {
+				addr = std::stoi(argv[2]);
+				
+				if (addr < 0){
+					std::cerr << "Error: negative number" << std::endl;
+					return 1;
+				}
+				
+			} catch (const std::invalid_argument&){
+				std::cerr << "Error: invalid number" << std::endl;
+				return 1;
+			} catch (const std::out_of_range&){
+				std::cerr << "Error: number out of range" << std::endl;
+				return 1;
+			}
 			if (debug_)
 				cout << "MAC address of current node is " << addr
 					 << std::endl;
 			return TCL_OK;
 		} 
+		else if (strcasecmp(argv[1], "setPhyDataTag") == 0) {
+			phy_data_tag = argv[2];
+			return TCL_OK;
+		}
 	}
 	return MMac::command(argc, argv);
 }
