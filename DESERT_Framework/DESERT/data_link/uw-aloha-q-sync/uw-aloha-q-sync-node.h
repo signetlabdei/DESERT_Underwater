@@ -40,13 +40,10 @@
 #define UW_ALOHA_Q_SYNC_NODE_H
 
 #include <mmac.h>
-#include <queue>
 #include <deque>
 #include <iostream>
 #include <assert.h>
-#include <sstream>
 #include <fstream>
-#include <sys/time.h>
 
 #include <mphy.h>
 
@@ -102,35 +99,37 @@ public:
 	/**
 	 * Destructor of the UwAloha_Q_Sync_NODE class
 	 */
-	virtual ~UwAloha_Q_Sync_NODE();
+	virtual ~UwAloha_Q_Sync_NODE() = default;
 
 
-  /**
-   * Cross-Layer messages synchronous interpreter.
-   * 
-   * @param ClMessage* an instance of ClMessage that represent the message received
-   * @return <i>0</i> if successful.
-   */
+	/**
+	* Cross-Layer messages synchronous interpreter.
+	* 
+	* @param ClMessage* an instance of ClMessage that represent the message received
+	* @return <i>0</i> if successful.
+	*/
 	virtual int recvSyncClMsg(ClMessage* m);
 
 protected:
 	
 	/**
-     * Confirm ACK is received in desired time slot
-	 * @param Packet* pointer to the ACK packet received
-	 * @param addr MAC adress of the receiving node 
-     **/
+	* Confirm ACK is received in desired time slot
+	* @param Packet* pointer to the ACK packet received
+	* @param addr MAC adress of the receiving node 
+	**/
 	virtual void stateRxAck(Packet *p, int addr); 	
 	/**
-     * Search Q-table and find slot for transmission in the following frame
-     **/
+	* Search Q-table and find slot for transmission in the following frame
+	**/
 	virtual void findMySlot();	
 	/**
-     * Update Q-table based on reward value
-	  * @param ack_received reward value - 1 if ACK received, 0 if not 
-     **/
-	virtual void updateQ_table(int ack_received); 
-	
+	* Update Q-table based on reward value
+	* @param ack_received reward value - 1 if ACK received, 0 if not 
+	**/
+	virtual void updateQ_table(int ack_received); 	
+	/**
+	* Triggered upon timer expiration event
+	**/	
 	virtual void handleTimerExpiration();
 	/**
 	 * Transmit a data packet if in my slot
@@ -187,15 +186,6 @@ protected:
 	 * Packet in transmission
 	 */
 	virtual void initPkt(Packet *p);
-	/**
-	 * Calculate the epoch of the event. Used in sea-trial mode
-	 * @return the epoch of the system
-	 */
-	inline unsigned long int
-	getEpoch()
-	{
-		return time(NULL);
-	}
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
@@ -210,22 +200,22 @@ protected:
 	 */
 	virtual int command(int argc, const char *const *argv);
 	
-	enum UWALOHAQ_STATUS { IDLE, TRANSMITTING, RECEIVING }; /**<Enumeration class of UWALOHAQ status*/
+	enum UWALOHAQ_STATUS { IDLE, TRANSMITTING, RECEIVING }; /**<Enumeration
+									class of UWALOHAQ status*/
 	
-	enum SLOT_STATUS {TRANSMIT, RECEIVE}; /**<Enumeration class of UWALOHAQ slot status*/
+	enum SLOT_STATUS {TRANSMIT, RECEIVE}; /**<Enumeration class of 
+								UWALOHAQ slot status*/
 
 	UwAlohaQSyncTimer alohaq_sync_timer; /**<UwAlohaQSync timer handler*/
 	std::vector <std::vector<double>> Q_table{}; /**<2D Q-table*/
 	double start_time; /**<Time to wait before starting the protocol*/
-	UWALOHAQ_STATUS 
-	transceiver_status;
 	
-	SLOT_STATUS
-	slot_status;
+	UWALOHAQ_STATUS transceiver_status; /**<Variable that holds UWALOHAQ_STATUS*/
 	
-	std::ofstream out_file_stats; /**<File stream for the log file*/
-	double guard_time; 
+	SLOT_STATUS slot_status; /**<Variable that holds SLOT_STATUS*/
 	
+	std::ofstream out_file_stats; /**<File stream for the statistics log file*/
+		
 	int HDR_size; /**<Size of the HDR if any*/
 	int packet_sent_curr_frame; /**<counter of packet has been sent in the
 								current frame */
@@ -233,7 +223,6 @@ protected:
 	int drop_old_; /**<flag to set the drop packet policy in case of buffer overflow: 
 					if 0 (default) drops the new packet, if 1 the oldest*/
 	bool enable;
-	std::string name_label_;
 	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with priority,
 						set to 0 otherwise. Priority can be used only with UWCBR module */
 	
@@ -250,11 +239,10 @@ protected:
 	double t_prop_max; /**<Maximal propagation delay*/
 	double t_dp; /**<Transmission delay*/
 	double t_guard; /**<Guard interval*/
-	std::vector<int> ack_data; /**<Sink's table to collect successful transmittors*/
-	double slot_duration_factor; /**<slot_duration = t_dp * slot_duration_factor */
+	std::vector<int> ack_data; /**<Sink's list to store successful transmittors*/
+	double slot_duration_factor; /**<slot_duration = packet_duration * slot_duration_factor */
 	int nn; /**<number of nodes */
-	std::vector<int> max_arr_slot; 
-	std::vector<int> max_arr_subslot;
+
 	int subslot_num; /**<Number of subslots */
 
 };

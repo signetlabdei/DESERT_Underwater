@@ -44,12 +44,7 @@
 #include <mac.h>
 #include <uwmmac-clmsg.h>
 #include <uwcbr-module.h>
-#include <cstdlib>
-#include <cmath>
-#include <iomanip>
-#include <ctime>
-#include <vector>
-#include <queue>
+
 
 /**
  * Class that represent the binding of the protocol with tcl
@@ -81,25 +76,16 @@ public:
 UwAloha_Q_SINK::UwAloha_Q_SINK()
 	: MMac()
 	, sink_status(IDLE)
-	, out_file_stats(0)
 	, packet_sent_curr_slot_(0)
-	, max_queue_size(0)
-	, name_label_("")
 	, ack_phy_id(0)
 	
 {
-	bind("queue_size_", (int *) &max_queue_size);
 	bind("debug_", (int *) &debug_);
 	bind("sea_trial_", (int *) &sea_trial_);
 	bind("HDR_size_", (int *) &HDR_size);
 	bind("ACK_size_", (int *) &ACK_size);
 	bind("mac2phy_delay_", (double *) &mac2phy_delay_);
 
-	if (max_queue_size < 0) {
-		cerr << NOW << " UwALOHAQ() not valid max_queue_size < 0!! set to 1 by default " 
-			 	<< std::endl;
-		max_queue_size = 1;
-	}
 	if (mac2phy_delay_ <= 0) {
 		cerr << NOW << " UwALOHAQ() not valid mac2phy_delay_ < 0!! set to 1e-9 by default "
 			 	<< std::endl; 
@@ -114,21 +100,22 @@ UwAloha_Q_SINK::~UwAloha_Q_SINK()
 void UwAloha_Q_SINK::recvFromUpperLayers(Packet *p)
 {
 	//SINK MODE - No receiving from upper layers	
-	Packet::free(p);	
+	drop(p, 1, "SINK - NO_RECEVIVING_FROM_UPPER_LAYERS");	
 }
 
 int 
-UwAloha_Q_SINK::getLayerIdFromTag(const std::string& tag) {
-  ClMsgDiscovery m;
-  m.addSenderData((const PlugIn*) this, getLayer(), getId(),
+UwAloha_Q_SINK::getLayerIdFromTag(const std::string& tag) 
+{
+	ClMsgDiscovery m;
+	m.addSenderData((const PlugIn*) this, getLayer(), getId(),
 	getStackId(), name() , getTag());
-  sendSyncClMsgDown(&m);
-  DiscoveryStorage low_layer_storage = m.findTag(tag.c_str());
-  if (low_layer_storage.getSize() == 1) {
-    DiscoveryData low_layer = (*low_layer_storage.begin()).second;
-    return low_layer.getId();
-}
-  return (-1); // or whatever to say that it’s not found
+	sendSyncClMsgDown(&m);
+	DiscoveryStorage low_layer_storage = m.findTag(tag.c_str());
+	if (low_layer_storage.getSize() == 1) {
+		DiscoveryData low_layer = (*low_layer_storage.begin()).second;
+		return low_layer.getId();
+	}
+	return (-1); // or whatever to say that it’s not found
 }
 
 void 
@@ -138,7 +125,7 @@ UwAloha_Q_SINK::txAck(int dest_addr)
 	Packet *ack_pkt = Packet::alloc();
 	initPkt(ack_pkt, dest_addr);
 	
-	ack_phy_id = getLayerIdFromTag("APHY");
+	ack_phy_id = getLayerIdFromTag(phy_ack_tag);
 	Mac2PhyTurnOn(ack_phy_id);	
 	Mac2PhyStartTx(ack_phy_id, ack_pkt);
 	
@@ -153,10 +140,7 @@ UwAloha_Q_SINK::Phy2MacEndTx(const Packet *p)
 {
 	
 	packet_sent_curr_slot_++;
-	if (sea_trial_)
-		out_file_stats << left << "[" << "]::" << NOW
-				<< "SINK(" << addr << ")::Finished sending ACK"
-				<< std::endl;
+	
 	std::cout << NOW << " SINK ( " << addr << ") : Finished sending ACK" 
 			<< std::endl;
 	incrDataPktsTx();
@@ -199,33 +183,28 @@ UwAloha_Q_SINK::Phy2MacEndRx(Packet *p)
 						<< src_mac << std::endl;
 
 			incrErrorPktsRx();
-			Packet::free(p);
+			drop(p, 1, "CORRUPTED_PKT");
 		} else {
 			if (dest_mac != addr) {
-				Packet::free(p);
+				drop(p, 1, "PACKET_NOT_FOR_ME");
 
-				if (debug_ < -5)
+				if (debug_)
 					std::cout << NOW << " SINK " << addr << ": Packet not for me, packet is for "
 							<< dest_mac << std::endl;
 			} else if (rx_pkt_type == PT_MMAC_ACK) {	
 				std::cout << NOW << "? SINK Received ACK packet ?" << src_mac
 						<< std::endl;
-				Packet::free(p);
+				drop(p, 1, "RECEIVED_ACK_PKT");
 			}
 			else {
-				Packet::free(p);
 				//sendUp(p);
 				incrDataPktsRx();
 				txAck(src_mac);
 
-				if (debug_ < -5)
+				if (debug_)
 					std::cout << NOW << " ID " << addr
 							<< ": Received data packet from " << src_mac
 							<< std::endl;
-				if (sea_trial_)
-					out_file_stats << left << "[" << "]::" << NOW
-							<< "::ALOHAQ Sink_node(" << addr
-							<< ")::PCK_FROM:" << src_mac << std::endl;
 			}
 		}
 		
@@ -265,18 +244,30 @@ UwAloha_Q_SINK::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "setMacAddr") == 0) {
-			addr = atoi(argv[2]);
+			try {
+				addr = std::stoi(argv[2]);
+				
+				if (addr < 0){
+					std::cerr << "Error: negative number" << std::endl;
+					return 1;
+				}
+				
+			} catch (const std::invalid_argument&){
+				std::cerr << "Error: invalid number" << std::endl;
+				return 1;
+			} catch (const std::out_of_range&){
+				std::cerr << "Error: number out of range" << std::endl;
+				return 1;
+			}
 			if (debug_)
-				cout << "ALOHAQ SINK MAC address is "  << addr
-					 << std::endl;
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "setLogLabel") == 0) {
-			name_label_ = argv[2];
-			if (debug_)
-				cout << "ALOHAQ_SINK name_label_ " << name_label_
+				cout << "Sink MAC addres is " << addr
 					 << std::endl;
 			return TCL_OK;
 		} 
+		else if (strcasecmp(argv[1], "setPhyAckTag") == 0) {
+			phy_ack_tag = argv[2];
+			return TCL_OK;
+		}
 	}
 	return MMac::command(argc, argv);
 }

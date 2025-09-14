@@ -33,16 +33,12 @@
 Module/UW/ALOHAQ_NODE set debug_ 	       0
 Module/UW/ALOHAQ_NODE set HDR_size_ 	       5
 Module/UW/ALOHAQ_NODE set wait_constant_       0.1
-Module/UW/ALOHAQ_NODE set MAC_addr_ 	       0
 Module/UW/ALOHAQ_NODE set sea_trial_ 	       0
 Module/UW/ALOHAQ_NODE set guard_time           0
 Module/UW/ALOHAQ_NODE set tot_slots            0
 Module/UW/ALOHAQ_NODE set max_packet_per_slot  1
 Module/UW/ALOHAQ_NODE set max_queue_size_      10
-Module/UW/ALOHAQ_NODE set drop_old_            0
-Module/UW/ALOHAQ_NODE set checkPriority_       0
 Module/UW/ALOHAQ_NODE set mac2phy_delay_       [expr 1.0e-9]
-Module/UW/ALOHAQ_NODE set curr_slot            0
 Module/UW/ALOHAQ_NODE set backoff_mode         0
 
 
@@ -50,8 +46,6 @@ Module/UW/ALOHAQ_SINK set debug_ 	       0
 Module/UW/ALOHAQ_SINK set HDR_size_ 	       5
 Module/UW/ALOHAQ_SINK set ACK_size_ 	       2
 Module/UW/ALOHAQ_SINK set wait_constant_       0.1
-Module/UW/ALOHAQ_SINK set MAC_addr_ 	       0
 Module/UW/ALOHAQ_SINK set sea_trial_ 	       0  
-Module/UW/ALOHAQ_SINK set max_queue_size_          10
 Module/UW/ALOHAQ_SINK set mac2phy_delay_       [expr 1.0e-9]
 

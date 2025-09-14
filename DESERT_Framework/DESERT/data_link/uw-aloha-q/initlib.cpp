@@ -28,8 +28,8 @@
 //
 
 /**
- * @file   uwtdma/initlib.cpp
- * @author Filippo Campagnaro
+ * @file   uwalohaq/initlib.cpp
+ * @author Aleksa Albijanic
  * @version 1.0.0
  *
  * @brief Provides the initializazion of the uwtdma libraries

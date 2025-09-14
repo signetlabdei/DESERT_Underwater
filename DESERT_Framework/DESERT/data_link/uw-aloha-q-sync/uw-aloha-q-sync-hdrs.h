@@ -39,8 +39,6 @@
 #ifndef UWALOHA_Q_SYNC_HDRS
 #define UWALOHA_Q_SYNC_HDRS
 
-#include <iostream>
-#include <stdint.h>
 #include <packet.h>
 #include <vector>
 
@@ -49,9 +47,10 @@
 extern packet_t PT_ALOHAQ_SYNC_ACK;
 
 typedef struct aloha_q_sync_ACK {
-private:
-	std::vector<int> succ_macs;
+
 public:
+
+	std::vector<int> succ_macs;
 	
 	static int offset_;
 	std::vector<int> get_succ_macs()
@@ -68,7 +67,7 @@ public:
 		}	
 	}
 	inline static int &
-	get_offset()
+	offset()
 	{
 		return offset_;
 	}

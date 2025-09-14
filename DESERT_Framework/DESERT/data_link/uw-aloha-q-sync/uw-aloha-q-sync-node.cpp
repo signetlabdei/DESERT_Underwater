@@ -39,22 +39,16 @@
 #include "uw-aloha-q-sync-node.h"
 #include <iostream>
 #include <stdint.h>
+#include <rng.h>
 #include <clmsg-discovery.h>
 #include <mac.h>
 #include <uwmmac-clmsg.h>
 #include <uwcbr-module.h>
-#include <cstdlib>
-#include <cmath>
-#include <iomanip>
-#include <ctime>
 #include <vector>
-#include <queue>
 #include <algorithm>
 
 using std::vector; 
 
-
-extern packet_t PT_ALOHAQ_SYNC_ACK;
 
 /**
  * Class that represent the binding of the protocol with tcl
@@ -98,7 +92,6 @@ UwAloha_Q_Sync_NODE::UwAloha_Q_Sync_NODE()
 	, HDR_size(0)
 	, packet_sent_curr_frame(0)
 	, enable(true)
-	, name_label_("")
 	, curr_slot(0)
 	, curr_subslot(0)
 	, my_curr_slot(0)
@@ -139,11 +132,6 @@ UwAloha_Q_Sync_NODE::UwAloha_Q_Sync_NODE()
 			 << std::endl; 
 		mac2phy_delay_ = 1e-9;
 	}
-	if (guard_time <= 0) {
-		cerr << NOW << " UwALOHAQ() not valid guard_time < 0!! set to 0 by default "
-			 << std::endl; 
-		guard_time = 0;
-	}
 	if (subslot_num < 1) {
 		cerr << NOW << " UwALOHAQ() not valid subslot_num < 1!! set to 1 by default "
 			 << std::endl; 
@@ -152,48 +140,43 @@ UwAloha_Q_Sync_NODE::UwAloha_Q_Sync_NODE()
 	
 }
 
-UwAloha_Q_Sync_NODE::~UwAloha_Q_Sync_NODE()
-{
-}
 
 void
 UwAloha_Q_Sync_NODE::findMySlot()
 {
-	
-	max_arr_slot.clear();
-	max_arr_subslot.clear();
+
+	std::vector<int> max_arr_slot; 
+	std::vector<int> max_arr_subslot;
 	
 	double max = Q_table[0][0];
 	int i;
 	int j;
 	
 	for (i=0; i < nn; i++){
-	for(j=0; j < subslot_num; j++){
-		
-	    if (max < Q_table[i][j]) {
-	        max = Q_table[i][j];
-	    }
-	    }
-	}
-	
+		for(j=0; j < subslot_num; j++){		
+	    		if (max < Q_table[i][j]) {
+	        		max = Q_table[i][j];
+	    		}
+	    	}
+	}	
 	for (i=0; i < nn; i++) {
-	for (j=0; j < subslot_num; j++) {
-	    if (max == Q_table[i][j]) { 
-	        max_arr_slot.push_back(i); 
-	        max_arr_subslot.push_back(j); 
-	    }
-	    }
+		for (j=0; j < subslot_num; j++) {
+	    		if (max == Q_table[i][j]) { 
+	        		max_arr_slot.push_back(i); 
+	        		max_arr_subslot.push_back(j); 
+	    		}
+	    	}
 	}
 	int my_slot;
 	int my_subslot;
 	
 	if (max_arr_slot.size() == 1) {
-	    my_slot = max_arr_slot[0];
-	    my_subslot = max_arr_subslot[0];
+		my_slot = max_arr_slot[0];
+		my_subslot = max_arr_subslot[0];
 	} else {
-	    int pos = (rand() % max_arr_slot.size());
-	    my_slot = max_arr_slot[pos];
-	    my_subslot = max_arr_subslot[pos];
+		int pos = RNG::defaultrng()->uniform(0, max_arr_slot.size());
+		my_slot = max_arr_slot[pos];
+		my_subslot = max_arr_subslot[pos];
 	}
 	
 	my_curr_slot = my_slot;
@@ -228,8 +211,9 @@ UwAloha_Q_Sync_NODE::recvFromUpperLayers(Packet *p)
 		initPkt(p);
 		buffer.push_back(p);
 		
- 	} else {	
-		Packet::free(p);
+ 	} else {
+ 		drop(p, 1, "BUFFER_FULL");
+		//Packet::free(p);
 	}
 }
 
@@ -246,12 +230,14 @@ UwAloha_Q_Sync_NODE::txData()
 				incrDataPktsTx();
 				packet_sent_curr_frame = 1;
 			}
-		} else if (debug_) {
+		} else {
+			if (debug_) {
 				std::cout << NOW << " ALOHAQ NODE STATUS -  " << addr << 
 						" : Not in IDLE state - cannot transmit " << transceiver_status << std::endl;
+			}
 		}
-	} else if (debug_) {
-		cout << NOW << " AlohaQ(" << addr
+	} if (debug_) {
+		std::cout << NOW << " AlohaQ(" << addr
 			<< ")::already_tx sent a packet  " << std::endl;
 	}
 }
@@ -289,7 +275,7 @@ UwAloha_Q_Sync_NODE::Phy2MacStartRx(Packet *p)
 {
 
 	if (slot_status == TRANSMIT) {
-		Packet::free(p);
+		drop(p, 1, "RECEIVING_IN_TRANSMISSION_WINDOW");
 		if (debug_)
 			std::cout << NOW << " AlohaQ Node -  " << addr << 
 					" Dropped packet in transmitting frame part" << std::endl;		
@@ -311,8 +297,10 @@ UwAloha_Q_Sync_NODE::Phy2MacEndRx(Packet *p)
 {
 	transceiver_status = IDLE;
 	
-	std::cout << NOW << " AlohaQ Node -  " << addr << 
-			" Rx_ received ----- Phy2MacEndRx" << std::endl;	
+	if(debug_){
+		std::cout << NOW << " AlohaQ Node -  " << addr << 
+			" Rx_ received ----- Phy2MacEndRx" << std::endl;
+	}	
 	
 	if (transceiver_status != TRANSMITTING) {
 		hdr_cmn *ch = HDR_CMN(p);
@@ -328,10 +316,9 @@ UwAloha_Q_Sync_NODE::Phy2MacEndRx(Packet *p)
 					 	<< src_mac << std::endl;
 
 			incrErrorPktsRx();
-			Packet::free(p);
+			drop(p, 1, "CORRUPTED_PKT");
 		} else {
-			//if (dest_mac != addr && dest_mac != MAC_BROADCAST) {
-			if (dest_mac != addr && dest_mac != 0) {
+			if (dest_mac != addr && dest_mac != 0) { //0 is considered broadcast adress
 				rxPacketNotForMe(p);
 
 				if (debug_)
@@ -350,15 +337,14 @@ UwAloha_Q_Sync_NODE::Phy2MacEndRx(Packet *p)
 				std::cout << NOW << " AlohaQ Node - " << addr
 						<< " : Received NOT ACK " << src_mac << "   " << rx_pkt_type 
 						<< std::endl;
+				drop(p, 1, "RECEIVED_NOT_ACK");
 			}
-			Packet::free(p);
 		}
-	} else {
-		if (debug_)
+	} else if (debug_){
 			std::cout << NOW << " ID " << addr
-					<< ": Received packet while outside the receiving interval, dropping " 
-					<< std::endl;		
-		Packet::free(p);
+					<< ": Received packet while transmitting, dropping " 
+					<< std::endl;	
+			drop(p, 1, "TRANSCEIVER NOT IDLE");	
 	}
 
 	
@@ -366,42 +352,35 @@ UwAloha_Q_Sync_NODE::Phy2MacEndRx(Packet *p)
 
 void UwAloha_Q_Sync_NODE::stateRxAck(Packet *p, int addr)
 {
-
 	transceiver_status = IDLE;
-		if (debug_) {
-			std::cout << NOW << " ID " << addr
-					  << ": Received ACK in reception interval " << std::endl;
-		}		
-		/////PRINT ACK DATA
-		if (debug_) {
-			for (int i = 0; i < ack_data.size(); i++){
-	    			std::cout << ack_data[i] << endl;
-			}
+	if (debug_) {
+		std::cout << NOW << " ID " << addr
+				<< ": Received ACK in reception interval " << std::endl;
+	}		
+	/////PRINT ACK DATA
+	if (debug_) {
+		for (int i = 0; i < ack_data.size(); i++){
+	    		std::cout << ack_data[i] << endl;
 		}
+	}
 		
-		if (std::find(ack_data.begin(), ack_data.end(), addr)!=ack_data.end()) { 
+	if (std::find(ack_data.begin(), ack_data.end(), addr)!=ack_data.end()) { 
 			
-			incrDataPktsRx();
+		incrDataPktsRx();
 			     
-			updateQ_table(1);
-			out_file_stats << "1" << std::endl; //used for calculating convergence time			
-		} else {	
-			updateQ_table(-1);
-			out_file_stats << "0" << std::endl; //used for calculating convergence time	
-		}
-		Packet::free(p);		
+		updateQ_table(1);
+		out_file_stats << "1" << std::endl; //used for calculating convergence time			
+	} else {	
+		updateQ_table(-1);
+		out_file_stats << "0" << std::endl; //used for calculating convergence time	
+	}		
 }
 
 void
 UwAloha_Q_Sync_NODE::initPkt(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
-	hdr_mac *mach = HDR_MAC(p);
-
-	int curr_size = ch->size();
-	
-	ch->size() = curr_size + HDR_size;
-	
+	ch->size() += HDR_size;
 }
 
 void
@@ -411,7 +390,7 @@ UwAloha_Q_Sync_NODE::rxPacketNotForMe(Packet *p)
 		std::cout << NOW << "Node ID" << addr << "Packet not for me "
 				<< std::endl;
 	if (p != NULL)
-		Packet::free(p);
+		drop(p, 1, "PACKET_NOT_FOR_ME");
 }
 
 void
@@ -427,8 +406,9 @@ UwAloha_Q_Sync_NODE::handleTimerExpiration()
 	
 	if (my_curr_slot == curr_slot && my_curr_subslot == curr_subslot) {
 		txData();
-		std::cout << NOW << " ON node id " << addr << " "
-				<< std::endl;
+		if (debug_)
+			std::cout << NOW << " ON node id " << addr << " "
+					<< std::endl;
 	} else {
 		if (debug_)
 			std::cout << NOW << " ALOHAQ NODE STATUS -  " << addr << " : Not my slot!"
@@ -465,19 +445,11 @@ UwAloha_Q_Sync_NODE::start(double delay)
 {
 
 	enable = true;
-	srand((unsigned) (time(0) + addr));
-	if (sea_trial_) {
-		std::stringstream stat_file;
-		stat_file << "NODE" << addr << "_.out";
-		std::cout << stat_file.str().c_str() << std::endl;
-		out_file_stats.open(stat_file.str().c_str(), std::ios_base::app);
-
-	}
 	
 	vector<vector<double>> Q_table_template(nn, vector<double> (subslot_num, 0));
 	Q_table = Q_table_template;
 	
-	alohaq_sync_timer.sched(0);
+	alohaq_sync_timer.sched(delay);
 }
 
 void
@@ -508,10 +480,38 @@ UwAloha_Q_Sync_NODE::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "setStartTime") == 0) {
-			start_time = atof(argv[2]);
+			try {
+				start_time = std::stof(argv[2]);
+				
+				if (start_time < 0){
+					std::cerr << "Error: negative number" << std::endl;
+					return 1;
+				}
+				
+			} catch (const std::invalid_argument&){
+				std::cerr << "Error: invalid number" << std::endl;
+				return 1;
+			} catch (const std::out_of_range&){
+				std::cerr << "Error: number out of range" << std::endl;
+				return 1;
+			}
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
-			addr = atoi(argv[2]);
+			try {
+				addr = std::stoi(argv[2]);
+				
+				if (addr < 0){
+					std::cerr << "Error: negative number" << std::endl;
+					return 1;
+				}
+				
+			} catch (const std::invalid_argument&){
+				std::cerr << "Error: invalid number" << std::endl;
+				return 1;
+			} catch (const std::out_of_range&){
+				std::cerr << "Error: number out of range" << std::endl;
+				return 1;
+			}
 			if (debug_)
 				cout << "MAC address of current node is " << addr
 					 << std::endl;
