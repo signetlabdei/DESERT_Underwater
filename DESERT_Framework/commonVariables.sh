@@ -104,7 +104,7 @@ export HDF5_VERSION=1.14.2
 export HDF5_TAR_FILE=${ROOT_DESERT}/hdf5-${HDF5_VERSION}.tar.gz
 export HDF5_DIR=hdf5-${HDF5_VERSION}
 
-export WOSS_VERSION=1.14.0
+export WOSS_VERSION=1.14.1
 export WOSS_TAR_FILE=${ROOT_DESERT}/woss-${WOSS_VERSION}.tar.gz
 export WOSS_DIR=woss-${WOSS_VERSION}
 
