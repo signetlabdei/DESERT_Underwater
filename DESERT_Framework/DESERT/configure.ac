@@ -126,8 +126,6 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwtap'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdoa'
 
-
-
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
 
 #if test x$have_woss != xyes ; then
@@ -144,6 +142,50 @@ AC_SUBST(DESERT_CPPFLAGS)
 AC_SUBST(DESERT_LDFLAGS) 
 
 AC_SUBST(DESERT_LIBADD)
+
+
+DESERT_UWINTERFERENCE_LIBADD='$(top_builddir)/interference/uwinterference/libuwinterference.la'
+DESERT_UWSTATS_UTILITIES_LIBADD='$(top_builddir)/statistics/uwstats_utilities/libuwstats_utilities.la'
+DESERT_MSGDISPLAY_LIBADD='$(top_builddir)/utility/msg-display/libmsgdisplay.la'
+DESERT_UWOPTICAL_PROPAGATION_LIBADD='$(top_builddir)/propagation/uwoptical_propagation/libuwoptical_propagation.la'
+DESERT_UWSMPOSITION_LIBADD='$(top_builddir)/mobility/uwsmposition/libuwsmposition.la'
+DESERT_UWAL_LIBADD='$(top_builddir)/physical/uw-al/libuwal.la'
+DESERT_UWMODEM_LIBADD='$(top_builddir)/physical/uwmodem/libuwmodem.la'
+DESERT_UWCONNECTOR_LIBADD='$(top_builddir)/physical/uwconnector/libuwconnector.la'
+DESERT_UWPHY_CLMSGS_LIBADD='$(top_builddir)/physical/uwphy_clmsgs/libuwphy_clmsgs.la'
+DESERT_UWPHYSICAL_LIBADD='$(top_builddir)/physical/uwphysical/libuwphysical.la'
+DESERT_UWOFDMPHY_LIBADD='$(top_builddir)/physical/uwofdmphy/libuwofdmphy.la'
+DESERT_UWOPTICAL_PHY_LIBADD='$(top_builddir)/physical/uwoptical_phy/libuwoptical_phy.la'
+DESERT_UWIP_LIBADD='$(top_builddir)/network/uwip/libuwip.la'
+DESERT_UWUDP_LIBADD='$(top_builddir)/transport/uwudp/libuwudp.la'
+DESERT_UWCBR_LIBADD='$(top_builddir)/application/uwcbr/libuwcbr.la'
+DESERT_UWMMAC_CLMSGS_LIBADD='$(top_builddir)/data_link/uwmmac_clmsgs/libuwmmac_clmsgs.la'
+DESERT_UWTDMA_LIBADD='$(top_builddir)/data_link/uwtdma/libuwtdma.la'
+DESERT_UWEM_CHANNEL_LIBADD='$(top_builddir)/channel/uwem_channel/libuwem_channel.la'
+DESERT_UWTOKENBUS_LIBADD='$(top_builddir)/data_link/uwtokenbus/libuwtokenbus.la'
+DESERT_UWTAP_LIBADD='$(top_builddir)/ranging/uwtap/libuwtap.la'
+
+AC_SUBST(DESERT_UWINTERFERENCE_LIBADD)
+AC_SUBST(DESERT_UWSTATS_UTILITIES_LIBADD)
+AC_SUBST(DESERT_MSGDISPLAY_LIBADD)
+AC_SUBST(DESERT_UWOPTICAL_PROPAGATION_LIBADD)
+AC_SUBST(DESERT_UWSMPOSITION_LIBADD)
+AC_SUBST(DESERT_UWAL_LIBADD)
+AC_SUBST(DESERT_UWMODEM_LIBADD)
+AC_SUBST(DESERT_UWCONNECTOR_LIBADD)
+AC_SUBST(DESERT_UWPHY_CLMSGS_LIBADD)
+AC_SUBST(DESERT_UWPHYSICAL_LIBADD)
+AC_SUBST(DESERT_UWOFDMPHY_LIBADD)
+AC_SUBST(DESERT_UWOPTICAL_PHY_LIBADD)
+AC_SUBST(DESERT_UWIP_LIBADD)
+AC_SUBST(DESERT_UWUDP_LIBADD)
+AC_SUBST(DESERT_UWCBR_LIBADD)
+AC_SUBST(DESERT_UWMMAC_CLMSGS_LIBADD)
+AC_SUBST(DESERT_UWTDMA_LIBADD)
+AC_SUBST(DESERT_UWEM_CHANNEL_LIBADD)
+AC_SUBST(DESERT_UWTOKENBUS_LIBADD)
+AC_SUBST(DESERT_UWTAP_LIBADD)
+
 
 AC_DEFINE(CPP_NAMESPACE,std) 
 

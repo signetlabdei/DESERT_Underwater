@@ -44,8 +44,8 @@ libuwpolling_la_SOURCES = initlib.cpp\
 libuwpolling_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwpolling_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libuwpolling_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
-						 $(top_builddir)/application/uwcbr/libuwcbr.la \
-						 $(top_builddir)/physical/uwphy_clmsgs/libuwphy_clmsgs.la
+						 @DESERT_UWCBR_LIBADD@ \
+						 @DESERT_UWPHY_CLMSGS_LIBADD@
 
 nodist_libuwpolling_la_SOURCES = InitTcl.cc
 

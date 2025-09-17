@@ -36,7 +36,7 @@ libuwsmartofdm_la_SOURCES = initlib.cpp uw-smart-ofdm.h uw-smart-ofdm.cpp
 libuwsmartofdm_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwsmartofdm_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libuwsmartofdm_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
-							 $(top_builddir)/physical/uwofdmphy/libuwofdmphy.la
+							 @DESERT_UWOFDMPHY_LIBADD@
 
 
 nodist_libuwsmartofdm_la_SOURCES = embeddedtcl.cc

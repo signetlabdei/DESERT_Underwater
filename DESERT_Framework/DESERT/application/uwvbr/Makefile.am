@@ -43,7 +43,7 @@ libuwvbr_la_SOURCES = initlib.cpp\
 libuwvbr_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwvbr_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libuwvbr_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
-					 $(top_builddir)/transport/uwudp/libuwudp.la
+					 @DESERT_UWUDP_LIBADD@
 
 nodist_libuwvbr_la_SOURCES = InitTcl.cc
 

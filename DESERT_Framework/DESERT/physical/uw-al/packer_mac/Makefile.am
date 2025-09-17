@@ -36,7 +36,7 @@ libpackermac_la_SOURCES = packer-mac.cpp initlib.cpp
 libpackermac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libpackermac_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libpackermac_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
-						 $(top_builddir)/physical/uw-al/libuwal.la
+						 @DESERT_UWAL_LIBADD@
 
 nodist_libpackermac_la_SOURCES = initTcl.cc
 
