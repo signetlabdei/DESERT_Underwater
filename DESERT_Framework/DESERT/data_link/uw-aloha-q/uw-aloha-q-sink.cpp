@@ -243,26 +243,23 @@ UwAloha_Q_SINK::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
-		if (strcasecmp(argv[1], "setMacAddr") == 0) {
-			try {
-				addr = std::stoi(argv[2]);
-				
+		if (strcasecmp(argv[2], "setMacAddr") == 0) {
+			std::stringstream ss(argv[2]);
+			int ma;
+			
+			if (ss >> ma){
+				addr = ma;
+			
 				if (addr < 0){
-					std::cerr << "Error: negative number" << std::endl;
-					return 1;
+					tcl.resultf("Error: negative number");
+					return TCL_ERROR;
 				}
-				
-			} catch (const std::invalid_argument&){
-				std::cerr << "Error: invalid number" << std::endl;
-				return 1;
-			} catch (const std::out_of_range&){
-				std::cerr << "Error: number out of range" << std::endl;
-				return 1;
+			
+				return TCL_OK;
 			}
-			if (debug_)
-				cout << "Sink MAC addres is " << addr
-					 << std::endl;
-			return TCL_OK;
+		
+			tcl.resultf("Error: invalid number");
+			return TCL_ERROR;
 		} 
 		else if (strcasecmp(argv[1], "setPhyAckTag") == 0) {
 			phy_ack_tag = argv[2];
