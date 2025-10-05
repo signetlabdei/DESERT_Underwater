@@ -178,6 +178,7 @@ AC_CONFIG_FILES([
     data_link/uwtdma/Makefile
     data_link/uwtdma-frame/Makefile
     data_link/uwtokenbus/Makefile
+    data_link/uwtwr/Makefile
     physical/uwmodem/Makefile
     physical/uwmodemcsa/Makefile
     physical/uwconnector/Makefile
