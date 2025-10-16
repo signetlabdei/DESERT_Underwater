@@ -476,8 +476,6 @@ build_NSMIRACLE() {
     ln -sf tcl-${TCL_VERSION}/generic include
     cd - > "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
 
-    info_L2 "patch      [$*]"
-    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/nsmiracle-trunk-fix-libs-dependence.patch >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ -e Makefile ]; then
         make distclean >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     fi

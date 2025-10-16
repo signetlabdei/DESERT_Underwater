@@ -438,20 +438,18 @@ build_NS() {
 # (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NSMIRACLE() {
-    info_L1 "nsmiracle-${NSMIRACLE_VERSION}"
+    info_L1 "${NSMIRACLE_DIR}"
     start="$(date +%s)"
 
     cd ..
     ln -sf tcl-${TCL_VERSION}/generic include
-    cd - > "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    cd - > "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
 
-    info_L2 "patch      [$*]"
-    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/nsmiracle-trunk-fix-libs-dependence.patch >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ -e Makefile ]; then
-        make distclean >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+        make distclean >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     fi
 
-    ./autogen.sh >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    ./autogen.sh >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     info_L2 "configure  [$*]"
     # export ARCH="arm-linux-gnu"
     CXXFLAGS="-Wno-write-strings"                     \
@@ -463,25 +461,25 @@ build_NSMIRACLE() {
                 --build=${HOST}                       \
                 --with-ns-allinone=${currentBuildLog} \
                 --prefix=${DEST_FOLDER}               \
-                >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+                >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the configuration of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the configuration of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
 
     info_L2 "make       [$*]"
-    make >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    make >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the compilation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the compilation of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
 
-    make install-strip >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    make install-strip >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the installation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the installation of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -530,7 +528,7 @@ build_DESERT() {
                                            --host=${ARCH}                                                     \
                                            --build=${HOST}                                                    \
                                            --with-ns-allinone=${currentBuildLog}                              \
-                                           --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION} \
+                                           --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR} \
                                            --prefix=${DEST_FOLDER}                                            \
                                            >> "${currentBuildLog}/desert-${DESERT_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
@@ -607,7 +605,7 @@ build_DESERT_addon() {
                                             --host=$ARCH                                                                         \
                                             --build=$HOST                                                                        \
                                             --with-ns-allinone=${currentBuildLog}                                                \
-                                            --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}                   \
+                                            --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}                   \
                                             --with-desert=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-src                     \
                                             --with-desert-build=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-build             \
                                             --with-desertAddon=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-src         \
@@ -620,7 +618,7 @@ build_DESERT_addon() {
                                             --host=$ARCH                                                                         \
                                             --build=$HOST                                                                        \
                                             --with-ns-allinone=${currentBuildLog}                                                \
-                                            --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}                   \
+                                            --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}                   \
                                             --with-desert=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-src                     \
                                             --with-desert-build=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-build             \
                                             --with-desertAddon=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-src         \
