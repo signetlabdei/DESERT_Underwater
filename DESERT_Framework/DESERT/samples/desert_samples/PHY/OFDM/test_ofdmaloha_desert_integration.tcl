@@ -91,7 +91,6 @@ load libuwinterference.so
 load libuwinterferenceofdm.so
 load libuwphy_clmsgs.so
 load libUwmStd.so
-load libUwmStdPhyBpskTracer.so
 load libuwstats_utilities.so
 load libuwphysical.so
 load libmsgdisplay.so
