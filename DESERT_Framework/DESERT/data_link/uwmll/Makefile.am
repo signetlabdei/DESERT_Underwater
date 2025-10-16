@@ -39,7 +39,8 @@ libuwmll_la_SOURCES = uwmll-module.cpp \
 
 libuwmll_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@  @DESERT_CPPFLAGS@
 libuwmll_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@  @DESERT_LDFLAGS@
-libuwmll_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@  @DESERT_LIBADD@
+libuwmll_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@  @DESERT_LIBADD@ \
+					 @DESERT_UWIP_LIBADD@
 
 nodist_libuwmll_la_SOURCES = UWMllInitTcl.cc
 

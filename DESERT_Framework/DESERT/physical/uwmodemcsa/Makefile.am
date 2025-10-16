@@ -40,7 +40,10 @@ libuwmodemcsa_la_SOURCES = initlib.cpp \
 
 libuwmodemcsa_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwmodemcsa_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwmodemcsa_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwmodemcsa_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						  @DESERT_UWAL_LIBADD@ \
+						  @DESERT_UWMODEM_LIBADD@ \
+						  @DESERT_UWCONNECTOR_LIBADD@
 
 nodist_libuwmodemcsa_la_SOURCES = initTcl.cc
 BUILT_SOURCES = initTcl.cc

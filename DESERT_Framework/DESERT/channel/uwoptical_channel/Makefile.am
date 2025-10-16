@@ -35,7 +35,8 @@ libuwoptical_channel_la_SOURCES = initlib.cpp uwoptical-channel.cpp
 
 libuwoptical_channel_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwoptical_channel_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwoptical_channel_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwoptical_channel_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+								 @DESERT_UWEM_CHANNEL_LIBADD@
 
 nodist_libuwoptical_channel_la_SOURCES = InitTcl.cc
 

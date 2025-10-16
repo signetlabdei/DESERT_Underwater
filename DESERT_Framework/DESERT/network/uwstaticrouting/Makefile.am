@@ -50,7 +50,8 @@ libuwstaticrouting_la_SOURCES = initlib.cpp\
 
 libuwstaticrouting_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwstaticrouting_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwstaticrouting_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwstaticrouting_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							   @DESERT_UWIP_LIBADD@
 
 nodist_libuwstaticrouting_la_SOURCES = InitTcl.cc
 

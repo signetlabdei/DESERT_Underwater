@@ -35,7 +35,8 @@ libuwopticalbeampattern_la_SOURCES = initlib.cpp uwopticalbeampattern.cpp
 
 libuwopticalbeampattern_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwopticalbeampattern_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwopticalbeampattern_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwopticalbeampattern_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+									@DESERT_UWOPTICAL_PHY_LIBADD@
 
 nodist_libuwopticalbeampattern_la_SOURCES = InitTcl.cc
 
