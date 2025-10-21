@@ -498,7 +498,7 @@ UwAloha_Q_Sync_NODE::command(int argc, const char *const *argv)
 			tcl.resultf("Error: invalid number");
 			return TCL_ERROR;
 		
-		} else if (strcasecmp(argv[2], "setMacAddr") == 0) {
+		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
 			std::stringstream ss(argv[2]);
 			int ma;
 			

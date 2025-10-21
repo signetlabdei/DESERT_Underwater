@@ -485,7 +485,7 @@ UwAloha_Q_NODE::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
-		if (strcasecmp(argv[2], "setStartTime") == 0) {
+		if (strcasecmp(argv[1], "setStartTime") == 0) {
 			std::stringstream ss(argv[2]);
 			double st;
 			
@@ -503,7 +503,7 @@ UwAloha_Q_NODE::command(int argc, const char *const *argv)
 			tcl.resultf("Error: invalid number");
 			return TCL_ERROR;
 		
-		} else if (strcasecmp(argv[2], "setMacAddr") == 0) {
+		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
 			std::stringstream ss(argv[2]);
 			int ma;
 			

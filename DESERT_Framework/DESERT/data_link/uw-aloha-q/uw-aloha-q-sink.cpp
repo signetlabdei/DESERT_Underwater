@@ -243,7 +243,7 @@ UwAloha_Q_SINK::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 3) {
-		if (strcasecmp(argv[2], "setMacAddr") == 0) {
+		if (strcasecmp(argv[1], "setMacAddr") == 0) {
 			std::stringstream ss(argv[2]);
 			int ma;
 			
