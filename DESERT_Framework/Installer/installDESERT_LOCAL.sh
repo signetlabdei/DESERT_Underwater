@@ -268,14 +268,14 @@ build_OTCL() {
     mv configure.in configure.ac
     #---
     autoreconf >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
-    CFLAGS=-I../tcl-${TCL_VERSION}/unix/
 
     info_L2 "configure  [$*]"
+    CFLAGS="-I../tcl-${TCL_VERSION}/unix/ -I../tcl-${TCL_VERSION}/generic/" \
     ./configure --target=${ARCH}                  \
                 --host=${ARCH}                    \
                 --build=${HOST}                   \
                 --with-tcl=../tcl-${TCL_VERSION}/ \
-                --with-tcl-ver=8.4                \
+                --with-tcl-ver=8.5                \
                 --exec-prefix=${DEST_FOLDER}      \
                 >> "${currentBuildLog}/otcl-${OTCL_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
@@ -329,13 +329,13 @@ build_TCLCL() {
     #---
     info_L2 "autoreconf [$*]"
     autoreconf >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
-    CFLAGS=-I../tcl-${TCL_VERSION}/unix/
     info_L2 "configure  [$*]"
+    CFLAGS="-I../tcl-${TCL_VERSION}/unix/ -I../tcl-${TCL_VERSION}/generic/" \
     ./configure --target=${ARCH}                    \
                 --host=${ARCH}                      \
                 --build=${HOST}                     \
                 --with-tcl=../tcl-${TCL_VERSION}/   \
-                --with-tcl-ver=8.4                  \
+                --with-tcl-ver=8.5                  \
                 --with-zlib=${DEST_FOLDER} \
                 --exec-prefix=${DEST_FOLDER}        \
                 >> "${currentBuildLog}/tclcl-${TCLCL_VERSION}-$*.log"  2>&1
@@ -400,7 +400,7 @@ build_NS() {
                 --host=${ARCH}                                         \
                 --build=${HOST}                                        \
                 --with-tcl=${currentBuildLog}/tcl-${TCL_VERSION}       \
-                --with-tcl-ver=8.4                                     \
+                --with-tcl-ver=8.5                                     \
                 --with-otcl=${currentBuildLog}/otcl-${OTCL_VERSION}    \
                 --with-tclcl=${currentBuildLog}/tclcl-${TCLCL_VERSION} \
                 --prefix=${DEST_FOLDER}                                \
@@ -459,20 +459,18 @@ build_NS() {
 # (v) add the "return check" after each compile command. Moreover add "tail -n 50" command when a error compile happen.
 #*
 build_NSMIRACLE() {
-    info_L1 "nsmiracle-${NSMIRACLE_VERSION}"
+    info_L1 "${NSMIRACLE_DIR}"
     start="$(date +%s)"
 
     cd ..
     ln -sf tcl-${TCL_VERSION}/generic include
-    cd - > "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    cd - > "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
 
-    info_L2 "patch      [$*]"
-    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/nsmiracle-trunk-fix-libs-dependence.patch >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
     if [ -e Makefile ]; then
-        make distclean >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+        make distclean >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     fi
 
-    ./autogen.sh >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    ./autogen.sh >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     info_L2 "configure  [$*]"
     CXXFLAGS="-Wno-write-strings"                     \
     CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"      \
@@ -482,25 +480,25 @@ build_NSMIRACLE() {
                 --build=${HOST}                       \
                 --with-ns-allinone=${currentBuildLog} \
                 --prefix=${DEST_FOLDER}               \
-                >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+                >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the configuration of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the configuration of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
 
     info_L2 "make       [$*]"
-    make >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    make >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the compilation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the compilation of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
 
-    make install-strip >> "${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log"  2>&1
+    make install-strip >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
-        err_L1 "Error during the installation of nsmiracle-${NSMIRACLE_VERSION}! Exiting ..."
-        tail -n 50 ${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}-$*.log
+        err_L1 "Error during the installation of ${NSMIRACLE_DIR}! Exiting ..."
+        tail -n 50 ${currentBuildLog}/${NSMIRACLE_DIR}-$*.log
         exit 1
     fi
     elapsed=`expr $(date +%s) - $start`
@@ -548,7 +546,7 @@ build_DESERT() {
                                            --host=${ARCH}                                                     \
                                            --build=${HOST}                                                    \
                                            --with-ns-allinone=${currentBuildLog}                              \
-                                           --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION} \
+                                           --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}               \
                                            --prefix=${DEST_FOLDER}                                            \
                                            >> "${currentBuildLog}/desert-${DESERT_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
@@ -628,7 +626,7 @@ build_DESERT_addon() {
                                             --host=$ARCH                                                                         \
                                             --build=$HOST                                                                        \
                                             --with-ns-allinone=${currentBuildLog}                                                \
-                                            --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}                   \
+                                            --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}                                 \
                                             --with-desert=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-src                     \
                                             --with-desert-build=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-build             \
                                             --with-desertAddon=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-src         \
@@ -645,7 +643,7 @@ build_DESERT_addon() {
                                             --host=$ARCH                                                                         \
                                             --build=$HOST                                                                        \
                                             --with-ns-allinone=${currentBuildLog}                                                \
-                                            --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION}                   \
+                                            --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}                                   \
                                             --with-desert=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-src                     \
                                             --with-desert-build=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-build             \
                                             --with-desertAddon=${DEST_FOLDER}/${DESERT_DIR}-${DESERT_VERSION}-ADDONS-src         \
@@ -898,16 +896,17 @@ build_WOSS() {
     info_L1 "woss-$WOSS_VERSION"
     start="$(date +%s)"
 
+    info_L2 "patch      [$*]"
     if [ -f Makefile ]; then
         make distclean > "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     fi
-    # In case of patches...
-    #patch -p1 -i $PATCHES_DIR/woss-1.2.0-fix-gcc-4.7.patch >> "$LOG_DIR/woss.log" 2>&0
-    #if [ $? -ne 0 ]
-    #then
+
+    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/woss-remove-nsmiracle-extra-deps.patch >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"  2>&1
+    # if [ $? -ne 0 ]
+    # then
     #    print_error "woss-$WOSS_VERSION error during patching! Exiting ..."
     #    exit
-    #fi
+    # fi
     ./autogen.sh >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     printf ">>>\n" >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"
     ./autogen.sh >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
@@ -920,14 +919,14 @@ build_WOSS() {
     CXXFLAGS="-Wno-write-strings"                                                  \
     CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                                   \
       CFLAGS="-Wno-write-strings"                                                  \
-    CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx               \
+    CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx              \
      LDFLAGS=-L${DEST_FOLDER}/lib                                                  \
     ./configure --target=${ARCH}                                                   \
                 --host=${ARCH}                                                     \
                 --build=${HOST}                                                    \
                 --with-ns-allinone=${currentBuildLog}                              \
-                --with-nsmiracle=${currentBuildLog}/nsmiracle-${NSMIRACLE_VERSION} \
-                --with-netcdf4=${DEST_FOLDER}                                       \
+                --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}               \
+                --with-netcdf4=${DEST_FOLDER}                                      \
                 --with-pthread                                                     \
                 --prefix=${DEST_FOLDER}                                            \
                 >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1

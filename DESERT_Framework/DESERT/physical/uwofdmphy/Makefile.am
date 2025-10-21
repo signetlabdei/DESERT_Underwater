@@ -41,7 +41,9 @@ libuwofdmphy_la_SOURCES = initlib.cpp\
 
 libuwofdmphy_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwofdmphy_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwofdmphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwofdmphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+						 @DESERT_UWPHYSICAL_LIBADD@ \
+						 @DESERT_MSGDISPLAY_LIBADD@
 
 nodist_libuwofdmphy_la_SOURCES = InitTcl.cc
 BUILT_SOURCES = InitTcl.cc

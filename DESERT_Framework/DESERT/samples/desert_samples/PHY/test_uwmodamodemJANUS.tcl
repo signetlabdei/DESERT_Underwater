@@ -48,7 +48,6 @@ load libuwstaticrouting.so
 load libuwmll.so
 load libuwudp.so
 load libuwapplication.so
-load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so

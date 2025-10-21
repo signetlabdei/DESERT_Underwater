@@ -518,16 +518,16 @@ This middleware, provides:
 /** \page DEV Developer guide
 
 \section desstruct	DESERT Structure
-The DESERT underwater framework is an extension of [ns-miracle](https://signet.dei.unipd.it/dgt/ns/miracle/doxygen/index.html), thus it inherits its modular structure and can directly use all the modules of such framework.
-Each DESERT module extends from the ns-miracle class Module, which in turn extends from the class PlugIn.
-They provide basic APIs to (i) send packets to upper/lower layers, (ii) communicate via crosslayer messages with other layers of the stack and (iii) configure the layer via tcl script (command and bind).
-
-The folder structure is composed by two main folders: DESERT_Framework and DESERT_Addons.
-Inside the former, you find all the modules organized according to the ISO/OSI stack and the installer folder.
-While the latter contains external modules which doesn't necessarily fit inside the ISO/OSI stack and/or the DESERT core.
+The DESERT Underwater Framework is an extension of [ns-miracle](https://signet.dei.unipd.it/dgt/ns/miracle/doxygen/index.html). It inherits the modular structure and allows the use of all the modules of ns-miracle.
+Each DESERT module extends the `Module` class, which in turn extends the `PlugIn` class.
+These classes provide basic APIs to (i) send packets to upper/lower layers, (ii) communicate via cross-layer messages with other layers of the stack, and (iii) configure the layer via Tcl script.
+<br>
+The folder structure is composed of two main folders: 
+- <b>DESERT_Framework</b>: contains the DESERT folder, which groups all the core modules organized according to the ISO/OSI protocol stack and the installer folder. For brevity, we refer to the path `DESERT_Underwater/DESERT_Framework/DESERT` as `DES_CORE`.
+- <b>DESERT_Addons</b>: contains external modules that do not necessarily fit within the ISO/OSI stack and/or the DESERT core.
 
 \section howtcl How to create a new tcl script
-In this section we describe how to write a basic DESERT tcl script, following the structure of the tcl found in `DESERT/samples/desert_samples/test_uwcbr.tcl`.
+In this section we describe how to write a basic Tcl script, following the structure of the script found in `DES_CORE/samples/desert_samples/test_uwcbr.tcl`.
 
 It is a good practice to start your script with a brief description and a simple draw of the simulated network topology:
 \code{.tcl}
@@ -720,26 +720,27 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1} {
 }
 \endcode
 
-Optionally, it is good practice to add a finish procedure where display the simulation settings and compute some statistics.
+Optionally, it is good practice to add a finish procedure that displays the simulation settings and computes relevant statistics.
 
 \section howmod How to add a new module
-In this section we describe how to add a new module in the DESERT core (i.e., into the DESERT_Framework/DESERT directory.) 
-As an example we present the creation of a new module (i.e., a library containing a new DESERT module) named `uwcool_phy`. The procedure to create a new module is described in the following.
+In this section, we describe how to add a new module to the DESERT core (i.e., into the DES_CORE directory). 
+As an example, we present the creation of a new module (a library containing a new DESERT module) named `uwcool_phy`.
 
-The folder structure aims to follow ISO/OSI structure.
-First of all, identify where your module can be logically placed and give  it a name, in this case, our new `uwcool_phy` physical layer module should stay inside  `DESERT_Framework/DESERT/physical` folder, therefore you need to cd to that directory and create a folder named `uwcool_phy`.
-This folder will contain your new library.
-
-Create two files called `uwcoolphy.h` and `uwcoolphy.cpp` files containing your class definition `UwCoolPhy`.
-For this class to work, some types of binding are necessary.
-Moreover you will need to create the following files:
+According to the ISO/OSI structure, our new protocol belongs to the physical layer. 
+First, change directory to `DES_CORE/physical` and create a folder named `uwcool_phy`, which will contain your new module.
+Then, change directory to the just created folder and create two files called `uwcoolphy.h` and `uwcoolphy.cpp`, which will contain the class definition `UwCoolPhy`.
+<br>
+You will also need to create the following files:
 
 - `initlib.cpp`,
+- `uwcoolphy-defaults.tcl`.
 - `Makefile.am`,
-- `uwcoolphy-default.tcl`.
 
-In order to use your class with tcl, in the cpp file you always need to create a **static** class that derives from `TclClass` and gives the name that will be used from tcl to create and bind an object of that module.
-In our example it would be done via the following code:
+For this class to work, some types of bindings are necessary.
+<br>
+Inside `uwcoolphy.cpp`, you must always create a **static** class variable that derives from `TclClass` and defines the name that will be used in Tcl to create and bind an object of this module.
+<br>
+In our example, this is done with the following code:
 
 \code{cpp} 
 
@@ -759,8 +760,8 @@ In our example it would be done via the following code:
 
 \endcode
 
-Then we need to link class parameters to tcl variables, this is usually done in the cpp constructor, using the `bind()` function.
-This function take as input a string representing a tcl variable which is bound to the second input, which represents a cpp class parameter.
+Then, we need to link the class parameters to Tcl variables. This is usually done in the `.cpp` constructor using the `bind()` function.
+This function takes as input a string representing a Tcl variable, which is bound to the second argument, a cpp class parameter.
 
 \code{.cpp}
 
@@ -769,14 +770,17 @@ This function take as input a string representing a tcl variable which is bound 
 \endcode
 \code{.tcl}
 
-	Module/UW/CoolPhy set debug 1			# inside uwcoolphy-init.tcl
+	Module/UW/CoolPhy set debug 1			# inside a tcl script
 
 \endcode
 
-The `initlib.cpp` file make *the connection* between the cpp library of your module and the tcl representing your scenario under simulation/emulation.
-You need to define an extern variable representing an **EmbeddedTcl** object, which has a specific name structure: `<ModuleNameInCamelCase><TclCode>`.
-You need also to define a function with fixed naming, which is the name of your module with the first capital letter and `_Init` suffix.
-Following our example, your `initlib.cc` will look like this:
+The `initlib.cpp` file creates the connection between the cpp library of your module and the Tcl representing your simulation/emulation scenario.
+To do so, you need to define an **extern** variable representing an **EmbeddedTcl** object, which folllows the naming convention: `<ModuleNameInCamelCase><TclCode>`.
+<br>
+You also need to define an **extern** function that translates Tcl modules into cpp code to speed up the simulation.
+This function must be named after the module, starting with an uppercase letter, followed by the `_Init` suffix.
+<br>
+Following our example, your `initlib.cc` should look like this:
 
 \code{.cpp}
 
@@ -794,21 +798,22 @@ Following our example, your `initlib.cc` will look like this:
 \endcode
 
 All bound variables need to be initialized to a default value in the `uwcoolphy-defaults.tcl` file.
-An example of it would be
+<br>
+For instance:
 
 \code{.tcl}
 
 	Module/UW/CoolPhy set BitRate					32500
 	Module/UW/CoolPhy set AcquisitionThreshold_dB_	10.0
-	Module/UW/CoolPhy set debug_					0
+	Module/UW/CoolPhy set debug						0
 
 \endcode
 
-Finally, to compile your module, you need to fill the `Makefile.am` file:
+To compile your module, you need to fill the `Makefile.am` file:
 - There should be the definition of your library. The name of your library should always contain *lib* prefix, i.e., `libuwcoolphy`.
 - Specify the list of sources (`libuwcool_phy_la_SOURCES`), which should contain only the cpp files located in the `uwcool_phy` folder.
 - Remember to define the `CPPFLAGS`, `LDFLAGS` and `LIBADD` where needed.
-- Define the tcl files variables defaults which are specified inside `uwcool-phy-default.tcl`.
+- Define the tcl files variables defaults which are specified inside `uwcool-phy-defaults.tcl`.
 
 Your `Makefile.am` should look like this:
 
@@ -836,28 +841,53 @@ Your `Makefile.am` should look like this:
 
 \endcode
 
-DESERT compilation and linking is based on autotools, hence to add a new library you need to modify the top-level `DESERT_Framework/DESERT/Makefile.am` and `DESERT_Framework/DESERT/configure.ac` files as follows:
-- `Makefile.am`: we need to add our folder to the subdirectories list (SUBDIRS) using \ as a separator
-- `configure.ac`: we need to add our new folder to the CPPFLAGS and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is
+DESERT compilation and linking is based on autotools. 
+Specifically, to add a new library, you need to modify the top-level `DES_CORE/Makefile.am` and `DES_CORE/configure.ac` files as follows:
+- `Makefile.am`: add your folder to the list of subdirectories (SUBDIRS), using \ as a separator. The order of the list also determines the compilation order; if your module depends on another module (i.e., it inclludes headers from another modulle), it should be listed after that. 
+- `configure.ac`: add your new folder to the CPPFLAGS, and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is.
 
+In our example:
+
+`DES_CORE/Makefile.am`
 \code{.am}
 
-		… \
+[...]
+SUBDIRS = m4 \
+		... \
+		data_link/uwcool_mac \
         physical/uwcool_phy
 
 \endcode
 
+`DES_CORE/configure.ac`
 \code{.ac}
 
-    […]
+    [...]
     DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
-    […]
+    [...]
     AC_CONFIG_FILES=([
     [...]
     physical/uwcool_phy
     [...]
     ])
 
+\endcode
+
+Suppose now, that your module depends on anoter one called `UwCoolMac`.
+You also have to modify the `libuwcoolphy_la_LIBADD` flag of the module `Makefile.am` as follows.
+\code{.am}
+
+	libuwcoolphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							@DESERT_UWCOOLMAC_LIBADD@
+
+\endcode
+
+Where the variable `@DESERT_UWCOOLMAC_LIBADD@` is defined inside the top-level `configure.ac` (if not, you need to manually define it):
+\code{.ac}
+
+	DESERT_UWCOOLMAC_LIBADD='$(top_builddir)/data_link/uwcoolmac/libuwcoolmac.la'
+    [...]
+	AC_SUBST(DESERT_UWCOOLMAC_LIBADD)
 \endcode
 
 Once everything is ready, we need to reinstall DESERT to properly add the new module.
@@ -991,7 +1021,7 @@ For instance, suppose, you have a tcl file, with one transmitting node and one s
 It will print all the `coolphy` log messages inside a file called `log_output.txt`.
 Each message has an `id` associated with it, which is the ns id of the node and is incremental set, e.g., the first node created will have `id` 0, the second `id` 1 and so on.
 
-Note: You can find a complete example on how to use the logging system inside `DESERT/samples/desert_samples/logger/` folder.
+Note: You can find a complete example on how to use the logging system inside `DES_CORE/samples/desert_samples/logger/` folder.
 
 \section newheader How to add a new Packet headers
 
