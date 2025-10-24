@@ -37,7 +37,9 @@ libuwalohaq_la_SOURCES = initlib.cpp \
 
 libuwalohaq_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwalohaq_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwalohaq_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwalohaq_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+                          @DESERT_UWMMAC_CLMSGS_LIBADD@ \
+                          @DESERT_UWCBR_LIBADD@
 
 
 nodist_libuwalohaq_la_SOURCES = initTcl.cc
