@@ -27,12 +27,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-<<<<<<< HEAD
 AC_INIT(DESERT,3.6.1)
-
-=======
-AC_INIT(DESERT,3.4.1)
->>>>>>> bab85ff (updated top-level Makefile.am and configure.ac files)
 AM_INIT_AUTOMAKE 
 AM_PROG_AR
 
@@ -118,56 +113,16 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-ofdm-aloha'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-smart-ofdm'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwsr'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-t-lohi'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q-sync'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-csma-aloha-trigger'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwUFetch'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-aloha-q-sync'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma-frame'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtokenbus'
-<<<<<<< HEAD
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwjammer'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwem_channel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
-=======
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodem'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodemcsa'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwconnector'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwevologicss2cmodem'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmphypatch'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysical'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhmmphysical'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalrogersmodel'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwgainfromdb'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicaldb'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalfromdb'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_common'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uw-al/packer_mac'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphysicalracun'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwhermesphy'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwofdmphy'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoimodem'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodamodem'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwphy_clmsgs'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_phy'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_antenna'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/utility/msg-display'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwdriftposition'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwgmposition'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwrandomlib'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/mobility/uwsmposition'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterference'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceofdm'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwoptical_propagation'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/propagation/uwem_propagation'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwem_channel'
-DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/statistics/uwstats_utilities'
->>>>>>> 63d4330 (Added two Q-learning based MAC protocols - uw_alohaq and uw_alohaq_sync)
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwtap'
@@ -304,48 +259,9 @@ AC_CONFIG_FILES([
     data_link/uwtdma/Makefile
     data_link/uwtdma-frame/Makefile
     data_link/uwtokenbus/Makefile
-<<<<<<< HEAD
     data_link/uwjammer/Makefile
     channel/uwem_channel/Makefile
     channel/uwoptical_channel/Makefile
-=======
-    physical/uwmodem/Makefile
-    physical/uwmodemcsa/Makefile
-    physical/uwconnector/Makefile
-    physical/uwevologicss2cmodem/Makefile
-    physical/uwmphypatch/Makefile
-    physical/uwphysical/Makefile
-    physical/uwhmmphysical/Makefile
-    physical/uwphysicalrogersmodel/Makefile
-    physical/uwgainfromdb/Makefile
-    physical/uwphysicaldb/Makefile
-    physical/uwphysicalfromdb/Makefile
-    physical/uw-al/Makefile
-    physical/uw-al/packer_common/Makefile
-    physical/uw-al/packer_mac/Makefile    
-    physical/uwhermesphy/Makefile
-    physical/uwofdmphy/Makefile
-    physical/uwahoi_phy/Makefile
-    physical/uwahoimodem/Makefile
-    physical/uwmodamodem/Makefile
-    physical/uwoptical_phy/Makefile
-    physical/uwopticalbeampattern/Makefile
-    physical/uwphy_clmsgs/Makefile
-    physical/uwem_phy/Makefile
-    physical/uwem_antenna/Makefile
-    utility/msg-display/Makefile
-    mobility/uwdriftposition/Makefile
-    mobility/uwgmposition/Makefile
-    mobility/uwrandomlib/Makefile
-    mobility/uwsmposition/Makefile
-    interference/uwinterference/Makefile
-    interference/uwinterferenceofdm/Makefile
-    propagation/uwoptical_propagation/Makefile
-    propagation/uwem_propagation/Makefile
-    channel/uwoptical_channel/Makefile
-    channel/uwem_channel/Makefile
-    statistics/uwstats_utilities/Makefile
->>>>>>> 63d4330 (Added two Q-learning based MAC protocols - uw_alohaq and uw_alohaq_sync)
     ranging/uwranging_tokenbus/Makefile
     ranging/uwranging_tdma/Makefile
     ranging/uwtap/Makefile
