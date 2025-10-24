@@ -99,7 +99,6 @@ set opt(bash_parameters) 	0
 # Library Loading   #
 #####################
 load libMiracle.so
-load libMiracleWirelessCh.so 
 load libMiracleBasicMovement.so
 load libuwip.so
 load libuwstaticrouting.so
@@ -113,7 +112,6 @@ load libuwcbr.so
 load libuwalohaq.so
 load libuwinterference.so
 load libUwmStd.so
-load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
