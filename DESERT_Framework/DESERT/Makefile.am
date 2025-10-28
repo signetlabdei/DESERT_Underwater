@@ -92,6 +92,8 @@ SUBDIRS = m4 \
     data_link/uwsr \
     data_link/uw-t-lohi \
     data_link/uwUFetch \
+    data_link/uw-aloha-q \
+    data_link/uw-aloha-q-sync \
     data_link/uw-csma-aloha-trigger \
     data_link/uwtdma \
     data_link/uwtdma-frame \
