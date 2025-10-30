@@ -44,9 +44,7 @@
 #include "uwinterference.h"
 #include "uwofdmphy_hdr.h"
 
-
 typedef std::pair<int, int> counter; /**< counter of collisions */
-
 
 class uwinterferenceofdm;
 
@@ -55,7 +53,6 @@ class ListNodeOFDM : public ListNode
 public:
 	std::vector<double> carrier_power;
 
-
 	/**
 	 * Constructor of the class ListNode when used with multicarrier
 	 * @param t time
@@ -63,13 +60,14 @@ public:
 	 * @param ctrl  control packet counter
 	 * @param data data packet counter
 	 */
-	ListNodeOFDM(double t, double sum_pw, int ctrl, int data, const std::vector<double>& carPwr): 
-	carrier_power(carPwr)
+	ListNodeOFDM(double t, double sum_pw, int ctrl, int data,
+			const std::vector<double> &carPwr)
+		: carrier_power(carPwr)
 	{
 		time = t;
 		sum_power = sum_pw;
 		ctrl_cnt = ctrl;
-		data_cnt = data;		
+		data_cnt = data;
 	}
 
 	/**
@@ -93,22 +91,21 @@ protected:
 	uwinterferenceofdm *interference;
 };
 
-
 class uwinterferenceofdm : public uwinterference
 {
 public:
 	int interfSubCarriers_;
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   *
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that
-   * <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched
-   * successfully or not.
-   *
-   */
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
+	 */
 	virtual int command(int, const char *const *);
 
 	/**
@@ -131,13 +128,15 @@ public:
 	 * @param carriers vector of carriers used in that packet
 	 * @param carNum explicit number of carriers
 	 */
-	virtual void addToInterference(double pw, PKT_TYPE tp, int* carriers, int carNum);
+	virtual void addToInterference(
+			double pw, PKT_TYPE tp, int *carriers, int carNum);
 	/**
 	 * Remove a packet to the interference calculation
 	 * @param pw Received power of the current packet
 	 * @param type type of the packet (DATA or CTRL)
 	 */
-	virtual void removeFromInterference(double pw, PKT_TYPE tp, const std::vector<double>& carPwr);
+	virtual void removeFromInterference(
+			double pw, PKT_TYPE tp, const std::vector<double> &carPwr);
 	/**
 	 * Compute the average interference power for the given packet
 	 * @param p Pointer to the interferer packet
@@ -151,8 +150,8 @@ public:
 	 * @param duration duration of the reception phase
 	 * @return average interference power
 	 */
-	virtual double getInterferencePower(
-			double power, double starttime, double duration, int* carriers, int ncar);
+	virtual double getInterferencePower(double power, double starttime,
+			double duration, int *carriers, int ncar);
 	/**/
 	virtual double getCurrentTotalPower();
 	/**
@@ -194,15 +193,19 @@ public:
 	/**
 	 * @return number of carriers used by the node
 	 */
-	inline int getInterfCarriers(){
+	inline int
+	getInterfCarriers()
+	{
 		return interfSubCarriers_;
 	}
 	/**
 	 * Sets number of carriers used by the node
 	 * @param sc number of carriers
 	 */
-	inline void setInterfCarriers(int sc){
-		interfSubCarriers_ = sc;		
+	inline void
+	setInterfCarriers(int sc)
+	{
+		interfSubCarriers_ = sc;
 		return;
 	}
 
@@ -237,11 +240,10 @@ public:
 	}
 
 protected:
-
 	std::list<ListNodeOFDM> power_list; /**<List with power and counters*/
-	EndInterfTimerOFDM end_timerOFDM; /**< Timer for schedules end of interference for a transmission */
+	EndInterfTimerOFDM end_timerOFDM; /**< Timer for schedules end of
+										 interference for a transmission */
 	int inodeID; /* ID of the node */
-
 };
 
 #endif /*UW_INTERFERENCE*/

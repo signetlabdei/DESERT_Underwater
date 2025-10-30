@@ -40,18 +40,16 @@
 
 #include <mphy.h>
 
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <string.h>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
-
-
 
 /**
  * Class to patch the absence of a PHY layer's module when we want to use a
@@ -66,58 +64,59 @@ class UWMPhypatch : public MPhy
 
 public:
 	/**
- * Class constructor.
- */
+	 * Class constructor.
+	 */
 	UWMPhypatch();
 
 	/**
- * Class destructor.
- */
+	 * Class destructor.
+	 */
 	~UWMPhypatch();
 
 	/**
- * Method to handle the reception of packets arriving from the upper layers of
- * the network simulator.
- *
- * @param p pointer to the packet that has been received from the simulator's
- * upper layers.
- */
+	 * Method to handle the reception of packets arriving from the upper layers
+	 * of the network simulator.
+	 *
+	 * @param p pointer to the packet that has been received from the
+	 * simulator's upper layers.
+	 */
 	virtual void recv(Packet *);
 
 protected:
 	/**
- *  Method to send the packet to be transmitted over the communication channel.
- *
- *  @param p pointer to the packet to be transmitted.
- */
+	 *  Method to send the packet to be transmitted over the communication
+	 * channel.
+	 *
+	 *  @param p pointer to the packet to be transmitted.
+	 */
 	virtual void startTx(Packet *p);
 
 	/**
-		 *  Method to send a cross layer message Phy2MacEndTx(p) to notify the
+	 *  Method to send a cross layer message Phy2MacEndTx(p) to notify the
 	 * above layers of the simulator about the end
 	 *  of a given transmission, see
 	 * http://telecom.dei.unipd.it/ns/miracle/doxygen/classMPhy.html#c8c2f52d3833fed8ac736aca0ee52c98.
-		 *
-		 *  @param p pointer to the last transmitted packet.
-		 */
+	 *
+	 *  @param p pointer to the last transmitted packet.
+	 */
 	virtual void endTx(Packet *p);
 
 	/**
-		 *  Method in charge to send a cross layer message Phy2MacStartRx(p) to
+	 *  Method in charge to send a cross layer message Phy2MacStartRx(p) to
 	 * notify the above layers of the simulator
 	 *  about the start of a reception, see
 	 * http://telecom.dei.unipd.it/ns/miracle/doxygen/classMPhy.html#a15cc91b98013e1c631ad85072867ab6.
-		 *
-		 *  @param p pointer to the last received packet.
-		 */
+	 *
+	 *  @param p pointer to the last received packet.
+	 */
 	virtual void startRx(Packet *p);
 
 	/**
-		 *  Method to send a packet to the above layers after the finishing of a
+	 *  Method to send a packet to the above layers after the finishing of a
 	 * reception.
-		 *
-		 *  @param p pointer to the last received packet.
-		 */
+	 *
+	 *  @param p pointer to the last received packet.
+	 */
 	virtual void endRx(Packet *p);
 
 	/**

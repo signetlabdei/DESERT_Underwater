@@ -40,8 +40,8 @@
 #ifndef TLOHI_WAKEUPTONE_CLMSG_H
 #define TLOHI_WAKEUPTONE_CLMSG_H
 
-#include <packet.h>
 #include <clmessage.h>
+#include <packet.h>
 
 #define TLOHI_WAKEUPTONE_VERBOSITY 3
 

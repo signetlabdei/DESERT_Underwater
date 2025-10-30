@@ -40,18 +40,18 @@
 
 #include "uwpolling_cmn_hdr.h"
 
+#include "uwsmposition.h"
+#include <chrono>
+#include <clmessage.h>
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <mmac.h>
 #include <mphy.h>
-#include <clmessage.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
-#include <fstream>
 #include <ostream>
-#include <chrono>
-#include "uwsmposition.h"
+#include <queue>
+#include <set>
+#include <string>
 
 #define UWPOLLING_AUV_DROP_REASON_ERROR "DERR" /**< Packet corrupted */
 #define UWPOLLING_AUV_DROP_REASON_UNKNOWN_TYPE \
@@ -64,26 +64,41 @@
 
 #define ENTRY_MAX_SIZE 256
 
-/** 
- * Struct used for handling the number of probes detected and received to estimate 
- * the number of neighbors.
-**/
+/**
+ * Struct used for handling the number of probes detected and received to
+ *estimate the number of neighbors.
+ **/
 typedef struct probe_cicle_counters {
-	uint n_probe_detected; /**< Number of probe (prehamble) detected in a round by the MAC*/
-	uint n_probe_received; /**< Number of probe received in a round (i.e., prehamble received)*/
+	uint n_probe_detected; /**< Number of probe (prehamble) detected in a round
+							  by the MAC*/
+	uint n_probe_received; /**< Number of probe received in a round (i.e.,
+							  prehamble received)*/
 	/**
-	 * Increment both counters 
-	**/
-	inline void incrementCounters() {n_probe_detected++; n_probe_received++;}
+	 * Increment both counters
+	 **/
+	inline void
+	incrementCounters()
+	{
+		n_probe_detected++;
+		n_probe_received++;
+	}
 	/**
-	 * Reset both counters 
-	**/
-	inline void resetCounters() {n_probe_detected = 0; n_probe_received = 0;}
+	 * Reset both counters
+	 **/
+	inline void
+	resetCounters()
+	{
+		n_probe_detected = 0;
+		n_probe_received = 0;
+	}
 	/**
 	 * Get estimate number of neighbors
-	**/
-	inline uint getNumberOfNeighbors() {
-		return n_probe_detected + (n_probe_detected-n_probe_received);}
+	 **/
+	inline uint
+	getNumberOfNeighbors()
+	{
+		return n_probe_detected + (n_probe_detected - n_probe_received);
+	}
 };
 
 /**
@@ -92,22 +107,21 @@ typedef struct probe_cicle_counters {
  */
 typedef struct probbed_node {
 	uint id_node; /**< Id of the node **/
-	int
-			n_pkts; /**< Number of packets that the node transmit when he's
-					   polled. */
+	int n_pkts; /**< Number of packets that the node transmit when he's
+				   polled. */
 	int mac_address; /**< Mac Address of the node */
 	double time_stamp; /**< Timestamp of the most recent data packet generated
 						  by the node */
-	//double backoff_time; /**< Backoff time chosen by the node before
-						//	transmitting the PROBE */
-	double
-			Tmeasured; /**< Time elapsed between the transmisssion of the
-						  TRIGGER and the reception of the PROBE */
+	// double backoff_time; /**< Backoff time chosen by the node before
+	//	transmitting the PROBE */
+	double Tmeasured; /**< Time elapsed between the transmisssion of the
+						 TRIGGER and the reception of the PROBE */
 	bool is_sink_; /**< Ture if the probe comes from a sink */
 
-	uint16_t id_ack; /**< Id used for ack purpose is the proebbed node is a sink */
+	uint16_t id_ack; /**< Id used for ack purpose is the proebbed node is a sink
+					  */
 
-	double policy_weight; /**< Weigth used to choose the order to poll 
+	double policy_weight; /**< Weigth used to choose the order to poll
 				the nodes. The higher weight, the higher priority */
 
 	/**
@@ -560,7 +574,6 @@ protected:
 		virtual void expire(Event *e);
 	};
 
-	
 	/**
 	 * Reference to the backoff_time variable
 	 */
@@ -571,7 +584,7 @@ protected:
 	 *
 	 * @param x x-coordinate of which we need to finde the value.
 	 * @param x1 x-coordinate of the first point
- 	 * @param x2 x-coordinate of the second point
+	 * @param x2 x-coordinate of the second point
 	 * @param y1 y-coordinate of the first point
 	 * @param y2 y-coordinate of the second point
 	 * @return the value assumed by y obtained by linear interpolation
@@ -579,14 +592,13 @@ protected:
 	virtual double linearInterpolator(
 			double x, double x1, double x2, double y1, double y2);
 
-	
 	/**
 	 * Pass the packet to the PHY layer
 	 * @param Event* Pointer to an object of type Packet that rapresent the
 	 * Packet to transmit
 	 */
 	virtual void Mac2PhyStartTx(Packet *p);
-	
+
 	/**
 	 * Method called when the PHY layer finish to transmit the packet.
 	 * @param Packet* Pointer to an object of type Packet that rapresent the
@@ -650,7 +662,7 @@ protected:
 	}
 
 	/**
-	 * Increases the number of wrong PROBE packet received. 
+	 * Increases the number of wrong PROBE packet received.
 	 * Used for statistical purposes
 	 */
 	inline void
@@ -660,7 +672,7 @@ protected:
 	}
 
 	/**
-	 * Increases the number of wrong ACK packet received. 
+	 * Increases the number of wrong ACK packet received.
 	 * Used for statistical purposes
 	 */
 	inline void
@@ -914,32 +926,34 @@ protected:
 	inline unsigned long int
 	getEpoch()
 	{
-	  unsigned long int timestamp =
-		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
-			  std::chrono::system_clock::now().time_since_epoch()).count() );
-	  return timestamp;
+		unsigned long int timestamp =
+				(unsigned long int) (std::chrono::duration_cast<
+						std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch())
+								.count());
+		return timestamp;
 	}
 
-	/** 
-   	 * Handle a packet coming from upper layers
-   	 * 
-   	 * @param p pointer to the packet
-   	 */
+	/**
+	 * Handle a packet coming from upper layers
+	 *
+	 * @param p pointer to the packet
+	 */
 	virtual void recvFromUpperLayers(Packet *p);
 
 	/**
-	 * Handle the transmission after poll reception. Decide if transmit data to 
+	 * Handle the transmission after poll reception. Decide if transmit data to
 	 * the sink or to trnasmit poll to other nodes in the list
 	 */
 	virtual void stateTx();
 
 	/**
-	 * Handle the data transmission after poll reception. 
+	 * Handle the data transmission after poll reception.
 	 */
 	virtual void stateTxData();
 
 	/**
-	 * Transmit data transmission after poll reception. 
+	 * Transmit data transmission after poll reception.
 	 */
 	virtual void txData();
 
@@ -1003,7 +1017,7 @@ protected:
 	 * return false if file not found
 	 */
 	bool initBackoffLUT();
-	
+
 	// timers
 	DataTimer data_timer; /**< Data timer*/
 	ProbeTimer probe_timer; /**< PROBE Timer */
@@ -1026,7 +1040,7 @@ protected:
 
 	// input parameters via TCL
 	double T_probe; /**< Duration of PROBE TIMER */
-	double T_probe_guard; /**< Guard time for PROBE packet: 
+	double T_probe_guard; /**< Guard time for PROBE packet:
 							T_probe=T_max+T_probe_guard */
 	double T_ack_timer; /** Duration of ACK_TIMER */
 	int max_payload; /**< Dimension of the DATA payload */
@@ -1035,18 +1049,15 @@ protected:
 	double T_max; /**< Maximum value in which the node can choose his backoff
 					 time */
 	double T_guard; /**< Guard time added to the calculation of the RTT */
-	int
-			max_polled_node; /**< Maximum number of node that the AUV can poll
-								each time. */
-	int
-			sea_trial_; /**< Sea Trial flag: To activate if the protocol is
-						   going to be tested at the sea */
+	int max_polled_node; /**< Maximum number of node that the AUV can poll
+							each time. */
+	int sea_trial_; /**< Sea Trial flag: To activate if the protocol is
+					   going to be tested at the sea */
 	int print_stats_; /**< Print protocol's statistics of the protocol */
 	int modem_data_bit_rate; /**< Bit rate of the modem used */
-	int
-			DATA_POLL_guard_time_; /**< Guard time between the reception of the
-									  last data and the transmission of the
-									  following POLL */
+	int DATA_POLL_guard_time_; /**< Guard time between the reception of the
+								  last data and the transmission of the
+								  following POLL */
 	int n_run; /*< ID of the experiments (used during sea trial) */
 
 	// states of protocol and reasons
@@ -1056,43 +1067,37 @@ protected:
 												 for the change of the state */
 
 	// mapping
-	static std::
-			map<UWPOLLING_PKT_TYPE, std::string>
-					pkt_type_info; /**< Map the UWPOLLING_PKT_TYPE to the
-									  description of each type of packet */
-	static std::
-			map<UWPOLLING_AUV_STATUS, std::string>
-					status_info; /** Map the UWPOLLING_AUV_STATUS to the
-									description of each state */
-	static std::
-			map<UWPOLLING_AUV_REASON, std::string>
-					reason_info; /** Map the UWPOLLING_AUV_REASON to the
-									description of each reason */
+	static std::map<UWPOLLING_PKT_TYPE, std::string>
+			pkt_type_info; /**< Map the UWPOLLING_PKT_TYPE to the
+							  description of each type of packet */
+	static std::map<UWPOLLING_AUV_STATUS, std::string>
+			status_info; /** Map the UWPOLLING_AUV_STATUS to the
+							description of each state */
+	static std::map<UWPOLLING_AUV_REASON, std::string>
+			reason_info; /** Map the UWPOLLING_AUV_REASON to the
+							description of each reason */
 
-	static bool
-			initialized; /**< Indicate if the protocol has been initialized or
-							not */
+	static bool initialized; /**< Indicate if the protocol has been initialized
+								or not */
 
 	bool RxDataEnabled; /**< <i>true</i> if the AUV is enabled to receive DATA
 						   packets, <i>false</i> otherwise */
-	bool
-			RxProbeEnabled; /**< <i>true</i> if the AUV is enabled to receive
-							   PROBE packets, <i>false</i> otherwise */
+	bool RxProbeEnabled; /**< <i>true</i> if the AUV is enabled to receive
+							PROBE packets, <i>false</i> otherwise */
 	bool TxEnabled; /**< <i>true</i> if the AUV is enabled to receive POLL
 						   packets, <i>false</i> otherwise */
 	double distance; /**< Distance between the AUV and the current node */
 	int N_expected_pkt; /**< Number of packets that the node polled wish to
 						   transmit to the AUV */
-	int
-			packet_index; /**< Variable that indicate the number of the packet
-							 that has been just received by the AUV */
+	int packet_index; /**< Variable that indicate the number of the packet
+						 that has been just received by the AUV */
 	int curr_polled_node_address; /**< MAC address of the node polled */
 
 	uint curr_node_id; /**< ID of the node polled */
 
 	// statistics
 
-	//double curr_backoff_time; /**< backoff time of the node polled */
+	// double curr_backoff_time; /**< backoff time of the node polled */
 	double curr_RTT; /**< Round Trip time of the node polled */
 	double curr_Tmeasured; /**< Time elapsed between the transmission of the
 							  TRIGGER and the reception of the PROBE packet by
@@ -1126,10 +1131,9 @@ protected:
 	int N_dropped_probe_wrong_state; /**< Number of PROBE dropped because the
 										AUV was not in RX_PROBE mode */
 
-	std::
-			ofstream fout; /**< Variable that handle the file in which the
-							  protocol write the state transition for debug
-							  purposes */
+	std::ofstream fout; /**< Variable that handle the file in which the
+						   protocol write the state transition for debug
+						   purposes */
 	std::ofstream out_file_stats; /**< Variable that handle the file in which
 									 the protocol write the statistics */
 
@@ -1138,31 +1142,33 @@ protected:
 									waiting for an ACK */
 	uint max_buffer_size; /**< Max size for the transmission buffer */
 	uint16_t uid_tx_pkt; /**< Unique ID of the transmitted packets */
-	
+
 	bool curr_is_sink; /**< True if the current node of the list is a sink.*/
 	uint max_tx_pkts; /**< Max number of packets can be transmitted by the AUV
 						during a TxData session */
-	uint n_pkts_to_tx; /**< Number of packets to transmit during a TxData 
+	uint n_pkts_to_tx; /**< Number of packets to transmit during a TxData
 						session */
-	uint n_tx_pkts; /**< Number of packets transmitted by the AUV during a 
+	uint n_tx_pkts; /**< Number of packets transmitted by the AUV during a
 					TxData session */
 	uint16_t last_pkt_uid; /**< ID of the last packet transmitted in the round*/
 
 	bool enableAckRx; /**< True if the ack reception is enabled */
 	bool acked; /**< True if an ack has been received*/
 
-	int ack_enabled; /**< True if ack is enabled, false if disabled, default true*/
+	int ack_enabled; /**< True if ack is enabled, false if disabled, default
+						true*/
 
-	std::map<int, uint>rx_pkts_map; /**< Map (mac_addr,rx_pkts) with the received  
-					packets for each node*/
-	bool enable_adaptive_backoff; /**< Set to true if backoff is chosen adaptively*/
+	std::map<int, uint> rx_pkts_map; /**< Map (mac_addr,rx_pkts) with the
+					 received packets for each node*/
+	bool enable_adaptive_backoff; /**< Set to true if backoff is chosen
+									 adaptively*/
 	std::string backoff_LUT_file; /**< File name of the backoff LUT */
 	char lut_token_separator; /**< LUT token separator */
-	std::map<double, double>backoff_LUT; /**< Map with the backoff LUT */
-	probe_cicle_counters probe_counters; /**< Number of probe detected in a round (i.e., prehamble received)*/
-	int full_knowledge; /**< Set to a number != 0 means we have full_knowledge 
+	std::map<double, double> backoff_LUT; /**< Map with the backoff LUT */
+	probe_cicle_counters probe_counters; /**< Number of probe detected in a
+											round (i.e., prehamble received)*/
+	int full_knowledge; /**< Set to a number != 0 means we have full_knowledge
 						about the estimate of neighbors*/
 	int last_probe_lost; /**Number of probe packets lost since last round;*/
-
 };
 #endif

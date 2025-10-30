@@ -39,22 +39,20 @@
 #ifndef UW_POS_BASED_RT_ROV_H
 #define UW_POS_BASED_RT_ROV_H
 
-#define DROP_NEXT_HOP_NOT_FOUND \
-	"NNF"
-#define DROP_IP_NOT_SET \
-	"INS"
+#define DROP_NEXT_HOP_NOT_FOUND "NNF"
+#define DROP_IP_NOT_SET "INS"
 
 #define pi (4 * atan(1.0))
 
-#include <module.h>
-#include <utility>
-#include "uwip-module.h"
-#include "uwPosBasedRt-hdr.h"
 #include "node-core.h"
+#include "uwPosBasedRt-hdr.h"
+#include "uwip-module.h"
 #include "uwsmposition.h"
-#include <map>
 #include <list>
+#include <map>
+#include <module.h>
 #include <tclcl.h>
+#include <utility>
 
 class UwPosBasedRtROV : public Module
 {
@@ -83,58 +81,55 @@ protected:
 	virtual int command(int, const char *const *);
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void recv(Packet* p);
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void recv(Packet *p);
 
 	/**
-	* Initialize field of <i>hdr_uwpos_based_rt</i>
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void initPkt(Packet* p);
-
-
-	/**
-	* Find next hop of a packet passed as input
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual uint8_t findNextHop(const Packet* p);
+	 * Initialize field of <i>hdr_uwpos_based_rt</i>
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void initPkt(Packet *p);
 
 	/**
-	* Set maximum transmission range 
-	*
-	* @param float New value for transmission range.
-	*/
+	 * Find next hop of a packet passed as input
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual uint8_t findNextHop(const Packet *p);
+
+	/**
+	 * Set maximum transmission range
+	 *
+	 * @param float New value for transmission range.
+	 */
 	virtual void setMaxTxRange(double newRange);
 
 private:
-
 	/**
-	* Compute absoulute distance between 2 nodes
-	*
-	* @param Position position first node.
-	* @param Position position second node.
-	*/
-	virtual double nodesDistance(Position& p1, Position& p2); 
+	 * Compute absoulute distance between 2 nodes
+	 *
+	 * @param Position position first node.
+	 * @param Position position second node.
+	 */
+	virtual double nodesDistance(Position &p1, Position &p2);
 
 	uint8_t ipAddr;
 
-	double maxTxRange; /**<Maximum transmission range, 
+	double maxTxRange; /**<Maximum transmission range,
 						in meters, for this node. */
 
-	UWSMPosition* ROV_pos; /**<Pointer to ROV position. 
+	UWSMPosition *ROV_pos; /**<Pointer to ROV position.
 							Give ROV position via TCL command. */
 
-	typedef std::pair<Position,uint8_t> pair_posIP;
-	std::list<pair_posIP> list_posIP; /**<List with position of all 
+	typedef std::pair<Position, uint8_t> pair_posIP;
+	std::list<pair_posIP> list_posIP; /**<List with position of all
 										the other nodes with its IP. */
 
 	int debug_; /**< Flag to enable or disable dirrefent levels of debug. */
-
 };
 
-#endif //UW_POS_BASED_RT_H
+#endif // UW_POS_BASED_RT_H

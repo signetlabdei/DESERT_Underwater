@@ -39,23 +39,21 @@
 #ifndef UW_POS_BASED_RT_H
 #define UW_POS_BASED_RT_H
 
-#define DROP_NEXT_HOP_NOT_FOUND \
-	"NNF"
-#define DROP_IP_NOT_SET \
-	"INS"
+#define DROP_NEXT_HOP_NOT_FOUND "NNF"
+#define DROP_IP_NOT_SET "INS"
 
 #define pi (4 * atan(1.0))
 
-#include <module.h>
-#include <utility>
-#include "uwip-module.h"
-#include "uwPosBasedRt-hdr.h"
 #include "node-core.h"
-#include "uwsmposition.h"
+#include "uwPosBasedRt-hdr.h"
 #include "uwPosEstimation.h"
-#include <map>
+#include "uwip-module.h"
+#include "uwsmposition.h"
 #include <list>
+#include <map>
+#include <module.h>
 #include <tclcl.h>
+#include <utility>
 
 class UwPosBasedRt : public Module
 {
@@ -84,78 +82,77 @@ protected:
 	virtual int command(int, const char *const *);
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void recv(Packet* p);
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void recv(Packet *p);
 
 	/**
-	* Initialize field of <i>hdr_uwpos_based_rt</i>
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void initPkt(Packet* p);
-
-
-	/**
-	* update informations regardin position, if needed
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void updatePosInfo(Packet* p);
+	 * Initialize field of <i>hdr_uwpos_based_rt</i>
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void initPkt(Packet *p);
 
 	/**
-	* Find next hop of a packet passed as input
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual uint8_t findNextHop(const Packet* p);
+	 * update informations regardin position, if needed
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void updatePosInfo(Packet *p);
 
 	/**
-	* Add new entry to the routing table
-	*
-	* @param uint8_t Address of the destination.
-	* @param uint8_t Address of the next hop.
-	* @param int Parameter to find if the dest address is a static node or a vehicle
-	*/
+	 * Find next hop of a packet passed as input
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual uint8_t findNextHop(const Packet *p);
+
+	/**
+	 * Add new entry to the routing table
+	 *
+	 * @param uint8_t Address of the destination.
+	 * @param uint8_t Address of the next hop.
+	 * @param int Parameter to find if the dest address is a static node or a
+	 * vehicle
+	 */
 	virtual void addRoute(
 			const uint8_t &dst, const uint8_t &next, const int toFixedNode);
 
 	/**
-	* Set maximum transmission range 
-	*
-	* @param float New value for transmission range.
-	*/
+	 * Set maximum transmission range
+	 *
+	 * @param float New value for transmission range.
+	 */
 	virtual void setMaxTxRange(double newRange);
 
 private:
 	/**
-	* Compute absoulute distance between 2 nodes
-	*
-	* @param Position position first node.
-	* @param Position position second node.
-	*/
-	virtual double nodesDistance(Position& p1, Position& p2); 
-
+	 * Compute absoulute distance between 2 nodes
+	 *
+	 * @param Position position first node.
+	 * @param Position position second node.
+	 */
+	virtual double nodesDistance(Position &p1, Position &p2);
 
 	uint8_t ipAddr;
 
-	double timestamp; /**<Timestamp for the validity of 
+	double timestamp; /**<Timestamp for the validity of
 						last received ROV position. */
 	double ROV_speed; /**<Last known ROV speed. */
-	double maxTxRange; /**<Maximum transmission range, 
+	double maxTxRange; /**<Maximum transmission range,
 							in meters, for this node. */
 
-	Position node_pos;  /**<Position of this node */
+	Position node_pos; /**<Position of this node */
 
 	std::map<uint8_t, uint8_t> static_routing; /**< Routing table:
 													 destination - next hop. */
 
-	std::map<uint8_t,UwPosEstimation> ROV_routing; /**<Rouitng table for ROV. */
+	std::map<uint8_t, UwPosEstimation>
+			ROV_routing; /**<Rouitng table for ROV. */
 
 	int debug_; /**< Flag to enable or disable dirrefent levels of debug. */
-
 };
 
-#endif //UW_POS_BASED_RT_H
+#endif // UW_POS_BASED_RT_H

@@ -60,13 +60,11 @@ public:
 	 */
 	virtual ~UwRangingTokenBus();
 
-
 protected:
-	
 	/**
-	 * Assert if the received token id is valid, i.e it follows the monotonic progression
-	 * taking in account overflow.
-	 * 
+	 * Assert if the received token id is valid, i.e it follows the monotonic
+	 * progression taking in account overflow.
+	 *
 	 * @param p Packet with token
 	 */
 	virtual bool validToken(Packet *p) const override;
@@ -84,10 +82,9 @@ protected:
 	 */
 	virtual void Phy2MacEndRx(Packet *p) override;
 
-
 	/**
 	 * @brief compute the linear regression and updates the distances vector
-	 * 
+	 *
 	 */
 	virtual void computeDist();
 
@@ -104,20 +101,33 @@ protected:
 	 */
 	virtual int command(int argc, const char *const *argv);
 
-	const int dist_num; /**< num of distances: will be initialized to n_nodes*(n_nodes-1)/2 */
-	/** difference between virtually equal distances can result in small negative numbers due to floating point precision so values within epsilon will not be discarded by NNLS algo */
-	double epsilon; 			
-	double max_tt; /**< max travel time between nodes in seconds, used to discard bad nnleast_squares() results */
-	std::vector<std::vector<int>> dist_map; /**< of size [n_nodes][n_nodes] maps(nodeX,nodeY) -> distance */
-	/** vector of shape [n_nodes][n_nodes-1] holds the travel times: the first index is the node_id which has calculated them */
+	const int dist_num; /**< num of distances: will be initialized to
+						   n_nodes*(n_nodes-1)/2 */
+	/** difference between virtually equal distances can result in small
+	 * negative numbers due to floating point precision so values within epsilon
+	 * will not be discarded by NNLS algo */
+	double epsilon;
+	double max_tt; /**< max travel time between nodes in seconds, used to
+					  discard bad nnleast_squares() results */
+	std::vector<std::vector<int>> dist_map; /**< of size [n_nodes][n_nodes]
+											   maps(nodeX,nodeY) -> distance */
+	/** vector of shape [n_nodes][n_nodes-1] holds the travel times: the first
+	 * index is the node_id which has calculated them */
 	std::vector<std::vector<double>> times_mat;
-	/** vector of shape [n_nodes][n_nodes-1] holds the age of a time (slot number in which the time was calculate or received)*/
-	std::vector<std::vector<int>> times_age;  										
-	std::vector<std::vector<double>>  x_mat; /**< of size [2D][D] it's the sparse matrix with the equations coefficients (-1,0,1) */
-	/** vector of shape [D], contains the one way travel times between nodes to be transformed to distances by the user according to the chosen speed of sound model */
-	std::vector<double> distances;  
-	double time_last_range; /**< time of last ping reception (or transmission) */
-	int id_last_range; /**< node id from which I received the last ranging pkt */
+	/** vector of shape [n_nodes][n_nodes-1] holds the age of a time (slot
+	 * number in which the time was calculate or received)*/
+	std::vector<std::vector<int>> times_age;
+	std::vector<std::vector<double>>
+			x_mat; /**< of size [2D][D] it's the sparse matrix with the
+					  equations coefficients (-1,0,1) */
+	/** vector of shape [D], contains the one way travel times between nodes to
+	 * be transformed to distances by the user according to the chosen speed of
+	 * sound model */
+	std::vector<double> distances;
+	double time_last_range; /**< time of last ping reception (or transmission)
+							 */
+	int id_last_range; /**< node id from which I received the last ranging pkt
+						*/
 };
 
 #endif

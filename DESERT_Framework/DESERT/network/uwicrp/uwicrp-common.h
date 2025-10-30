@@ -42,9 +42,8 @@
 
 #include "config.h"
 
-static const int MAX_HOP_NUMBER =
-		6; /**< Maximum number of hops contained in a <i>SUN Path
-			  Establishment</i> packet. */
+static const int MAX_HOP_NUMBER = 6; /**< Maximum number of hops contained in a
+										<i>SUN Path Establishment</i> packet. */
 static const int HOP_TABLE_LENGTH =
 		10; /**< Maximum length of the routing table of a node FOR UWICRP. */
 

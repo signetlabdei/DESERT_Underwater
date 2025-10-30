@@ -107,7 +107,7 @@ UwModem::printOnLog(LogLevel log_level, std::string module, std::string message)
 		double timestamp =
 				(double) (std::chrono::duration_cast<std::chrono::milliseconds>(
 						std::chrono::system_clock::now().time_since_epoch())
-								  .count()) /
+								.count()) /
 				1000.0;
 		if (!log_is_open) {
 			outLog.open((getLogFile()).c_str(), ios::app);

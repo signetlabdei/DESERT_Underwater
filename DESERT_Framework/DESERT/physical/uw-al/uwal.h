@@ -68,8 +68,6 @@ typedef struct PERListElement {
 	double per;
 } pl_element;
 
-
-
 class Uwal;
 
 /**

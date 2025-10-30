@@ -37,10 +37,10 @@
  */
 
 #include "uwahoi-phy.h"
-#include <fstream>
-#include <sstream>
-#include <phymac-clmsg.h>
 #include "mac.h"
+#include <fstream>
+#include <phymac-clmsg.h>
+#include <sstream>
 
 /**
  * Adds the module for UwCbrModuleClass in ns2.
@@ -193,10 +193,11 @@ UwAhoiPhy::endRx(Packet *p)
 			bool error_n = x <= per_n;
 			error_n = 0;
 			bool error_ni = 0;
-			double interference = interference_ ? 
-				interference_->getInterferencePower(p):0;
+			double interference =
+					interference_ ? interference_->getInterferencePower(p) : 0;
 			if (!error_n) {
-				per_ni = interference?getPER(ph->Pr/interference,p):getPER(0,p); 
+				per_ni = interference ? getPER(ph->Pr / interference, p)
+									  : getPER(0, p);
 				error_ni = x <= per_ni;
 			}
 			if (time_ready_to_end_rx_ > Scheduler::instance().clock()) {
@@ -264,7 +265,7 @@ UwAhoiPhy::getPER(double _sir, Packet *_p)
 {
 	double pdr = matchDistancePDR(getDistance(_p));
 
-	if(_sir > 0) {
+	if (_sir > 0) {
 		pdr = pdr * matchSIR_PDR(_sir);
 	}
 	return 1 - pdr;
@@ -288,8 +289,7 @@ double
 UwAhoiPhy::matchDistancePDR(double distance)
 { // success probability of AHOI
 	if (debug_)
-		std::cout << NOW
-				  << "  UwAhoiPhy()::matchDistancePDR(double distance)"
+		std::cout << NOW << "  UwAhoiPhy()::matchDistancePDR(double distance)"
 				  << "distance = " << distance << std::endl;
 	if (distance <= range2pdr_.begin()->first)
 		return range2pdr_.begin()->second;
@@ -312,10 +312,9 @@ UwAhoiPhy::matchDistancePDR(double distance)
 double
 UwAhoiPhy::matchSIR_PDR(double sir)
 { // success probability of AHOI
-	double sir_db = 10*log10(sir/10);
+	double sir_db = 10 * log10(sir / 10);
 	if (debug_)
-		std::cout << NOW
-				  << "  UwAhoiPhy()::matchSIR_PDR(double sir)"
+		std::cout << NOW << "  UwAhoiPhy()::matchSIR_PDR(double sir)"
 				  << "sir = " << sir << std::endl;
 	if (sir_db <= sir2pdr_.begin()->first)
 		return sir2pdr_.begin()->second;
@@ -342,9 +341,9 @@ UwAhoiPhy::linearInterpolator(
 	double m = (y1 - y2) / (x1 - x2);
 	double q = y1 - m * x1;
 	if (debug_)
-		std::cout << NOW << "  UwAhoiPhy::linearInterpolator( double x, "
-							"double x1, double y1, double x2, double y2 )"
+		std::cout << NOW
+				  << "  UwAhoiPhy::linearInterpolator( double x, "
+					 "double x1, double y1, double x2, double y2 )"
 				  << "m = " << m << " q= " << q << std::endl;
 	return m * x + q;
 }
-

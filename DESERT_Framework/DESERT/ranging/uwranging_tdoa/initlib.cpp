@@ -35,8 +35,8 @@
  * @brief Provides the initializazion of the uwranging_tdoa libraries
  */
 
-#include <tclcl.h>
 #include "uwranging_tdoa_hdr.h"
+#include <tclcl.h>
 
 int hdr_ranging_tdoa::offset_ = 0;
 packet_t PT_UWRANGING_TDOA;
@@ -51,15 +51,13 @@ public:
 	 * Constructor of the class
 	 */
 	UwRangingTDOAHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWRANGING_TDOA", sizeof(hdr_ranging_tdoa))
+		: PacketHeaderClass(
+				  "PacketHeader/UWRANGING_TDOA", sizeof(hdr_ranging_tdoa))
 	{
 		this->bind();
 		bind_offset(&hdr_ranging_tdoa::offset_);
 	}
 } class_hdr_ranging_tdoa;
-
-
-
 
 extern EmbeddedTcl Uwranging_tdoaTclCode;
 
@@ -70,4 +68,3 @@ Uwranging_tdoa_Init()
 	Uwranging_tdoaTclCode.load();
 	return 0;
 }
-

@@ -129,7 +129,8 @@ protected:
 	virtual double getSpeedKnots(Position *p) const;
 
 	int debug_noise;
-	int ship_stop;		/**< If enabled, the speed is set to zero when the ship reaches its destination. */
+	int ship_stop; /**< If enabled, the speed is set to zero when the ship
+					  reaches its destination. */
 	double granularity; /**< Number of step for the integration. */
 	std::vector<Noisesource>
 			noise_src; /**< Vector that stores all the vessels. */

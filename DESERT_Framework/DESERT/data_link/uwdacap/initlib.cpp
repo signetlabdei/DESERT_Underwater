@@ -36,8 +36,8 @@
  *
  */
 
-#include <tclcl.h>
 #include <sap.h>
+#include <tclcl.h>
 
 #include "uw-mac-DACAP-alter.h"
 // #include "uw-mac-DACAP-new.h"
@@ -84,7 +84,7 @@ Uwdacap_Init()
 	 * Put here all the commands which must be execute when the library
 	 * is loaded (i.e. TCL script execution)
 	 * Remember to return 0 if all is OK, otherwise return 1
-	*/
+	 */
 	DACAPPktClass *dacap_header_class = new DACAPPktClass; // <---
 	dacap_header_class->bind();
 	PT_DACAP = p_info::addPacket("DACAP");

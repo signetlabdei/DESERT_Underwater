@@ -36,15 +36,15 @@
  */
 
 #include "uwsr.h"
-#include <mac.h>
-#include <cmath>
-#include <climits>
-#include <iomanip>
-#include <rng.h>
 #include <algorithm>
-#include <vector>
-#include <ctime>
+#include <climits>
+#include <cmath>
 #include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <mac.h>
+#include <rng.h>
+#include <vector>
 
 /**
  * Class that represents the binding with tcl scripting language

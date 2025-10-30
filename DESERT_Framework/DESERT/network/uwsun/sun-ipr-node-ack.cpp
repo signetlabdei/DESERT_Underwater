@@ -37,8 +37,8 @@
  * Provides the implementation of all the methods regarding Ack Packets.
  */
 
-#include "sun-ipr-node.h"
 #include "sun-ipr-common-structures.h"
+#include "sun-ipr-node.h"
 
 /* This function uses the value contained in the header of a uwcbr packet.
  * TODO: try to modifies this in order to use the ch->uid() field instead.
@@ -63,12 +63,10 @@ SunIPRoutingNode::sendBackAck(const Packet *p)
 	hack->uid() = uwcbrh->sn();
 
 	if (printDebug_ > 5) {
-		std::cout << "[" <<  NOW 
-				  << "]::Node[IP:" << this->printIP(ipAddr_)
+		std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 				  << "||hops:" << this->getNumberOfHopToSink()
 				  << "]::ACK_SENT_TO:" << printIP(ch_ack->next_hop())
-				  << "::SN:" << uwcbrh->sn()
-				  << std::endl;
+				  << "::SN:" << uwcbrh->sn() << std::endl;
 	}
 	number_of_ackpkt_++;
 	if (trace_)
@@ -111,11 +109,9 @@ void
 SunIPRoutingNode::createRouteError(const Packet *p_data, Packet *p)
 { // p is a path establishment packet beacause it contains a list of hops.
 	if (printDebug_ > 5) {
-		std::cout << "[" <<  NOW
-				  << "]::Node[IP:" << this->printIP(ipAddr_)
+		std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 				  << "||hops:" << this->getNumberOfHopToSink()
-				  << "]::GENERATING_ROUTE_ERROR"
-				  << std::endl;
+				  << "]::GENERATING_ROUTE_ERROR" << std::endl;
 	}
 	if (STACK_TRACE)
 		std::cout << "> createRouteError()" << std::endl;

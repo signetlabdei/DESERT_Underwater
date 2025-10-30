@@ -135,9 +135,8 @@ protected:
 					   * inside)
 					   */
 	double updateTime_; /**< Time between two update computation. */
-	double
-			nextUpdateTime_; /**< Internal variable used to evaluate the steps
-								to be computed. */
+	double nextUpdateTime_; /**< Internal variable used to evaluate the steps
+							   to be computed. */
 	double speed_; /**< Current value of the speed. */
 	double direction_; /**< Current value of the direction. */
 	double pitch_; /**< Current value of the pitch. */

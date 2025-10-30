@@ -60,7 +60,6 @@ public:
 	virtual ~UwRangingTDMA();
 
 protected:
-
 	/**
 	 * sends the ranging packet at the beginning of my slot
 	 */
@@ -94,18 +93,23 @@ protected:
 	 *
 	 * @param argc Number of arguments in <i>argv</i>.
 	 * @param argv Array of strings which are the command parameters
-	 * @return TCL_OK or TCL_ERROR 
+	 * @return TCL_OK or TCL_ERROR
 	 */
 	virtual int command(int argc, const char *const *argv);
 
-	static int count_nodes;	/**< counts the instantiated nodes, used for assigning node ids in default contructor*/
-	int node_id;	/**<id of the node (0 to n_nodes-1)*/
-	int slot_id; /**< = node_id + k*n_nodes; slot_id value is written in the outgoing ranging packet then k is incremented */
+	static int count_nodes; /**< counts the instantiated nodes, used for
+							   assigning node ids in default contructor*/
+	int node_id; /**<id of the node (0 to n_nodes-1)*/
+	int slot_id; /**< = node_id + k*n_nodes; slot_id value is written in the
+					outgoing ranging packet then k is incremented */
 	int n_nodes; /**< number of nodes */
 	int slotidmax; /**< maximum slot_id allowable in packet header*/
-	/** vector of lenght D = n_nodes*(n_nodes-1)/2 + 1 where the one way travel times are stored*/
+	/** vector of lenght D = n_nodes*(n_nodes-1)/2 + 1 where the one way travel
+	 * times are stored*/
 	std::vector<double> owtt_vec;
-	std::vector<std::vector<int>> owtt_map; /**< of size [n_nodes][n_nodes] maps(nodeX,nodeY) -> owtt_vec index */
+	std::vector<std::vector<int>>
+			owtt_map; /**< of size [n_nodes][n_nodes] maps(nodeX,nodeY) ->
+						 owtt_vec index */
 };
 
 #endif

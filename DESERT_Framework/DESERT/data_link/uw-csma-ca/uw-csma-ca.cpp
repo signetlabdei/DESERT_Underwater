@@ -37,14 +37,14 @@
  */
 
 #include "uw-csma-ca.h"
-#include "uw-csma-ca-hdrs.h"
-#include <queue>
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
 #include "mac.h"
 #include "mmac.h"
 #include "rng.h"
+#include "uw-csma-ca-hdrs.h"
+#include <queue>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
 
 extern packet_t PT_CA_CTS;
 extern packet_t PT_CA_RTS;
@@ -464,7 +464,8 @@ CsmaCa::state_Backoff(int tx_time)
 {
 	LOGINFO("State Backoff");
 	updateState(CSMA_CA_BACKOFF);
-	int random = RNG::defaultrng()->uniform(backoff_max) + (int) (tx_time + backoff_delta);
+	int random = RNG::defaultrng()->uniform(backoff_max) +
+			(int) (tx_time + backoff_delta);
 	backoff_timer.resched(random);
 }
 

@@ -52,7 +52,8 @@ static class UwopticalbeampatternPktClass : public PacketHeaderClass
 {
 public:
 	UwopticalbeampatternPktClass()
-		: PacketHeaderClass("PacketHeader/UWOPTICALBEAMPATTERN", sizeof(hdr_uwopticalbeampattern))
+		: PacketHeaderClass("PacketHeader/UWOPTICALBEAMPATTERN",
+				  sizeof(hdr_uwopticalbeampattern))
 	{
 		this->bind();
 		bind_offset(&hdr_uwopticalbeampattern::offset_);

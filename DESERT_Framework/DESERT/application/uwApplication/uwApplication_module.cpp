@@ -155,13 +155,15 @@ uwApplicationModule::command(int argc, const char *const *argv)
 					if (!listenTCP())
 						return TCL_ERROR;
 
-					socket_thread = std::thread(&uwApplicationModule::acceptTCP, this);
+					socket_thread =
+							std::thread(&uwApplicationModule::acceptTCP, this);
 
 				} else {
 					if (!openConnectionUDP())
 						return TCL_ERROR;
 
-					socket_thread = std::thread(&uwApplicationModule::readFromUDP, this);
+					socket_thread = std::thread(
+							&uwApplicationModule::readFromUDP, this);
 				}
 			}
 
@@ -329,7 +331,8 @@ uwApplicationModule::recv(Packet *p)
 		printOnLog(Logger::LogLevel::DEBUG,
 				"UWAPPLICATION",
 				"recv(Packet *)::Payload received : " +
-						std::string(uwApph->payload_msg, uwApph->payload_size()));
+						std::string(
+								uwApph->payload_msg, uwApph->payload_size()));
 
 	printOnLog(Logger::LogLevel::DEBUG,
 			"UWAPPLICATION",

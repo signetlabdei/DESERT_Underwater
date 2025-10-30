@@ -39,8 +39,8 @@
  * Answer Packets.
  */
 
-#include "sun-ipr-node.h"
 #include "sun-ipr-common-structures.h"
+#include "sun-ipr-node.h"
 
 extern packet_t PT_SUN_DATA;
 extern packet_t PT_SUN_PATH_EST;
@@ -54,7 +54,7 @@ void
 SunIPRoutingNode::answerPath(const Packet *p_old)
 {
 	if (STACK_TRACE)
-	    std::cout << "> answerPath()" << std::endl;
+		std::cout << "> answerPath()" << std::endl;
 	// This node is a node with hop count = 1. Checks anyway for errors.
 	// The packet p_old is removed by the method that invokes this one.
 	if (this->getNumberOfHopToSink() == 1) {
@@ -65,12 +65,11 @@ SunIPRoutingNode::answerPath(const Packet *p_old)
 		hdr_uwip *iph_old = HDR_UWIP(p_old);
 		hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p_answer);
 		if (printDebug_ > 5) {
-			std::cout << "[" <<  NOW
-					  << "]::Node[IP:" << this->printIP(ipAddr_)
+			std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 					  << "||hops:" << this->getNumberOfHopToSink()
 					  << "]::PATH_ANSWER_SENT::UID:" << ch_answer->uid()
 					  << "::SRC:" << printIP(iph_old->saddr())
-			          << "::HOPCOUNT:" << (hpest->list_of_hops_length() + 1)
+					  << "::HOPCOUNT:" << (hpest->list_of_hops_length() + 1)
 					  << std::endl;
 		}
 		number_of_pathestablishment_++;
@@ -92,7 +91,7 @@ void
 SunIPRoutingNode::initPktPathEstAnswer(Packet *new_pkt, const Packet *old_pkt)
 {
 	if (STACK_TRACE)
-	    std::cout << "> initPktPathEstAnswer()" << std::endl;
+		std::cout << "> initPktPathEstAnswer()" << std::endl;
 	// Common header.
 	hdr_cmn *ch_old = HDR_CMN(old_pkt);
 	hdr_cmn *ch_new = HDR_CMN(new_pkt);
@@ -162,7 +161,7 @@ void
 SunIPRoutingNode::sendRouteBack(Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> sendRouteBack()" << std::endl;
+		std::cout << "> sendRouteBack()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
@@ -192,22 +191,28 @@ SunIPRoutingNode::sendRouteBack(Packet *p)
 						this->clearHops();
 						this->setNumberOfHopToSink(0);
 						// Update the routing table of the current node.
-						for (int i = j_ + 1, w = 0;	i < hpest->list_of_hops_length(); i++, w++) {
+						for (int i = j_ + 1, w = 0;
+								i < hpest->list_of_hops_length();
+								i++, w++) {
 							hop_table[w] = hpest->list_of_hops()[i];
 						}
-						hop_table_length = hpest->list_of_hops_length() - hpest->pointer() - 1;
+						hop_table_length = hpest->list_of_hops_length() -
+								hpest->pointer() - 1;
 						this->setNumberOfHopToSink(hop_table_length + 1);
 						sink_associated = hpest->sinkAssociated();
 						rmhopTableTmr_.resched(timer_route_validity_);
 						ack_warnings_counter_ = 0;
 						ack_error_state = false;
 
-						// Keep track of the nodes that responded to a PATH_SEARCH request
-						uint endnode = hop_table[hop_table_length-1];
-						if (paths_selected.find(endnode) == paths_selected.end())
+						// Keep track of the nodes that responded to a
+						// PATH_SEARCH request
+						uint endnode = hop_table[hop_table_length - 1];
+						if (paths_selected.find(endnode) ==
+								paths_selected.end())
 							paths_selected[endnode] = 1;
 						else
-							paths_selected[endnode] = paths_selected[endnode] + 1;
+							paths_selected[endnode] =
+									paths_selected[endnode] + 1;
 					}
 				} else if (metrics_ == SNR) {
 					double tmp_ = hpest->quality();
@@ -217,10 +222,13 @@ SunIPRoutingNode::sendRouteBack(Packet *p)
 						this->clearHops();
 						this->setNumberOfHopToSink(0);
 						// Update the routing table of the current node.
-						for (int i = j_ + 1, w = 0;	i < hpest->list_of_hops_length(); i++, w++) {
+						for (int i = j_ + 1, w = 0;
+								i < hpest->list_of_hops_length();
+								i++, w++) {
 							hop_table[w] = hpest->list_of_hops()[i];
 						}
-						hop_table_length = hpest->list_of_hops_length() - hpest->pointer() - 1;
+						hop_table_length = hpest->list_of_hops_length() -
+								hpest->pointer() - 1;
 						this->setNumberOfHopToSink(hop_table_length + 1);
 						quality_link = tmp_;
 						sink_associated = hpest->sinkAssociated();
@@ -228,12 +236,15 @@ SunIPRoutingNode::sendRouteBack(Packet *p)
 						ack_warnings_counter_ = 0;
 						ack_error_state = false;
 
-						// Keep track of the nodes that responded to a PATH_SEARCH request
-						uint endnode = hop_table[hop_table_length-1];
-						if (paths_selected.find(endnode) == paths_selected.end())
+						// Keep track of the nodes that responded to a
+						// PATH_SEARCH request
+						uint endnode = hop_table[hop_table_length - 1];
+						if (paths_selected.find(endnode) ==
+								paths_selected.end())
 							paths_selected[endnode] = 1;
 						else
-							paths_selected[endnode] = paths_selected[endnode] + 1;
+							paths_selected[endnode] =
+									paths_selected[endnode] + 1;
 					}
 				} else if (metrics_ == LESSCONGESTED) {
 					double tmp_ =
@@ -272,11 +283,12 @@ SunIPRoutingNode::sendRouteBack(Packet *p)
 					ch->prev_hop_ = ipAddr_;
 				}
 				if (printDebug_ > 5) {
-					std::cout << "[" <<  NOW
+					std::cout << "[" << NOW
 							  << "]::Node[IP:" << this->printIP(ipAddr_)
 							  << "||hops:" << this->getNumberOfHopToSink()
 							  << "]::UID:" << ch->uid()
-							  << "::SEND_ROUTE_BACK::NEXT_HOP:" << printIP(ch->next_hop())
+							  << "::SEND_ROUTE_BACK::NEXT_HOP:"
+							  << printIP(ch->next_hop())
 							  << "::DESTINATION:" << printIP(iph->saddr())
 							  << std::endl;
 				}
@@ -306,7 +318,7 @@ const int &
 SunIPRoutingNode::evaluatePath(const Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> evaluatePath()" << std::endl;
+		std::cout << "> evaluatePath()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
@@ -334,23 +346,25 @@ SunIPRoutingNode::evaluatePath(const Packet *p)
 							// + 1 (node-node with hc 1-sink)
 
 				if (printDebug_ > 5) {
-					std::cout << "[" <<  NOW
+					std::cout << "[" << NOW
 							  << "]::Node[IP:" << this->printIP(ipAddr_)
 							  << "||hops:" << this->getNumberOfHopToSink()
 							  << "]::UID:" << ch->uid()
-							  << "::ROUTE_ESTABLISHED::HOPS:" << getNumberOfHopToSink()
+							  << "::ROUTE_ESTABLISHED::HOPS:"
+							  << getNumberOfHopToSink()
 							  << "::LAST_HOP:" << printIP(iph->saddr()) << "::";
-					  for (int s = 0; s < hpest->list_of_hops_length(); s++)
-						std::cout << ":" << (int)hpest->list_of_hops()[s];
+					for (int s = 0; s < hpest->list_of_hops_length(); s++)
+						std::cout << ":" << (int) hpest->list_of_hops()[s];
 					std::cout << std::endl;
 				}
 
-				// Keep track of the nodes that responded to a PATH_SEARCH request
+				// Keep track of the nodes that responded to a PATH_SEARCH
+				// request
 				uint endnode = iph->saddr();
 				if (paths_selected.find(endnode) == paths_selected.end())
-				    paths_selected[endnode] = 1;
+					paths_selected[endnode] = 1;
 				else
-				    paths_selected[endnode] = paths_selected[endnode] + 1;
+					paths_selected[endnode] = paths_selected[endnode] + 1;
 
 				rmhopTableTmr_.resched(timer_route_validity_);
 				ack_warnings_counter_ = 0;
@@ -380,24 +394,26 @@ SunIPRoutingNode::evaluatePath(const Packet *p)
 						1); // The value to reach the node connected to the sink
 							// + 1 (node-node with hc 1-sink)
 				if (printDebug_ > 5) {
-					std::cout << "[" <<  NOW
+					std::cout << "[" << NOW
 							  << "]::Node[IP:" << this->printIP(ipAddr_)
 							  << "||hops:" << this->getNumberOfHopToSink()
 							  << "]::UID:" << ch->uid()
-							  << "::ROUTE_ESTABLISHED::HOPS:" << getNumberOfHopToSink()
+							  << "::ROUTE_ESTABLISHED::HOPS:"
+							  << getNumberOfHopToSink()
 							  << "::LAST_HOP:" << printIP(iph->saddr())
 							  << "::SNR:" << quality_link << "dB::";
-					  for (int s = 0; s < hpest->list_of_hops_length(); s++)
-						std::cout << ":" << (int)hpest->list_of_hops()[s];
+					for (int s = 0; s < hpest->list_of_hops_length(); s++)
+						std::cout << ":" << (int) hpest->list_of_hops()[s];
 					std::cout << std::endl;
 				}
 
-				// Keep track of the nodes that responded to a PATH_SEARCH request
+				// Keep track of the nodes that responded to a PATH_SEARCH
+				// request
 				uint endnode = iph->saddr();
 				if (paths_selected.find(endnode) == paths_selected.end())
-				    paths_selected[endnode] = 1;
+					paths_selected[endnode] = 1;
 				else
-				    paths_selected[endnode] = paths_selected[endnode] + 1;
+					paths_selected[endnode] = paths_selected[endnode] + 1;
 
 				rmhopTableTmr_.resched(timer_route_validity_);
 				ack_warnings_counter_ = 0;
@@ -428,11 +444,12 @@ SunIPRoutingNode::evaluatePath(const Packet *p)
 							// + 1 (node-node with hc 1-sink)
 
 				if (printDebug_ > 5) {
-					std::cout << "[" <<  NOW
+					std::cout << "[" << NOW
 							  << "]::Node[IP:" << this->printIP(ipAddr_)
 							  << "||hops:" << this->getNumberOfHopToSink()
 							  << "]::SN:" << ch->uid()
-							  << "::NEW_BEST_ROUTE::HOPCOUNT" << this->getNumberOfHopToSink()
+							  << "::NEW_BEST_ROUTE::HOPCOUNT"
+							  << this->getNumberOfHopToSink()
 							  << "::LOAD:" << quality_link
 							  << "::FINAL_HOP:" << printIP(iph->saddr())
 							  << std::endl;

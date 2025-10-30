@@ -50,16 +50,19 @@
 	(hdr_PROBE::access(p)) /**< alias defined to access the PROBE HEADER */
 #define HDR_TRIGGER(p)                                                       \
 	(hdr_TRIGGER::access(p)) /**< alias defined to access the TRIGGER HEADER \
-								*/
+							  */
 #define HDR_POLL(p) \
 	(hdr_POLL::access(p)) /**< alias defined to access the POLL HEADER */
-#define HDR_AUV_MULE(p) \
-	(hdr_AUV_MULE::access(p))/**< alias defined to access the AUV MULE HEADER */
+#define HDR_AUV_MULE(p)    \
+	(hdr_AUV_MULE::access( \
+			p)) /**< alias defined to access the AUV MULE HEADER */
 
-#define HDR_ACK_SINK(p) \
-	(hdr_ACK_SINK::access(p))/**< alias defined to access the ACK SINK HEADER*/
-#define HDR_PROBE_SINK(p) \
-	(hdr_PROBE_SINK::access(p))/**< alias defined to access the ACK SINK HEADER*/
+#define HDR_ACK_SINK(p)                                                 \
+	(hdr_ACK_SINK::access(p)) /**< alias defined to access the ACK SINK \
+								 HEADER*/
+#define HDR_PROBE_SINK(p)    \
+	(hdr_PROBE_SINK::access( \
+			p)) /**< alias defined to access the ACK SINK HEADER*/
 
 extern packet_t PT_TRIGGER;
 extern packet_t PT_POLL;
@@ -86,12 +89,10 @@ typedef struct POLL_ID {
  * Header of the TRIGGER message
  */
 typedef struct hdr_TRIGGER {
-	uint16_t
-			t_in_; /**< Minimum value in which the node can choose his backoff
-					  time */
-	uint16_t
-			t_fin_; /**< Maximum value in which the node can choose his backoff
+	uint16_t t_in_; /**< Minimum value in which the node can choose his backoff
 					   time */
+	uint16_t t_fin_; /**< Maximum value in which the node can choose his backoff
+						time */
 	uint TRIGGER_uid_; /**< TRIGGER packet unique ID */
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -167,7 +168,7 @@ typedef struct hdr_POLL {
 	uint16_t &
 	POLL_time()
 	{
-	  return (POLL_time_);
+		return (POLL_time_);
 	}
 
 	/**
@@ -190,7 +191,7 @@ typedef struct hdr_POLL {
  * Header of the PROBE message
  */
 typedef struct hdr_PROBE {
-	//uint16_t backoff_time_; /**< Backoff time chosen by the node */
+	// uint16_t backoff_time_; /**< Backoff time chosen by the node */
 	uint16_t ts_; /**< Timestamp of the most recent data packet */
 	int n_pkts_; /**< Number of packets that the node wish to transmit to the
 					AUV */
@@ -210,11 +211,11 @@ typedef struct hdr_PROBE {
 	/**
 	 * Reference to backoff_time variable
 	 */
-/*	uint16_t &
-	backoff_time()
-	{
-		return (backoff_time_);
-	}*/
+	/*	uint16_t &
+		backoff_time()
+		{
+			return (backoff_time_);
+		}*/
 
 	/**
 	 * Reference to n_pkts variable
@@ -258,7 +259,6 @@ typedef struct hdr_PROBE {
 		return (struct hdr_PROBE *) p->access(offset_);
 	}
 } hdr_PROBE;
-
 
 /**
  * Header of the PROBE message
@@ -312,12 +312,12 @@ typedef struct hdr_PROBE_SINK {
 	}
 } hdr_PROBE_SINK;
 
-
 /**
  * Header of the data sent from AUV MULE to SINK
  */
 typedef struct hdr_AUV_MULE {
-	uint16_t pkt_uid_;/**< unique ID of the transmitted packet by the AUV node*/
+	uint16_t
+			pkt_uid_; /**< unique ID of the transmitted packet by the AUV node*/
 	uint16_t last_pkt_uid_; /** ID of the last packet transmitted in the round*/
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -329,7 +329,7 @@ typedef struct hdr_AUV_MULE {
 	{
 		return (pkt_uid_);
 	}
-	
+
 	/**
 	 * Reference to the last_pkt_uid_ variable
 	 */

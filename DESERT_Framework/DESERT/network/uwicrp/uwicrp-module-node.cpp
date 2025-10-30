@@ -248,9 +248,9 @@ UwIcrpNode::recv(Packet *p)
 							HDR_UWICRP_STATUS(p_new);
 					ch_new->prev_hop_ = ipAddr_;
 					ch_new->next_hop() =
-							icrp_statush_new->list_of_hops()
-									[--icrp_statush_new
-													->pointer_to_list_of_hops()]; // TODO: check
+							icrp_statush_new->list_of_hops()[--icrp_statush_new
+											->pointer_to_list_of_hops()]; // TODO:
+																		  // check
 					numberofstatuspkt_++;
 					sendDown(p_new);
 					Packet::free(p);

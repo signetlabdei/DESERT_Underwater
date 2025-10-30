@@ -38,222 +38,229 @@
 #include "uwphy-clmsg.h"
 
 ClMsgUwPhy::ClMsgUwPhy(ClMessage_t type)
-: ClMessage(CLMSG_UWPHY_VERBOSITY, type),
-  stack_id(CLMSG_UWPHY_STACK_ID_NOT_VALID),
-  req_type(NOT_VALID)
+	: ClMessage(CLMSG_UWPHY_VERBOSITY, type)
+	, stack_id(CLMSG_UWPHY_STACK_ID_NOT_VALID)
+	, req_type(NOT_VALID)
 {
 }
-
 
 ClMsgUwPhy::ClMsgUwPhy(int sid, int dest_module_id, ClMessage_t type)
-: ClMessage(CLMSG_UWPHY_VERBOSITY, type, UNICAST, dest_module_id),
-  stack_id(sid),
-  req_type(NOT_VALID)
+	: ClMessage(CLMSG_UWPHY_VERBOSITY, type, UNICAST, dest_module_id)
+	, stack_id(sid)
+	, req_type(NOT_VALID)
 {
 }
 
-ClMsgUwPhy::ClMsgUwPhy(const ClMsgUwPhy& msg)
-: ClMessage(msg),
-  stack_id(CLMSG_UWPHY_STACK_ID_NOT_VALID)
+ClMsgUwPhy::ClMsgUwPhy(const ClMsgUwPhy &msg)
+	: ClMessage(msg)
+	, stack_id(CLMSG_UWPHY_STACK_ID_NOT_VALID)
 {
-  req_type = msg.req_type;
+	req_type = msg.req_type;
 }
 
 ClMsgUwPhy::~ClMsgUwPhy()
 {
 }
 
-ClMsgUwPhy* ClMsgUwPhy::copy()
+ClMsgUwPhy *
+ClMsgUwPhy::copy()
 {
-  return new ClMsgUwPhy(*this);
+	return new ClMsgUwPhy(*this);
 }
 
-void ClMsgUwPhy::setReqType(ReqType type)
+void
+ClMsgUwPhy::setReqType(ReqType type)
 {
-  req_type = type;
+	req_type = type;
 }
 
-ClMsgUwPhy::ReqType ClMsgUwPhy::getReqType()
+ClMsgUwPhy::ReqType
+ClMsgUwPhy::getReqType()
 {
-  return req_type;
+	return req_type;
 }
-
 
 ClMsgUwPhyTxPwr::ClMsgUwPhyTxPwr()
-: ClMsgUwPhy(CLMSG_UWPHY_TX_POWER),
-  tx_power(0)
+	: ClMsgUwPhy(CLMSG_UWPHY_TX_POWER)
+	, tx_power(0)
 {
 }
 
 ClMsgUwPhyTxPwr::ClMsgUwPhyTxPwr(int sid, int dest_module_id)
-: ClMsgUwPhy(sid, dest_module_id,CLMSG_UWPHY_TX_POWER),
-  tx_power(0)
+	: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_TX_POWER)
+	, tx_power(0)
 {
 }
 
-ClMsgUwPhyTxPwr::ClMsgUwPhyTxPwr(const ClMsgUwPhyTxPwr& msg)
-: ClMsgUwPhy(msg)
+ClMsgUwPhyTxPwr::ClMsgUwPhyTxPwr(const ClMsgUwPhyTxPwr &msg)
+	: ClMsgUwPhy(msg)
 {
-  tx_power = msg.tx_power;
+	tx_power = msg.tx_power;
 }
 
 ClMsgUwPhyTxPwr::~ClMsgUwPhyTxPwr()
 {
 }
 
-double ClMsgUwPhyTxPwr::getPower()
+double
+ClMsgUwPhyTxPwr::getPower()
 {
 	return tx_power;
 }
 
-void ClMsgUwPhyTxPwr::setPower(double power)
+void
+ClMsgUwPhyTxPwr::setPower(double power)
 {
 	tx_power = power;
 }
 
-
 ClMsgUwPhyBRate::ClMsgUwPhyBRate()
-: ClMsgUwPhy(CLMSG_UWPHY_B_RATE),
-  b_rate(0)
+	: ClMsgUwPhy(CLMSG_UWPHY_B_RATE)
+	, b_rate(0)
 {
 }
 
 ClMsgUwPhyBRate::ClMsgUwPhyBRate(int sid, int dest_module_id)
-: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_B_RATE),
-  b_rate(0)
+	: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_B_RATE)
+	, b_rate(0)
 {
 }
 
-ClMsgUwPhyBRate::ClMsgUwPhyBRate(const ClMsgUwPhyBRate& msg)
-: ClMsgUwPhy(msg)
+ClMsgUwPhyBRate::ClMsgUwPhyBRate(const ClMsgUwPhyBRate &msg)
+	: ClMsgUwPhy(msg)
 {
-  b_rate = msg.b_rate;
+	b_rate = msg.b_rate;
 }
 
 ClMsgUwPhyBRate::~ClMsgUwPhyBRate()
 {
 }
 
-double ClMsgUwPhyBRate::getBRate()
+double
+ClMsgUwPhyBRate::getBRate()
 {
 	return b_rate;
 }
 
-void ClMsgUwPhyBRate::setBRate(double rate)
+void
+ClMsgUwPhyBRate::setBRate(double rate)
 {
 	b_rate = rate;
 }
 
-
 ClMsgUwPhyThresh::ClMsgUwPhyThresh()
-: ClMsgUwPhy(CLMSG_UWPHY_THRESH),
-  threshold(0)
+	: ClMsgUwPhy(CLMSG_UWPHY_THRESH)
+	, threshold(0)
 {
 }
 
 ClMsgUwPhyThresh::ClMsgUwPhyThresh(int sid, int dest_module_id)
-: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_THRESH),
-  threshold(0)
+	: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_THRESH)
+	, threshold(0)
 {
 }
 
-ClMsgUwPhyThresh::ClMsgUwPhyThresh(const ClMsgUwPhyThresh& msg)
-: ClMsgUwPhy(msg)
+ClMsgUwPhyThresh::ClMsgUwPhyThresh(const ClMsgUwPhyThresh &msg)
+	: ClMsgUwPhy(msg)
 {
-  threshold = msg.threshold;
+	threshold = msg.threshold;
 }
 
 ClMsgUwPhyThresh::~ClMsgUwPhyThresh()
 {
 }
 
-double ClMsgUwPhyThresh::getThresh()
+double
+ClMsgUwPhyThresh::getThresh()
 {
 	return threshold;
 }
 
-void ClMsgUwPhyThresh::setThresh(double thresh)
+void
+ClMsgUwPhyThresh::setThresh(double thresh)
 {
 	threshold = thresh;
 }
 
-
 ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy()
-: ClMsgUwPhy(CLMSG_UWPHY_TX_BUSY),
-  tx_busy(0),
-  getop(0)
+	: ClMsgUwPhy(CLMSG_UWPHY_TX_BUSY)
+	, tx_busy(0)
+	, getop(0)
 {
 }
 
 ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy(int sid, int dest_module_id)
-: ClMsgUwPhy(sid, dest_module_id,CLMSG_UWPHY_TX_BUSY),
-  tx_busy(0),
-  getop(0)
+	: ClMsgUwPhy(sid, dest_module_id, CLMSG_UWPHY_TX_BUSY)
+	, tx_busy(0)
+	, getop(0)
 {
 }
 
-ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy(const ClMsgUwPhyTxBusy& msg)
-: ClMsgUwPhy(msg)
+ClMsgUwPhyTxBusy::ClMsgUwPhyTxBusy(const ClMsgUwPhyTxBusy &msg)
+	: ClMsgUwPhy(msg)
 {
-  tx_busy = msg.tx_busy;
+	tx_busy = msg.tx_busy;
 }
 
 ClMsgUwPhyTxBusy::~ClMsgUwPhyTxBusy()
 {
 }
 
-int ClMsgUwPhyTxBusy::getTxBusy()
+int
+ClMsgUwPhyTxBusy::getTxBusy()
 {
 	return tx_busy;
 }
 
-void ClMsgUwPhyTxBusy::setTxBusy(int busy)
+void
+ClMsgUwPhyTxBusy::setTxBusy(int busy)
 {
 	tx_busy = busy;
 }
 
-int ClMsgUwPhyTxBusy::getGetOp()
+int
+ClMsgUwPhyTxBusy::getGetOp()
 {
 	return getop;
 }
 
-void ClMsgUwPhyTxBusy::setGetOp(int go)
+void
+ClMsgUwPhyTxBusy::setGetOp(int go)
 {
 	getop = go;
 }
 
 ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(bool control)
-: ClMsgUwPhy(CLMSG_UWPHY_LOSTPKT)
-, lost_packets(0)
-, is_control(control)
+	: ClMsgUwPhy(CLMSG_UWPHY_LOSTPKT)
+	, lost_packets(0)
+	, is_control(control)
 {
-
 }
-ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(int stack_id, int dest_module_id, bool control)
-: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_UWPHY_LOSTPKT)
-, lost_packets(0)
+ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(
+		int stack_id, int dest_module_id, bool control)
+	: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_UWPHY_LOSTPKT)
+	, lost_packets(0)
 {
-
 }
 
-ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(const ClMsgUwPhyGetLostPkts& msg)
-: ClMsgUwPhy(msg),
-  lost_packets(0)
+ClMsgUwPhyGetLostPkts::ClMsgUwPhyGetLostPkts(const ClMsgUwPhyGetLostPkts &msg)
+	: ClMsgUwPhy(msg)
+	, lost_packets(0)
 {
-
 }
 
 ClMsgUwPhyGetLostPkts::~ClMsgUwPhyGetLostPkts()
 {
-
 }
 
-uint ClMsgUwPhyGetLostPkts::getLostPkts() 
+uint
+ClMsgUwPhyGetLostPkts::getLostPkts()
 {
-  return lost_packets;
+	return lost_packets;
 }
 
-void ClMsgUwPhyGetLostPkts::setLostPkts(uint lost_pkt)
+void
+ClMsgUwPhyGetLostPkts::setLostPkts(uint lost_pkt)
 {
-  lost_packets = lost_pkt;
+	lost_packets = lost_pkt;
 }

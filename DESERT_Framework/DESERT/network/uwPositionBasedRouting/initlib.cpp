@@ -36,7 +36,7 @@
  *
  * Provides the initialization of uwPositionBasedRouting libraries.
  */
- 
+
 #include "uwPosBasedRt-hdr.h"
 
 #include <tclcl.h>
@@ -54,7 +54,8 @@ static class UwPosBasedRtPktClass : public PacketHeaderClass
 {
 public:
 	UwPosBasedRtPktClass()
-		: PacketHeaderClass("PacketHeader/PosBasedRt", sizeof(hdr_uwpos_based_rt))
+		: PacketHeaderClass(
+				  "PacketHeader/PosBasedRt", sizeof(hdr_uwpos_based_rt))
 	{
 		this->bind();
 		bind_offset(&hdr_uwpos_based_rt::offset_);

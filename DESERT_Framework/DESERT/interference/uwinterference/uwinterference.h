@@ -39,13 +39,13 @@
 #ifndef UW_INTERFERENCE
 #define UW_INTERFERENCE
 
-#include <interference_miv.h>
-#include <list>
-#include <iostream>
-#include <scheduler.h>
-#include <vector>
 #include <assert.h>
 #include <cmath>
+#include <interference_miv.h>
+#include <iostream>
+#include <list>
+#include <scheduler.h>
+#include <vector>
 
 enum PKT_TYPE { CTRL, DATA }; /**< Pkt type: CONTROL or DATA packet */
 // enum RX_STATE { START_RX, END_RX};
@@ -109,12 +109,13 @@ public:
 		type = tp;
 	}
 	/**
-	 * Constructor of the class EndInterfEvent for OFDM 
+	 * Constructor of the class EndInterfEvent for OFDM
 	 * @param pw Received power of the current packet
 	 * @param type type of the packet (DATA or CTRL)
 	 */
 
-	EndInterfEvent(double pw, PKT_TYPE tp, const std::vector<double>& carPwr): carrier_power(carPwr)
+	EndInterfEvent(double pw, PKT_TYPE tp, const std::vector<double> &carPwr)
+		: carrier_power(carPwr)
 	{
 		power = pw;
 		type = tp;

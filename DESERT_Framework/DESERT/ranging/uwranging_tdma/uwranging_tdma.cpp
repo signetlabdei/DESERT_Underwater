@@ -36,17 +36,23 @@
  *
  */
 
-#include <mmac.h>
-#include <mac.h>
 #include "uwranging_tdma.h"
 #include "uwranging_tdma_hdr.h"
-#include <iostream>
-#include <tclcl.h>
 #include <cmath>
 #include <iomanip>
- 
-//define a macro to print debug messages
-#define DEBUG(level,text) {if (1) {std::cout << NOW << " UwRangingTDMA(" << node_id << "): " << text << std::endl;}}
+#include <iostream>
+#include <mac.h>
+#include <mmac.h>
+#include <tclcl.h>
+
+// define a macro to print debug messages
+#define DEBUG(level, text)                                                    \
+	{                                                                         \
+		if (1) {                                                              \
+			std::cout << NOW << " UwRangingTDMA(" << node_id << "): " << text \
+					  << std::endl;                                           \
+		}                                                                     \
+	}
 /**
  * Class that represent the binding of the protocol with tcl
  */
@@ -73,35 +79,34 @@ public:
 
 } class_module_uwrangingtdma;
 
-//initializing static variables
+// initializing static variables
 int UwRangingTDMA::count_nodes = 0;
 
 UwRangingTDMA::UwRangingTDMA()
 	: UwTDMA()
-	,node_id(count_nodes++)
-	,slot_id(node_id)
-	,n_nodes(tot_slots)
-	,slotidmax(SLOTIDMAX_HDR - std::fmod(SLOTIDMAX_HDR,n_nodes) -1)
-	,owtt_vec()
-	,owtt_map()
+	, node_id(count_nodes++)
+	, slot_id(node_id)
+	, n_nodes(tot_slots)
+	, slotidmax(SLOTIDMAX_HDR - std::fmod(SLOTIDMAX_HDR, n_nodes) - 1)
+	, owtt_vec()
+	, owtt_map()
 {
 	slot_number = node_id;
 	owtt_vec.resize(((n_nodes * (n_nodes - 1)) / 2) + 1, -1.0);
-	owtt_vec[0] = 0.; //so that owtt_vec[owtt_map[a][a]] will return 0
+	owtt_vec[0] = 0.; // so that owtt_vec[owtt_map[a][a]] will return 0
 
 	if (count_nodes > n_nodes) {
-		std::cerr << NOW << " UwRangingTDMA() instances are " << count_nodes 
-		<< " but parameter tot_slots is set to " << tot_slots << std::endl;
-	}	
+		std::cerr << NOW << " UwRangingTDMA() instances are " << count_nodes
+				  << " but parameter tot_slots is set to " << tot_slots
+				  << std::endl;
+	}
 
 	// initialize the owtt_map
 	owtt_map.resize(n_nodes, std::vector<int>(n_nodes, 0));
 	{
 		int temp = 1;
-		for (int ni = 0; ni < n_nodes; ni++)
-		{
-			for (int nj = ni + 1; nj < n_nodes; nj++)
-			{
+		for (int ni = 0; ni < n_nodes; ni++) {
+			for (int nj = ni + 1; nj < n_nodes; nj++) {
 				owtt_map[ni][nj] = temp;
 				owtt_map[nj][ni] = temp++;
 			}
@@ -123,18 +128,19 @@ UwRangingTDMA::sendRange()
 	hdr_ranging_tdma *rangh = HDR_RANGING_TDMA(p);
 	ch->ptype() = PT_UWRANGING_TDMA;
 	mach->set(MF_CONTROL, addr, BCAST_ADDR);
-	mach->macDA() = BCAST_ADDR; // hdr_mac->set() doesn't set correctly broadcast address as -1
+	mach->macDA() = BCAST_ADDR; // hdr_mac->set() doesn't set correctly
+								// broadcast address as -1
 	rangh->slotId() = slot_id;
-	//DEBUG(5,"sending ping with slot_id: " << slot_id)
+	// DEBUG(5,"sending ping with slot_id: " << slot_id)
 	slot_id += n_nodes;
-	if(slot_id > slotidmax) {
+	if (slot_id > slotidmax) {
 		slot_id = node_id;
 	}
-	for(int i= 0; i< n_nodes;i++){
-		if ( i != node_id) {
-			//rangh->times().push_back(half_float::half_cast<half_float::half>(owtt_vec[owtt_map[node_id][i]]));
+	for (int i = 0; i < n_nodes; i++) {
+		if (i != node_id) {
+			// rangh->times().push_back(half_float::half_cast<half_float::half>(owtt_vec[owtt_map[node_id][i]]));
 			rangh->times().push_back(owtt_vec[owtt_map[node_id][i]]);
-		}	
+		}
 	}
 	// DEBUG(5,"sending ping with values:")
 	// for (auto &&i : rangh->times())
@@ -152,7 +158,7 @@ void
 UwRangingTDMA::stateTxData()
 {
 	sendRange();
-	//txData() should be called by UwTDMA::Phy2MacEndTx()
+	// txData() should be called by UwTDMA::Phy2MacEndTx()
 }
 
 void
@@ -166,42 +172,52 @@ void
 UwRangingTDMA::Phy2MacEndRx(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
-	incrCtrlPktsRx(); //use to count all control packets (good+errored ones)
-	if(ch->ptype() == PT_UWRANGING_TDMA) {
-		
+	incrCtrlPktsRx(); // use to count all control packets (good+errored ones)
+	if (ch->ptype() == PT_UWRANGING_TDMA) {
+
 		if (transceiver_status != TRANSMITTING) {
-			transceiver_status = IDLE;			
+			transceiver_status = IDLE;
 			if (!(ch->error())) {
 				hdr_ranging_tdma *rangh = HDR_RANGING_TDMA(p);
 				int origin_node = ((rangh->slotId()) % n_nodes);
-				double range_rx_time = std::fmod(NOW-Mac2PhyTxDuration(p),slot_duration*(slotidmax+1));
-				double tt = range_rx_time - ((rangh->slotId())*slot_duration);
-				//DEBUG(0,"reveiced ping from "<<origin_node << " with values")
+				double range_rx_time = std::fmod(NOW - Mac2PhyTxDuration(p),
+						slot_duration * (slotidmax + 1));
+				double tt = range_rx_time - ((rangh->slotId()) * slot_duration);
+				// DEBUG(0,"reveiced ping from "<<origin_node << " with values")
 				{
-					int i=0;
-					for (auto el : rangh->times())
-					{
-						if (i == origin_node) {++i;}
+					int i = 0;
+					for (auto el : rangh->times()) {
+						if (i == origin_node) {
+							++i;
+						}
 						if (el >= 0.) {
-							owtt_vec[owtt_map[origin_node][i]] = el; //copy owttimes data from packet						
+							owtt_vec[owtt_map[origin_node][i]] =
+									el; // copy owttimes data from packet
 						}
 						++i;
 					}
 				}
-				owtt_vec[owtt_map[node_id][origin_node]] = tt; //save measured owtt
-				//DEBUG(0,"update [" << node_id << "][" << origin_node << "] : " << tt*1500.0)
-			} else {incrXCtrlPktsRx();} //use incrXCtrlPktsRx() to count control packets with errors
-		} else {incrXCtrlPktsRx();}
+				owtt_vec[owtt_map[node_id][origin_node]] =
+						tt; // save measured owtt
+				// DEBUG(0,"update [" << node_id << "][" << origin_node << "] :
+				// " << tt*1500.0)
+			} else {
+				incrXCtrlPktsRx();
+			} // use incrXCtrlPktsRx() to count control packets with errors
+		} else {
+			incrXCtrlPktsRx();
+		}
 		Packet::free(p);
+	} else {
+		UwTDMA::Phy2MacEndRx(p);
 	}
-	else {UwTDMA::Phy2MacEndRx(p);}
 }
 
 void
 UwRangingTDMA::Mac2PhyStartTx(Packet *p)
 {
 	transceiver_status = TRANSMITTING;
-	if(sea_trial_) {
+	if (sea_trial_) {
 		sendDown(p, 0.01);
 	} else {
 		MMac::Mac2PhyStartTx(p);
@@ -212,14 +228,11 @@ int
 UwRangingTDMA::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
-	if (argc == 4)
-	{
-		if (strcasecmp(argv[1], "get_distance") == 0)
-		{
+	if (argc == 4) {
+		if (strcasecmp(argv[1], "get_distance") == 0) {
 			int n1 = atoi(argv[2]);
 			int n2 = atoi(argv[3]);
-			if (n1 >= 0 && n1 < n_nodes && n2 >= 0 && n2 < n_nodes)
-			{
+			if (n1 >= 0 && n1 < n_nodes && n2 >= 0 && n2 < n_nodes) {
 				tcl.resultf("%.17f", owtt_vec[owtt_map[n1][n2]]);
 				return TCL_OK;
 			}

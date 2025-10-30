@@ -51,31 +51,37 @@ UwPosEstimation::~UwPosEstimation()
 {
 }
 
-Position UwPosEstimation::getInitPos()
+Position
+UwPosEstimation::getInitPos()
 {
 	return initialPos;
 }
 
-Position UwPosEstimation::getDest()
+Position
+UwPosEstimation::getDest()
 {
 	return destPos;
 }
 
-double UwPosEstimation::getTimestamp()
+double
+UwPosEstimation::getTimestamp()
 {
 	return timestamp;
 }
 
-double UwPosEstimation::getSpeed()
+double
+UwPosEstimation::getSpeed()
 {
 	return speed;
 }
 
-void UwPosEstimation::update(Position newInitPos, Position newDest, double newTime, double newSpeed)
+void
+UwPosEstimation::update(
+		Position newInitPos, Position newDest, double newTime, double newSpeed)
 {
 	if (newTime <= timestamp) {
-		std::cout << "UwPosEstimation::update, new informations are obslete" 
-			<< std::endl;
+		std::cout << "UwPosEstimation::update, new informations are obslete"
+				  << std::endl;
 		return;
 	}
 	initialPos.setX(newInitPos.getX());
@@ -88,7 +94,8 @@ void UwPosEstimation::update(Position newInitPos, Position newDest, double newTi
 	speed = newSpeed;
 }
 
-Position UwPosEstimation::getEstimatePos(double time)
+Position
+UwPosEstimation::getEstimatePos(double time)
 {
 	double x_ROV = initialPos.getX();
 	double y_ROV = initialPos.getY();
@@ -99,50 +106,51 @@ Position UwPosEstimation::getEstimatePos(double time)
 	double x = std::abs(x_ROV - x_wp);
 	double y = std::abs(y_ROV - y_wp);
 	double z = std::abs(z_ROV - z_wp);
-	double rho = sqrt(pow(x,2) + pow(y,2) + pow(z,2));
-	double theta = 0; //theta [-pi, pi]
-	double psi = 0;	//psi [0, pi]
+	double rho = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+	double theta = 0; // theta [-pi, pi]
+	double psi = 0; // psi [0, pi]
 	double deltaT = time - timestamp;
-	double dist = nodesDistance(initialPos,destPos);
+	double dist = nodesDistance(initialPos, destPos);
 	Position estimated_ROV_pos;
-	if (speed == 0 || dist/speed < deltaT) {  //waypoint reached
+	if (speed == 0 || dist / speed < deltaT) { // waypoint reached
 		estimated_ROV_pos.setX(x_wp);
 		estimated_ROV_pos.setY(y_wp);
 		estimated_ROV_pos.setZ(z_wp);
 		return estimated_ROV_pos;
 	}
 
-	if (x == 0 && y == 0) { //true both for z=0 and z!=0
+	if (x == 0 && y == 0) { // true both for z=0 and z!=0
 		estimated_ROV_pos.setX(x_ROV);
 		estimated_ROV_pos.setY(y_ROV);
 		estimated_ROV_pos.setZ(z_ROV + deltaT * speed);
 	} else {
-		psi = acos(z/rho);
+		psi = acos(z / rho);
 		if (x == 0) {
 			if (y > 0) {
-				theta = pi/2;
+				theta = pi / 2;
 			} else {
-				theta = -pi/2;
+				theta = -pi / 2;
 			}
-			psi = acos(z/rho);
+			psi = acos(z / rho);
 		} else if (x > 0) {
-			theta = atan(y/x);
+			theta = atan(y / x);
 		} else { // x < 0
 			if (y >= 0) {
-				theta = atan(y/x) + pi;
+				theta = atan(y / x) + pi;
 			} else {
-				theta = atan(y/x) - pi;
+				theta = atan(y / x) - pi;
 			}
 		}
 	}
-	estimated_ROV_pos.setX(x_ROV + deltaT*speed*sin(psi)*cos(theta));
-	estimated_ROV_pos.setY(y_ROV + deltaT*speed*sin(psi)*sin(theta));
-	estimated_ROV_pos.setZ(z_ROV + deltaT*speed*cos(psi));	
+	estimated_ROV_pos.setX(x_ROV + deltaT * speed * sin(psi) * cos(theta));
+	estimated_ROV_pos.setY(y_ROV + deltaT * speed * sin(psi) * sin(theta));
+	estimated_ROV_pos.setZ(z_ROV + deltaT * speed * cos(psi));
 
 	return estimated_ROV_pos;
 }
 
-double UwPosEstimation::nodesDistance(Position& p1, Position& p2)
+double
+UwPosEstimation::nodesDistance(Position &p1, Position &p2)
 {
 	double x1 = p1.getX();
 	double y1 = p1.getY();
@@ -151,5 +159,5 @@ double UwPosEstimation::nodesDistance(Position& p1, Position& p2)
 	double y2 = p2.getY();
 	double z2 = p2.getZ();
 
-	return sqrt(pow(x2-x1,2) + pow(y2-y1,2) + pow(z2-z1,2));
+	return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) + pow(z2 - z1, 2));
 }

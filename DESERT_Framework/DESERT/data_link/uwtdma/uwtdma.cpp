@@ -39,10 +39,10 @@
 
 #include "uwtdma.h"
 #include <iostream>
-#include <stdint.h>
 #include <mac.h>
-#include <uwmmac-clmsg.h>
+#include <stdint.h>
 #include <uwcbr-module.h>
+#include <uwmmac-clmsg.h>
 
 /**
  * Class that represent the binding of the protocol with tcl
@@ -111,28 +111,36 @@ UwTDMA::UwTDMA()
 	}
 
 	if (max_queue_size < 0) {
-		cerr << NOW << " UwTDMA() not valid max_queue_size < 0!! set to 1 by default " 
+		cerr << NOW
+			 << " UwTDMA() not valid max_queue_size < 0!! set to 1 by default "
 			 << std::endl;
 		max_queue_size = 1;
 	}
 	if (frame_duration < 0) {
-		cerr << NOW << " UwTDMA() not valid frame_duration < 0!! set to 1 by default " 
+		cerr << NOW
+			 << " UwTDMA() not valid frame_duration < 0!! set to 1 by default "
 			 << std::endl;
 		frame_duration = 1;
 	}
 	if (max_packet_per_slot < 0) {
-		cerr << NOW << " UwTDMA() not valid max_packet_per_slot < 0!! set to 1 by default " 
+		cerr << NOW
+			 << " UwTDMA() not valid max_packet_per_slot < 0!! set to 1 by "
+				"default "
 			 << std::endl;
 		max_packet_per_slot = 1;
 	}
 	if (drop_old_ == 1 && checkPriority == 1) {
-		cerr << NOW << " UwTDMA() drop_old_ and checkPriority cannot be set both to 1!! "
+		cerr << NOW
+			 << " UwTDMA() drop_old_ and checkPriority cannot be set both to "
+				"1!! "
 			 << "checkPriority set to 0 by default " << std::endl;
-		checkPriority = 0; 
+		checkPriority = 0;
 	}
 	if (mac2phy_delay_ <= 0) {
-		cerr << NOW << " UwTDMA() not valid mac2phy_delay_ < 0!! set to 1e-9 by default "
-			 << std::endl; 
+		cerr << NOW
+			 << " UwTDMA() not valid mac2phy_delay_ < 0!! set to 1e-9 by "
+				"default "
+			 << std::endl;
 		mac2phy_delay_ = 1e-9;
 	}
 }
@@ -152,20 +160,24 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 		} else {
 			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 			if (uwcbrh->priority() == 0) {
-					buffer.push_back(p);
+				buffer.push_back(p);
 				if (debug_)
-					std::cout << NOW << " TDMA(" << addr 
-					<< ")::insert packet with standard priority in the queue" << std::endl;
+					std::cout << NOW << " TDMA(" << addr
+							  << ")::insert packet with standard priority in "
+								 "the queue"
+							  << std::endl;
 			} else {
 				buffer.push_front(p);
 				if (debug_)
-					std::cout << NOW << " TDMA(" << addr 
-					<< ")::insert packet with high priority in the queue" << std::endl;
+					std::cout << NOW << " TDMA(" << addr
+							  << ")::insert packet with high priority in the "
+								 "queue"
+							  << std::endl;
 			}
 		}
- 		
- 	} else {
-	if (debug_)
+
+	} else {
+		if (debug_)
 			cout << NOW << " TDMA(" << addr
 				 << ")::recvFromUpperLayers() dropping pkt due to buffer full "
 				 << std::endl;
@@ -175,7 +187,7 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 			Packet::free(p_old);
 			initPkt(p);
 			buffer.push_back(p);
-		}else if (checkPriority == 1) {
+		} else if (checkPriority == 1) {
 			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 			if (uwcbrh->priority() == 1) {
 				Packet *p_old = buffer.back();
@@ -184,8 +196,7 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 				initPkt(p);
 				buffer.push_front(p);
 			}
-		}
-		else
+		} else
 			Packet::free(p);
 	}
 	txData();
@@ -194,7 +205,7 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 void
 UwTDMA::stateTxData()
 {
-	//if (transceiver_status == TRANSMITTING)
+	// if (transceiver_status == TRANSMITTING)
 	//	transceiver_status = IDLE;
 	txData();
 }
@@ -203,7 +214,8 @@ void
 UwTDMA::txData()
 {
 	if (packet_sent_curr_slot_ < max_packet_per_slot) {
-		if (slot_status == UW_TDMA_STATUS_MY_SLOT && transceiver_status == IDLE) {
+		if (slot_status == UW_TDMA_STATUS_MY_SLOT &&
+				transceiver_status == IDLE) {
 			if (buffer.size() > 0) {
 				Packet *p = buffer.front();
 				buffer.pop_front();
@@ -216,15 +228,16 @@ UwTDMA::txData()
 						  << std::endl;
 			else
 				std::cout << NOW << " ID " << addr
-						  << ": Wait earlier packet expires to send the current one"
+						  << ": Wait earlier packet expires to send the "
+							 "current one"
 						  << std::endl;
 		}
-	}
-	else {
+	} else {
 		if (sea_trial_)
-			out_file_stats << left << "[" << getEpoch() << "]::" << NOW << "::TDMA_node(" 
-						<< addr << ")::already_tx max packet = " << max_packet_per_slot 
-						<< std::endl;
+			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
+						   << "::TDMA_node(" << addr
+						   << ")::already_tx max packet = "
+						   << max_packet_per_slot << std::endl;
 		if (debug_)
 			cout << NOW << " TDMA(" << addr
 				 << ")::already_tx max packet = " << max_packet_per_slot
@@ -239,7 +252,7 @@ UwTDMA::Mac2PhyStartTx(Packet *p)
 		assert(transceiver_status == IDLE);
 
 	transceiver_status = TRANSMITTING;
-	if(sea_trial_) {
+	if (sea_trial_) {
 		sendDown(p, 0.01);
 	} else {
 		MMac::Mac2PhyStartTx(p);
@@ -249,9 +262,11 @@ UwTDMA::Mac2PhyStartTx(Packet *p)
 		std::cout << NOW << " ID " << addr << ": Sending packet" << std::endl;
 	if (sea_trial_)
 		out_file_stats << left << "[" << getEpoch() << "]::" << NOW
-					   << "::TDMA_node(" << addr << ")::PCK_SENT packet_sent_curr_slot_ = " 
-					   << packet_sent_curr_slot_ << " max_packet_per_slot = " 
-					   << max_packet_per_slot << std::endl;
+					   << "::TDMA_node(" << addr
+					   << ")::PCK_SENT packet_sent_curr_slot_ = "
+					   << packet_sent_curr_slot_
+					   << " max_packet_per_slot = " << max_packet_per_slot
+					   << std::endl;
 }
 
 void
@@ -495,10 +510,9 @@ UwTDMA::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "setLogLabel") == 0) {
 			name_label_ = argv[2];
 			if (debug_)
-				cout << "TDMA name_label_ " << name_label_
-					 << std::endl;
+				cout << "TDMA name_label_ " << name_label_ << std::endl;
 			return TCL_OK;
-		} 
+		}
 	}
 	return MMac::command(argc, argv);
 }

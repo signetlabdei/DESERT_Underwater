@@ -76,7 +76,7 @@ const int
 SunIPRoutingNode::getPacketsLastMinute() const
 {
 	if (STACK_TRACE)
-	  std::cout << "> getPacketsLastMinute()" << std::endl;
+		std::cout << "> getPacketsLastMinute()" << std::endl;
 	long t_max_ = list_packets_max_time_;
 	long t_min_ = t_max_;
 	int position_min_ = 0;

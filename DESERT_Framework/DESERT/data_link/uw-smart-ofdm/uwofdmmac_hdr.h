@@ -39,8 +39,7 @@
 
 #ifndef UWOFDMMAC_HDR_H
 #define UWOFDMMAC_HDR_H
-#define MAX_AVAL_CAR 10 //like the number of carriers in the system
-
+#define MAX_AVAL_CAR 10 // like the number of carriers in the system
 
 #include <mmac.h>
 #include <module.h>
@@ -50,22 +49,24 @@
 #define HDR_OFDMMAC(p) \
 	(hdr_OFDMMAC::access(p)) /**< alias defined to access the PROBE HEADER */
 
-
 extern packet_t PT_OFDMMAC;
 
 /**
  * Header of the OFDM message with fields to implement a multi carrier system
  */
-// Total size of MAC header is 17 bytes 
+// Total size of MAC header is 17 bytes
 typedef struct hdr_OFDMMAC {
 
 	static int offset_; /**< Required by the PacketHeaderManager. 4 bytes*/
 
-	int usage_carriers[MAX_AVAL_CAR];      /// Vector with available carriers. fields are -1 if no more carriers are available (1 byte for now)
-								// Picks from occupancy_table
-	int bytesToSend; // for RTS 4 bytes 
+	int usage_carriers[MAX_AVAL_CAR]; /// Vector with available carriers. fields
+									  /// are -1 if no more carriers are
+									  /// available (1 byte for now)
+									  // Picks from occupancy_table
+	int bytesToSend; // for RTS 4 bytes
 
-	double timeReserved; // for CTS, how long is each carriers reserved for 8 bytes 
+	double timeReserved; // for CTS, how long is each carriers reserved for 8
+						 // bytes
 
 	/**
 	 * Reference to the offset_ variable.
@@ -82,6 +83,5 @@ typedef struct hdr_OFDMMAC {
 		return (struct hdr_OFDMMAC *) p->access(hdr_OFDMMAC::offset_);
 	}
 } hdr_OFDMMAC;
-
 
 #endif

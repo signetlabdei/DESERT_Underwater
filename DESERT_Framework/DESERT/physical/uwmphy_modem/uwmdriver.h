@@ -42,18 +42,18 @@
 #include "uwmconnector.h"
 #include "uwminterpreter.h"
 
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <string.h>
-#include <cstring>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <cmath>
+#include <cstring>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define MAX_LOG_LEVEL 2
 
@@ -78,8 +78,6 @@ typedef enum LOG_LEVEL log_level_t;
 
 typedef enum MODEM_STATES modem_state_t;
 
-
-
 // Forward declaration(s)
 class UWMPhy_modem;
 class UWMcodec;
@@ -96,11 +94,11 @@ class UWMdriver
 {
 public:
 	/**
-* Class constructor.
-*
-* @param pmModem_ pointer to the UWMPhy_modem object to link with this UWMdriver
-*object.
-*/
+	 * Class constructor.
+	 *
+	 * @param pmModem_ pointer to the UWMPhy_modem object to link with this
+	 *UWMdriver object.
+	 */
 	UWMdriver(UWMPhy_modem *);
 
 	/**
@@ -329,18 +327,16 @@ public:
 	 */
 	std::string getLogFile();
 
-	void printOnLog(log_level_t log_level, std::string module, std::string message);
+	void printOnLog(
+			log_level_t log_level, std::string module, std::string message);
 
 protected:
 	UWMPhy_modem *pmModem; /**< link to the UWMPhy_modem object that contains
 							  this driver */
 
-	UWMinterpreter
-			*pmInterpreter; /**< pointer to the object that builds/parses the
-							   necessary
-							   messages to make
-									   UWMdriver able to communicate with a real
-							   modem */
+	UWMinterpreter *pmInterpreter; /**< pointer to the object that builds/parses
+									  the necessary messages to make UWMdriver
+									  able to communicate with a real modem */
 	UWMconnector *pmConnector; /**< pointer to the object that handles the
 								  physical transmission and
 										  reception of acoustic packets */

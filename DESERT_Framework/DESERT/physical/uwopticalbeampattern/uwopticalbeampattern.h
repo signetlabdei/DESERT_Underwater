@@ -42,10 +42,8 @@
 #include "uwopticalbeampattern-hdr.h"
 #include <uwoptical-phy.h>
 
-
-//structure for max distance from LUT without noise, with noise
-struct MaxDist
-{
+// structure for max distance from LUT without noise, with noise
+struct MaxDist {
 	double max_range;
 	double max_range_with_noise;
 };
@@ -53,9 +51,8 @@ typedef ::std::map<double, MaxDist> CMaxDist; // max distance per c
 typedef CMaxDist::iterator CMaxDistIter;
 
 // LUT of angle in radiance vs normalized beam pattern
-typedef ::std::map<double, double> BeamPattern; 
+typedef ::std::map<double, double> BeamPattern;
 typedef BeamPattern::iterator BeamPatternIter;
-
 
 class UwOpticalBeamPattern : public UwOpticalPhy
 {
@@ -85,36 +82,34 @@ public:
 	 */
 	virtual int command(int, const char *const *);
 
-
 	virtual void startRx(Packet *p);
 
 	virtual void startTx(Packet *p);
 
 protected:
-
 	/**
 	 * Inizialize all the LUTs
-	*/
+	 */
 	void initializeLUT();
 
 	/**
 	 * Inizialize beam pattern LUT
-	*/
+	 */
 	void initializeBeamLUT(BeamPattern &beam_lut_, string beam_pattern_path_);
 
 	/**
 	 * Inizialize max range LUT
-	*/
+	 */
 	void initializeMaxRangeLUT();
 
 	/**
 	 * Get the transmission range in the current conditions.
-	*/
+	 */
 	double getMaxTxRange(Packet *p);
 
 	/**
 	 * Get the maximum transmission range for these water properties.
-	*/
+	 */
 	double getLutMaxDist(double c, double na);
 	double getLutBeamFactor(BeamPattern &beam_lut_, double beta);
 	double getBetaRx(Packet *p);
@@ -122,17 +117,16 @@ protected:
 	double getBetaXYRx(Packet *p);
 	double getBetaXYTx(Packet *p);
 	double getBetaTx(Packet *p);
-	
+
 private:
-	
-	//string beam_pattern_path_; // LUT file name
+	// string beam_pattern_path_; // LUT file name
 	string beam_pattern_path_rx_; // LUT file name
 	string beam_pattern_path_tx_; // LUT file name
 	string max_dist_path_; // LUT file name
 	char beam_pattern_separator_; //
 	char max_dist_separator_; //
 	CMaxDist dist_lut_;
-	//BeamPattern beam_lut_;
+	// BeamPattern beam_lut_;
 	BeamPattern beam_lut_rx_;
 	BeamPattern beam_lut_tx_;
 	double back_noise_threshold_;

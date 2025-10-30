@@ -42,20 +42,22 @@
 
 extern ClMessage_t CLMSG_TRIGGER_STATS;
 
-namespace StatsEnum {
+namespace StatsEnum
+{
 /** Enum to use in the d_type field of Stats class. */
-	enum StatsEnum : int {
-		STATS_PHY_LAYER = 0,/**Stats phy layer.*/
-		STATS_MAC_LAYER,	/**Stats mac layer.*/
-		STATS_NET_LAYER, 	/**Stats net layer.*/
-		STATS_TRANSP_LAYER, /**Stats transport layer.*/
-		STATS_APP_LAYER 	/**Stats app layer.*/
-	};
-}
+enum StatsEnum : int {
+	STATS_PHY_LAYER = 0, /**Stats phy layer.*/
+	STATS_MAC_LAYER, /**Stats mac layer.*/
+	STATS_NET_LAYER, /**Stats net layer.*/
+	STATS_TRANSP_LAYER, /**Stats transport layer.*/
+	STATS_APP_LAYER /**Stats app layer.*/
+};
+} // namespace StatsEnum
 
-class ClMsgTriggerStats : public ClMessage {
-	
-public:	
+class ClMsgTriggerStats : public ClMessage
+{
+
+public:
 	/**
 	 * Constructor for broadcast ClMsg
 	 */
@@ -66,11 +68,10 @@ public:
 	 */
 	ClMsgTriggerStats(int dest_id);
 
-
 	/**
 	 * Destructor
 	 */
 	virtual ~ClMsgTriggerStats();
-}; 
+};
 
 #endif /* UW_STATS_UTILTIES_H */

@@ -50,7 +50,7 @@ public:
 	{
 		return (new UwElectroMagneticAntenna);
 	}
-}class_UwElectroMagneticAntenna;
+} class_UwElectroMagneticAntenna;
 
 UwElectroMagneticAntenna::UwElectroMagneticAntenna()
 	: gain_(1)
@@ -64,13 +64,14 @@ UwElectroMagneticAntenna::command(int argc, const char *const *argv)
 	if (argc == 3) {
 		if (strcasecmp(argv[1], "setGain") == 0) {
 			gain_ = strtod(argv[2], NULL);
-      		return TCL_OK;
+			return TCL_OK;
 		}
 	}
 	return UwElectroMagneticAntenna::command(argc, argv);
 }
 
-double 
-UwElectroMagneticAntenna::getGain(Packet* p){
+double
+UwElectroMagneticAntenna::getGain(Packet *p)
+{
 	return gain_;
 }

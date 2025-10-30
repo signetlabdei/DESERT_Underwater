@@ -52,131 +52,118 @@
 extern ClMessage_t CLMSG_UWMMAC_ENABLE;
 
 /**
-* ClMsgUwMmac should be extended and used to ask to set or get a parameter of a specific phy.
-* In addition, ClMsgUwMmac can be used from the phy to reply such a request.
-**/
+ * ClMsgUwMmac should be extended and used to ask to set or get a parameter of a
+ *specific phy. In addition, ClMsgUwMmac can be used from the phy to reply such
+ *a request.
+ **/
 class ClMsgUwMmac : public ClMessage
 {
 public:
+	enum ReqType { NOT_VALID = -1, SET_REQ, GET_REQ, SET_REPLY, GET_REPLY };
 
-  enum ReqType
-  {
-    NOT_VALID = -1,
-    SET_REQ,
-    GET_REQ,
-    SET_REPLY,
-    GET_REPLY
-  };
+	/**
+	 * Broadcast constructor of the ClMsgUwMmac class
+	 **/
+	ClMsgUwMmac(ClMessage_t type);
 
-  /**
-  * Broadcast constructor of the ClMsgUwMmac class
-  **/
-  ClMsgUwMmac(ClMessage_t type);
+	/**
+	 * Unicast constructor of the ClMsgUwMmac class
+	 * @param int stack_id: id of the stack
+	 * @param dest_mod_id: id of the destination module
+	 **/
+	ClMsgUwMmac(int stack_id, int dest_module_id, ClMessage_t type);
 
-  /**
-  * Unicast constructor of the ClMsgUwMmac class
-  * @param int stack_id: id of the stack
-  * @param dest_mod_id: id of the destination module
-  **/
-  ClMsgUwMmac(int stack_id, int dest_module_id, ClMessage_t type);
+	/**
+	 * Copy constructor
+	 * @param const ClMsgUwMmac& msg: ClMsgUwMmac that has to be copied
+	 */
+	ClMsgUwMmac(const ClMsgUwMmac &msg);
 
-  /**
-  * Copy constructor
-  * @param const ClMsgUwMmac& msg: ClMsgUwMmac that has to be copied
-  */
-  ClMsgUwMmac(const ClMsgUwMmac& msg);
+	/**
+	 * Destructor of the ClMsgUwMmac class
+	 **/
+	virtual ~ClMsgUwMmac();
 
-  /**
-    * Destructor of the ClMsgUwMmac class
-  **/
-  virtual ~ClMsgUwMmac();
-  
-  /**
-    * Copy method of the ClMsgUwMmac class, the specialization of the return value is 
-    * intentional and it is allowed by c++ standard
-    *
-    * @return pointer to a copy of the current ClMsgUwMmac object
-  **/
-  virtual ClMsgUwMmac* copy();
+	/**
+	 * Copy method of the ClMsgUwMmac class, the specialization of the return
+	 *value is intentional and it is allowed by c++ standard
+	 *
+	 * @return pointer to a copy of the current ClMsgUwMmac object
+	 **/
+	virtual ClMsgUwMmac *copy();
 
-  /**
-  * method to set the request type
-  * @param ReqType type: request type
-  */
-  void setReqType(ReqType type);
+	/**
+	 * method to set the request type
+	 * @param ReqType type: request type
+	 */
+	void setReqType(ReqType type);
 
-  /**
-  * method to return the request type
-  * @return req_type
-  */
-  ReqType getReqType();
+	/**
+	 * method to return the request type
+	 * @return req_type
+	 */
+	ReqType getReqType();
 
-    
 protected:
-
-  // receiver stack id (valid only for broadcast request)
-  int stack_id; /* <id of the stack */
-  ReqType req_type; /*< request type: either get, set, request or reply */
-
+	// receiver stack id (valid only for broadcast request)
+	int stack_id; /* <id of the stack */
+	ReqType req_type; /*< request type: either get, set, request or reply */
 };
 
-
 /**
-* ClMsgUwMmacEnable should be and used to ask either to set or get the
-* transmitting power of a specific phy.
-* In addition, ClMsgUwMmacEnable can be used from the phy to reply such a request.
-**/
+ * ClMsgUwMmacEnable should be and used to ask either to set or get the
+ * transmitting power of a specific phy.
+ * In addition, ClMsgUwMmacEnable can be used from the phy to reply such a
+ *request.
+ **/
 
 class ClMsgUwMmacEnable : public ClMsgUwMmac
 {
 public:
+	/**
+	 * Broadcast constructor of the ClMsgUwMmacEnable class
+	 **/
+	ClMsgUwMmacEnable();
 
-  /**
-  * Broadcast constructor of the ClMsgUwMmacEnable class
-  **/
-  ClMsgUwMmacEnable();
+	/**
+	 * Unicast constructor of the ClMsgUwMmacEnable class
+	 * @param int stack_id: id of the stack
+	 * @param dest_mod_id: id of the destination module
+	 **/
+	ClMsgUwMmacEnable(int stack_id, int dest_module_id);
 
-  /**
-  * Unicast constructor of the ClMsgUwMmacEnable class
-  * @param int stack_id: id of the stack
-  * @param dest_mod_id: id of the destination module
-  **/
-  ClMsgUwMmacEnable(int stack_id, int dest_module_id);
+	/**
+	 * Copy constructor
+	 * @param const ClMsgUwMmac& msg: ClMsgUwMmacEnable that has to be copied
+	 */
+	ClMsgUwMmacEnable(const ClMsgUwMmacEnable &msg);
 
-  /**
-  * Copy constructor
-  * @param const ClMsgUwMmac& msg: ClMsgUwMmacEnable that has to be copied
-  */
-  ClMsgUwMmacEnable(const ClMsgUwMmacEnable& msg);
+	/**
+	 * Destructor of the ClMsgUwMmacEnable class
+	 **/
+	~ClMsgUwMmacEnable();
 
-  /**
-    * Destructor of the ClMsgUwMmacEnable class
-  **/
-  ~ClMsgUwMmacEnable();
+	/**
+	 * method to return the transmitting power
+	 * @return tx_power
+	 */
+	double getEnable();
 
-  /**
-  * method to return the transmitting power
-  * @return tx_power
-  */
-  double getEnable();
+	/**
+	 * method to set the transmitting power
+	 * @param double powr: power to set
+	 */
+	void disable();
 
-  /**
-  * method to set the transmitting power
-  * @param double powr: power to set
-  */
-  void disable();  
-
-  /**
-  * method to set the transmitting power
-  * @param double powr: power to set
-  */
-  void enable();
+	/**
+	 * method to set the transmitting power
+	 * @param double powr: power to set
+	 */
+	void enable();
 
 private:
-
-  bool enable_; /* < Transmission power. Its definition (W, dB, dB re uPa, ...) depends on the specific phy.*/
-    
+	bool enable_; /* < Transmission power. Its definition (W, dB, dB re uPa,
+					 ...) depends on the specific phy.*/
 };
-
 
 #endif /* UWMMAC_CLMSG_H  */

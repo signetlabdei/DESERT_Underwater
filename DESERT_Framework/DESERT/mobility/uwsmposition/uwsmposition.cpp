@@ -183,9 +183,8 @@ UWSMPosition::update(double now)
 
 	double gamma;
 	double theta;
-	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0)
-						 + pow(Xdest_ - Xsorg_, 2.0)
-						 + pow(Zdest_ - Zsorg_, 2.0));
+	double theta_den = sqrt(pow(Ydest_ - Ysorg_, 2.0) +
+			pow(Xdest_ - Xsorg_, 2.0) + pow(Zdest_ - Zsorg_, 2.0));
 
 	if (theta_den == 0) {
 		x_ = Xsorg_;
@@ -238,9 +237,8 @@ UWSMPosition::update(double now)
 bool
 UWSMPosition::isDestReached() const
 {
-	double dist = std::sqrt(pow(Xdest_ - x_, 2.0)
-						 + pow(Ydest_ - y_, 2.0)
-						 + pow(Zdest_ - z_, 2.0));
+	double dist = std::sqrt(pow(Xdest_ - x_, 2.0) + pow(Ydest_ - y_, 2.0) +
+			pow(Zdest_ - z_, 2.0));
 
 	if (std::fabs(dist) < 1e-6)
 		return true;

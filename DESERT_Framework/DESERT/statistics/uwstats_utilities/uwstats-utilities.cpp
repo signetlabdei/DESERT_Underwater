@@ -39,18 +39,16 @@
 #define CLMSG_TRIGGER_STATS_VERBOSITY (3)
 
 ClMsgTriggerStats::ClMsgTriggerStats()
-	:
-	ClMessage(CLMSG_TRIGGER_STATS_VERBOSITY, CLMSG_TRIGGER_STATS)
+	: ClMessage(CLMSG_TRIGGER_STATS_VERBOSITY, CLMSG_TRIGGER_STATS)
 {
 }
 
 ClMsgTriggerStats::ClMsgTriggerStats(int dest_id)
-	:
-	ClMessage(CLMSG_TRIGGER_STATS_VERBOSITY,CLMSG_TRIGGER_STATS,UNICAST,dest_id)
+	: ClMessage(CLMSG_TRIGGER_STATS_VERBOSITY, CLMSG_TRIGGER_STATS, UNICAST,
+			  dest_id)
 {
 }
 
 ClMsgTriggerStats::~ClMsgTriggerStats()
 {
-
 }

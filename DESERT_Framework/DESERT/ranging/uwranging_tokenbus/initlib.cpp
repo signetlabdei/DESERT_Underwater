@@ -35,13 +35,12 @@
  *
  */
 
-#include <tclcl.h>
-#include <iostream>
 #include "uwranging_tokenbus_hdr.h"
+#include <iostream>
+#include <tclcl.h>
 
 int hdr_uwranging_tokenbus::offset_ = 0;
 packet_t PT_UWRANGING_TOKENBUS;
-
 
 /**
  * Class that describe the Header of a token bus packet
@@ -53,13 +52,13 @@ public:
 	 * Constructor of the class
 	 */
 	TokenBusRangingHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWRANGING_TOKENBUS", sizeof(hdr_uwranging_tokenbus))
+		: PacketHeaderClass("PacketHeader/UWRANGING_TOKENBUS",
+				  sizeof(hdr_uwranging_tokenbus))
 	{
 		this->bind();
 		bind_offset(&hdr_uwranging_tokenbus::offset_);
 	}
 } class_hdr_ranging_tokenbus;
-
 
 extern EmbeddedTcl Uwranging_tokenbusTclCode;
 extern "C" int

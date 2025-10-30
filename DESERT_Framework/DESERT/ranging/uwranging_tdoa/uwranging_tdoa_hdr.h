@@ -40,9 +40,9 @@
 #ifndef UWRANGING_TDOA_HDR_H
 #define UWRANGING_TDOA_HDR_H
 
+#include <cmath>
 #include <packet.h>
 #include <sys/types.h>
-#include <cmath>
 
 #define MAX_NUM_NODES 32
 #define HDR_RANGING_TDOA(p)    \
@@ -51,7 +51,8 @@
 
 extern packet_t PT_UWRANGING_TDOA;
 
-typedef float uwrange_time_t; /**< Precision of the holdover times measurement. */
+typedef float
+		uwrange_time_t; /**< Precision of the holdover times measurement. */
 typedef uint8_t uwrange_pkt_t; /**< Number of bits to store a packet id. */
 typedef uint8_t uwrange_node_t; /**< Number of bits to store a node id. */
 
@@ -94,13 +95,13 @@ typedef struct hdr_ranging_tdoa {
 
 	/**
 	 * Returns the size of a ranging header with all the entries
-	 * @returns Returns the size of a ranging header with all the entries 
+	 * @returns Returns the size of a ranging header with all the entries
 	 */
 	size_t
 	getSize() const
 	{
-		return std::ceil(times_size_ * sizeof(tdoa_entry) 
-				   + sizeof(uwrange_node_t) + sizeof(uwrange_pkt_t));
+		return std::ceil(times_size_ * sizeof(tdoa_entry) +
+				sizeof(uwrange_node_t) + sizeof(uwrange_pkt_t));
 	}
 
 	/**
@@ -111,8 +112,8 @@ typedef struct hdr_ranging_tdoa {
 	static size_t
 	getSize(int entries)
 	{
-		return std::ceil(entries * sizeof(tdoa_entry) 
-				   + sizeof(uwrange_node_t) + sizeof(uwrange_pkt_t));
+		return std::ceil(entries * sizeof(tdoa_entry) + sizeof(uwrange_node_t) +
+				sizeof(uwrange_pkt_t));
 	}
 
 	/**

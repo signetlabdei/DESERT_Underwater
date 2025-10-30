@@ -40,19 +40,17 @@
 #ifndef UWTDMA_H
 #define UWTDMA_H
 
+#include <assert.h>
+#include <deque>
+#include <fstream>
+#include <iostream>
 #include <mmac.h>
 #include <queue>
-#include <deque>
-#include <iostream>
-#include <assert.h>
 #include <sstream>
-#include <fstream>
 #include <sys/time.h>
 
 #define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active>*/
 #define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/
-
-
 
 class UwTDMA;
 
@@ -104,14 +102,14 @@ public:
 	 */
 	virtual ~UwTDMA();
 
-
-  /**
-   * Cross-Layer messages synchronous interpreter.
-   * 
-   * @param ClMessage* an instance of ClMessage that represent the message received
-   * @return <i>0</i> if successful.
-   */
-	virtual int recvSyncClMsg(ClMessage* m);
+	/**
+	 * Cross-Layer messages synchronous interpreter.
+	 *
+	 * @param ClMessage* an instance of ClMessage that represent the message
+	 * received
+	 * @return <i>0</i> if successful.
+	 */
+	virtual int recvSyncClMsg(ClMessage *m);
 
 protected:
 	/**
@@ -232,11 +230,14 @@ protected:
 	int max_packet_per_slot; /**<max numer of packet it can transmit per slot */
 	int packet_sent_curr_slot_; /**<counter of packet has been sent in the
 								current slot */
-	int drop_old_; /**<flag to set the drop packet policy in case of buffer overflow: 
-					if 0 (default) drops the new packet, if 1 the oldest*/
-	std::string name_label_; /**<label added in the log file, empty string by default*/
-	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with priority,
-						set to 0 otherwise. Priority can be used only with UWCBR module */
+	int drop_old_; /**<flag to set the drop packet policy in case of buffer
+					overflow: if 0 (default) drops the new packet, if 1 the
+					oldest*/
+	std::string name_label_; /**<label added in the log file, empty string by
+								default*/
+	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with
+						priority, set to 0 otherwise. Priority can be used only
+						with UWCBR module */
 };
 
 #endif

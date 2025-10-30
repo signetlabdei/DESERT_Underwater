@@ -83,7 +83,7 @@ public:
 	/**
 	 * Method that converts an enum type of the loglevel
 	 * into the string representing it
-     * @param ll return loglevel to be converted
+	 * @param ll return loglevel to be converted
 	 * @param ll_string return param string representing the loglevel
 	 * @return boolean true if conversion was correctly performed
 	 */
@@ -325,34 +325,35 @@ protected:
 class CheckTimer : public TimerHandler
 {
 public:
-  /**
-   * Class constructor.
-   *
-   * @param pmModem_ pointer to the UwModem object to link with this
-   *CheckTimer object.
-   */
-  CheckTimer(UwModem *pmModem_)
-    : TimerHandler()
-  {
-    pmModem = pmModem_;
-    if (pmModem->getDebug() >= 2) {
-      std::cout << this
-                << ": in constructor of CheckTimer which points to modem: "
-                << pmModem << std::endl;
-    }
-  }
+	/**
+	 * Class constructor.
+	 *
+	 * @param pmModem_ pointer to the UwModem object to link with this
+	 *CheckTimer object.
+	 */
+	CheckTimer(UwModem *pmModem_)
+		: TimerHandler()
+	{
+		pmModem = pmModem_;
+		if (pmModem->getDebug() >= 2) {
+			std::cout
+					<< this
+					<< ": in constructor of CheckTimer which points to modem: "
+					<< pmModem << std::endl;
+		}
+	}
 
 protected:
-  /**
-   * Method to handle the expiration of a given event.
-   *
-   * @param e event to be handled.
-   */
-  virtual void expire(Event *e);
+	/**
+	 * Method to handle the expiration of a given event.
+	 *
+	 * @param e event to be handled.
+	 */
+	virtual void expire(Event *e);
 
-  UwModem *pmModem; /**< Pointer to an UwModem object. It is used to
-                         call UwModem::checkEvent() when the countdown
-                         expires.*/
+	UwModem *pmModem; /**< Pointer to an UwModem object. It is used to
+						   call UwModem::checkEvent() when the countdown
+						   expires.*/
 };
 
 struct ModemEvent {

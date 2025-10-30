@@ -37,13 +37,13 @@
  */
 
 #include "uw-mac-DACAP-alter.h"
-#include <mac.h>
 #include <cmath>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <mac.h>
 #include <rng.h>
-//#include <ip-clmsg.h>
-//#include <mll-clmsg.h>
+// #include <ip-clmsg.h>
+// #include <mll-clmsg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -512,9 +512,9 @@ MMacDACAP::crLayCommand(ClMessage *m)
 {
 	switch (m->type()) {
 
-		// case whatever:
-		//    return 0;
-		//    break;
+			// case whatever:
+			//    return 0;
+			//    break;
 
 		default:
 			return Module::crLayCommand(m);
@@ -642,8 +642,9 @@ MMacDACAP::computeWaitTime(int mode, double distance)
 
 	double T_w;
 
-	double t_1 = (t_min - min((delta_D / prop_speed),
-								  min(t_data, 2.0 * max_prop_delay - t_min))) /
+	double t_1 = (t_min -
+						 min((delta_D / prop_speed),
+								 min(t_data, 2.0 * max_prop_delay - t_min))) /
 			2.0;
 	double t_2 = (t_min - delta_data) / 2.0;
 	double t_3 =

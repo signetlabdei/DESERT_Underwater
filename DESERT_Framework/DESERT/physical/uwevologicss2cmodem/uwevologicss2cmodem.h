@@ -43,11 +43,11 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <map>
 
 /**
  * Lookup table (LUT) containing all the possible transmission times.
@@ -81,7 +81,7 @@ class UwEvoLogicsS2CModem : public UwModem
 public:
 	/** Transmission mode: either IM or BURST
 	 * See the EvoLogics S2C manuals or reach for www.evologics.de
-     */
+	 */
 	enum class TransmissionMode { BURST = 0, IM = 1 };
 
 	/**
@@ -277,10 +277,12 @@ private:
 	bool source_level_change; /**< Flag that tells a new SL value to be
 								 applied*/
 
-	TransmissionDurationLUT size2dur_; /**< Map from size [byte] to TX duration [s].  */
+	TransmissionDurationLUT
+			size2dur_; /**< Map from size [byte] to TX duration [s].  */
 	std::string txdur_file_name_; /**< TX duration LUT file name. */
 	char txdur_token_separator_; /**< TX duration LUT separator. */
-	bool initLUT_; /**< Flag that tells whether the TX duration LUT is loaded or not. */
+	bool initLUT_; /**< Flag that tells whether the TX duration LUT is loaded or
+					  not. */
 
 	/** Minimum time to wait before to schedule a new event in seconds*/
 	static const double EPSILON_S;

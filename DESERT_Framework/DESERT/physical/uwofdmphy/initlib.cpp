@@ -35,9 +35,9 @@
  * \brief file to initialize the libuwphysical.so library
  */
 
-#include <tclcl.h>
 #include "packet.h"
 #include "uwofdmphy_hdr.h"
+#include <tclcl.h>
 
 extern EmbeddedTcl UwOFDMPhyInitTclCode;
 packet_t PT_OFDM;

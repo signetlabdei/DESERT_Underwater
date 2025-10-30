@@ -80,12 +80,11 @@ static const int BIT_RATE_INSTANT = 10000;
  */
 typedef struct hdr_TRIGGER_UFETCH {
 	int t_min_; /**< minimum value in which the HN can choose his backoff time
-				   */
+				 */
 	int t_max_; /**< maximum value in which the HN can choose his backoff time
-				   */
-	int
-			max_pck_want_rx_; /**< Maximum number of pck that AUV want receive
-								 from sink */
+				 */
+	int max_pck_want_rx_; /**< Maximum number of pck that AUV want receive
+							 from sink */
 
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -144,9 +143,8 @@ typedef struct hdr_TRIGGER_UFETCH {
 typedef struct hdr_RTS_UFETCH {
 	int num_DATA_pcks_; /**< Number of packets that the HN want to transmit to
 						   the AUV */
-	int
-			backoff_time_RTS_; /**< Backoff time chosen by the HN for collision
-								  free */
+	int backoff_time_RTS_; /**< Backoff time chosen by the HN for collision
+							  free */
 
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
@@ -301,12 +299,10 @@ typedef struct hdr_BEACON_UFETCH {
  * Content header of PROBE packet
  */
 typedef struct hdr_PROBE_UFETCH {
-	int
-			n_DATA_pcks_Node_tx_; /**< number of packets that Node have to
-									 transmit at HN */
-	int
-			backoff_time_PROBE_; /**< Backoff time chosen by the NODE for
-									collision free */
+	int n_DATA_pcks_Node_tx_; /**< number of packets that Node have to
+								 transmit at HN */
+	int backoff_time_PROBE_; /**< Backoff time chosen by the NODE for
+								collision free */
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
 	/**

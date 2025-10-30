@@ -40,17 +40,17 @@
 #ifndef Uwpolling_HDR_SINK_H
 #define Uwpolling_HDR_SINK_H
 
-#include "uwpolling_cmn_hdr.h"
 #include "mmac.h"
+#include "uwpolling_cmn_hdr.h"
 
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
-#include <fstream>
-#include <list>
 #include <chrono>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <string>
 
 #define UWPOLLING_SINK_DROP_REASON_BUFFER_FULL \
 	"DBF" /**< Buffer of the node is full */
@@ -69,7 +69,7 @@
 #define UWPOLLING_SINK_DROP_REASON_NOT_POLLED \
 	"DNP" /**< The node is not in the polling list */
 
-	/**
+/**
  * Class used to represents the UWPOLLING MAC layer of a node.
  */
 class Uwpolling_SINK : public MMac
@@ -537,7 +537,7 @@ protected:
 	{
 		return duplicate_pkts;
 	}
-	
+
 	inline void
 	incrDuplicatedPkt()
 	{
@@ -571,7 +571,7 @@ protected:
 	 */
 
 	virtual void stateTxProbe();
-	
+
 	/**
 	 * Method called by the Expire event of the timer. Here we call the
 	 * stateTxProbe method
@@ -630,10 +630,12 @@ protected:
 	inline unsigned long int
 	getEpoch()
 	{
-	  unsigned long int timestamp =
-		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
-			  std::chrono::system_clock::now().time_since_epoch()).count() );
-	  return timestamp;
+		unsigned long int timestamp =
+				(unsigned long int) (std::chrono::duration_cast<
+						std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch())
+								.count());
+		return timestamp;
 	}
 
 	/*************************
@@ -642,7 +644,7 @@ protected:
 	double T_data; /**< Duration of RxDataTimer */
 	double T_data_gurad; /**< Guard time for RxDataTimer */
 	double backoff_tuner; /**< Multiplying value to the backoff value */
-	
+
 	uint sink_id; /**< Unique Node ID */
 
 	static bool initialized; /**< <i>true</i> if the protocol is initialized,
@@ -662,7 +664,7 @@ protected:
 	double BOffTime; /**< Backoff time chosen */
 
 	int AUV_mac_addr; /**< MAC address of the AUV from which it receives data*/
-	
+
 	int n_probe_sent; /**< Number of PROBE packets sent to the AUV */
 
 	int n_trigger_received; /**< Number of TRIGGER packets received */
@@ -677,13 +679,13 @@ protected:
 	bool send_ACK; /**< True if an ACK has to be sent, false otherwise*/
 
 	std::list<uint16_t> missing_id_list; /**< List with missing packet ID */
-	uint16_t expected_last_id; /**Expected Unique ID of the last packet 
+	uint16_t expected_last_id; /**Expected Unique ID of the last packet
 							in the round*/
-	uint16_t prev_expect_last_id; /*Expected last id of the previous round. 
+	uint16_t prev_expect_last_id; /*Expected last id of the previous round.
 							Needed to find which are the retx packets. */
 	uint duplicate_pkts; /** Number ot duplicated packets received.*/
 
-	bool first_rx_pkt; /** True if the packet received is the first packet in 
+	bool first_rx_pkt; /** True if the packet received is the first packet in
 						the round*/
 
 	uint PROBE_uid; /**< PROBE Unique ID */
@@ -694,7 +696,7 @@ protected:
 	Packet *curr_ack_pkt; /**< Pointer to the current ACK packet */
 
 	UWPOLLING_SINK_REASON
-			last_reason; /**< Last reason to the change of state */
+	last_reason; /**< Last reason to the change of state */
 	UWPOLLING_SINK_STATUS curr_state; /**< Current state of the protocol */
 	UWPOLLING_SINK_STATUS prev_state; /**< Previous state of the protocol */
 
@@ -708,7 +710,6 @@ protected:
 	BackOffTimer backoff_timer; /**< Backoff timer */
 	Rx_Data_Timer rx_data_timer; /**< Receiving DATA Timer */
 
-
 	std::ofstream fout; /**< Output stream for the textual file of debug */
 	std::ofstream out_file_stats;
 	int sea_trial; /**< Sea Trial flag: To activate if the protocol is going to
@@ -718,8 +719,9 @@ protected:
 	int n_run; /*< ID of the experiments (used during sea trial) */
 
 	int useAdaptiveTdata; /**< True if an adaptive T_poll is used*/
-	int ack_enabled; /**< True if ack is enabled, false if disabled, default true*/
-	uint max_n_ack; /**< Max number of ACK that can be sent in a single round. 
+	int ack_enabled; /**< True if ack is enabled, false if disabled, default
+						true*/
+	uint max_n_ack; /**< Max number of ACK that can be sent in a single round.
 					The same value has to be used in packer, if needed. */
 	double T_guard; /**< Guard time added to the calculation of the data TO*/
 	int max_payload; /**< Dimension of the DATA payload */

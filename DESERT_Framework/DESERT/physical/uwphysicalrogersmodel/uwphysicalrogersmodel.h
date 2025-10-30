@@ -39,8 +39,8 @@
 #ifndef UWPHYSICALROGERSMODEL_H
 #define UWPHYSICALROGERSMODEL_H
 
-#include <underwater-mpropagation.h>
 #include <node-core.h>
+#include <underwater-mpropagation.h>
 #include <uwlib.h>
 
 #include <cmath>

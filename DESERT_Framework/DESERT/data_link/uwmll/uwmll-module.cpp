@@ -43,9 +43,9 @@
  */
 
 #include "uwmll-module.h"
+#include <iostream>
 #include <mmac-clmsg.h>
 #include <uwip-clmsg.h>
-#include <iostream>
 
 /**
  * Class that represents the binding with the tcl configuration script
@@ -164,8 +164,7 @@ UWMllModule::sendDown(Packet *p)
 	if (debug_) {
 		std::cout << NOW << "::UWMLL::SENDDOWN::SOURCE_MAC::" << mh->macSA()
 				  << "::NEXT_HOP::" << ch->next_hop()
-				  << "::DESTINATION::" << (uint)ih->daddr()
-				  << std::endl;
+				  << "::DESTINATION::" << (uint) ih->daddr() << std::endl;
 	}
 
 	switch (ch->addr_type()) {
@@ -183,7 +182,7 @@ UWMllModule::sendDown(Packet *p)
 				dst = ih->daddr();
 			else
 				dst = ch->next_hop();
-		//                        cout << "INET mode " << endl;
+			//                        cout << "INET mode " << endl;
 
 		case NS_AF_NONE:
 

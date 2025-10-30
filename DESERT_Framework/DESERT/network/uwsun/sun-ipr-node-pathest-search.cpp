@@ -39,8 +39,8 @@
  * Search Packets.
  */
 
-#include "sun-ipr-node.h"
 #include "sun-ipr-common-structures.h"
+#include "sun-ipr-node.h"
 
 extern packet_t PT_SUN_DATA;
 extern packet_t PT_SUN_PATH_EST;
@@ -54,14 +54,14 @@ void
 SunIPRoutingNode::searchPath()
 {
 	if (STACK_TRACE)
-	    std::cout << "> searchPath()" << std::endl;
+		std::cout << "> searchPath()" << std::endl;
 
-	if (getNumberOfHopToSink() == 1) { // Do nothing, the node is directly connected with the sink
+	if (getNumberOfHopToSink() ==
+			1) { // Do nothing, the node is directly connected with the sink
 		if (printDebug_ > 5)
-		  std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
-					<< "||hops:" << this->getNumberOfHopToSink()
-					<< "]::PATH_SEARCH::END_NODE"
-					<< std::endl;
+			std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+					  << "||hops:" << this->getNumberOfHopToSink()
+					  << "]::PATH_SEARCH::END_NODE" << std::endl;
 		return;
 	} else if (this->getNumberOfHopToSink() == 0) {
 		// Update internal variables.
@@ -73,11 +73,10 @@ SunIPRoutingNode::searchPath()
 		number_of_pathestablishment_++;
 		hdr_cmn *ch = HDR_CMN(p);
 		if (printDebug_ > 5) {
-			std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+			std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 					  << "||hops:" << this->getNumberOfHopToSink()
 					  << "]::SENDING_SEARCH_PATH"
-					  << "::UID:" << ch->uid()
-					  << std::endl;
+					  << "::UID:" << ch->uid() << std::endl;
 		}
 
 		if (trace_)
@@ -95,7 +94,7 @@ void
 SunIPRoutingNode::initPktPathEstSearch(Packet *p) const
 {
 	if (STACK_TRACE)
-	    std::cout << "> initPktPathEstSearch()" << std::endl;
+		std::cout << "> initPktPathEstSearch()" << std::endl;
 
 	// Common header.
 	hdr_cmn *ch = HDR_CMN(p);
@@ -134,7 +133,7 @@ void
 SunIPRoutingNode::replyPathEstSearch(Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> replyPathEstSearch()" << std::endl;
+		std::cout << "> replyPathEstSearch()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
@@ -144,11 +143,12 @@ SunIPRoutingNode::replyPathEstSearch(Packet *p)
 				(iph->saddr() == ipAddr_)) { // My Ip is already in list or the
 											 // packet is returned to the
 											 // source: drop.
-		    if (printDebug_ > 5) {
-				std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+			if (printDebug_ > 5) {
+				std::cout << "[" << NOW
+						  << "]::Node[IP:" << this->printIP(ipAddr_)
 						  << "||hops:" << this->getNumberOfHopToSink()
-						  << "]::PATH_SEARCH::DROP_ALREADY_PROCESSED_FROM:" << printIP(iph->saddr())
-						  << "::UID:" << ch->uid()
+						  << "]::PATH_SEARCH::DROP_ALREADY_PROCESSED_FROM:"
+						  << printIP(iph->saddr()) << "::UID:" << ch->uid()
 						  << std::endl;
 			}
 			drop(p, 1, DROP_PATH_ESTABLISHMENT_SEARCH_PACKET_ALREADY_PROCESSED);
@@ -169,13 +169,13 @@ SunIPRoutingNode::replyPathEstSearch(Packet *p)
 					return;
 				} else { // I'm a relay node, forward the packet in BCAST.
 					if (printDebug_ > 5) {
-						std::cout << "[" <<  NOW << "]::Node[IP:" << this->printIP(ipAddr_)
+						std::cout << "[" << NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
 								  << "||hops:" << this->getNumberOfHopToSink()
 								  << "]::PATH_SEARCH::FORWARD"
 								  << "::PREV_HOP:" << printIP(ch->prev_hop_)
 								  << "::SOURCE:" << printIP(iph->saddr())
-								  << "::UID:" << ch->uid()
-								  << std::endl;
+								  << "::UID:" << ch->uid() << std::endl;
 					}
 					ch->next_hop() = UWIP_BROADCAST;
 					ch->prev_hop_ = ipAddr_;
@@ -205,7 +205,7 @@ const bool
 SunIPRoutingNode::addMyIpInList(Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> addMyIpInList()" << std::endl;
+		std::cout << "> addMyIpInList()" << std::endl;
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
 
 	if (hpest->pointer() >= MAX_HOP_NUMBER) { // Impossible to add new hops.
@@ -228,7 +228,7 @@ const bool
 SunIPRoutingNode::isMyIpInList(const Packet *p) const
 {
 	if (STACK_TRACE)
-	    std::cout << "> isMyIpInList()" << std::endl;
+		std::cout << "> isMyIpInList()" << std::endl;
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
 
 	for (int i = 0; i <= hpest->list_of_hops_length(); i++) {
@@ -245,7 +245,7 @@ void
 SunIPRoutingNode::updateQuality(Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> updateQuality()" << std::endl;
+		std::cout << "> updateQuality()" << std::endl;
 	hdr_sun_path_est *hpest = HDR_SUN_PATH_EST(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 	if (metrics_ == HOPCOUNT) {
@@ -271,6 +271,6 @@ SunIPRoutingNode::updateQuality(Packet *p)
 			hpest->quality() = hpest->quality() + this->getLoad();
 		}
 	} else {
-	  std::cerr << "The metric_ field of SUN was not set up." << std::endl;
+		std::cerr << "The metric_ field of SUN was not set up." << std::endl;
 	}
 } /* SunIPRoutingNode::updateQuality */

@@ -47,11 +47,11 @@
 #include <uwip-module.h>
 #include <uwudp-module.h>
 
-#include <module.h>
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <climits>
+#include <iostream>
+#include <module.h>
+#include <sstream>
+#include <string>
 
 #define UWVBR_DROP_REASON_UNKNOWN_TYPE \
 	"UKT" /**< Reason for a drop in a <i>UWVBR</i> module. */
@@ -61,8 +61,6 @@
 	"DPK" /**< Reason for a drop in a <i>UWVBR</i> module. */
 
 #define HDR_UWVBR(P) (hdr_uwvbr::access(P))
-
-
 
 extern packet_t PT_UWVBR;
 
@@ -262,13 +260,11 @@ protected:
 
 	int txsn; /**< Sequence number of next new packet to be transmitted. */
 	int hrsn; /**< Highest received sequence number. */
-	int
-			pkts_recv; /**< Total number of received packets. Packet out of
-						  sequence are not counted here. */
+	int pkts_recv; /**< Total number of received packets. Packet out of
+					  sequence are not counted here. */
 	int pkts_ooseq; /**< Total number of packets received out of sequence. */
-	int
-			pkts_lost; /**< Total number of lost packets, including packets
-						  received out of sequence. */
+	int pkts_lost; /**< Total number of lost packets, including packets
+					  received out of sequence. */
 	int pkts_invalid; /**< Total number of invalid packets received. */
 	int pkts_last_reset; /**< for error checking after stats are reset. Set to
 							pkts_lost+pkts_recv each time resetStats is called.

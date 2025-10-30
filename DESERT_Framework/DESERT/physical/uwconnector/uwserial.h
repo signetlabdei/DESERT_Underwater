@@ -88,7 +88,7 @@ public:
 	 * Method that writes a command to the port interface
 	 * @param msg std::string command to be sent through the port
 	 */
-	virtual int writeToDevice(const std::string& msg);
+	virtual int writeToDevice(const std::string &msg);
 
 	/**
 	 * Function that receives data from the device's port to a backup buffer.

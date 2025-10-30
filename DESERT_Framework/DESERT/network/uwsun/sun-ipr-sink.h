@@ -41,30 +41,28 @@
 #ifndef SUN_SINK_H
 #define SUN_SINK_H
 
-#include "sun-ipr-common-structures.h"
 #include "sun-hdr-ack.h"
+#include "sun-hdr-data.h"
 #include "sun-hdr-pathestablishment.h"
 #include "sun-hdr-probe.h"
-#include "sun-hdr-data.h"
+#include "sun-ipr-common-structures.h"
 
-#include <uwip-module.h>
-#include <uwip-clmsg.h>
 #include <uwcbr-module.h>
+#include <uwip-clmsg.h>
+#include <uwip-module.h>
 
 #include "packet.h"
 #include <module.h>
 #include <tclcl.h>
 
+#include <fstream>
+#include <iostream>
+#include <rng.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <rng.h>
-#include <fstream>
-
-
 
 /**
  * SunIPRoutingSink class is used to represent the routing layer of a sink.
@@ -352,38 +350,35 @@ protected:
 							Poisson traffic for SUN packets. */
 	double periodPoissonTraffic_; /**< Period of the Poisson traffic. */
 	int printDebug_; /**< Flag to enable or disable dirrefent levels of debug.
-						*/
+					  */
 
 	// Statistics
 	static long probe_count_; /**< Comulative number of probes sent by
 								 SunIPRoutingSink objects. */
 	static long number_of_ackpkt_; /**< Comulative number of Ack packets
 									  processed by SunIPRoutingNode objects. */
-	int
-			numberofnodes_; /**< Number of nodes in the network, used for
-							   statistic purposes. */
+	int numberofnodes_; /**< Number of nodes in the network, used for
+						   statistic purposes. */
 	unsigned int **arrayofstats_; /**< Structure that contains the number of
 								   * data packets received by the the sink,
-									* for different nodes and for different
+								   * for different nodes and for different
 								   * values of hop count. It is used for
 								   * statistics purposes.
-									*/
+								   */
 
 	// Timer
 	SendTimer sendTmr_; /**< SendTimer object. */
 
 	// Trace file
 	bool trace_; /**< Flag used to enable or disable the trace file for nodes,
-					*/
+				  */
 	bool trace_path_; /**< Flag used to enable or disable the path trace file
 						 for nodes, */
-	char
-			*trace_file_name_; /**< Name of the trace file writter for the
-								  current node. */
-	char
-			*trace_file_path_name_; /**< Name of the trace file that contains
-									   the list of paths of the data packets
-									   received. */
+	char *trace_file_name_; /**< Name of the trace file writter for the
+							   current node. */
+	char *trace_file_path_name_; /**< Name of the trace file that contains
+									the list of paths of the data packets
+									received. */
 	ostringstream osstream_; /**< Used to convert to string. */
 	ofstream trace_file_; /**< Ofstream used to write the trace file in the
 							 disk. */

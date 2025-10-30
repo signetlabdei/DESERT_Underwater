@@ -174,11 +174,13 @@ UwOpticalPhy::getNoisePower(Packet *p)
 	double t = variable_temperature_ ? getVarTemperature(p) : T;
 	double il = (Il == IL_ILLEGAL ? S * ph->Pr : Il);
 	t = t > NOT_VARIABLE_TEMPERATURE ? t : T;
-	double circuit_noise = 2 * q * (Id + il) * ph->srcSpectralMask->getBandwidth() + 
+	double circuit_noise =
+			2 * q * (Id + il) * ph->srcSpectralMask->getBandwidth() +
 			(4 * K * t * ph->srcSpectralMask->getBandwidth()) / R;
-	return circuit_noise + pow(lut_value * Ar_ * S, 2); // right now returns 0, due to not bias
-										// the snr calculation with unexpected
-										// values
+	return circuit_noise +
+			pow(lut_value * Ar_ * S, 2); // right now returns 0, due to not bias
+										 // the snr calculation with unexpected
+										 // values
 }
 
 void

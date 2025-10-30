@@ -36,8 +36,8 @@
  *
  */
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "uwem-channel.h"
 
@@ -60,7 +60,7 @@ public:
 	{
 		return (new UwElectroMagneticChannel());
 	}
-}class_UwElectroMagneticChannel;
+} class_UwElectroMagneticChannel;
 
 UwElectroMagneticChannel::UwElectroMagneticChannel()
 	: ChannelModule()
@@ -126,8 +126,9 @@ UwElectroMagneticChannel::getPropDelay(Position *src, Position *dst)
 	double delay = distance / speed_of_light;
 
 	if (debug_)
-		cout << "UwElectroMagneticChannel::getPropDelay() distance = " << distance
-			 << "; speed = " << speed_of_light << "; delay = " << delay << endl;
+		cout << "UwElectroMagneticChannel::getPropDelay() distance = "
+			 << distance << "; speed = " << speed_of_light
+			 << "; delay = " << delay << endl;
 
 	return delay;
 }

@@ -40,8 +40,8 @@
 #define UW_POS_EST_H
 
 #include "node-core.h"
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 #define pi (4 * atan(1.0))
 
@@ -66,7 +66,8 @@ public:
 	 *  @param double time of update
 	 *  @param double speed of the node
 	 */
-	virtual void update (Position newInitPos, Position newDest, double newTime, double newSpeed);
+	virtual void update(Position newInitPos, Position newDest, double newTime,
+			double newSpeed);
 
 	/**
 	 *	Get position estimation at a given time
@@ -97,12 +98,12 @@ public:
 
 private:
 	/**
-	* Compute absoulute distance between 2 nodes
-	*
-	* @param Position position first node.
-	* @param Position position second node.
-	*/
-	virtual double nodesDistance(Position& p1, Position& p2);
+	 * Compute absoulute distance between 2 nodes
+	 *
+	 * @param Position position first node.
+	 * @param Position position second node.
+	 */
+	virtual double nodesDistance(Position &p1, Position &p2);
 
 	Position initialPos; /**<Initial position related to last update. */
 	Position destPos; /**<Destination of last update. */
@@ -110,4 +111,4 @@ private:
 	double speed; /**<speed of the node. */
 };
 
-#endif //UW_POS_EST_H
+#endif // UW_POS_EST_H

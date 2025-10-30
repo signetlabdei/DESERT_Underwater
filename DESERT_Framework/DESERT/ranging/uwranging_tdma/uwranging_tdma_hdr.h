@@ -41,16 +41,19 @@
 #define UWRANGING_TDMA_HDR_H
 
 #include <cstdint>
+#include <limits>
 #include <packet.h>
 #include <vector>
-#include <limits>
-//#include "half.hpp" //for using half precision library from https://half.sourceforge.net/
+// #include "half.hpp" //for using half precision library from
+// https://half.sourceforge.net/
 
 typedef uint_least16_t slotid_t; /**< set here the size of the slotid*/
 constexpr size_t SLOTIDMAX_HDR = std::numeric_limits<slotid_t>::max();
 extern packet_t PT_UWRANGING_TDMA;
-//typedef half_float::half uwrange_time_t;	/**< set here the size and precision of the time measures (uint16/half/float...)*/
-typedef float uwrange_time_t; /**< set here the size and precision of the time measures (uint16/half/float...)*/
+// typedef half_float::half uwrange_time_t;	/**< set here the size and precision
+// of the time measures (uint16/half/float...)*/
+typedef float uwrange_time_t; /**< set here the size and precision of the time
+								 measures (uint16/half/float...)*/
 
 /**
  * Header of the token bus protocol
@@ -59,22 +62,25 @@ typedef struct hdr_ranging_tdma {
 public:
 	static int offset_; /**< Required by the PacketHeaderManager. */
 	slotid_t slotid_; /**< sending slot id */
-	std::vector<uwrange_time_t> times_; /**< Holds the times measured by the node */
+	std::vector<uwrange_time_t>
+			times_; /**< Holds the times measured by the node */
 
 	/**
 	 * Returns a reference to the nodeid_ variable
 	 * @returns a reference to the nodeid_ variable
 	 */
-	slotid_t & slotId()
+	slotid_t &
+	slotId()
 	{
 		return (slotid_);
 	}
-	
+
 	/**
 	 * Returns a reference to the travel times array
 	 * @returns a reference to the travel times array
 	 */
-	std::vector<uwrange_time_t> & times()
+	std::vector<uwrange_time_t> &
+	times()
 	{
 		return (times_);
 	}
@@ -83,16 +89,18 @@ public:
 	 * Returns the size of this header
 	 * @returns the size of this header
 	 */
-	size_t getSize() const
+	size_t
+	getSize() const
 	{
-		return (sizeof(uwrange_time_t)*times_.size() + sizeof(slotid_t));
+		return (sizeof(uwrange_time_t) * times_.size() + sizeof(slotid_t));
 	}
 
 	/**
 	 * Returns a reference to the offset_ variable
 	 * @returns a reference to the offset_ variable
 	 */
-	inline static int & offset()
+	inline static int &
+	offset()
 	{
 		return offset_;
 	}
@@ -109,7 +117,8 @@ public:
 	}
 } hdr_ranging_tdma;
 
-#define HDR_RANGING_TDMA(p) \
-	(hdr_ranging_tdma::access(p))	/**< alias defined to access the hdr_ranging_tdma HEADER*/
+#define HDR_RANGING_TDMA(p)    \
+	(hdr_ranging_tdma::access( \
+			p)) /**< alias defined to access the hdr_ranging_tdma HEADER*/
 
 #endif

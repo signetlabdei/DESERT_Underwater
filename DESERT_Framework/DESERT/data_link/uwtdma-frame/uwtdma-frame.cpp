@@ -38,10 +38,10 @@
 
 #include "uwtdma-frame.h"
 #include <iostream>
+#include <mac.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mac.h>
 #include <string>
 
 extern packet_t PT_UWHEALTHCBR;
@@ -152,7 +152,7 @@ UwTDMA_frame::command(int argc, const char *const *argv)
 					return TCL_ERROR;
 				} else {
 					Slot::iterator iter = my_slot_numbers_.begin();
-          start_time = iter->first * slot_duration;
+					start_time = iter->first * slot_duration;
 					start(iter->first * slot_duration);
 					return TCL_OK;
 				}
@@ -228,12 +228,13 @@ UwTDMA_frame::initializeTopologyS()
 	strcpy(tmp_, topology_S_file_name_.c_str());
 	input_file_.open(tmp_);
 	int slot_number = 0;
-	if(tot_slots || tot_nodes) { //initialize the frame again due to frame change
+	if (tot_slots ||
+			tot_nodes) { // initialize the frame again due to frame change
 		tot_slots = 0;
 		tot_nodes = 0;
 		s_.clear();
 		my_slot_numbers_.clear();
-	}	
+	}
 	if (input_file_.is_open()) {
 		while (std::getline(input_file_, line_)) {
 			::std::stringstream line_stream(line_);
@@ -258,8 +259,8 @@ UwTDMA_frame::initializeTopologyS()
 		// std::cout << NOW << " ID " << addr << " num slots: "
 		// <<my_slot_numbers_.size() << std::endl;
 	} else {
-		cerr << "Impossible to open file " << topology_S_file_name_.c_str() <<
-				endl;
+		cerr << "Impossible to open file " << topology_S_file_name_.c_str()
+			 << endl;
 	}
 	if (debug_) {
 		std::cout << NOW << " ID " << addr

@@ -44,61 +44,61 @@
 #include <tclcl.h>
 
 /**
- * UwElectroMagneticChannel extends Miracle channel class and implements the underwater
- * optical channel
+ * UwElectroMagneticChannel extends Miracle channel class and implements the
+ * underwater optical channel
  */
 class UwElectroMagneticChannel : public ChannelModule
 {
 
 public:
 	/**
-	* Constructor of UwElectroMagneticChannel class.
-	*/
+	 * Constructor of UwElectroMagneticChannel class.
+	 */
 	UwElectroMagneticChannel();
 
 	/**
-	* Destructor of UwElectroMagneticChannel class.
-	*/
+	 * Destructor of UwElectroMagneticChannel class.
+	 */
 	virtual ~UwElectroMagneticChannel()
 	{
 	}
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet received.
-	* @param ChSAP* Pointer to the channel Service Access Point (SAP)
-	*/
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet received.
+	 * @param ChSAP* Pointer to the channel Service Access Point (SAP)
+	 */
 	virtual void recv(Packet *p, ChSAP *chsap);
 
 	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	*
-	* @param argc Number of arguments in <i>argv</i>.
-	* @param argv Array of strings which are the command parameters (Note that
-	* <i>argv[0]</i> is the name of the object).
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched
-	* successfully or not.
-	*
-	*/
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
+	 */
 	virtual int command(int argc, const char *const *argv);
 
 protected:
 	/**
-	* Returns the underwater optical propagation delay between the two given
-	* Position pointers.
-	* @param Position* s pointer to the first Position object
-	* @param Position* d pointer to the second Position object
-	* @return underwater optical propagation delay [s]
-	*/
+	 * Returns the underwater optical propagation delay between the two given
+	 * Position pointers.
+	 * @param Position* s pointer to the first Position object
+	 * @param Position* d pointer to the second Position object
+	 * @return underwater optical propagation delay [s]
+	 */
 	virtual double getPropDelay(Position *s, Position *d);
 
 	/**
-	* Sends the given Packet* to the upper PHY layer
-	*
-	* @param Packet* Pointer to the packet received.
-	* @param ChSAP* Pointer to the channel Service Access Point (SAP)
-	*/
+	 * Sends the given Packet* to the upper PHY layer
+	 *
+	 * @param Packet* Pointer to the packet received.
+	 * @param ChSAP* Pointer to the channel Service Access Point (SAP)
+	 */
 	void sendUpPhy(Packet *p, ChSAP *chsap);
 
 	double refractive_index; /**< refractive index of the underwater medium. */

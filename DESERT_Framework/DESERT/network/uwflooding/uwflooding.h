@@ -45,9 +45,9 @@
 
 #include "uwflooding-hdr.h"
 
-#include <uwip-module.h>
-#include <uwip-clmsg.h>
 #include <uwcbr-module.h>
+#include <uwip-clmsg.h>
+#include <uwip-module.h>
 
 #include "mphy.h"
 #include "packet.h"
@@ -55,18 +55,16 @@
 #include <tclcl.h>
 
 #include <cmath>
+#include <ctime>
+#include <fstream>
+#include <iostream>
 #include <limits>
+#include <list>
+#include <map>
+#include <rng.h>
 #include <sstream>
 #include <string>
-#include <iostream>
-#include <rng.h>
-#include <ctime>
 #include <vector>
-#include <fstream>
-#include <map>
-#include <list>
-
-
 
 /**
  * UwFlooding class is used to represent the routing layer of a node.
@@ -163,10 +161,9 @@ private:
 	long packets_forwarded_; /**< Number of packets forwarded by this module. */
 	bool trace_path_; /**< Flag used to enable or disable the path trace file
 						 for nodes, */
-	char
-			*trace_file_path_name_; /**< Name of the trace file that contains
-									   the list of paths of the data packets
-									   received. */
+	char *trace_file_path_name_; /**< Name of the trace file that contains
+									the list of paths of the data packets
+									received. */
 	ofstream trace_file_path_; /**< Ofstream used to write the path trace file
 								  in the disk. */
 	ostringstream osstream_; /**< Used to convert to string. */
@@ -180,7 +177,8 @@ private:
 	map_forwarded_packets
 			my_forwarded_packets_; /**< Map of the packet forwarded. */
 
-	std::map<uint16_t,uint8_t> ttl_traffic_map; /**< Map with ttl per traffic. */
+	std::map<uint16_t, uint8_t>
+			ttl_traffic_map; /**< Map with ttl per traffic. */
 
 	/**
 	 * Copy constructor declared as private. It is not possible to create a new
@@ -197,7 +195,7 @@ private:
 	 *
 	 * @return the ttl for that packet
 	 */
-	uint8_t getTTL(Packet* p) const;
+	uint8_t getTTL(Packet *p) const;
 };
 
 #endif // UWFLOODING_H

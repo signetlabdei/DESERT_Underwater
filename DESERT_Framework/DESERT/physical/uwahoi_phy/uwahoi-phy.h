@@ -34,17 +34,15 @@
  *
  * \brief Definition of UwAhoiPhy class.
  *
-**/
+ **/
 
 #ifndef UWAHOIPHY_H
 #define UWAHOIPHY_H
 
 #include "uwphysical.h"
-#include <math.h>
 #include <iostream>
 #include <map>
-
-
+#include <math.h>
 
 typedef ::std::map<double, double> PdrLut;
 typedef PdrLut::iterator PdrLutIt;
@@ -64,15 +62,15 @@ public:
 	virtual ~UwAhoiPhy();
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   *
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that
-   * <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched
-   * successfully or not.
-   *
-   */
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
+	 */
 	virtual int command(int, const char *const *);
 
 protected:
@@ -100,42 +98,42 @@ protected:
 
 private:
 	/**
-	* Return the distance between source and destination.
-	*
-	* @param p Packet by witch the module gets information about source and
-	*destination.
-	**/
+	 * Return the distance between source and destination.
+	 *
+	 * @param p Packet by witch the module gets information about source and
+	 *destination.
+	 **/
 	virtual double getDistance(Packet *);
 
 	/**
-	* Return the PER via linear interpolation.
-	*
-	* @param distance: distance between source and destination.
-	**/
+	 * Return the PER via linear interpolation.
+	 *
+	 * @param distance: distance between source and destination.
+	 **/
 	virtual double matchDistancePDR(double distance);
-	
+
 	/**
-	* Return the PER via linear interpolation.
-	*
-	* @param distance: distance between source and destination.
-	**/
+	 * Return the PER via linear interpolation.
+	 *
+	 * @param distance: distance between source and destination.
+	 **/
 	virtual double matchSIR_PDR(double sir);
 
 	/**
-	* Return y via linear interpolation given two points.
-	*
-	* @param x: input.
-	* @param x1, y1: coordinates of the first point.
-	* @param x2, y2: coordinates of the second point.
-	**/
+	 * Return y via linear interpolation given two points.
+	 *
+	 * @param x: input.
+	 * @param x1, y1: coordinates of the first point.
+	 * @param x2, y2: coordinates of the second point.
+	 **/
 	virtual double linearInterpolator(
 			double x, double x1, double y1, double x2, double y2);
 
 	string pdr_file_name_; // LUT file name
 	string sir_file_name_; // LUT file name
 	char pdr_token_separator_; // LUT token separator
-	PdrLut range2pdr_; //LUT pdr vs distance
-	PdrLut sir2pdr_; //LUT pdr vs sir
+	PdrLut range2pdr_; // LUT pdr vs distance
+	PdrLut sir2pdr_; // LUT pdr vs sir
 	bool initLUT_;
 };
 

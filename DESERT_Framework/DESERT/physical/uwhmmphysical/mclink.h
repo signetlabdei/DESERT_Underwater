@@ -55,7 +55,7 @@ public:
 	/**
 	 * Channel state
 	 */
-	enum ChState {NOT_DEFINED = 0, GOOD = 1, MEDIUM = 2, BAD = 3};
+	enum ChState { NOT_DEFINED = 0, GOOD = 1, MEDIUM = 2, BAD = 3 };
 
 	/**
 	 * Default constructor of MCLink class.
@@ -64,23 +64,23 @@ public:
 
 	/**
 	 * Constructor of MCLink class.
-	 * 
+	 *
 	 * @param ber_good BER with channel in GOOD state
 	 * @param ber_bad BER with channel in BAD state
 	 * @param p_gb Probability of transition from GOOD to BAD in one step
 	 * @param p_bg Probability of transition from BAD to GOOD in one step
 	 * @param step_period period (s) for channel transition between states
-	 * @param ch_state Optional (default = GOOD) initial channel state 
+	 * @param ch_state Optional (default = GOOD) initial channel state
 	 * @return a new MCLink object
-	 */	
-	
-	MCLink(double ber_good, double ber_bad,double p_gb, double p_bg, double step_period,
-			ChState ch_state = MCLink::GOOD);
-	
+	 */
+
+	MCLink(double ber_good, double ber_bad, double p_gb, double p_bg,
+			double step_period, ChState ch_state = MCLink::GOOD);
+
 	/**
 	 * Default destructor of MCLink class.
 	 */
-	virtual ~MCLink() 
+	virtual ~MCLink()
 	{
 	}
 
@@ -95,7 +95,7 @@ public:
 	 *
 	 */
 	virtual int command(int, const char *const *);
-	
+
 	/**
 	 * Called upon packet reception, decides and returns the new channel state
 	 * updates the members state and last_step.
@@ -108,7 +108,8 @@ public:
 	 *
 	 * @return current (updated) channel state
 	 */
-	ChState getChState()
+	ChState
+	getChState()
 	{
 		return updateChState();
 	}
@@ -116,11 +117,10 @@ public:
 	/**
 	 * @return BER with current (updated) channel state
 	 */
-	virtual double getBER(); //remember to call updateChState() before returning a BER value
-
+	virtual double
+	getBER(); // remember to call updateChState() before returning a BER value
 
 protected:
-
 	// Variables
 	double ber_good; /**< BER with good channel*/
 	double ber_bad; /**< BER with bad channel*/
@@ -129,7 +129,6 @@ protected:
 	double last_update; /**< last time channel state has been updated */
 	double step_period; /**< period (s) for channel transition between states */
 	ChState ch_state; /**< last channel state */
-
 };
 
 #endif /* MCLINK_H  */

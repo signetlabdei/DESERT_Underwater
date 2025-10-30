@@ -38,9 +38,9 @@
 
 #include "uwinterferenceofdm.h"
 
-#include <mphy.h>
-#include <mac.h>
 #include <iostream>
+#include <mac.h>
+#include <mphy.h>
 
 #define POWER_PRECISION_THRESHOLD (1e-14)
 #define EPSILON_TIME 0.000000000001
@@ -60,40 +60,40 @@ public:
 	}
 } class_interf_foverlap;
 
-void EndInterfTimerOFDM::handle(Event *e)
+void
+EndInterfTimerOFDM::handle(Event *e)
 {
 
-	EndInterfEvent *ee = (EndInterfEvent *)e;
-	interference->removeFromInterference(ee->power, ee->type, ee->carrier_power);
+	EndInterfEvent *ee = (EndInterfEvent *) e;
+	interference->removeFromInterference(
+			ee->power, ee->type, ee->carrier_power);
 	delete ee;
 }
 
 uwinterferenceofdm::uwinterferenceofdm()
-	: uwinterference(), end_timerOFDM(this)
+	: uwinterference()
+	, end_timerOFDM(this)
 {
 	bind("use_maxinterval_", &use_maxinterval_);
-	bind("inodeID_", (int *)&inodeID);
+	bind("inodeID_", (int *) &inodeID);
 }
 
 uwinterferenceofdm::~uwinterferenceofdm()
 {
 }
 
-int uwinterferenceofdm::command(int argc, const char *const *argv)
+int
+uwinterferenceofdm::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
-	if (argc == 2)
-	{
-		if (strcasecmp(argv[1], "getInterfCarriers") == 0)
-		{
+	if (argc == 2) {
+		if (strcasecmp(argv[1], "getInterfCarriers") == 0) {
 			tcl.resultf("%d", getInterfCarriers());
 			return TCL_OK;
 		}
 	}
-	if (argc == 3)
-	{
-		if (strcasecmp(argv[1], "setInterfCarriers") == 0)
-		{
+	if (argc == 3) {
+		if (strcasecmp(argv[1], "setInterfCarriers") == 0) {
 			setInterfCarriers(atoi(argv[2]));
 			return TCL_OK;
 		}
@@ -101,7 +101,8 @@ int uwinterferenceofdm::command(int argc, const char *const *argv)
 	return uwinterferenceofdm::command(argc, argv);
 }
 
-void uwinterferenceofdm::addToInterference(Packet *p)
+void
+uwinterferenceofdm::addToInterference(Packet *p)
 {
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_mac *mach = HDR_MAC(p);
@@ -110,62 +111,64 @@ void uwinterferenceofdm::addToInterference(Packet *p)
 	int used_carriers = 0;
 
 	// Check how many carriers are effectively used
-	for (int i = 0; i < ofdmph->carrierNum; i++)
-	{
+	for (int i = 0; i < ofdmph->carrierNum; i++) {
 		used_carriers += ofdmph->carriers[i];
 	}
 
 	// For each used carrier fill with associated power
-	for (int i = 0; i < ofdmph->carrierNum; i++)
-	{
+	for (int i = 0; i < ofdmph->carrierNum; i++) {
 		car_power.push_back(ph->Pr / used_carriers * ofdmph->carriers[i]);
 	}
-	bool ctrl_pkt = (mach->ftype() == MF_CTS || mach->ftype() == MF_RTS || mach->ftype() == MF_ACK );  
+	bool ctrl_pkt = (mach->ftype() == MF_CTS || mach->ftype() == MF_RTS ||
+			mach->ftype() == MF_ACK);
 
 	if (ctrl_pkt) {
 
 		if (debug_)
-			std::cout << NOW << " uwinterference::addToInterference() CTRL packet" << std::endl;
+			std::cout << NOW
+					  << " uwinterference::addToInterference() CTRL packet"
+					  << std::endl;
 		addToInterference(ph->Pr, CTRL, ofdmph->carriers, ofdmph->carrierNum);
 		EndInterfEvent *ee = new EndInterfEvent(ph->Pr, CTRL, car_power);
 		// EPSILON_TIME needed to avoid the scheduling of simultaneous events
 		Scheduler::instance().schedule(
-			&end_timerOFDM, ee, ph->duration - EPSILON_TIME);
+				&end_timerOFDM, ee, ph->duration - EPSILON_TIME);
 
 	} else {
 
 		if (debug_)
-			std::cout << NOW << " uwinterference::addToInterference() DATA packet" << std::endl;
+			std::cout << NOW
+					  << " uwinterference::addToInterference() DATA packet"
+					  << std::endl;
 		addToInterference(ph->Pr, DATA, ofdmph->carriers, ofdmph->carrierNum);
 		EndInterfEvent *ee = new EndInterfEvent(ph->Pr, DATA, car_power);
 		// EPSILON_TIME needed to avoid the scheduling of simultaneous events
 		Scheduler::instance().schedule(
-			&end_timerOFDM, ee, ph->duration - EPSILON_TIME);
+				&end_timerOFDM, ee, ph->duration - EPSILON_TIME);
 	}
 }
 
-void uwinterferenceofdm::addToInterference(double pw, PKT_TYPE tp, int *carriers, int carNum)
+void
+uwinterferenceofdm::addToInterference(
+		double pw, PKT_TYPE tp, int *carriers, int carNum)
 {
 	std::vector<double> car_power;
 	int used_carriers = 0;
 
 	// Check how many carriers are effectively used
-	for (int i = 0; i < carNum; i++)
-	{
+	for (int i = 0; i < carNum; i++) {
 		used_carriers += carriers[i];
 	}
 
 	// For each used carrier fill with associated power
-	for (int i = 0; i < carNum; i++)
-	{
+	for (int i = 0; i < carNum; i++) {
 		car_power.push_back(pw / used_carriers * carriers[i]);
 	}
 
 	if (use_maxinterval_) {
 
 		std::list<ListNodeOFDM>::iterator it;
-		for (it = power_list.begin(); it != power_list.end();)
-		{
+		for (it = power_list.begin(); it != power_list.end();) {
 			if (it->time < NOW - maxinterval_) {
 				it = power_list.erase(it); // Side effect: it++
 			} else
@@ -191,28 +194,28 @@ void uwinterferenceofdm::addToInterference(double pw, PKT_TYPE tp, int *carriers
 
 		string carPwr = "CarrierPower_Vector = [";
 
-		for (int i = 0; i < car_pwr_old.size(); i++)
-		{
+		for (int i = 0; i < car_pwr_old.size(); i++) {
 			car_power.at(i) += car_pwr_old.at(i);
 			carPwr += (std::to_string(car_power.at(i)) + ", ");
 		}
 		carPwr += "]";
 
 		if (debug_)
-			std::cout << NOW << " uwinterference::addToInterference() " << carPwr << std::endl;
+			std::cout << NOW << " uwinterference::addToInterference() "
+					  << carPwr << std::endl;
 
-		if (tp == CTRL)
-		{
-			ListNodeOFDM pn(NOW, pw + power_temp, ctrl_temp + 1, data_temp, car_power);
+		if (tp == CTRL) {
+			ListNodeOFDM pn(
+					NOW, pw + power_temp, ctrl_temp + 1, data_temp, car_power);
 			power_list.push_back(pn);
 		} else {
-			ListNodeOFDM pn(NOW, pw + power_temp, ctrl_temp, data_temp + 1, car_power);
+			ListNodeOFDM pn(
+					NOW, pw + power_temp, ctrl_temp, data_temp + 1, car_power);
 			power_list.push_back(pn);
 		}
 	}
 
-	if (debug_)
-	{
+	if (debug_) {
 		std::cout << NOW << " uwinterference::addToInterference, power: " << pw
 				  << " ,total power: " << power_list.back().sum_power
 				  << " ,ctrl_packet: " << power_list.back().ctrl_cnt
@@ -221,17 +224,17 @@ void uwinterferenceofdm::addToInterference(double pw, PKT_TYPE tp, int *carriers
 	}
 }
 
-void uwinterferenceofdm::removeFromInterference(double pw, PKT_TYPE tp, const std::vector<double> &carPwr)
+void
+uwinterferenceofdm::removeFromInterference(
+		double pw, PKT_TYPE tp, const std::vector<double> &carPwr)
 {
 	if (use_maxinterval_) {
 		std::list<ListNodeOFDM>::iterator it;
 
-		for (it = power_list.begin(); it != power_list.end();)
-		{
+		for (it = power_list.begin(); it != power_list.end();) {
 			if (it->time < NOW - maxinterval_) {
 				it = power_list.erase(it); // Side effect: it++
-			}
-			else
+			} else
 				break;
 		}
 	}
@@ -247,14 +250,13 @@ void uwinterferenceofdm::removeFromInterference(double pw, PKT_TYPE tp, const st
 		int data_temp = power_list.back().data_cnt;
 		std::vector<double> car_pwr_old = power_list.back().carrier_power;
 		std::vector<double> car_pwr_new;
-		for (std::size_t i = 0; i < car_pwr_old.size(); ++i)
-		{
+		for (std::size_t i = 0; i < car_pwr_old.size(); ++i) {
 			double tempPwr = car_pwr_old[i] - carPwr[i];
-			if (tempPwr < 0)
-			{
+			if (tempPwr < 0) {
 				if (tempPwr < -0.001)
-					cerr << NOW << " NODE " << inodeID << " REMOVE FROM INTERFERENCE !!! result < 0 (" 
-					<< tempPwr << ") car " << i << std::endl;
+					cerr << NOW << " NODE " << inodeID
+						 << " REMOVE FROM INTERFERENCE !!! result < 0 ("
+						 << tempPwr << ") car " << i << std::endl;
 				tempPwr = 0;
 			}
 			car_pwr_new.push_back(tempPwr);
@@ -264,18 +266,20 @@ void uwinterferenceofdm::removeFromInterference(double pw, PKT_TYPE tp, const st
 			// NOW+EPSILON_TIME to compensate the early scheduling in
 			// addToInterference(Packet* p)
 			ListNodeOFDM pn(NOW + EPSILON_TIME,
-							power_temp - pw,
-							ctrl_temp - 1,
-							data_temp, car_pwr_new);
+					power_temp - pw,
+					ctrl_temp - 1,
+					data_temp,
+					car_pwr_new);
 			power_list.push_back(pn);
 		} else {
 
 			// NOW+EPSILON_TIME to compensate the early scheduling in
 			// addToInterference(Packet* p)
 			ListNodeOFDM pn(NOW + EPSILON_TIME,
-							power_temp - pw,
-							ctrl_temp,
-							data_temp - 1, car_pwr_new);
+					power_temp - pw,
+					ctrl_temp,
+					data_temp - 1,
+					car_pwr_new);
 			power_list.push_back(pn);
 		}
 	}
@@ -292,10 +296,12 @@ void uwinterferenceofdm::removeFromInterference(double pw, PKT_TYPE tp, const st
 
 	if (power_temp < -0.001) {
 		if (debug_)
-			std::cout << NOW << " NODE " << inodeID << " Precision error, negative power: " << power_temp
+			std::cout << NOW << " NODE " << inodeID
+					  << " Precision error, negative power: " << power_temp
 					  << std::endl;
 		if (power_temp < -1)
-			cerr << NOW << " NODE " << inodeID << " Precision ERROR, negative power: " << power_temp
+			cerr << NOW << " NODE " << inodeID
+				 << " Precision ERROR, negative power: " << power_temp
 				 << std::endl;
 
 		power_list.back().sum_power = 0;
@@ -309,12 +315,16 @@ uwinterferenceofdm::getInterferencePower(Packet *p)
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_OFDM *ofdmph = HDR_OFDM(p);
 
-	return (getInterferencePower(ph->Pr, ph->rxtime, ph->duration, ofdmph->carriers, ofdmph->carrierNum));
+	return (getInterferencePower(ph->Pr,
+			ph->rxtime,
+			ph->duration,
+			ofdmph->carriers,
+			ofdmph->carrierNum));
 }
 
 double
-uwinterferenceofdm::getInterferencePower(
-	double power, double starttime, double duration, int *carriers, int ncarriers)
+uwinterferenceofdm::getInterferencePower(double power, double starttime,
+		double duration, int *carriers, int ncarriers)
 {
 	std::list<ListNodeOFDM>::reverse_iterator rit;
 
@@ -327,16 +337,13 @@ uwinterferenceofdm::getInterferencePower(
 	assert(starttime <= NOW);
 	assert(duration > 0);
 
-	for (rit = power_list.rbegin(); rit != power_list.rend(); ++rit)
-	{
+	for (rit = power_list.rbegin(); rit != power_list.rend(); ++rit) {
 		car_power = 0;
-		if (starttime < rit->time)
-		{
+		if (starttime < rit->time) {
 			integral += rit->sum_power * (lasttime - rit->time);
 
 			// for each carrier add interf pwr if carrier is used
-			for (int i = 0; i < rit->carrier_power.size(); i++)
-			{
+			for (int i = 0; i < rit->carrier_power.size(); i++) {
 				car_power += carriers[i] * rit->carrier_power.at(i);
 			}
 
@@ -345,8 +352,7 @@ uwinterferenceofdm::getInterferencePower(
 		} else {
 
 			integral += rit->sum_power * (lasttime - starttime);
-			for (int i = 0; i < rit->carrier_power.size(); i++)
-			{
+			for (int i = 0; i < rit->carrier_power.size(); i++) {
 				car_power += carriers[i] * rit->carrier_power.at(i);
 			}
 			car_integral += car_power * (lasttime - starttime);
@@ -355,18 +361,17 @@ uwinterferenceofdm::getInterferencePower(
 	}
 	double interference = (integral / duration) - power;
 	double ofdminterference = (car_integral / duration) - power;
-	if(interference < (ofdminterference - 1))
-		std::cerr << "PROBLEM interference VS OFDM interference " << interference << " - " << ofdminterference << std::endl;
+	if (interference < (ofdminterference - 1))
+		std::cerr << "PROBLEM interference VS OFDM interference "
+				  << interference << " - " << ofdminterference << std::endl;
 
-	if (abs(interference) < POWER_PRECISION_THRESHOLD)
-	{
+	if (abs(interference) < POWER_PRECISION_THRESHOLD) {
 		if (debug_)
 			std::cout << "getInterferencePower() WARNING:"
 					  << " interference=" << interference
 					  << " POWER_PRECISION_THRESHOLD="
 					  << POWER_PRECISION_THRESHOLD
-					  << ". Precision error, interference set to 0"
-					  << endl;
+					  << ". Precision error, interference set to 0" << endl;
 	}
 	// Check for cancellation errors
 	// which can arise when interference is subtracted
@@ -430,8 +435,7 @@ uwinterferenceofdm::getTimeOverlap(double starttime, double duration)
 	assert(starttime <= NOW);
 	assert(duration > 0);
 
-	for (rit = power_list.rbegin(); rit != power_list.rend(); ++rit)
-	{
+	for (rit = power_list.rbegin(); rit != power_list.rend(); ++rit) {
 		if (starttime < rit->time) {
 
 			if (rit->ctrl_cnt > 1 || rit->data_cnt > 1) {
@@ -477,8 +481,7 @@ uwinterferenceofdm::getCounters(double starttime, double duration, PKT_TYPE tp)
 	int last_ctrl_cnt = rit->ctrl_cnt;
 	int last_data_cnt = rit->data_cnt;
 	rit++;
-	for (; rit != power_list.rend(); ++rit)
-	{
+	for (; rit != power_list.rend(); ++rit) {
 		if (starttime < rit->time) {
 			if (last_ctrl_cnt - rit->ctrl_cnt >= 0) {
 				ctrl_pkts += last_ctrl_cnt - rit->ctrl_cnt;

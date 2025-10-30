@@ -38,9 +38,9 @@
 
 #include "uwinterference.h"
 
-#include <mphy.h>
-#include <mac.h>
 #include <iostream>
+#include <mac.h>
+#include <mphy.h>
 
 #define POWER_PRECISION_THRESHOLD (1e-14)
 #define EPSILON_TIME 0.000000000001
@@ -250,18 +250,16 @@ uwinterference::getInterferencePower(
 			std::cout << "getInterferencePower() WARNING:"
 					  << " interference=" << interference
 					  << " POWER_PRECISION_THRESHOLD="
-					  << POWER_PRECISION_THRESHOLD 
-					  << ". Precision error, interference set to 0"
-					  << endl;
+					  << POWER_PRECISION_THRESHOLD
+					  << ". Precision error, interference set to 0" << endl;
 	}
 	// Check for cancellation errors
 	// which can arise when interference is subtracted
 	if (interference < 0) {
 		interference = 0;
 		if (debug_)
-				std::cout << "getInterferencePower() WARNING:"
-						  << " cancellation errors, interference set to 0"
-						  << endl;
+			std::cout << "getInterferencePower() WARNING:"
+					  << " cancellation errors, interference set to 0" << endl;
 	}
 
 	if (debug_) {

@@ -35,8 +35,8 @@
  * @brief Provides the initializazion of the uwtap libraries
  */
 
-#include <tclcl.h>
 #include "uwtap.h"
+#include <tclcl.h>
 
 ClMessage_t CLMSG_TAP_PKT;
 extern EmbeddedTcl UwtapTclCode;
@@ -48,4 +48,3 @@ Uwtap_Init()
 	UwtapTclCode.load();
 	return 0;
 }
-

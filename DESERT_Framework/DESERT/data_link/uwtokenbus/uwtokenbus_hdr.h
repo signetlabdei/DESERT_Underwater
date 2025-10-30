@@ -41,11 +41,12 @@
 #define UWTOKENBUS_HDR_H
 
 #include <cstdint>
-#include <packet.h>
 #include <limits>
+#include <packet.h>
 
-typedef uint_least16_t tokenid_t; /**< set here the size of the tokenid counter*/
-constexpr size_t TOKENIDMAX = std::numeric_limits<tokenid_t>::max(); 
+typedef uint_least16_t
+		tokenid_t; /**< set here the size of the tokenid counter*/
+constexpr size_t TOKENIDMAX = std::numeric_limits<tokenid_t>::max();
 
 extern packet_t PT_UWTOKENBUS;
 /**
@@ -54,31 +55,35 @@ extern packet_t PT_UWTOKENBUS;
 typedef struct hdr_tokenbus {
 public:
 	static int offset_; /**< Required by the PacketHeaderManager. */
-	tokenid_t token_id_; /**< progressive token id, indicates which node has the token */
-	
+	tokenid_t token_id_; /**< progressive token id, indicates which node has the
+							token */
+
 	/**
 	 * Returns a reference to the token_id variable
 	 * @returns a reference to the token_id variable
 	 */
-	tokenid_t & tokenId()
+	tokenid_t &
+	tokenId()
 	{
 		return (token_id_);
 	}
-	
+
 	/**
 	 * Returns the size of this header
 	 * @returns the size of this header
 	 */
-	size_t getSize() const
+	size_t
+	getSize() const
 	{
-		return sizeof(tokenid_t); 
+		return sizeof(tokenid_t);
 	}
 
 	/**
 	 * Returns a reference to the offset variable
 	 * @returns a reference to the offset variable
 	 */
-	inline static int & offset()
+	inline static int &
+	offset()
 	{
 		return offset_;
 	}
@@ -95,7 +100,8 @@ public:
 	}
 } hdr_tokenbus;
 
-#define HDR_TOKENBUS(p) \
-	(hdr_tokenbus::access(p))	/**< alias defined to access the TOKEN BUS HEADER*/
+#define HDR_TOKENBUS(p)    \
+	(hdr_tokenbus::access( \
+			p)) /**< alias defined to access the TOKEN BUS HEADER*/
 
 #endif

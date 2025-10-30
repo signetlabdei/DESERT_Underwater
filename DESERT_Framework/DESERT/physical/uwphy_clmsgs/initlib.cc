@@ -10,27 +10,27 @@
 // 2. Redistributions in binary form must reproduce the above copyright
 //    notice, this list of conditions and the following disclaimer in the
 //    documentation and/or other materials provided with the distribution.
-// 3. Neither the name of the University of Padova (SIGNET lab) nor the 
-//    names of its contributors may be used to endorse or promote products 
+// 3. Neither the name of the University of Padova (SIGNET lab) nor the
+//    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
-// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file  initlib.cc
  * @author Filippo Campagnaro
  * @version 1.0.0
- * 
+ *
  * \brief file to initialize the libuwphy_clmsgs.so library
  */
 
@@ -46,10 +46,11 @@ ClMessage_t CLMSG_S2C_POWER_LEVEL;
 ClMessage_t CLMSG_S2C_RX_FAILED;
 ClMessage_t CLMSG_UWPHY_TX_BUSY;
 
-
 extern EmbeddedTcl UwPhyClMsgsInitTclCode;
 
-extern "C" int Uwphy_clmsgs_Init() {
+extern "C" int
+Uwphy_clmsgs_Init()
+{
 	CLMSG_UWPHY_TX_POWER = ClMessage::addClMessage();
 	CLMSG_UWPHY_B_RATE = ClMessage::addClMessage();
 	CLMSG_UWPHY_THRESH = ClMessage::addClMessage();
@@ -62,8 +63,9 @@ extern "C" int Uwphy_clmsgs_Init() {
 	return 0;
 }
 
-extern "C" int CygUwphy_clmsgs_Init_Init() {
-    Uwphy_clmsgs_Init();
-    return 0;
+extern "C" int
+CygUwphy_clmsgs_Init_Init()
+{
+	Uwphy_clmsgs_Init();
+	return 0;
 }
-

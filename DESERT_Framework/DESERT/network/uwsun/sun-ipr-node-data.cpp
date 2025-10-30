@@ -62,7 +62,8 @@ SunIPRoutingNode::initPktDataPacket(Packet *p)
 
 	// IP Header.
 	hdr_uwip *iph = HDR_UWIP(p);
-	iph->daddr() = sink_associated; // The destination is always the Sink associated.
+	iph->daddr() =
+			sink_associated; // The destination is always the Sink associated.
 	// iph->dport() = 0; // Set by the Application above.
 	iph->saddr() = ipAddr_;
 	// iph->sport() = 0; // Set by the Application above.
@@ -95,9 +96,11 @@ SunIPRoutingNode::forwardDataPacket(Packet *p)
 
 	if (hdata->list_of_hops_length() <= 0) { // Garbage Packet.
 		drop(p, 1, DROP_DATA_HOPS_LENGTH_EQUALS_ZERO);
-	} else if (hdata->list_of_hops_length() > 0) { // The current node acts as relay.
+	} else if (hdata->list_of_hops_length() >
+			0) { // The current node acts as relay.
 		int i_ = hdata->pointer();
-		if (hdata->list_of_hops()[i_] == ipAddr_) { // If I'm the right next hop.
+		if (hdata->list_of_hops()[i_] ==
+				ipAddr_) { // If I'm the right next hop.
 			if (this->getNumberOfHopToSink() == 1) { // Send to the sink.
 				ch->next_hop() = sink_associated;
 				ch->prev_hop_ = ipAddr_;
@@ -108,7 +111,7 @@ SunIPRoutingNode::forwardDataPacket(Packet *p)
 			}
 
 			if (printDebug_ > 5) {
-				std::cout << "[" <<  NOW
+				std::cout << "[" << NOW
 						  << "]::Node[IP:" << this->printIP(ipAddr_)
 						  << "||hops:" << this->getNumberOfHopToSink()
 						  << "]::PACKET::UID:" << ch->uid()

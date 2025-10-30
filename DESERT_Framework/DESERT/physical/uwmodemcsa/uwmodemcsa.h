@@ -81,13 +81,13 @@ public:
 	 */
 	virtual int recvSyncClMsg(ClMessage *m);
 
-   /**
-    * Method that returns the duration of a given transmitted packet.
-    * Inherited from MPhy, in NS-MIRACLE, could be empty if there is no way
-    * to retrieve this information.
-    * @param p Packet pointer to the given packet being transmitted
-    * @return duration in seconds
-    */
+	/**
+	 * Method that returns the duration of a given transmitted packet.
+	 * Inherited from MPhy, in NS-MIRACLE, could be empty if there is no way
+	 * to retrieve this information.
+	 * @param p Packet pointer to the given packet being transmitted
+	 * @return duration in seconds
+	 */
 	virtual double getTxDuration(Packet *p);
 
 	/**

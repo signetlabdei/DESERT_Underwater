@@ -40,25 +40,23 @@
 #ifndef UWICRP_MODULE_NODE_H
 #define UWICRP_MODULE_NODE_H
 
+#include "uwicrp-common.h"
 #include "uwicrp-hdr-ack.h"
 #include "uwicrp-hdr-data.h"
 #include "uwicrp-hdr-status.h"
-#include "uwicrp-common.h"
-#include <uwip-module.h>
 #include <uwip-clmsg.h>
+#include <uwip-module.h>
 
 #include "packet.h"
+#include <climits>
+#include <ctime>
+#include <iostream>
+#include <module.h>
+#include <rng.h>
 #include <sstream>
 #include <string>
-#include <iostream>
-#include <rng.h>
-#include <ctime>
-#include <climits>
-#include <module.h>
 #include <tclcl.h>
 #include <vector>
-
-
 
 class UwIcrpNode;
 
@@ -290,7 +288,7 @@ protected:
 			route_table[HOP_TABLE_LENGTH]; /**< Node routing table. */
 	double max_validity_time_; /**< Maximum validity time of a route. */
 	int printDebug_; /**< Flag to enable or disable dirrefent levels of debug.
-						*/
+					  */
 	double timer_ack_waiting_; /**< Ack waiting timer. */
 	AckWaiting ackwaitingTmr_; /**< AckWaiting object. */
 
@@ -299,9 +297,8 @@ private:
 									   processed by UwIcrpNode objects. */
 	static long numberofdatapkt_; /**< Comulative number of Data packets
 									 processed by UwIcrpNode objects. */
-	static long
-			numberofackpkt_; /**< Comulative number of Ack packets processed by
-								UwIcrpNode objects. */
+	static long numberofackpkt_; /**< Comulative number of Ack packets processed
+									by UwIcrpNode objects. */
 };
 
 #endif // UWICRP_MODULE_NODE_H

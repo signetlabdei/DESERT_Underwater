@@ -143,8 +143,8 @@ UwFlooding::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addTtlPerTraffic") == 0) {
-			ttl_traffic_map[static_cast<uint16_t>(atoi(argv[2]))] = 
-				static_cast<uint8_t>(atoi(argv[3]));
+			ttl_traffic_map[static_cast<uint16_t>(atoi(argv[2]))] =
+					static_cast<uint8_t>(atoi(argv[3]));
 			return TCL_OK;
 		}
 	}
@@ -375,11 +375,12 @@ UwFlooding::recv(Packet *p)
 	}
 } /* UwFlooding::recv */
 
-uint8_t UwFlooding::getTTL(Packet* p) const
+uint8_t
+UwFlooding::getTTL(Packet *p) const
 {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	auto it = ttl_traffic_map.find(uwcbrh->traffic_type());
-	if(it != ttl_traffic_map.end()) {
+	if (it != ttl_traffic_map.end()) {
 		return it->second;
 	}
 	return ttl_;

@@ -39,9 +39,9 @@
 #ifndef UW_CSMA_UW_CS_ALOHA_TRIG_SINK_TRIGGER_SINK_H
 #define UW_CSMA_UW_CS_ALOHA_TRIG_SINK_TRIGGER_SINK_H
 
+#include "mac.h"
 #include "mmac.h"
 #include "mphy.h"
-#include "mac.h"
 
 #include <iostream>
 
@@ -454,11 +454,11 @@ protected:
 									data packet */
 
 	UW_CS_ALOHA_TRIG_SINK_STATUS
-			curr_state; /**< Current state of the protocol */
+	curr_state; /**< Current state of the protocol */
 	UW_CS_ALOHA_TRIG_SINK_STATUS
-			prev_state; /**< Previous state of the protocol */
+	prev_state; /**< Previous state of the protocol */
 	UW_CS_ALOHA_TRIG_SINK_REASON_STATUS
-			last_reason; /**< Last reason of the state change of the protocol */
+	last_reason; /**< Last reason of the state change of the protocol */
 
 	ReceiveTimer receive_timer; /**< timer of receive state */
 

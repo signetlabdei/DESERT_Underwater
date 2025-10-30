@@ -39,9 +39,9 @@
 #ifndef UW_WAKEUP_H
 #define UW_WAKEUP_H
 
-#include <mphy.h>
-#include <map>
 #include "wake-up-pkt-hdr.h"
+#include <map>
+#include <mphy.h>
 
 #define UW_WAKEUP_MODNAME "WKUP"
 #define DROP_REASON_BELOW_THRESHOLD "DBT"
@@ -169,7 +169,7 @@ protected:
 	/* input */
 	double AcquisitionThreshold_dB_; /**< How many dB over noise are required
 									  * for a signal to trigger
-									   * acquisition (i.e., a RX attempt) */
+									  * acquisition (i.e., a RX attempt) */
 
 	double ToneDuration_; /**< predefined tone duration */
 

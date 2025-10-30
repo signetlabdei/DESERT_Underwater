@@ -36,7 +36,6 @@
  *
  */
 
-
 #ifndef HDR_UWPOS_BASED_RT_H
 #define HDR_UWPOS_BASED_RT_H
 
@@ -61,55 +60,62 @@ typedef struct hdr_uwpos_based_rt {
 	double ROV_speed_;
 	uint8_t ipROV_; /***<IP of the ROV related to the informations inserted in
 						the header. */
-	
+
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
-
-	inline double& x_ROV()
+	inline double &
+	x_ROV()
 	{
 		return x_ROV_;
 	}
 
-	inline double& y_ROV()
+	inline double &
+	y_ROV()
 	{
 		return y_ROV_;
 	}
 
-	inline double& z_ROV()
+	inline double &
+	z_ROV()
 	{
 		return z_ROV_;
 	}
 
-	inline double& timestamp()
+	inline double &
+	timestamp()
 	{
 		return timestamp_;
 	}
 
-	inline double& x_waypoint()
+	inline double &
+	x_waypoint()
 	{
 		return x_wp_;
 	}
 
-	inline double& y_waypoint()
+	inline double &
+	y_waypoint()
 	{
 		return y_wp_;
 	}
 
-	inline double& z_waypoint()
+	inline double &
+	z_waypoint()
 	{
 		return z_wp_;
 	}
 
-	inline double& ROV_speed()
+	inline double &
+	ROV_speed()
 	{
 		return ROV_speed_;
 	}
 
-	inline uint8_t& IP_ROV()
+	inline uint8_t &
+	IP_ROV()
 	{
 		return ipROV_;
 	}
-
 
 	/**
 	 * Reference to the offset_ variable.
@@ -119,8 +125,6 @@ typedef struct hdr_uwpos_based_rt {
 	{
 		return offset_;
 	}
-
-
 
 	inline static struct hdr_uwpos_based_rt *
 	access(const Packet *p)

@@ -39,15 +39,15 @@
 #ifndef MMAC_UW_TLOHI_H
 #define MMAC_UW_TLOHI_H
 
-//#include<module.h>
-#include <mmac.h>
-#include <vector>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
-#include <utility>
+// #include<module.h>
 #include <fstream>
+#include <map>
+#include <mmac.h>
+#include <queue>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <mphy.h>
 
@@ -150,9 +150,8 @@ typedef struct hdr_tlohi {
 	double ts; /**< packet timestamp, i.e., its generation time) */
 	int sn; /**< sequence number of this packet */
 	TLOHI_PKT_TYPE pkt_type; /**< T-LOHI packet type */
-	packet_t
-			orig_type; /**< Original type of the packet (i.e. the type defined
-						  by the upper layers) */
+	packet_t orig_type; /**< Original type of the packet (i.e. the type defined
+						   by the upper layers) */
 	int data_sn; /**< DATA packet sequence number */
 
 	static int offset_; /**< Required by PacketManager Header */
@@ -215,8 +214,8 @@ class DataTimer : public TimerHandler
 {
 public:
 	/**
-	* Constructor of the class
-	*/
+	 * Constructor of the class
+	 */
 	DataTimer(MMacTLOHI *m)
 		: TimerHandler()
 	{
@@ -294,7 +293,7 @@ protected:
 	 * Method called when the Phy Layer start to receive a Packet
 	 * @param const Packet* Pointer to an object of type Packet that rapresent
 	 * the Packet that is in reception
-	*/
+	 */
 	virtual void Phy2MacStartRx(const Packet *p);
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet
@@ -431,7 +430,7 @@ protected:
 	 * a command in tcl.
 	 * @param double delay
 	 * @see command method
-	*/
+	 */
 	virtual void printStateInfo(double delay = 0);
 	/**
 	 * Initializes the map between the protocol states and the textual
@@ -597,8 +596,8 @@ protected:
 	/////
 
 	/***************
-	* input values *
-	****************/
+	 * input values *
+	 ****************/
 	double max_prop_delay; /**< Maximum propagation delay in the network */
 	int max_tx_rounds; /**< Maximum transmission round for one packet */
 	double max_tx_tries; /**< Maximum transmission tries for one packet */
@@ -620,9 +619,8 @@ protected:
 
 	bool TxActive; /**< Flag that indicates if a transmission is occuring */
 	bool session_active; /**< Flag that indicates if a Session is active */
-	bool
-			backoff_pending; /**< Flag that indicates if a backoff timer is
-								pending */
+	bool backoff_pending; /**< Flag that indicates if a backoff timer is
+							 pending */
 	bool tone_transmitted; /**< Flag that indicates if a tone has been
 							  transmitted */
 	bool print_transitions; /**< Flat that indicates if the modality in which
@@ -647,7 +645,7 @@ protected:
 	int last_data_id_rx; /**< Last data packet transmitted ID */
 	Packet *curr_data_pkt; /**< Pointer to the current data packet */
 	int curr_contenders; /**< Number of contenders in current Contention Round
-							*/
+						  */
 	int curr_tx_rounds; /**< Number of current transmission round */
 	int curr_tx_tries; /**< Number of current transmission tries */
 
@@ -671,11 +669,10 @@ protected:
 	string tcl_modulation; /**< Type of modulation adopted for data PHY layer */
 
 	Timer timer; /**< timer for Contention Round */
-	DataTimer
-			data_phy_timer; /**< Timer that describe the time needed to receive
-							   the packet (i.e. the data PHY layer wake up for
-							   the duration of the reception, then go to sleep
-							   again */
+	DataTimer data_phy_timer; /**< Timer that describe the time needed to
+								 receive the packet (i.e. the data PHY layer
+								 wake up for the duration of the reception, then
+								 go to sleep again */
 
 	static map<TLOHI_STATUS, string>
 			status_info; /**< Map between the state and the textual description

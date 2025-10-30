@@ -41,15 +41,15 @@
 
 #include <bpsk.h>
 #include <mantenna.h>
-#include <packet.h>
 #include <module.h>
+#include <packet.h>
 #include <tclcl.h>
 
+#include <climits>
+#include <fstream>
 #include <iostream>
 #include <limits>
-#include <climits>
 #include <node-core.h>
-#include <fstream>
 #include <sstream>
 
 class UwElectroMagneticAntenna : public MAntenna
@@ -80,7 +80,8 @@ public:
 	 */
 	virtual int command(int, const char *const *);
 
-	virtual double getGain(Packet* p);
+	virtual double getGain(Packet *p);
+
 private:
 	// Variables
 	double gain_;

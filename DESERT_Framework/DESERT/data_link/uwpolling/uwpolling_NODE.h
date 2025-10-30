@@ -40,16 +40,16 @@
 #ifndef Uwpolling_HDR_NODE_H
 #define Uwpolling_HDR_NODE_H
 
-#include "uwpolling_cmn_hdr.h"
 #include "mmac.h"
+#include "uwpolling_cmn_hdr.h"
 
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
-#include <fstream>
 #include <chrono>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <string>
 
 #define UWPOLLING_NODE_DROP_REASON_BUFFER_FULL \
 	"DBF" /**< Buffer of the node is full */
@@ -540,10 +540,8 @@ protected:
 	inline void
 	getDataQueueLog()
 	{
-		std::cout << getEpoch() << "::"  << NOW
-				  << "::Uwpolling_NODE(" << addr
-				  << ")::DATA_QUEUE_SIZE--> " << Q_data.size()
-				  << std::endl;
+		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+				  << ")::DATA_QUEUE_SIZE--> " << Q_data.size() << std::endl;
 	}
 
 	/**
@@ -674,10 +672,12 @@ protected:
 	inline unsigned long int
 	getEpoch()
 	{
-	  unsigned long int timestamp =
-		  (unsigned long int) (std::chrono::duration_cast<std::chrono::milliseconds>(
-			  std::chrono::system_clock::now().time_since_epoch()).count() );
-	  return timestamp;
+		unsigned long int timestamp =
+				(unsigned long int) (std::chrono::duration_cast<
+						std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch())
+								.count());
+		return timestamp;
 	}
 
 	/*************************
@@ -688,38 +688,34 @@ protected:
 	double backoff_tuner; /**< Multiplying value to the backoff value */
 	int max_payload; /**< Payload of Application Layer in bytes */
 	int buffer_data_pkts; /**< Length of buffer of DATA pkts in number of pkts
-							 */
-	int
-			max_data_pkt_tx; /**< Max number of DATA packets to transmit each
-								cycle */
+						   */
+	int max_data_pkt_tx; /**< Max number of DATA packets to transmit each
+							cycle */
 	uint node_id; /**< Unique Node ID */
 	int sea_trial; /**< Sea Trial flag: To activate if the protocol is going to
 					  be tested at the sea */
 	int print_stats; /**< Print protocol's statistics of the protocol */
 	int n_run; /*< ID of the experiments (used during sea trial) */
-	double Intra_data_Guard_Time; /**< Guard Time between one data packet and the
-								  following */
+	double Intra_data_Guard_Time; /**< Guard Time between one data packet and
+								  the following */
 
 	std::queue<Packet *> Q_data; /**< Queue of DATA in number of packets */
 
 	static bool initialized; /**< <i>true</i> if the protocol is initialized,
 								<i>false</i> otherwise */
 
-	bool
-			polled; /**< <i>true</i> if the node is polled, <i>false</i>
-					   otherwise */
+	bool polled; /**< <i>true</i> if the node is polled, <i>false</i>
+					otherwise */
 	bool RxPollEnabled; /**< <i>true</i> if the node is enabled to receive the
 						   POLL, <i>false</i> otherwise */
 	bool Triggered; /**< <i>true</i> if the node has correctly received a
 					   TRIGGER, <i>false</i> otherwise */
-	bool
-			LastPacket; /**< <i>true</i> if the node has just sent the last
-						   packet of the queue and has to exit from the TxData
-						   state, <i>false</i> otherwise */
+	bool LastPacket; /**< <i>true</i> if the node has just sent the last
+						packet of the queue and has to exit from the TxData
+						state, <i>false</i> otherwise */
 
-	double
-			MaxTimeStamp; /**< Timestamp of the most recent data packet
-							 generated */
+	double MaxTimeStamp; /**< Timestamp of the most recent data packet
+							generated */
 	double T_in; /**< Lower bound of the range in which choose randomly the
 					backoff time (sent by the AUV in the TRIGGER message) */
 	double T_fin; /**< Upper bound of the range in which choose randomly the
@@ -741,7 +737,7 @@ protected:
 	Packet *curr_trigger_pkt; /**< Pointer to the current TRIGGER packet */
 
 	UWPOLLING_NODE_REASON
-			last_reason; /**< Last reason to the change of state */
+	last_reason; /**< Last reason to the change of state */
 	UWPOLLING_NODE_STATUS curr_state; /**< Current state of the protocol */
 	UWPOLLING_NODE_STATUS prev_state; /**< Previous state of the protocol */
 
