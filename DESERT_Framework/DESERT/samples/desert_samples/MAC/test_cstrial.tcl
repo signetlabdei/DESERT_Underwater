@@ -26,7 +26,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test UW-TDMA protocol
+# This script is used to test UW-CSTRIAL protocol
 # with a CBR (Constant Bit Rate) Application Module
 # Here the complete stack used for each node in the simulation
 #
@@ -50,7 +50,7 @@
 #   +-------------------------+
 #   |  3. UW/MLL              |
 #   +-------------------------+
-#   |  2. UW/TDMA             |
+#   |  2. UW/CSTRIAL          |
 #   +-------------------------+
 #   |  1. UW/PHYSICAL         |
 #   +-------------------------+
@@ -118,7 +118,7 @@ if {$opt(bash_parameters)} {
 		puts "- the first for the seed"
 		puts "- the second one is for the Poisson CBR period"
 		puts "- the third one is the cbr packet size (byte);"
-		puts "example: ns TDMA_exp.tcl 1 60 125"
+		puts "example: ns test_cstrial.tcl 1 60 125"
 		puts "If you want to leave the default values, please set to 0"
 		puts "the value opt(bash_parameters) in the tcl script"
 		puts "Please try again."
@@ -135,9 +135,9 @@ for {set k 0} {$k < $opt(rngstream)} {incr k} {
 	$defaultRNG next-substream
 }
 if {$opt(trace_files)} {
-	set opt(tracefilename) "./test_uwtdma_simple.tr"
+	set opt(tracefilename) "./test_uwcstrial.tr"
 	set opt(tracefile) [open $opt(tracefilename) w]
-	set opt(cltracefilename) "./test_uwtdma_simple.cltr"
+	set opt(cltracefilename) "./test_uwcstrial.cltr"
 	set opt(cltracefile) [open $opt(tracefilename) w]
 } else {
 	set opt(tracefilename) "/dev/null"
