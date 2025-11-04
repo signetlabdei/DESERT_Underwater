@@ -32,7 +32,8 @@
  * @author Vincenzo Cimino
  * @version 1.0.0
  *
- * \brief  Header of the class responsible to map the NS-Miracle packet of uwrangingTDOA into a bit stream, and vice-versa.
+ * \brief  Header of the class responsible to map the NS-Miracle packet of
+ * uwrangingTDOA into a bit stream, and vice-versa.
  */
 
 #ifndef PACKER_UWRANGINGTDOA_H
@@ -73,7 +74,8 @@ private:
 	 *
 	 * @return  size_t New offset after packing the headers of the packets
 	 */
-	virtual size_t packMyHdr(Packet *p, unsigned char *buffer, size_t offset) override;
+	virtual size_t packMyHdr(
+			Packet *p, unsigned char *buffer, size_t offset) override;
 
 	/**
 	 *  Method responsible to take the informations from the received buffer and
@@ -85,7 +87,8 @@ private:
 	 *
 	 * @return size_t New offset after unpacking the headers
 	 */
-	virtual size_t unpackMyHdr(unsigned char *buffer, size_t offset, Packet *p) override;
+	virtual size_t unpackMyHdr(
+			unsigned char *buffer, size_t offset, Packet *p) override;
 
 	/**
 	 * Method used for debug purposes. It prints the number of bits for each
@@ -109,8 +112,11 @@ private:
 		LAST_ELEM
 	};
 
-	size_t source_pkt_id_Bits; /**< Bit length of the source_pkt_id field to be put in the header stream of bits. */
-	size_t source_node_id_Bits; /**< Bit length of the source_node_id to be put in the header stream of bits. */
-	size_t times_size_Bits; /**< Bit length of the times_size_field to be put in the header stream of bits. */
+	size_t source_pkt_id_Bits; /**< Bit length of the source_pkt_id field to be
+								  put in the header stream of bits. */
+	size_t source_node_id_Bits; /**< Bit length of the source_node_id to be put
+								   in the header stream of bits. */
+	size_t times_size_Bits; /**< Bit length of the times_size_field to be put in
+							   the header stream of bits. */
 };
 #endif /* PACKER_UWRANGINGTDOA_H */

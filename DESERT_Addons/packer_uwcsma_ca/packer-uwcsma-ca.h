@@ -38,8 +38,8 @@
 
 #include "packer.h"
 
-#include "uw-csma-ca.h"
 #include "mac.h"
+#include "uw-csma-ca.h"
 
 #include <iostream>
 
@@ -50,49 +50,49 @@ class packerUwCsmaCa : public packer
 {
 public:
 	/**
-	* Class constructor.
-	*
-	*/
+	 * Class constructor.
+	 *
+	 */
 	packerUwCsmaCa();
 
 	/**
-	* Class destructor.
-	*
-	*/
-	~packerUwCsmaCa(){};
+	 * Class destructor.
+	 *
+	 */
+	~packerUwCsmaCa() {};
 
 private:
 	/**
-  * Init the Packer
-  */
+	 * Init the Packer
+	 */
 	void init();
 	/**
-	* Method to transform the headers of UwCsma-Ca into a stream of bits
-	* @param Pointer to the packet to serialize
-	* @param Pointer to the buffer
-	* @param Offset from the begin of the buffer
-	* @return New offset after packing the headers of the packets
-	*/
+	 * Method to transform the headers of UwCsma-Ca into a stream of bits
+	 * @param Pointer to the packet to serialize
+	 * @param Pointer to the buffer
+	 * @param Offset from the begin of the buffer
+	 * @return New offset after packing the headers of the packets
+	 */
 	size_t packMyHdr(Packet *, unsigned char *, size_t);
 	/**
-	* Method responsible to take the informations from the received buffer and
-	* store it into the headers of the packet
-	* @param Pointer to the buffer received
-	* @param Offset from the begin of the buffer
-	* @param Pointer to the new packet
-	* @return New offset after unpacking the headers
-	*/
+	 * Method responsible to take the informations from the received buffer and
+	 * store it into the headers of the packet
+	 * @param Pointer to the buffer received
+	 * @param Offset from the begin of the buffer
+	 * @param Pointer to the new packet
+	 * @return New offset after unpacking the headers
+	 */
 	size_t unpackMyHdr(unsigned char *, size_t, Packet *);
 	/**
-	* Method used for debug purposes. It prints the number of bits
-	* for each header serialized
-	*/
+	 * Method used for debug purposes. It prints the number of bits
+	 * for each header serialized
+	 */
 	void printMyHdrMap();
 	/**
-	* Method used for debug purposes. It prints the value of the headers
-	* of a packet
-	* @param Pointer of the packet
-	*/
+	 * Method used for debug purposes. It prints the value of the headers
+	 * of a packet
+	 * @param Pointer of the packet
+	 */
 	void printMyHdrFields(Packet *);
 
 	size_t txtime_Bits;

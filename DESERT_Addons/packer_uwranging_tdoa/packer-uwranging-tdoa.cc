@@ -31,7 +31,8 @@
  * @author Vincenzo Cimino
  * @version 1.0.0
  *
- * \brief  Header of the class responsible to map the NS-Miracle packet of uwrangingTDOA into a bit stream, and vice-versa.
+ * \brief  Header of the class responsible to map the NS-Miracle packet of
+ * uwrangingTDOA into a bit stream, and vice-versa.
  *
  */
 
@@ -117,7 +118,8 @@ packer_uwRangingTDOA::packMyHdr(Packet *p, unsigned char *buffer, size_t offset)
 }
 
 size_t
-packer_uwRangingTDOA::unpackMyHdr(unsigned char *buffer, size_t offset, Packet *p)
+packer_uwRangingTDOA::unpackMyHdr(
+		unsigned char *buffer, size_t offset, Packet *p)
 {
 	hdr_cmn *hcmn = HDR_CMN(p);
 
@@ -145,7 +147,8 @@ packer_uwRangingTDOA::unpackMyHdr(unsigned char *buffer, size_t offset, Packet *
 
 		if (debug_) {
 			std::cout << "\033[1;32;40m (RX) UwRangingTDOA::DATA packer hdr "
-						 "\033[0m" << std::endl;
+						 "\033[0m"
+					  << std::endl;
 			printMyHdrFields(p);
 		}
 	}

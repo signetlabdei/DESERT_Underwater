@@ -27,13 +27,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file   uwmulti-destination.h
-* @author William Rizzo
-* @version 1.0.0h
-*
-* \brief Definition of UwMultiDestination class.
-*
-*/
+ * @file   uwmulti-destination.h
+ * @author William Rizzo
+ * @version 1.0.0h
+ *
+ * \brief Definition of UwMultiDestination class.
+ *
+ */
 
 #ifndef UWMULTI_DESTINATION_H
 #define UWMULTI_DESTINATION_H
@@ -41,8 +41,8 @@
 #include <climits>
 #include <cmath>
 #include <iostream>
-#include <map>
 #include <list>
+#include <map>
 #include <module.h>
 #include <packet.h>
 #include <rng.h>
@@ -50,15 +50,13 @@
 #include <tclcl.h>
 #include <uwip-module.h>
 
-typedef struct IP_range
-{
+typedef struct IP_range {
 	int min_IP; /**< Minimum IP address of the range */
 	int max_IP; /**< Maximum IP address of the range */
 
 	IP_range(int min, int max)
-	:
-	min_IP(min),
-	max_IP(max)
+		: min_IP(min)
+		, max_IP(max)
 	{
 	}
 
@@ -67,7 +65,8 @@ typedef struct IP_range
 	 * @param range IP range to check
 	 * @return true if the ranges are not overlapped
 	 */
-	bool overlappingRange(IP_range range)
+	bool
+	overlappingRange(IP_range range)
 	{
 		return overlappingRange(range.min_IP, range.max_IP);
 	}
@@ -78,7 +77,8 @@ typedef struct IP_range
 	 * @param max masimum IP address of the range
 	 * @return true if the ranges are overlapped
 	 */
-	bool overlappingRange(int min, int max)
+	bool
+	overlappingRange(int min, int max)
 	{
 		return !(min_IP > max || max_IP < min);
 	}
@@ -88,14 +88,14 @@ typedef struct IP_range
 	 * @param addr IP address
 	 * @return true if the IP address is in the range, false otherwise
 	 */
-	bool isInRange(int addr)
+	bool
+	isInRange(int addr)
 	{
 		return (addr >= min_IP && addr <= max_IP);
 	}
 } range_IP;
 
 typedef std::pair<int, IP_range> layer_IPrange;
-
 
 /**
  * Class used to represents the UwMultiDestination layer of a node.
@@ -134,7 +134,7 @@ public:
 	virtual int command(int, const char *const *);
 
 	/**
-	 * Add a layer in the layer map if the IP range is valide, i.e., 
+	 * Add a layer in the layer map if the IP range is valide, i.e.,
 	 * if the range doesn't overlap with an existing one
 	 *
 	 * @param range IP range
@@ -164,7 +164,7 @@ protected:
 	int lower_id_active_; /**< Id of the current lower layer active. It is
 								 used only in MANUAL MODE.*/
 
-	std::list<layer_IPrange> layer_list;/**Maps a layer id into an IP_range. */
+	std::list<layer_IPrange> layer_list; /**Maps a layer id into an IP_range. */
 
 	int default_lower_id; /**Default lower id to use if dest adress is not found
 							in the considered IP ranges. */
@@ -173,7 +173,7 @@ protected:
 	 * Handle a packet coming from upper layers
 	 *
 	 * @param p pointer to the packet
-	*/
+	 */
 	virtual void recvFromUpperLayers(Packet *p);
 
 	/**
@@ -183,16 +183,16 @@ protected:
 	 * @param p pointer to the packet
 	 *
 	 * @return id of the module representing the best layer.
-	*/
+	 */
 
 	virtual int getDestinationLayer(Packet *p);
-	
+
 	/**
-	 * return true if there is not overlap between the new range and the 
+	 * return true if there is not overlap between the new range and the
 	 * previous rnage in the list
 	 *
 	 * @param range that has to be inserted in the list
-	 * @return true if there is not overlap, false otherwise 
+	 * @return true if there is not overlap, false otherwise
 	 */
 	virtual bool checkNotOverlap(IP_range range);
 

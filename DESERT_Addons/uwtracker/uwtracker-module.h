@@ -27,19 +27,19 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwtracker-module.h
-* @author Filippo Campagnaro
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UWROV</i>.
-*
-* Provides the definition of the class <i>UWROV</i>, based on <i>UwCbr</i>.
-* <i>UWROV</i> can manage no more than 2^16 packets. If a module generates more
-* than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
-* <i>UWROV</i> sends periodically monitoring packets containing information about
-* the current position and acknowledges the last control packet received.
-* Each control packet contains the next waypoint that has to be reach.
-*/
+ * @file uwtracker-module.h
+ * @author Filippo Campagnaro
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UWROV</i>.
+ *
+ * Provides the definition of the class <i>UWROV</i>, based on <i>UwCbr</i>.
+ * <i>UWROV</i> can manage no more than 2^16 packets. If a module generates more
+ * than 2^16 packets, they will be dropped, according with <i>UwCbr</i>.
+ * <i>UWROV</i> sends periodically monitoring packets containing information
+ * about the current position and acknowledges the last control packet received.
+ * Each control packet contains the next waypoint that has to be reach.
+ */
 
 #ifndef UWTRACK_MODULE_H
 #define UWTRACK_MODULE_H
@@ -47,15 +47,15 @@
 #include <uwtracker-packet.h>
 
 class UwTrackerModule; // forward declaration
-class UWSMPosition;  // forward declaration
+class UWSMPosition; // forward declaration
 
 class UwUpdateTrackMeasure : public TimerHandler
 {
 public:
 	UwUpdateTrackMeasure(UwTrackerModule *m)
-		: TimerHandler(), module(m)
+		: TimerHandler()
+		, module(m)
 	{
-
 	}
 
 protected:
@@ -64,12 +64,14 @@ protected:
 };
 
 /**
-* UwTrackerModule class is used to track mobile nodes via sonar and share tracking information via packets.
-*/
-class UwTrackerModule : public UwCbrModule {
+ * UwTrackerModule class is used to track mobile nodes via sonar and share
+ * tracking information via packets.
+ */
+class UwTrackerModule : public UwCbrModule
+{
 	friend class UwUpdateTrackMeasure;
-public:
 
+public:
 	/**
 	 * Default Constructor of UwTrackerModule class.
 	 */
@@ -80,7 +82,7 @@ public:
 	 *
 	 * @param UWSMPosition* p Pointer to the track position
 	 */
-	UwTrackerModule(UWSMPosition* p);
+	UwTrackerModule(UWSMPosition *p);
 
 	/**
 	 * Destructor of UwTrackerModule class.
@@ -89,24 +91,27 @@ public:
 
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
-	 * 
+	 *
 	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	 * 
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
 	 */
-	virtual int command(int argc, const char*const* argv);
+	virtual int command(int argc, const char *const *argv);
 
 	/**
-	 * Initializes a monitoring data packet passed as argument with the default values.
-	 * 
-	 * @param Packet* Pointer to a packet already allocated to fill with the right values.
+	 * Initializes a monitoring data packet passed as argument with the default
+	 * values.
+	 *
+	 * @param Packet* Pointer to a packet already allocated to fill with the
+	 * right values.
 	 */
-	virtual void initPkt(Packet* p) ;
+	virtual void initPkt(Packet *p);
 
 protected:
-
-	UWSMPosition* track_position; /**< Track position.*/
+	UWSMPosition *track_position; /**< Track position.*/
 	hdr_uwTracker track_measure; /**< Track position.*/
 
 	double max_tracking_distance; /**< Maximum tracking distance, in [m]*/
@@ -114,11 +119,12 @@ protected:
 	int send_only_active_trace; /**< send only active trace*/
 	int track_my_position; /**< track also my position*/
 	double tracking_period; /**< period between tracking measurements*/
-	UwUpdateTrackMeasure measure_timer; /**< timer to schedule tracking measurements*/
+	UwUpdateTrackMeasure
+			measure_timer; /**< timer to schedule tracking measurements*/
 	/**
 	 * Print to tracefile details about a received packet
 	 *
-	 * @param Packet* Pointer to the received packet 
+	 * @param Packet* Pointer to the received packet
 	 */
 	virtual void printReceivedPacket(Packet *p);
 

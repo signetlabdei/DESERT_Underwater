@@ -27,14 +27,14 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-rovctr-module.cc
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the <i>UWROVCtr</i> class implementation.
-*
-* Provides the UwROVCtr class implementation.
-*/
+ * @file uwsc-rovctr-module.cc
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the <i>UWROVCtr</i> class implementation.
+ *
+ * Provides the UwROVCtr class implementation.
+ */
 
 #include "uwsc-rovctr-module.h"
 #include <iostream>
@@ -42,22 +42,26 @@
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
 
 /**
-* Class that represents the binding with the tcl configuration script.
-*/
-static class UwSCROVCtrModuleClass : public TclClass {
+ * Class that represents the binding with the tcl configuration script.
+ */
+static class UwSCROVCtrModuleClass : public TclClass
+{
 public:
-
 	/**
-	* Constructor of the class.
-	*/
-	UwSCROVCtrModuleClass() : TclClass("Module/UW/SC/CTR") {
+	 * Constructor of the class.
+	 */
+	UwSCROVCtrModuleClass()
+		: TclClass("Module/UW/SC/CTR")
+	{
 	}
 
 	/**
-	* Creates the TCL object needed for the tcl language interpretation
-	* @return Pointer to an TclObject.
-	*/
-	TclObject* create(int, const char*const*) {
+	 * Creates the TCL object needed for the tcl language interpretation
+	 * @return Pointer to an TclObject.
+	 */
+	TclObject *
+	create(int, const char *const *)
+	{
 		return (new UwSCROVCtrModule());
 	}
 } class_module_uwROV_ctr;
@@ -69,9 +73,11 @@ UwSCROVCtrModule::UwSCROVCtrModule()
 {
 }
 
-int UwSCROVCtrModule::command(int argc, const char*const* argv) {
-	Tcl& tcl = Tcl::instance();
-	if (argc == 3){
+int
+UwSCROVCtrModule::command(int argc, const char *const *argv)
+{
+	Tcl &tcl = Tcl::instance();
+	if (argc == 3) {
 		if (strcasecmp(argv[1], "setLeaderId") == 0) {
 			leader_id = std::atoi(argv[2]);
 
@@ -79,10 +85,9 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 
 			return TCL_OK;
 		}
-	} else if(argc == 5){
+	} else if (argc == 5) {
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
-			if (!rov_status)
-			{
+			if (!rov_status) {
 				newX = std::atof(argv[2]);
 				newY = std::atof(argv[3]);
 				newZ = std::atof(argv[4]);
@@ -94,10 +99,9 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 			}
 			return TCL_OK;
 		}
-	} else if(argc == 6){
+	} else if (argc == 6) {
 		if (strcasecmp(argv[1], "sendPosition") == 0) {
-			if (!rov_status)
-			{
+			if (!rov_status) {
 				newX = std::atof(argv[2]);
 				newY = std::atof(argv[3]);
 				newZ = std::atof(argv[4]);
@@ -112,12 +116,13 @@ int UwSCROVCtrModule::command(int argc, const char*const* argv) {
 		}
 	}
 
-	return UwROVCtrModule::command(argc,argv);
+	return UwROVCtrModule::command(argc, argv);
 }
 
 void
-UwSCROVCtrModule::recv(Packet* p) {
-	hdr_uwROV_monitoring* monitoring = HDR_UWROV_MONITORING(p);
+UwSCROVCtrModule::recv(Packet *p)
+{
+	hdr_uwROV_monitoring *monitoring = HDR_UWROV_MONITORING(p);
 	Position temp_rov_position = Position();
 	temp_rov_position.setX(monitoring->x());
 	temp_rov_position.setY(monitoring->y());
@@ -129,20 +134,19 @@ UwSCROVCtrModule::recv(Packet* p) {
 
 	if (debug_)
 		std::cout << NOW << " UwSCROVCtrModule::recv(Packet *p) ROV monitoring "
-			<< "(" << m.getSource() << ")"
-			<< " position: X = " << temp_rov_position.getX()
-			<< ", Y = " << temp_rov_position.getY()
-			<< ", Z = " << temp_rov_position.getZ() << std::endl;
+				  << "(" << m.getSource() << ")"
+				  << " position: X = " << temp_rov_position.getX()
+				  << ", Y = " << temp_rov_position.getY()
+				  << ", Z = " << temp_rov_position.getZ() << std::endl;
 
 	UwROVCtrModule::recv(p);
 }
 
 int
-UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
+UwSCROVCtrModule::recvSyncClMsg(ClMessage *m)
 {
-	if (m->type() == CLMSG_MC2CTR_SETPOS)
-	{
-		Position* p = ((ClMsgMc2CtrPosition*)m)->getRovDestination();
+	if (m->type() == CLMSG_MC2CTR_SETPOS) {
+		Position *p = ((ClMsgMc2CtrPosition *) m)->getRovDestination();
 		newX = p->getX();
 		newY = p->getY();
 		newZ = p->getZ();
@@ -154,21 +158,19 @@ UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)
 
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
-				<< " Set new destination of ROV " << m->getDest()
-				<< " to position: X = " << newX << ", Y = " << newY
-				<< ", Z = " << newZ << std::endl;
+					  << " Set new destination of ROV " << m->getDest()
+					  << " to position: X = " << newX << ", Y = " << newY
+					  << ", Z = " << newZ << std::endl;
 
 		return 0;
-	}
-	else if (m->type() == CLMSG_MC2CTR_SETSTATUS)
-	{
-		rov_status = ((ClMsgMc2CtrStatus*)m)->getRovStatus();
+	} else if (m->type() == CLMSG_MC2CTR_SETSTATUS) {
+		rov_status = ((ClMsgMc2CtrStatus *) m)->getRovStatus();
 
 		if (debug_)
 			std::cout << NOW << " UwSCROVCtrModule::recvSyncClMsg(ClMessage* m)"
-				<< " Mine detected at position: X = " << x_rov
-				<< ", Y = " << y_rov << ", Z = " << z_rov
-				<< " is removed " << std::endl;
+					  << " Mine detected at position: X = " << x_rov
+					  << ", Y = " << y_rov << ", Z = " << z_rov
+					  << " is removed " << std::endl;
 
 		return 0;
 	}

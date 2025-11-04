@@ -1,8 +1,10 @@
-#include<tclcl.h>
+#include <tclcl.h>
 
 extern EmbeddedTcl PackerUwApplicationTclCode;
 
-extern "C" int Packeruwapplication_Init() {
+extern "C" int
+Packeruwapplication_Init()
+{
 	PackerUwApplicationTclCode.load();
 	return 0;
 }

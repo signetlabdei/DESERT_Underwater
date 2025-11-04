@@ -44,15 +44,18 @@
 #ifndef UWROV_MODULE_H
 #define UWROV_MODULE_H
 
-#include "uwsmposition.h"
 #include "uwcbr-module.h"
 #include "uwrov-packet.h"
+#include "uwsmposition.h"
 
 #include <fstream>
 
-#define UWROV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
-#define UWROV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
-#define UWROV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_UNKNOWN_TYPE \
+	"UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_OUT_OF_SEQUENCE \
+	"OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_DUPLICATED_PACKET \
+	"DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
 #define HDR_UWROV_CTR(p) (hdr_uwROV_ctr::access(p))
 
@@ -161,22 +164,30 @@ public:
 protected:
 	enum UWROV_ACK_POLICY { ACK_PIGGYBACK, ACK_IMMEDIATELY, ACK_PGBK_OR_TO };
 
-	int last_sn_confirmed; /**< Sequence number of the last command packet received.*/
-	int ack; /**< If not zero, contains the ACK to the last command packet received.*/
+	int last_sn_confirmed; /**< Sequence number of the last command packet
+							  received.*/
+	int ack; /**< If not zero, contains the ACK to the last command packet
+				received.*/
 	int ackPriority; /**< Flag to give higher priority to ACK or not.*/
-	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy = 2. */
-	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence number lower or equal than last_sn_confirmed.*/
-	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy = ACK_PGBK_OR_TO. */
+	int ackNotPgbk; /** < Number of ACK not sent in piggyback when ackPolicy
+					   = 2. */
+	int drop_old_waypoints; /** < Flag set to 1 to drop waypoints with sequence
+							   number lower or equal than last_sn_confirmed.*/
+	int ackTimeout; /**< Timeout after which ACK is sent if ackPolicy =
+					   ACK_PGBK_OR_TO. */
 	UWSMPosition *posit; /**< ROV position.*/
 	UwROVSendAckTimer ackTimer_; /**< Timer to schedule ACK transmission.*/
 	/** Flag to set the policy for ACK transimission,
 	 * ACK_PIGGYBACK: ACK is always sent in piggyback,
-	 * ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated packet after the reception of CTR packet,
-	 * ACK_PGBK_OR_TO:  ACK is sent in piggyback if a ROV packet is generated before an ackTimeout otherwise ACK is sent with a dedicated packet after the acKTimeout. */
+	 * ACK_IMMEDIATELY: ACK is always sent immediately with a dedicated packet
+	 * after the reception of CTR packet, ACK_PGBK_OR_TO:  ACK is sent in
+	 * piggyback if a ROV packet is generated before an ackTimeout otherwise ACK
+	 * is sent with a dedicated packet after the acKTimeout. */
 	UWROV_ACK_POLICY ackPolicy;
 
 	int log_flag; /**< Flag to enable log file writing.*/
-	std::ofstream out_file_stats; /**< Output stream for the textual file of debug */
+	std::ofstream
+			out_file_stats; /**< Output stream for the textual file of debug */
 };
 
 #endif // UWROV_MODULE_H

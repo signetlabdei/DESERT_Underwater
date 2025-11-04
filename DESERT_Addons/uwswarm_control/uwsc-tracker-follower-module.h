@@ -116,12 +116,14 @@ protected:
 		IDLE /**< Not tracking. */
 	};
 
-	std::vector<UWSMPosition *> mine_positions;	/**< Positions of the mines in the area. */
+	std::vector<UWSMPosition *>
+			mine_positions; /**< Positions of the mines in the area. */
 	Position auv_position; /**< Current position of the follower. */
 	FollowerState auv_state; /**< Current state of the follower. */
 	double demine_period; /**< Timer to schedule packets transmission.*/
 	hdr_uwSCFTracker mine_measure; /**< Detected mine packets. */
-	UwUpdateMineStatus mine_timer; /**< Timer to schedule detecting measurements*/
+	UwUpdateMineStatus
+			mine_timer; /**< Timer to schedule detecting measurements*/
 
 	/**
 	 * Allocates, initialize and sends a packet with the default priority flag

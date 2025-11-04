@@ -44,82 +44,90 @@
 /**
  * Class used to represents the UwMultiStackControllerPhySlave layer of a node.
  */
-class UwMultiStackControllerPhySlave : public UwMultiStackControllerPhy {
+class UwMultiStackControllerPhySlave : public UwMultiStackControllerPhy
+{
 
 public:
-  
-  /**
-   * Constructor of UwMultiPhy class.
-  **/ 
-  UwMultiStackControllerPhySlave();
-  
-  /**
-   * Destructor of UwMultiPhy class.
-  **/
-  virtual ~UwMultiStackControllerPhySlave() { }
-    
-  /**
-   * TCL command interpreter. It implements the following OTcl methods:
-   *
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-   *
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-  **/
-  virtual int command(int, const char*const*);
+	/**
+	 * Constructor of UwMultiPhy class.
+	 **/
+	UwMultiStackControllerPhySlave();
 
-  /**
-   * It manages each packet reception, either from the upper and the lower layer
-   * 
-   * @param p pointer to the packet will be received
-   * @param idSrc unique id of the module that has sent the packet
-   * 
-   * @see SAP, ChSAP
-  **/
-  virtual void recv(Packet *p, int idSrc);
+	/**
+	 * Destructor of UwMultiPhy class.
+	 **/
+	virtual ~UwMultiStackControllerPhySlave()
+	{
+	}
 
-    
+	/**
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 *<i>argv[0]</i> is the name of the object).
+	 *
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 *successfully or not.
+	 **/
+	virtual int command(int, const char *const *);
+
+	/**
+	 * It manages each packet reception, either from the upper and the lower
+	 *layer
+	 *
+	 * @param p pointer to the packet will be received
+	 * @param idSrc unique id of the module that has sent the packet
+	 *
+	 * @see SAP, ChSAP
+	 **/
+	virtual void recv(Packet *p, int idSrc);
+
 protected:
-  // Variables
-  int slave_lower_layer_;
-  int signaling_recv_; /** Number of signaling packets received*/
-  int signaling_active_; /**If true slave is in signaling mode, otherwise not */
-  
-  /** 
-   * Return the best layer to forward the packet when the system works in AUTOMATIC_MODE.
-   * It has to be overload in the extended classes to implement the choice rule.
-   * 
-   * @param p pointer to the packet
-   *
-   * @return id of the module representing the best layer
-  **/
-  virtual int getBestLayer(Packet *p);
+	// Variables
+	int slave_lower_layer_;
+	int signaling_recv_; /** Number of signaling packets received*/
+	int signaling_active_; /**If true slave is in signaling mode, otherwise not
+							*/
 
-  /** 
-   * It implements the slave choice rule to choose the lower layer when the system works 
-   * in AUTOMATIC_MODE. 
-   * 
-   * @param p pointer to the packet
-   * @param idSrc unique id of the module that has sent the packet
-  **/
-  virtual void updateSlave(Packet *p, int idSrc);
+	/**
+	 * Return the best layer to forward the packet when the system works in
+	 *AUTOMATIC_MODE. It has to be overload in the extended classes to implement
+	 *the choice rule.
+	 *
+	 * @param p pointer to the packet
+	 *
+	 * @return id of the module representing the best layer
+	 **/
+	virtual int getBestLayer(Packet *p);
 
-    /**
-  * Cross-Layer messages synchronous interpreter. It has to be properly extended in order to 
-  * interpret custom cross-layer messages used by this particular plug-in.
-  * This type of communication need to be directly answered in the message exchanged in 
-  * order to be synchronous with the source.
-  * 
-  * @param m an instance of <i>ClMessage</i> that represent the message received and used for the answer
-  *
-  * @return zero if successful
-  * 
-  * @see NodeCore, ClMessage, ClSAP, ClTracer, UwMultiStackControllerPhy
-  **/
-  int recvSyncClMsg(ClMessage* m);
+	/**
+	 * It implements the slave choice rule to choose the lower layer when the
+	 *system works in AUTOMATIC_MODE.
+	 *
+	 * @param p pointer to the packet
+	 * @param idSrc unique id of the module that has sent the packet
+	 **/
+	virtual void updateSlave(Packet *p, int idSrc);
+
+	/**
+	 * Cross-Layer messages synchronous interpreter. It has to be properly
+	 *extended in order to interpret custom cross-layer messages used by this
+	 *particular plug-in. This type of communication need to be directly
+	 *answered in the message exchanged in order to be synchronous with the
+	 *source.
+	 *
+	 * @param m an instance of <i>ClMessage</i> that represent the message
+	 *received and used for the answer
+	 *
+	 * @return zero if successful
+	 *
+	 * @see NodeCore, ClMessage, ClSAP, ClTracer, UwMultiStackControllerPhy
+	 **/
+	int recvSyncClMsg(ClMessage *m);
 
 private:
-  //Variables
+	// Variables
 };
 
 #endif /* UWOPTICAL_ACOUSTIC_CONTROLLER_H  */
