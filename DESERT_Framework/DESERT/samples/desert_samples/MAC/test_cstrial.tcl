@@ -80,7 +80,7 @@ load libuwphy_clmsgs.so
 load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
-load libuwtdma.so
+load libuwcstrial.so
 load libuwinterference.so
 load libUwmStd.so
 load libuwphy_clmsgs.so
@@ -156,16 +156,6 @@ Module/UW/CBR set period_              $opt(cbr_period)
 Module/UW/CBR set PoissonTraffic_      2
 Module/UW/CBR set debug_               0
 
-### TDMA MAC ###
-Module/UW/TDMA set frame_duration   3.5
-Module/UW/TDMA set debug_           0
-Module/UW/TDMA set sea_trial_       1
-Module/UW/TDMA set fair_mode        0
-# FAIR Modality on
-# Remeber to put silent the SetSlotDuration, SetGuardTime and setStartTime call
-# down below
-# Module/UW/TDMA set guard_time       0.1
-# Module/UW/TDMA set tot_slots        3
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_ 2
@@ -181,6 +171,10 @@ $data_mask setFreq              $opt(freq)
 $data_mask setBandwidth         $opt(bw)
 $data_mask setPropagationSpeed  $opt(propagation_speed)
 
+
+Module/UW/CSTRIAL  set debug_                      0
+Module/UW/CSTRIAL  set fix_sens_time               0.5
+Module/UW/CSTRIAL  set rv_sens_time                2.5
 
 ### PHY ###
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
@@ -213,7 +207,7 @@ proc createNode { id } {
     set ipr($id)  [new Module/UW/StaticRouting]
     set ipif($id) [new Module/UW/IP]
     set mll($id)  [new Module/UW/MLL] 
-    set mac($id)  [new Module/UW/TDMA]
+    set mac($id)  [new Module/UW/CSTRIAL]
     set phy($id)  [new Module/UW/PHYSICAL]  
 	
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -245,10 +239,6 @@ proc createNode { id } {
     #$ipif($id) addr "1.0.0.${id}"
     $ipif($id) addr [expr $id + 1]
     
-    # Set the MAC address
-    $mac($id) setMacAddr [expr $id + 5]
-    # $mac($id) setSlotNumber $id
-
     set position($id) [new "Position/BM"]
     $node($id) addPosition $position($id)
     
@@ -278,23 +268,6 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
     createNode $id
     puts "Node $id created"
 }
-
-
-###############################
-# MAC settings: Generic mode  #
-###############################
-# Node 1
-$mac(0) setStartTime    0
-$mac(0) setSlotDuration 2
-$mac(0) setGuardTime    0.2
-# Node 2
-$mac(1) setStartTime    2
-$mac(1) setSlotDuration 1
-$mac(1) setGuardTime    0.2
-# Node 3
-$mac(2) setStartTime    3
-$mac(2) setSlotDuration 0.5
-$mac(2) setGuardTime    0.1
 
 
 ################################
@@ -358,10 +331,6 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     }
 }
 
-for {set ii 0} {$ii < $opt(nn)} {incr ii} {
-    $ns at $opt(starttime)    "$mac($ii) start"
-    $ns at $opt(stoptime)     "$mac($ii) stop"
-}
 ###################
 # Final Procedure #
 ###################

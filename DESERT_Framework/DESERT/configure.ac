@@ -121,6 +121,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtdma-frame'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwtokenbus'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uwjammer'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/data_link/uw-cs-sea-trial'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwem_channel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/channel/uwoptical_channel'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/ranging/uwranging_tokenbus'
@@ -165,6 +166,7 @@ DESERT_UWMMAC_CLMSGS_LIBADD='$(top_builddir)/data_link/uwmmac_clmsgs/libuwmmac_c
 DESERT_UWTDMA_LIBADD='$(top_builddir)/data_link/uwtdma/libuwtdma.la'
 DESERT_UWEM_CHANNEL_LIBADD='$(top_builddir)/channel/uwem_channel/libuwem_channel.la'
 DESERT_UWTOKENBUS_LIBADD='$(top_builddir)/data_link/uwtokenbus/libuwtokenbus.la'
+DESERT_UWCSTRIAL_LIBADD='$(top_builddir)/data_link/uwtokenbus/libuwcstrial.la'
 DESERT_UWTAP_LIBADD='$(top_builddir)/ranging/uwtap/libuwtap.la'
 
 AC_SUBST(DESERT_UWINTERFERENCE_LIBADD)
@@ -186,6 +188,7 @@ AC_SUBST(DESERT_UWMMAC_CLMSGS_LIBADD)
 AC_SUBST(DESERT_UWTDMA_LIBADD)
 AC_SUBST(DESERT_UWEM_CHANNEL_LIBADD)
 AC_SUBST(DESERT_UWTOKENBUS_LIBADD)
+AC_SUBST(DESERT_UWCSTRIAL_LIBADD)
 AC_SUBST(DESERT_UWTAP_LIBADD)
 
 
@@ -260,6 +263,7 @@ AC_CONFIG_FILES([
     data_link/uwtdma-frame/Makefile
     data_link/uwtokenbus/Makefile
     data_link/uwjammer/Makefile
+    data_link/uw-cs-sea-trial/Makefile
     channel/uwem_channel/Makefile
     channel/uwoptical_channel/Makefile
     ranging/uwranging_tokenbus/Makefile
