@@ -28,12 +28,17 @@
 //
 
 /**
- * @file   uwtdma.h
+ * @file   uw-cs-sea-trial.h
  * @author Filippo Campagnaro
- * @author Roberto Francescon
  * @version 1.0.0
  *
- * @brief Provides the definition of the class <i>UWTDMA</i>.
+ * @brief Provides the definition of the class <i>UwCsSeaTrial</i>.
+ * This is simple CSMA with random deferring to be used when your modem
+ * does not have real carrier-sensing abilities. 
+ * Once a packet is received from the apper layers, it starts a random timer.
+ * If no packets are received from the PHY in such time, it starts transmitting,
+ * otherwise it restarts the timer again.
+ * It performs burst transmisionsonce the channel is accessed.
  *
  */
 
@@ -41,7 +46,6 @@
 #define UWCSTRIAL_H
 
 #include <mmac.h>
-//#include <queue>
 #include <deque>
 #include <iostream>
 #include <assert.h>
@@ -53,7 +57,7 @@
 class UwCsSeaTrial;
 
 /**
- * UwSensingTimer class is used to handle the scheduling period of <i>UWTDMA</i>
+ * UwSensingTimer class is used to handle the scheduling period of <i>UWCSTRIAL</i>
  * slots.
  */
 
@@ -63,7 +67,7 @@ class UwSensingTimer : public TimerHandler
 public:
 	/**
 	 * Costructor of the class UwSensingTimer
-	 * @param Pointer of a UwTDMA object
+	 * @param Pointer of a UwCSTRIAL object
 	 */
 	UwSensingTimer(UwCsSeaTrial *m)
 		: TimerHandler()
@@ -83,7 +87,7 @@ protected:
 };
 
 /**
- * Class that represents a TDMA Node
+ * Class that represents a CSTRIAL Node
  */
 class UwCsSeaTrial : public MMac
 {
@@ -92,12 +96,12 @@ class UwCsSeaTrial : public MMac
 
 public:
 	/**
-	 * Constructor of the TDMA class
+	 * Constructor of the CSTRIAL class
 	 */
 	UwCsSeaTrial();
 
 	/**
-	 * Destructor of the TDMA class
+	 * Destructor of the CSTRIAL class
 	 */
 	virtual ~UwCsSeaTrial() = default;
 
@@ -171,15 +175,13 @@ protected:
 	 */
 	virtual int command(int argc, const char *const *argv);
 	/**
-	 * Enumeration class of UWTDMA status.
+	 * Enumeration class of CSTRIAL status.
 	 */
 	enum UWCS_STATUS {IDLE, SENSING, TRANSMITTING};
 
 	UWCS_STATUS
 	tx_status; /**<Variable holding the status enum type*/
-	int debug_; /**<Debug variable: 0 for no info,
-				>-5 for small info, <-5 for complete info*/
-	
+	int debug_; /**<Debug variable: 0 for no info, > 0 for info*/	
 	unsigned int HDR_size; /**<Size of the HDR if any*/
 	double fix_sens_time; /**<Frame duration*/
 	double rv_sens_time; /**<Guard time between slots*/

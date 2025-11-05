@@ -327,10 +327,10 @@ createNode
 # Put here all the commands required to connect nodes in the network (optional), namely, specify end to end connections, fill ARP tables, define routing settings
 
 # connections at the application level
-if {$opt(node) == 3} {
+if {$opt(node) >= $opt(n_node)} {
   $app_ set destAddr_ 1
 } else {
-  $app_ set destAddr_ 3
+  $app_ set destAddr_ [expr $opt(node) + 1]
 }
 $app_ set destPort_ 1
 
@@ -362,12 +362,16 @@ $ns at $time_stop "$modem_ stop"
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
    
-   global ns tf tf_name	
+   global ns tf tf_name	app_
    # computation of the statics
 
    # display messages
    puts "done!"
    puts "tracefile: $tf_name"
+   set app_sent_pkts               [$app_ getsentpkts]
+   set app_rcv_pkts                [$app_ getrecvpkts]
+   puts "transmitted packets $app_sent_pkts"
+   puts "received packets $app_rcv_pkts"
 
    # save traces
    $ns flush-trace

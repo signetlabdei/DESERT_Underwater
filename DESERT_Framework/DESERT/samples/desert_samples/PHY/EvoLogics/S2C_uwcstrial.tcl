@@ -26,7 +26,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Federico Favaro, Filippo Campagnaro
+# Author: Filippo Campagnaro
 # Version: 1.0.0
 #
 ######################
@@ -125,7 +125,7 @@ set socket_port "${opt(ip)}:${opt(port)}"
 set adrMAC $opt(node)
 
 # time when actually to stop the simulation
-set time_stop [expr "$opt(stop)+15"]
+set time_stop [expr "$opt(stop)+30"]
 
 #Trace file name
 set tf_name "S2C_Evologics_Uwcstrial.tr"
@@ -152,8 +152,8 @@ Module/UW/CBR set PoissonTraffic_      0
 Module/UW/CBR set debug_               0
 
 Module/UW/CSTRIAL  set debug_          0
-Module/UW/CSTRIAL  set fix_sens_time   1
-Module/UW/CSTRIAL  set rv_sens_time    1.5
+Module/UW/CSTRIAL  set fix_sens_time   1.0
+Module/UW/CSTRIAL  set rv_sens_time    6.0
 
 
 # variables for the AL module
@@ -240,11 +240,13 @@ proc createNode { } {
     set ipif_ [new Module/UW/IP]
 	
     # DATA LINK LAYER - MEDIA LINK LAYER
-    set mll_ [new Module/UW/MLL]
+    set mll_  [new Module/UW/MLL]
     
     # DATA LINK LAYER - MAC LAYER
-    set mac_ [new Module/UW/CSTRIAL]
-    set uwal_             [new Module/UW/AL]
+    set mac_  [new Module/UW/CSTRIAL]
+    set uwal_ [new Module/UW/AL]
+
+    $mac_ setMacAddr $opt(node)
 
     # PHY LAYER
     set modem_ [new Module/UW/UwModem/EvoLogicsS2C]    
@@ -319,10 +321,10 @@ createNode
 # Put here all the commands required to connect nodes in the network (optional), namely, specify end to end connections, fill ARP tables, define routing settings
 
 # connections at the application level
-if {$opt(node) == 3} {
+if {$opt(node) >= $opt(n_node)} {
   $app_ set destAddr_ 1
 } else {
-  $app_ set destAddr_ 3
+  $app_ set destAddr_ [expr $opt(node) + 1]
 }
 $app_ set destPort_ 1
 
@@ -352,12 +354,16 @@ $ns at $time_stop "$modem_ stop"
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
    
-   global ns tf tf_name	
+   global ns tf tf_name	app_
    # computation of the statics
 
    # display messages
    puts "done!"
    puts "tracefile: $tf_name"
+   set app_sent_pkts               [$app_ getsentpkts]
+   set app_rcv_pkts                [$app_ getrecvpkts]
+   puts "transmitted packets $app_sent_pkts"
+   puts "received packets $app_rcv_pkts"
 
    # save traces
    $ns flush-trace

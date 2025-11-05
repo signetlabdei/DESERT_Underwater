@@ -30,7 +30,6 @@
 /**
  * @file   UwCsSeaTrial.cpp
  * @author Filippo Campagnaro
- * @author Roberto Francescon
  * @version 1.0.0
  *
  * @brief Provides the implementation of the class <i>UwCsSeaTrial</i>.
@@ -172,7 +171,7 @@ UwCsSeaTrial::sensingExpired()
 		double sensing_time = fix_sens_time + 
 			RNG::defaultrng()->uniform_double() * rv_sens_time;
 		if (debug_)
-			cout << "but packet rx, new sensing_time = " 
+			cout << " but packet rx, new sensing_time = " 
 				 << sensing_time << std::endl;
 		sensing_timer.resched(sensing_time);
 		return;
@@ -317,6 +316,14 @@ UwCsSeaTrial::command(int argc, const char *const *argv)
 			tcl.resultf("%d", data_pkts_rx);
 			return TCL_OK;
 		} 
+	} else if (argc == 3) {
+		if (strcasecmp(argv[1], "setMacAddr") == 0) {
+			addr = atoi(argv[2]);
+			if (debug_)
+				cout << "CSTRIAL MAC address of current node is " << addr
+					 << std::endl;
+			return TCL_OK;
+		}
 	}
 	return MMac::command(argc, argv);
 }
