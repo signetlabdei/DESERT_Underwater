@@ -68,7 +68,7 @@ Uwsmartofdm_Init()
 {
 	PT_MMAC_CTS = p_info::addPacket("MMAC_CTS");
 	PT_MMAC_RTS = p_info::addPacket("MMAC_RTS");
-	PT_MMAC_ACK = p_info::addPacket("MMAC_ACK");		
+	PT_MMAC_ACK = p_info::addPacket("MMAC_ACK");
 	PT_MMAC_DATA = p_info::addPacket("MMAC_DATA");
 	PT_OFDMMAC = p_info::addPacket("PT_TDRLMAC");
 	UWSmartOFDMTclCode.load();

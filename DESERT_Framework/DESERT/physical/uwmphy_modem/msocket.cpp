@@ -32,13 +32,13 @@
  * @author Federico Favaro
  * \version 2.0.0
  * \brief  Implementation of the Msocket class.
-*/
+ */
 
 #include "msocket.h"
 #include <uwmdriver.h>
 
-#include <string>
 #include <cctype>
+#include <string>
 
 void
 Msocket::error(const char *msg)
@@ -161,9 +161,10 @@ read_process_msocket(void *pMsocket_me_)
 		// Check the queue length
 		if (pMsocket_me->queueMsg.size() >
 				pMsocket_me->getDriverQueueLength()) {
-			std::cout << "MSOCKET::READ::ERROR::BUFFER_FULL ---> drop the oldest "
-					"packet"
-				 << std::endl;
+			std::cout
+					<< "MSOCKET::READ::ERROR::BUFFER_FULL ---> drop the oldest "
+					   "packet"
+					<< std::endl;
 			pMsocket_me->queueMsg.pop();
 		}
 

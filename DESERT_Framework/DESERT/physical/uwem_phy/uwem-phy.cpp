@@ -52,7 +52,7 @@ public:
 	{
 		return (new UwElectroMagneticPhy);
 	}
-}class_UwElectroMagneticPhyClass;
+} class_UwElectroMagneticPhyClass;
 
 UwElectroMagneticPhy::UwElectroMagneticPhy()
 	: lut_file_name_("")
@@ -104,47 +104,53 @@ UwElectroMagneticPhy::startRx(Packet *p)
 	hdr_MPhy *ph = HDR_MPHY(p);
 	if ((PktRx == 0) && (txPending == false)) {
 		double rx_power = 10 * log10(getRxPower(p));
-		if (rx_power > rxPowerThreshold_){
+		if (rx_power > rxPowerThreshold_) {
 			if (ph->modulationType == MPhy_Bpsk::modid) {
 				PktRx = p;
 				Phy2MacStartRx(p);
 				return;
 			} else {
 				if (debug_)
-					std::cout << "UwElectroMagneticPhy::Drop Packet::Wrong modulation"
-					<< std::endl;
+					std::cout << "UwElectroMagneticPhy::Drop Packet::Wrong "
+								 "modulation"
+							  << std::endl;
 			}
 		} else {
-			if (debug_){
-				cout << NOW << " UwElectroMagneticPhy: Drop Packet::Below Threshold : received power = "
-					 << rx_power
-					 << ", threshold = " << rxPowerThreshold_
+			if (debug_) {
+				cout << NOW
+					 << " UwElectroMagneticPhy: Drop Packet::Below Threshold : "
+						"received power = "
+					 << rx_power << ", threshold = " << rxPowerThreshold_
 					 << endl;
 			}
 		}
 	} else {
 		if (debug_)
-			std::cout << "UwElectroMagneticPhy::Drop Packet::Synced onto another packet "
-					"PktRx = "
-				 << PktRx << ", pending = " << txPending << std::endl;
+			std::cout << "UwElectroMagneticPhy::Drop Packet::Synced onto "
+						 "another packet "
+						 "PktRx = "
+					  << PktRx << ", pending = " << txPending << std::endl;
 	}
 }
-
 
 void
 UwElectroMagneticPhy::endRx(Packet *p)
 {
-	if(PktRx != 0 ){
+	if (PktRx != 0) {
 		hdr_cmn *ch = HDR_CMN(p);
 		if (PktRx == p) {
 			if (propagation_) {
 				double rx_power = 10 * log10(getRxPower(p));
 				if (debug_)
-					std::cout << NOW << " UwElectroMagneticPhy: RSSI= " << rx_power << std::endl; 
+					std::cout << NOW
+							  << " UwElectroMagneticPhy: RSSI= " << rx_power
+							  << std::endl;
 
 				double PER = getPER(rx_power);
 				if (debug_)
-					std::cout << NOW << " UwElectroMagneticPhy: interpolated PER = " << PER << std::endl; 
+					std::cout << NOW
+							  << " UwElectroMagneticPhy: interpolated PER = "
+							  << PER << std::endl;
 
 				// random experiment
 				double x = RNG::defaultrng()->uniform_double();
@@ -155,7 +161,6 @@ UwElectroMagneticPhy::endRx(Packet *p)
 				} else {
 					// at least one interferent packet
 					ch->error() = 1;
-					
 				}
 			} else {
 				// no propagation model set
@@ -167,29 +172,30 @@ UwElectroMagneticPhy::endRx(Packet *p)
 		} else {
 			Packet::free(p);
 		}
-	}
-	else{
+	} else {
 		Packet::free(p);
 	}
-	
 }
 
-double 
-UwElectroMagneticPhy::getRxPower(Packet *p){
+double
+UwElectroMagneticPhy::getRxPower(Packet *p)
+{
 	hdr_MPhy *ph = HDR_MPHY(p);
 
-	if(debug_){
-		std::cout  << " UwElectroMagneticPhy: TxAntenna= " << ph->srcAntenna->getGain(p) << std::endl;
-		std::cout  << " UwElectroMagneticPhy: RxAntenna= " << ph->dstAntenna->getGain(p) << std::endl;
+	if (debug_) {
+		std::cout << " UwElectroMagneticPhy: TxAntenna= "
+				  << ph->srcAntenna->getGain(p) << std::endl;
+		std::cout << " UwElectroMagneticPhy: RxAntenna= "
+				  << ph->dstAntenna->getGain(p) << std::endl;
 	}
 
-	double tot_attenuation =propagation_->getGain(p);
+	double tot_attenuation = propagation_->getGain(p);
 
 	// rx_power in dB
-	double rx_power = TxPower_ + ph->srcAntenna->getGain(p) + ph->dstAntenna->getGain(p) - tot_attenuation;
+	double rx_power = TxPower_ + ph->srcAntenna->getGain(p) +
+			ph->dstAntenna->getGain(p) - tot_attenuation;
 	// linear rx_power
-	rx_power = pow(10,(rx_power/10));
-
+	rx_power = pow(10, (rx_power / 10));
 
 	return rx_power;
 }
@@ -218,7 +224,9 @@ UwElectroMagneticPhy::getPER(double rx_power)
 	// rx_power intermediate => interpolation
 	RSSIMap::iterator u_it = it;
 	it--;
-	return linearInterpolator(rx_power, it->first, it->second, u_it->first, u_it->second)/100;
+	return linearInterpolator(
+				   rx_power, it->first, it->second, u_it->first, u_it->second) /
+			100;
 }
 
 double

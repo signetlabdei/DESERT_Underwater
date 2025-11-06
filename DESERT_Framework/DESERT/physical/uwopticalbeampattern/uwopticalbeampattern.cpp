@@ -58,19 +58,18 @@ public:
 } class_module_optical;
 
 UwOpticalBeamPattern::UwOpticalBeamPattern()
-	: 
-	UwOpticalPhy(),
-	beam_pattern_path_tx_(""),
-	beam_pattern_path_rx_(""),
-	max_dist_path_(""),
-	beam_pattern_separator_(','),
-	max_dist_separator_(','),
-	dist_lut_(),
-	beam_lut_tx_(),
-	beam_lut_rx_(),
-	back_noise_threshold_(0),
-	inclination_angle_(0),
-	sameBeam(true)
+	: UwOpticalPhy()
+	, beam_pattern_path_tx_("")
+	, beam_pattern_path_rx_("")
+	, max_dist_path_("")
+	, beam_pattern_separator_(',')
+	, max_dist_separator_(',')
+	, dist_lut_()
+	, beam_lut_tx_()
+	, beam_lut_rx_()
+	, back_noise_threshold_(0)
+	, inclination_angle_(0)
+	, sameBeam(true)
 {
 	bind("noise_threshold", &back_noise_threshold_);
 	bind("inclination_angle_", &inclination_angle_);
@@ -92,7 +91,8 @@ UwOpticalBeamPattern::command(int argc, const char *const *argv)
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "setBeamPatternPath") == 0) {
 			if (!sameBeam) {
-				fprintf(stderr, "sameBeam set as false, 2 beam pattern paths needed");
+				fprintf(stderr,
+						"sameBeam set as false, 2 beam pattern paths needed");
 				return TCL_ERROR;
 			}
 			string tmp_ = ((char *) argv[2]);
@@ -136,7 +136,8 @@ UwOpticalBeamPattern::command(int argc, const char *const *argv)
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "setBeamPatternPath") == 0) {
 			if (sameBeam) {
-				fprintf(stderr, "sameBeam set as true, 1 beam pattern path needed");
+				fprintf(stderr,
+						"sameBeam set as true, 1 beam pattern path needed");
 				return TCL_ERROR;
 			}
 			string tmp_tx = ((char *) argv[2]);
@@ -145,7 +146,7 @@ UwOpticalBeamPattern::command(int argc, const char *const *argv)
 				fprintf(stderr, "Empty string for the file name");
 				return TCL_ERROR;
 			}
-			std::cout << "Use different LUTs for tx and rx" << std::endl; 
+			std::cout << "Use different LUTs for tx and rx" << std::endl;
 			beam_pattern_path_tx_ = tmp_tx;
 			beam_pattern_path_rx_ = tmp_rx;
 			return TCL_OK;
@@ -157,10 +158,12 @@ UwOpticalBeamPattern::command(int argc, const char *const *argv)
 void
 UwOpticalBeamPattern::checkInclinationAngle()
 {
-	inclination_angle_ = inclination_angle_ > M_PI ? 
-		inclination_angle_ - 2 * M_PI : inclination_angle_;
-	inclination_angle_ = inclination_angle_ < - M_PI ? 
-		inclination_angle_ + 2 * M_PI : inclination_angle_;
+	inclination_angle_ = inclination_angle_ > M_PI
+			? inclination_angle_ - 2 * M_PI
+			: inclination_angle_;
+	inclination_angle_ = inclination_angle_ < -M_PI
+			? inclination_angle_ + 2 * M_PI
+			: inclination_angle_;
 }
 
 void
@@ -171,12 +174,11 @@ UwOpticalBeamPattern::startRx(Packet *p)
 	Position *destination = ph->dstPosition;
 	double dist = source->getDist(destination);
 
-
 	if ((PktRx == 0) && (txPending == false)) {
 		double max_tx_range = getMaxTxRange(p);
 		if (debug_)
-			cout << NOW << " UwOpticalBeamPattern::startRx max_tx_range LUT = " << max_tx_range 
-					 << " distance = " << dist << endl;
+			cout << NOW << " UwOpticalBeamPattern::startRx max_tx_range LUT = "
+				 << max_tx_range << " distance = " << dist << endl;
 		if (max_tx_range > dist) {
 			if (ph->modulationType == MPhy_Bpsk::modid) {
 				PktRx = p;
@@ -184,79 +186,85 @@ UwOpticalBeamPattern::startRx(Packet *p)
 				return;
 			} else {
 				if (debug_)
-					cout << NOW << " UwOpticalBeamPattern::Drop Packet::Wrong modulation"
+					cout << NOW
+						 << " UwOpticalBeamPattern::Drop Packet::Wrong "
+							"modulation"
 						 << endl;
 			}
 		} else {
 			if (debug_)
 				cout << NOW << " UwOpticalBeamPattern::Drop Packet::Distance = "
-					 << dist
-					 << ", Above Max Range = " << max_tx_range
-					 << endl;
+					 << dist << ", Above Max Range = " << max_tx_range << endl;
 		}
 	} else {
 		if (debug_)
-			cout << NOW << " UwOpticalBeamPattern::Drop Packet::Synced onto another packet "
+			cout << NOW
+				 << " UwOpticalBeamPattern::Drop Packet::Synced onto another "
+					"packet "
 					"PktRx = "
 				 << PktRx << ", pending = " << txPending << endl;
 	}
 }
 
-double 
+double
 UwOpticalBeamPattern::getMaxTxRange(Packet *p)
 {
-	double beta = getBetaRx(p);	
-	//double beta_xy = getBetaXY(p, inclination_angle_);
+	double beta = getBetaRx(p);
+	// double beta_xy = getBetaXY(p, inclination_angle_);
 	double beta_xy = getBetaXYRx(p);
 
 	double c = ((UwOpticalMPropagation *) propagation_)->getC(p);
 
 	if (debug_)
-		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange c = " 
-			<< c << std::endl;
+		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange c = " << c
+			 << std::endl;
 
 	hdr_uwopticalbeampattern *bl = HDR_UWOPTICALBEAMPATTERN(p);
 	double beta_tx = getBetaTx(p);
-	//double beta_xy_tx = getBetaXY(p, bl->get_inclination_angle());	
-	double beta_xy_tx = getBetaXYTx(p);	
+	// double beta_xy_tx = getBetaXY(p, bl->get_inclination_angle());
+	double beta_xy_tx = getBetaXYTx(p);
 
 	hdr_MPhy *ph = HDR_MPHY(p);
 	Position *dest = ph->dstPosition;
 	double dest_depth = use_woss_ ? -dest->getAltitude() : -dest->getZ();
 	double na = lookUpLightNoiseE(dest_depth); // background noise
-	
-	if ((dist_lut_.empty() == true) || 
-			beam_lut_tx_.empty() == true || beam_lut_rx_.empty() == true) {
-		cerr << "UwOpticalBeamPattern::getMaxTxRange error: LUTs not init." << endl;
+
+	if ((dist_lut_.empty() == true) || beam_lut_tx_.empty() == true ||
+			beam_lut_rx_.empty() == true) {
+		cerr << "UwOpticalBeamPattern::getMaxTxRange error: LUTs not init."
+			 << endl;
 		return 0;
 	}
-	double max_distance = getLutMaxDist(c,na);	
+	double max_distance = getLutMaxDist(c, na);
 	if (debug_)
-		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange max_distance LUT = " 
-			<< max_distance << endl;
+		cout << NOW
+			 << " UwOpticalBeamPattern::getMaxTxRange max_distance LUT = "
+			 << max_distance << endl;
 	/*if(beta == 0) {
 		return max_distance;
 	}*/
 	double norm_beam_factor_rx = getLutBeamFactor(beam_lut_rx_, beta);
-	double norm_beam_factor_tx = getLutBeamFactor(beam_lut_tx_, beta_tx);	
+	double norm_beam_factor_tx = getLutBeamFactor(beam_lut_tx_, beta_tx);
 	if (debug_)
-		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor = " 
-			<< norm_beam_factor_rx << ", beta = " << beta << endl;
+		cout << NOW
+			 << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor = "
+			 << norm_beam_factor_rx << ", beta = " << beta << endl;
 	double norm_beam_factor_xy_rx = getLutBeamFactor(beam_lut_rx_, beta_xy);
-	double norm_beam_factor_xy_tx = getLutBeamFactor(beam_lut_tx_, beta_xy_tx);		
+	double norm_beam_factor_xy_tx = getLutBeamFactor(beam_lut_tx_, beta_xy_tx);
 	if (debug_)
-		cout << NOW << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor_xy = " 
-			<< norm_beam_factor_xy_rx << ", beta_xy = " << beta_xy << endl;
-	return max_distance * norm_beam_factor_rx * norm_beam_factor_xy_rx 
-			* norm_beam_factor_tx * norm_beam_factor_xy_tx;
+		cout << NOW
+			 << " UwOpticalBeamPattern::getMaxTxRange norm_beam_factor_xy = "
+			 << norm_beam_factor_xy_rx << ", beta_xy = " << beta_xy << endl;
+	return max_distance * norm_beam_factor_rx * norm_beam_factor_xy_rx *
+			norm_beam_factor_tx * norm_beam_factor_xy_tx;
 }
 
-double 
+double
 UwOpticalBeamPattern::getBetaRx(Packet *p)
 {
-	bool omnidirectional = 
-		((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
-	if(omnidirectional) {
+	bool omnidirectional =
+			((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
+	if (omnidirectional) {
 		return 0;
 	}
 	hdr_MPhy *ph = HDR_MPHY(p);
@@ -269,39 +277,39 @@ UwOpticalBeamPattern::getBetaRx(Packet *p)
 	double rx_depth = use_woss_ ? rx->getAltitude() : rx->getZ();
 	double tx_depth = use_woss_ ? tx->getAltitude() : tx->getZ();
 	double dx = tx_x - rx_x;
-  	double dy = tx_y - rx_y;
-  	double dz = tx_depth - rx_depth;
-  	double dx_prime = dx*cos(-inclination_angle_) - dz*sin(-inclination_angle_);
-  	double dz_prime = dx*sin(-inclination_angle_) + dz*cos(-inclination_angle_);
-  	double dy_prime = dy;
+	double dy = tx_y - rx_y;
+	double dz = tx_depth - rx_depth;
+	double dx_prime =
+			dx * cos(-inclination_angle_) - dz * sin(-inclination_angle_);
+	double dz_prime =
+			dx * sin(-inclination_angle_) + dz * cos(-inclination_angle_);
+	double dy_prime = dy;
 
-  	double dist_xy = sqrt(dx_prime*dx_prime + dy_prime*dy_prime);
-  	double beta = 0;
-  	if (dist_xy == 0) {
-  		beta = dz_prime > 0 ? M_PI/2 : - M_PI/2;
-  	}
-  	else {
-  		beta = use_woss_ ? 
-  			((UwOpticalMPropagation *) propagation_)->getBeta(p) 
-  			: atan(dz_prime/dist_xy);
-  	}
-  	beta = dz_prime == 0 ? 0 : beta;
-  	
-  	if (dx_prime < 0) {
-  		beta = beta > 0 ? beta - M_PI : beta + M_PI;
-  	}
-	beta = beta > M_PI ? beta - 2 * M_PI 
-		: beta < -M_PI ? beta + 2 * M_PI : beta;
+	double dist_xy = sqrt(dx_prime * dx_prime + dy_prime * dy_prime);
+	double beta = 0;
+	if (dist_xy == 0) {
+		beta = dz_prime > 0 ? M_PI / 2 : -M_PI / 2;
+	} else {
+		beta = use_woss_ ? ((UwOpticalMPropagation *) propagation_)->getBeta(p)
+						 : atan(dz_prime / dist_xy);
+	}
+	beta = dz_prime == 0 ? 0 : beta;
+
+	if (dx_prime < 0) {
+		beta = beta > 0 ? beta - M_PI : beta + M_PI;
+	}
+	beta = beta > M_PI	   ? beta - 2 * M_PI
+			: beta < -M_PI ? beta + 2 * M_PI
+						   : beta;
 	return beta;
 }
 
-
-double 
+double
 UwOpticalBeamPattern::getBetaXYRx(Packet *p)
 {
-	bool omnidirectional = 
-		((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
-	if(omnidirectional) {
+	bool omnidirectional =
+			((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
+	if (omnidirectional) {
 		return 0;
 	}
 	hdr_MPhy *ph = HDR_MPHY(p);
@@ -314,37 +322,33 @@ UwOpticalBeamPattern::getBetaXYRx(Packet *p)
 	double rx_depth = use_woss_ ? rx->getAltitude() : rx->getZ();
 	double tx_depth = use_woss_ ? tx->getAltitude() : tx->getZ();
 	double dx = tx_x - rx_x;
-  	double dy = tx_y - rx_y;
-  	double dz = tx_depth - rx_depth;
-  	double dx_prime = dx*cos(-inclination_angle_) - dz*sin(-inclination_angle_);
-  	double dz_prime = dx*sin(-inclination_angle_) + dz*cos(-inclination_angle_);
-  	double dy_prime = dy;
-
-
+	double dy = tx_y - rx_y;
+	double dz = tx_depth - rx_depth;
+	double dx_prime =
+			dx * cos(-inclination_angle_) - dz * sin(-inclination_angle_);
+	double dz_prime =
+			dx * sin(-inclination_angle_) + dz * cos(-inclination_angle_);
+	double dy_prime = dy;
 
 	double beta_xy = 0;
-	if(dx_prime == 0) { 
-		beta_xy = dy_prime > 0 ? M_PI/2 : - M_PI/2;
-	}
-	else {
-		beta_xy= atan((dy_prime)/(dx_prime));
+	if (dx_prime == 0) {
+		beta_xy = dy_prime > 0 ? M_PI / 2 : -M_PI / 2;
+	} else {
+		beta_xy = atan((dy_prime) / (dx_prime));
 	}
 	beta_xy = dy_prime == 0 ? 0 : beta_xy;
 
 	return beta_xy;
-
-
 }
 
-double 
+double
 UwOpticalBeamPattern::getBetaXYTx(Packet *p)
 {
-	bool omnidirectional = 
-		((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
-	if(omnidirectional) {
+	bool omnidirectional =
+			((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
+	if (omnidirectional) {
 		return 0;
 	}
-
 
 	hdr_uwopticalbeampattern *bl = HDR_UWOPTICALBEAMPATTERN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
@@ -357,23 +361,23 @@ UwOpticalBeamPattern::getBetaXYTx(Packet *p)
 	double tx_depth = use_woss_ ? tx->getAltitude() : tx->getZ();
 	double rx_depth = use_woss_ ? rx->getAltitude() : rx->getZ();
 	double dx = rx_x - tx_x;
-  	double dy = rx_y - tx_y;
-  	double dz = rx_depth - tx_depth;
-  	double dx_prime = dx*cos(-bl->get_inclination_angle()) - dz*sin(-bl->get_inclination_angle());
-  	double dz_prime = dx*sin(-bl->get_inclination_angle()) + dz*cos(-bl->get_inclination_angle());
-  	double dy_prime = dy;
+	double dy = rx_y - tx_y;
+	double dz = rx_depth - tx_depth;
+	double dx_prime = dx * cos(-bl->get_inclination_angle()) -
+			dz * sin(-bl->get_inclination_angle());
+	double dz_prime = dx * sin(-bl->get_inclination_angle()) +
+			dz * cos(-bl->get_inclination_angle());
+	double dy_prime = dy;
 
 	double beta_xy = 0;
-	if(dx_prime == 0) { 
-		beta_xy = dy_prime > 0 ? M_PI/2 : - M_PI/2;
-	}
-	else {
-		beta_xy= atan((dy_prime)/(dx_prime));
+	if (dx_prime == 0) {
+		beta_xy = dy_prime > 0 ? M_PI / 2 : -M_PI / 2;
+	} else {
+		beta_xy = atan((dy_prime) / (dx_prime));
 	}
 	beta_xy = dy_prime == 0 ? 0 : beta_xy;
 
 	return beta_xy;
-
 }
 
 double
@@ -383,26 +387,26 @@ UwOpticalBeamPattern::getLutMaxDist(double c, double na)
 	CMaxDistIter c_dist_it = dist_lut_.lower_bound(c);
 	assert(c_dist_it != dist_lut_.end());
 	if (c_dist_it->first > c && c_dist_it != dist_lut_.begin()) {
-		double dist_next = na > back_noise_threshold_ ? 
-			c_dist_it->second.max_range_with_noise : 
-			c_dist_it->second.max_range;
+		double dist_next = na > back_noise_threshold_
+				? c_dist_it->second.max_range_with_noise
+				: c_dist_it->second.max_range;
 		double c_next = c_dist_it->first;
 		c_dist_it--;
-		double dist_prev = na > back_noise_threshold_ ? 
-			c_dist_it->second.max_range_with_noise : 
-			c_dist_it->second.max_range;
+		double dist_prev = na > back_noise_threshold_
+				? c_dist_it->second.max_range_with_noise
+				: c_dist_it->second.max_range;
 		double c_prev = c_dist_it->first;
-		max_distance = linearInterpolator(c, c_prev, dist_prev, c_next, dist_next);
-	}
-	else {
-		max_distance = na > back_noise_threshold_ ? 
-			c_dist_it->second.max_range_with_noise : 
-			c_dist_it->second.max_range;
+		max_distance =
+				linearInterpolator(c, c_prev, dist_prev, c_next, dist_next);
+	} else {
+		max_distance = na > back_noise_threshold_
+				? c_dist_it->second.max_range_with_noise
+				: c_dist_it->second.max_range;
 	}
 	return max_distance;
 }
 
-double 
+double
 UwOpticalBeamPattern::getLutBeamFactor(BeamPattern &beam_lut_, double beta)
 {
 	double beam_norm_d = 0;
@@ -414,9 +418,9 @@ UwOpticalBeamPattern::getLutBeamFactor(BeamPattern &beam_lut_, double beta)
 		beam_it--;
 		double dist_prev = beam_it->second;
 		double beta_prev = beam_it->first;
-		beam_norm_d = linearInterpolator(beta, beta_prev, dist_prev, beta_next, dist_next);
-	}
-	else {
+		beam_norm_d = linearInterpolator(
+				beta, beta_prev, dist_prev, beta_next, dist_next);
+	} else {
 		beam_norm_d = beam_it->second;
 	}
 	return beam_norm_d;
@@ -430,8 +434,9 @@ UwOpticalBeamPattern::initializeLUT()
 	UwOpticalPhy::initializeLUT();
 }
 
-void 
-UwOpticalBeamPattern::initializeBeamLUT(BeamPattern &beam_lut_, string beam_pattern_path_)
+void
+UwOpticalBeamPattern::initializeBeamLUT(
+		BeamPattern &beam_lut_, string beam_pattern_path_)
 {
 	ifstream input_file_;
 	string line_;
@@ -452,7 +457,7 @@ UwOpticalBeamPattern::initializeBeamLUT(BeamPattern &beam_lut_, string beam_patt
 	}
 }
 
-void 
+void
 UwOpticalBeamPattern::initializeMaxRangeLUT()
 {
 	ifstream input_file_;
@@ -484,7 +489,7 @@ void
 UwOpticalBeamPattern::startTx(Packet *p)
 {
 	hdr_uwopticalbeampattern *bl = HDR_UWOPTICALBEAMPATTERN(p);
-	bl->get_inclination_angle() = inclination_angle_;	
+	bl->get_inclination_angle() = inclination_angle_;
 	UwOpticalPhy::startTx(p);
 }
 
@@ -492,7 +497,7 @@ double
 UwOpticalBeamPattern::getBetaTx(Packet *p)
 {
 	/*
-	bool omnidirectional = 
+	bool omnidirectional =
 		((UwOpticalMPropagation *) propagation_)->isOmnidirectional();
 	if(omnidirectional) {
 		return 0;
@@ -509,28 +514,29 @@ UwOpticalBeamPattern::getBetaTx(Packet *p)
 	double tx_depth = use_woss_ ? tx->getAltitude() : tx->getZ();
 	double rx_depth = use_woss_ ? rx->getAltitude() : rx->getZ();
 	double dx = rx_x - tx_x;
-  	double dy = rx_y - tx_y;
-  	double dz = rx_depth - tx_depth;
-  	double dx_prime = dx*cos(-bl->get_inclination_angle()) - dz*sin(-bl->get_inclination_angle());
-  	double dz_prime = dx*sin(-bl->get_inclination_angle()) + dz*cos(-bl->get_inclination_angle());
-  	double dy_prime = dy;
-  	
-  	double dist_xy = sqrt(dx_prime*dx_prime + dy_prime*dy_prime);
-  	double beta = 0;
-  	if (dist_xy == 0) {
-  		beta = dz_prime > 0 ? M_PI/2 : - M_PI/2;
-  	}
-  	else {
-  		beta = use_woss_ ? 
-  			((UwOpticalMPropagation *) propagation_)->getBeta(p) 
-  			: atan(dz_prime/dist_xy);
-  	}
-  	beta = dz_prime == 0 ? 0 : beta;
-  	if (dx_prime < 0) {
-  		beta = beta > 0 ? beta - M_PI : beta + M_PI;
-  	}
-	beta = beta > M_PI ? beta - 2 * M_PI 
-		: beta < -M_PI ? beta + 2 * M_PI : beta;
+	double dy = rx_y - tx_y;
+	double dz = rx_depth - tx_depth;
+	double dx_prime = dx * cos(-bl->get_inclination_angle()) -
+			dz * sin(-bl->get_inclination_angle());
+	double dz_prime = dx * sin(-bl->get_inclination_angle()) +
+			dz * cos(-bl->get_inclination_angle());
+	double dy_prime = dy;
+
+	double dist_xy = sqrt(dx_prime * dx_prime + dy_prime * dy_prime);
+	double beta = 0;
+	if (dist_xy == 0) {
+		beta = dz_prime > 0 ? M_PI / 2 : -M_PI / 2;
+	} else {
+		beta = use_woss_ ? ((UwOpticalMPropagation *) propagation_)->getBeta(p)
+						 : atan(dz_prime / dist_xy);
+	}
+	beta = dz_prime == 0 ? 0 : beta;
+	if (dx_prime < 0) {
+		beta = beta > 0 ? beta - M_PI : beta + M_PI;
+	}
+	beta = beta > M_PI	   ? beta - 2 * M_PI
+			: beta < -M_PI ? beta + 2 * M_PI
+						   : beta;
 
 	return beta;
 }

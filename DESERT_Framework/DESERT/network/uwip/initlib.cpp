@@ -39,8 +39,8 @@
 
 #include "uwip-module.h"
 
-#include <tclcl.h>
 #include <clmessage.h>
+#include <tclcl.h>
 
 extern EmbeddedTcl UwIpInitTclCode;
 

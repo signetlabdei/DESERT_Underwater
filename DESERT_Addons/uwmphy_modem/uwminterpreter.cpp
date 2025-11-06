@@ -32,7 +32,7 @@
  * @author Federico Favaro
  * \version 2.0.0
  * \brief Implementation of the UWMinterpreter class.
-*/
+ */
 
 #include "uwminterpreter.h"
 #include "uwmphy_modem.h"

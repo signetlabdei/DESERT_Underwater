@@ -41,14 +41,14 @@
 #ifndef SUN_NODE_H
 #define SUN_NODE_H
 
-#include "sun-ipr-common-structures.h"
 #include "sun-hdr-ack.h"
 #include "sun-hdr-data.h"
 #include "sun-hdr-pathestablishment.h"
+#include "sun-ipr-common-structures.h"
 
-#include <uwip-module.h>
-#include <uwip-clmsg.h>
 #include <uwcbr-module.h>
+#include <uwip-clmsg.h>
+#include <uwip-module.h>
 
 #include "mphy.h"
 #include "packet.h"
@@ -56,17 +56,15 @@
 #include <tclcl.h>
 
 #include <cmath>
+#include <ctime>
+#include <fstream>
+#include <iostream>
 #include <limits>
+#include <map>
+#include <rng.h>
 #include <sstream>
 #include <string>
-#include <iostream>
-#include <rng.h>
-#include <ctime>
 #include <vector>
-#include <fstream>
-#include <map>
-
-
 
 class SunIPRoutingNode;
 
@@ -325,7 +323,7 @@ protected:
 	inline const long &
 	getNPathsEstablished()
 	{
-	  return n_paths_established;
+		return n_paths_established;
 	}
 
 	/**
@@ -836,24 +834,22 @@ protected:
 	int metrics_; /**< Metric used by the current node. */
 	int PoissonTraffic_; /**< Enable (<i>1</i>) or disable (<i>0</i>) the
 							Poisson traffic for SUN packets. */
-	double
-			period_status_; /**< Period of the Poisson traffic for status and
-							   ack packets. */
+	double period_status_; /**< Period of the Poisson traffic for status and
+							  ack packets. */
 	double period_data_; /**< Period of the Poisson traffic for data packets in
 							the buffer. */
-	int
-			num_hop_to_sink; /**< Number of hops needed to reach the sink using
-							  * tha path saved tn the routing table.
-							   * If the node is directly connected this value is
-							  * equal to 1,
-							   * is the node doesn't have any valid path to the
-							  * sink this value is equal to 0 */
+	int num_hop_to_sink; /**< Number of hops needed to reach the sink using
+						  * tha path saved tn the routing table.
+						  * If the node is directly connected this value is
+						  * equal to 1,
+						  * is the node doesn't have any valid path to the
+						  * sink this value is equal to 0 */
 	double quality_link; /**< Quality of the link from the node to the sink. */
 	nsaddr_t *hop_table; /**< List of IPs to reach the sink. */
 	int hop_table_length; /**< Current length of the hop_table. */
 	nsaddr_t sink_associated; /**< IP of the sink associated to the node. */
 	int printDebug_; /**< Flag to enable or disable dirrefent levels of debug.
-						*/
+					  */
 	double probe_min_snr_; /**< Value below which if a node receives a probe it
 							  discards it. */
 	double snr_to_sink_; /**< SNR between the sink and the current node. */
@@ -861,17 +857,14 @@ protected:
 								 send search_path packets. */
 	int disable_path_error_; /**< Flag to enable or disable the possibility to
 								send <i>Path Error</i> packets. */
-	int
-			reset_buffer_if_error_; /**< If == 1 when a node identify a broken
-									   link it will automatically free its
-									   buffer. */
+	int reset_buffer_if_error_; /**< If == 1 when a node identify a broken
+								   link it will automatically free its
+								   buffer. */
 
 	// Load
-	double
-			list_packets
-					[LISTLENGTH]; /**< List of the last LISTLENGTH temporal
-									 instants in which the node received data
-									 packets. */
+	double list_packets[LISTLENGTH]; /**< List of the last LISTLENGTH temporal
+										instants in which the node received data
+										packets. */
 	double list_acks[LISTLENGTH]; /**< List of the last LISTLENGTH temporal
 									 instants in which the node received acks.
 									 */
@@ -882,12 +875,11 @@ protected:
 	long list_packets_max_time_; /**< Clock of the last packet received by the
 									node. */
 	long list_acks_max_time_; /**< Clock of the last ack received by the node.
-								 */
+							   */
 	bool packets_array_full; /**< <i>true</i> if list of packets is full,
 								<i>false</i> otherwise. */
-	bool
-			acks_array_full; /**< <i>true</i> if list of acks is full,
-								<i>false</i> otherwise. */
+	bool acks_array_full; /**< <i>true</i> if list of acks is full,
+							 <i>false</i> otherwise. */
 	double alpha_; /**< Parameters used by Load metric. It is a correlation
 					  factor. */
 
@@ -905,20 +897,18 @@ protected:
 	vector<buffer_element>
 			buffer_data; /**< Buffer used to store data packets. */
 	uint32_t buffer_max_size_; /**< Maximum length of the data buffer. */
-	long
-			pkt_stored_; /**< Keep track of the total number of packet
-							transmitted. */
+	long pkt_stored_; /**< Keep track of the total number of packet
+						 transmitted. */
 	long pkt_tx_; /**< Keep track of the total number of packet retransmitted.
-					 */
-	int
-			safe_timer_buffer_; /**< Enables a mechanism used to modify the
-								   <i>timer_buffer_</i> in case of the sending
-								   time is shorter than the time needed to
-								   receive acks. */
+				   */
+	int safe_timer_buffer_; /**< Enables a mechanism used to modify the
+							   <i>timer_buffer_</i> in case of the sending
+							   time is shorter than the time needed to
+							   receive acks. */
 
 	// Timers
 	double timer_route_validity_; /**< Maximum validity time for a route entry.
-									 */
+								   */
 	double timer_sink_probe_validity_; /**< Maximum validity time for a sink
 										  probe. */
 	double timer_buffer_; /**< Timer for buffer management. */
@@ -931,10 +921,9 @@ protected:
 
 	// Trace file
 	bool trace_; /**< Flag used to enable or disable the trace file for nodes,
-					*/
-	char
-			*trace_file_name_; /**< Name of the trace file writter for the
-								  current node. */
+				  */
+	char *trace_file_name_; /**< Name of the trace file writter for the
+							   current node. */
 	ostringstream osstream_; /**< Used to convert to string. */
 	ofstream trace_file_; /**< Ofstream used to write the trace file in the
 							 disk. */
@@ -945,40 +934,39 @@ protected:
 	int data_and_hops[MAX_HOP_NUMBER]; /**< Structure that contains the number
 										* of data packets sent by the current
 										* node to the sink,
-										 * for different values of hop count. It
+										* for different values of hop count. It
 										* is used for statistics purposes.
-										 */
+										*/
 
-	std::map<uint8_t, uint> paths_selected; /**< Map containing the nodes selected as relay to
-											   the sink and the number of times each node
-											   was selected */
+	std::map<uint8_t, uint>
+			paths_selected; /**< Map containing the nodes selected as relay to
+							   the sink and the number of times each node
+							   was selected */
 
-	long n_paths_established; /**< Number of times the node is established as realy
-								 node by the other nodes of the network */
+	long n_paths_established; /**< Number of times the node is established as
+								 realy node by the other nodes of the network */
 
-	static long
-			number_of_pathestablishment_; /**< Comulative number of Path
-											 Establishment packets processed by
-											 SunIPRoutingNode objects. */
+	static long number_of_pathestablishment_; /**< Comulative number of Path
+												 Establishment packets processed
+												 by SunIPRoutingNode objects. */
 	static long number_of_datapkt_; /**< Comulative number of Data packets
 									   processed by SunIPRoutingNode objects. */
 	static long number_of_ackpkt_; /**< Comulative number of Ack packets
 									  processed by SunIPRoutingNode objects. */
-	static long
-			number_of_drops_buffer_full_; /**< Comulative number of packets
-											 dropped by SunIPRoutingNode
-											 objects, reason: the buffer is
-											 full. */
+	static long number_of_drops_buffer_full_; /**< Comulative number of packets
+												 dropped by SunIPRoutingNode
+												 objects, reason: the buffer is
+												 full. */
 	static long number_of_drops_maxretx_; /**< Comulative number of packets
 											 dropped by SunIPRoutingNode
 											 objects, reason: max number of
 											 retransmission reached. */
-	static long
-			number_of_pkt_forwarded_; /**< Comulative number of Data packets
-										 forwarded by the network. */
+	static long number_of_pkt_forwarded_; /**< Comulative number of Data packets
+											 forwarded by the network. */
 
-	uint max_retx_; /**< Maximum Number of transmissions performed: real retransmissions counter
-					   the counter is increased only when the packet is sent downlayer */
+	uint max_retx_; /**< Maximum Number of transmissions performed: real
+					   retransmissions counter the counter is increased only
+					   when the packet is sent downlayer */
 
 private:
 	/**

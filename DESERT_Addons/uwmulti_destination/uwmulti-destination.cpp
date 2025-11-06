@@ -97,43 +97,41 @@ UwMultiDestination::command(int argc, const char *const *argv)
 			return TCL_OK;
 		}
 	} else if (argc == 4) {
-		
-		//parameters: IP_val, layer_id
+
+		// parameters: IP_val, layer_id
 		if (strcasecmp(argv[1], "addLayer") == 0) {
 			if (atoi(argv[2]) < 0) {
-				std::cerr << "UwMultiDestination::command. " 
-					<<"Error, negative IP address" << std::endl;
+				std::cerr << "UwMultiDestination::command. "
+						  << "Error, negative IP address" << std::endl;
 				return TCL_ERROR;
 			} else {
 				IP_range range(atoi(argv[2]), atoi(argv[2]));
 				if (!addLayer(range, atoi(argv[3]))) {
-					std::cerr << "UwMultiDestination::command. " 
-						<<"Error, overlapping IP ranges" << std::endl;
+					std::cerr << "UwMultiDestination::command. "
+							  << "Error, overlapping IP ranges" << std::endl;
 					return TCL_ERROR;
-				} 
-				
+				}
+
 				return TCL_OK;
 			}
-			
 		}
-		
+
 	} else if (argc == 5) {
-		//parameters: IP_val_min, IP_val_max, layer_id
+		// parameters: IP_val_min, IP_val_max, layer_id
 		if (strcasecmp(argv[1], "addLayer") == 0) {
 			if (atoi(argv[2]) < 0 || atoi(argv[3]) < atoi(argv[2])) {
-				std::cerr << "UwMultiDestination::command. " 
-					<<"Wrong IP address range" << std::endl;
+				std::cerr << "UwMultiDestination::command. "
+						  << "Wrong IP address range" << std::endl;
 				return TCL_ERROR;
 			} else {
-				IP_range range(atoi(argv[2]),atoi(argv[3]));
+				IP_range range(atoi(argv[2]), atoi(argv[3]));
 				if (!addLayer(range, atoi(argv[4]))) {
-					std::cerr << "UwMultiDestination::command. " 
-						<<"Error, overlapping IP ranges" << std::endl;
+					std::cerr << "UwMultiDestination::command. "
+							  << "Error, overlapping IP ranges" << std::endl;
 					return TCL_ERROR;
 				}
 				return TCL_OK;
 			}
-			
 		}
 	}
 
@@ -145,12 +143,12 @@ UwMultiDestination::addLayer(IP_range range, int id)
 {
 
 	if (layer_list.empty()) {
-		layer_IPrange item = std::make_pair(id,range);
+		layer_IPrange item = std::make_pair(id, range);
 		layer_list.push_back(item);
 		return true;
 	} else {
 		if (checkNotOverlap(range)) {
-			layer_IPrange item = std::make_pair(id,range);
+			layer_IPrange item = std::make_pair(id, range);
 			layer_list.push_back(item);
 			return true;
 		}
@@ -185,7 +183,6 @@ int
 UwMultiDestination::getDestinationLayer(Packet *p)
 {
 	hdr_uwip *ih = HDR_UWIP(p);
-
 
 	int dest_addr = ih->daddr();
 	auto it = layer_list.begin();

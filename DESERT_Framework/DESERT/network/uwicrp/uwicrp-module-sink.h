@@ -40,24 +40,22 @@
 #ifndef UWICRP_MODULE_SINK_H
 #define UWICRP_MODULE_SINK_H
 
+#include "packet.h"
+#include "uwicrp-common.h"
 #include "uwicrp-hdr-ack.h"
 #include "uwicrp-hdr-data.h"
 #include "uwicrp-hdr-status.h"
-#include "uwicrp-common.h"
-#include <uwip-module.h>
 #include <uwip-clmsg.h>
-#include "packet.h"
+#include <uwip-module.h>
 
+#include <ctime>
+#include <iostream>
+#include <module.h>
+#include <rng.h>
 #include <sstream>
 #include <string>
-#include <iostream>
-#include <rng.h>
-#include <ctime>
-#include <module.h>
 #include <tclcl.h>
 #include <vector>
-
-
 
 /**
  * UwIcrpSink class is used to represent the routing layer of a node.
@@ -189,12 +187,11 @@ protected:
 
 	uint8_t ipAddr_; /**< IP of the current node. */
 	int printDebug_; /**< Flag to enable or disable dirrefent levels of debug.
-						*/
+					  */
 
 private:
-	static long
-			numberofackpkt_; /**< Comulative number of Ack packets processed by
-								UwIcrpSink objects. */
+	static long numberofackpkt_; /**< Comulative number of Ack packets processed
+									by UwIcrpSink objects. */
 	static long numberofstatuspkt_; /**< Comulative number of Status packets
 									   processed by UwIcrpSink objects. */
 };

@@ -92,9 +92,8 @@
 #include <iostream>
 #include <sstream>
 
-static const int MAX_HOP_NUMBER =
-		5; /**< Maximum number of hops contained in a <i>SUN Path
-			  Establishment</i> packet.*/
+static const int MAX_HOP_NUMBER = 5; /**< Maximum number of hops contained in a
+										<i>SUN Path Establishment</i> packet.*/
 static int sunuid_ = 0; /**< Unique identifier for <i>UWSUN</i> packets. */
 
 /**

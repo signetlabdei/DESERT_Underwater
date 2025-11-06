@@ -39,17 +39,15 @@
 #ifndef UWTDMA_FRAME_H
 #define UWTDMA_FRAME_H
 
-#include <uwtdma.h>
-#include <queue>
-#include <iostream>
 #include <assert.h>
-#include <sstream>
 #include <fstream>
-#include <sys/time.h>
-#include <vector>
+#include <iostream>
 #include <map>
-
-
+#include <queue>
+#include <sstream>
+#include <sys/time.h>
+#include <uwtdma.h>
+#include <vector>
 
 typedef std::map<int, int> Slot;
 typedef std::map<int, Slot> SlotTopology;
@@ -108,9 +106,8 @@ protected:
 	int max_packet_per_slot; /**<max numer of packet it can transmit per slot */
 	int packet_sent_curr_slot_; /**<counter of packet has been sent in the
 								   current slot */
-	SlotTopology
-			s_; /**<matrix cointaining the transmission schedule of all the
-				   network */
+	SlotTopology s_; /**<matrix cointaining the transmission schedule of all the
+						network */
 	Slot my_slot_numbers_; /**<set the position of the node in the frame
 							  (fair_mode)
 										  (starting from 0 to tot_slots-1)*/

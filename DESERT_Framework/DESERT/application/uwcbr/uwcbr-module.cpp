@@ -366,7 +366,7 @@ UwCbrModule::recv(Packet *p)
 
 	if (!drop_out_of_order_) {
 		if (sn_check[uwcbrh->sn() & 0x00ffffff]) {
-			 // Packet already processed: drop it
+			// Packet already processed: drop it
 			incrPktInvalid();
 			drop(p, 1, UWCBR_DROP_REASON_DUPLICATED_PACKET);
 			return;

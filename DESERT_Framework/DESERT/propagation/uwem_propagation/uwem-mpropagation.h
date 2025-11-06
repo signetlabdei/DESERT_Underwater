@@ -34,16 +34,16 @@
 #ifndef UWEM_MPROPAGATION_H
 #define UWEM_MPROPAGATION_H
 
-#include <mpropagation.h>
-#include <mphy.h>
 #include <iostream>
-#include <math.h>
 #include <map>
+#include <math.h>
+#include <mphy.h>
+#include <mpropagation.h>
 
 #define NOT_FOUND_C_VALUE -1
-#define MU_0 (1.2566 * pow(10,-6))		// [H/m]	
-#define E_0 (8.854187817 * pow(10,-12))	// [F/m]
-#define ETA_A 377						// [Ohm]
+#define MU_0 (1.2566 * pow(10, -6)) // [H/m]
+#define E_0 (8.854187817 * pow(10, -12)) // [F/m]
+#define ETA_A 377 // [Ohm]
 
 /**
  * Class used to represents the UWOPTICAL_MPROPAGATION.
@@ -76,7 +76,7 @@ public:
 	virtual int command(int, const char *const *);
 
 	/**
-	 * Calculate the gain of the transmission (attenuation) 
+	 * Calculate the gain of the transmission (attenuation)
 	 *
 	 * @param Packet* Pointer to the packet that has to be received.
 	 * @return the gain due to the electromagnetic propagation.
@@ -90,13 +90,13 @@ public:
 protected:
 	double T_; /**< Temperature [°C] */
 	double S_; /**< Salinity [(g/kg)^2] */
-	
-	void getRelativePermittivity(double f_,double* rel_e);
+
+	void getRelativePermittivity(double f_, double *rel_e);
 	double getSigmaSW();
-	double getAlpha(double* rel_e,double w,double sigma);
-	double getBeta(double* rel_e,double w,double sigma);
-	void getEtaW(double* etaW,double* rel_e,double w,double sigma);
-	double getModTauSquared(double* etaW);
+	double getAlpha(double *rel_e, double w, double sigma);
+	double getBeta(double *rel_e, double w, double sigma);
+	void getEtaW(double *etaW, double *rel_e, double w, double sigma);
+	double getModTauSquared(double *etaW);
 };
 
 #endif /* UWEM_MPROPAGATION_H */

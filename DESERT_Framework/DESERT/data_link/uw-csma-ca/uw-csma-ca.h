@@ -39,13 +39,13 @@
 #ifndef CSMA_CA_H
 #define CSMA_CA_H
 
+#include <fstream>
+#include <iostream>
 #include <mmac.h>
 #include <queue>
 #include <sstream>
-#include <fstream>
-#include <unistd.h>
-#include <iostream>
 #include <time.h>
+#include <unistd.h>
 
 #include "uw-csma-ca-hdrs.h"
 
@@ -86,8 +86,6 @@ typedef enum CSMA_CA_STATES csma_ca_states_t;
 enum log_level { CSMA_CA_ERROR = 0, CSMA_CA_WARN, CSMA_CA_INFO, CSMA_CA_DEBUG };
 
 typedef enum log_level csma_ca_log_level_t;
-
-
 
 string log_level_string[] = {"ERROR", "WARNING", "INFO", "DEBUG"};
 /**
@@ -280,10 +278,9 @@ protected:
 	 */
 	virtual void stateTxAck(int mac_dst);
 	/**
-   * Initializes the protocol at the beginning of the simulation. This method is
-   * called by
-   * a command in tcl.
-   */
+	 * Initializes the protocol at the beginning of the simulation. This method
+	 * is called by a command in tcl.
+	 */
 	virtual void initializeLog();
 
 	CsmaCaTimer backoff_timer; /**< Backoff timer */

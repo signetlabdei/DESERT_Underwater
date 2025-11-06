@@ -35,9 +35,9 @@
  *
  */
 
-#include <tclcl.h>
-#include <iostream>
 #include "uwtokenbus_hdr.h"
+#include <iostream>
+#include <tclcl.h>
 
 int hdr_tokenbus::offset_ = 0;
 packet_t PT_UWTOKENBUS;
@@ -58,7 +58,6 @@ public:
 		bind_offset(&hdr_tokenbus::offset_);
 	}
 } class_hdr_tokenbus;
-
 
 extern EmbeddedTcl uwtokenbus_default;
 extern "C" int

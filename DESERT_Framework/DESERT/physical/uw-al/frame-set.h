@@ -52,8 +52,6 @@
 #define MAX_BIN_PAYLOAD_CHECK_ARRAY_LENGTH \
 	((MAX_BIN_PAYLOAD_ARRAY_LENGTH + sizeof(char) - 1) / sizeof(char))
 
-
-
 class RxFrameSetKey
 {
 

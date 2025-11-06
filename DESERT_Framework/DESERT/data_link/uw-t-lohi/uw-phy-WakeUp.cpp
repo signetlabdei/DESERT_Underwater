@@ -246,8 +246,9 @@ MPhy_WakeUp::startRx(Packet *p)
 				return;
 			} else { // below threshold
 				if (debug_)
-					cout << NOW << "  MPhy_WakeUp::startRx() rx a TONE but "
-								   "below threshold"
+					cout << NOW
+						 << "  MPhy_WakeUp::startRx() rx a TONE but "
+							"below threshold"
 						 << endl;
 
 				wkuph->startRx_time = WKUP_DISCARD;
@@ -278,8 +279,9 @@ MPhy_WakeUp::startRx(Packet *p)
 				return;
 			} else { // below threshold
 				if (debug_)
-					cout << NOW << "  MPhy_WakeUp::startRx() rx a TONE but "
-								   "below threshold"
+					cout << NOW
+						 << "  MPhy_WakeUp::startRx() rx a TONE but "
+							"below threshold"
 						 << endl;
 
 				wkuph->startRx_time = WKUP_DISCARD;

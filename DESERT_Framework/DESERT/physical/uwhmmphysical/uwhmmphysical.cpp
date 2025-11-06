@@ -37,32 +37,46 @@
  */
 
 #include "uwhmmphysical.h"
+#include "clmsg-stats.h"
+#include "mac.h"
 #include "mclink.h"
 #include "uwphy-clmsg.h"
 #include "uwstats-utilities.h"
-#include "mac.h"
-#include "clmsg-stats.h"
-#include <phymac-clmsg.h>
-#include <string.h>
-#include <rng.h>
-#include <packet.h>
-#include <module.h>
-#include <tclcl.h>
 #include <iostream>
+#include <module.h>
+#include <packet.h>
+#include <phymac-clmsg.h>
+#include <rng.h>
+#include <string.h>
+#include <tclcl.h>
 
-#define DEBUG(level,text) {if (debug_ >= level) {std::cout << NOW << " UwHMMPhysical error: "<< text << std::endl;}}
+#define DEBUG(level, text)                                                     \
+	{                                                                          \
+		if (debug_ >= level) {                                                 \
+			std::cout << NOW << " UwHMMPhysical error: " << text << std::endl; \
+		}                                                                      \
+	}
 
-Stats*
+Stats *
 UwHMMPhysicalStats::clone() const
 {
-	return new UwHMMPhysicalStats( *this );
+	return new UwHMMPhysicalStats(*this);
 }
 
 void
-UwHMMPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr, double noise_pwr, double interf_pwr,
-		double sinr, double ber, double per, bool error, MCLink::ChState channel_state)
-{	
-	UwPhysicalStats::updateStats(mod_id, stck_id, rx_pwr, noise_pwr, interf_pwr, sinr, ber, per, error);
+UwHMMPhysicalStats::updateStats(int mod_id, int stck_id, double rx_pwr,
+		double noise_pwr, double interf_pwr, double sinr, double ber,
+		double per, bool error, MCLink::ChState channel_state)
+{
+	UwPhysicalStats::updateStats(mod_id,
+			stck_id,
+			rx_pwr,
+			noise_pwr,
+			interf_pwr,
+			sinr,
+			ber,
+			per,
+			error);
 	channel_state = channel_state;
 }
 
@@ -74,7 +88,7 @@ public:
 	{
 	}
 	TclObject *
-	create(int argc, const char *const * argv)
+	create(int argc, const char *const *argv)
 	{
 		return (new UnderwaterHMMPhysical);
 	}
@@ -100,7 +114,7 @@ int
 UnderwaterHMMPhysical::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
-	
+
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "getPktsTotBad") == 0) {
 			tcl.resultf("%d", getPktsTotBad());
@@ -125,7 +139,7 @@ UnderwaterHMMPhysical::command(int argc, const char *const *argv)
 			}
 			std::cerr << "TCL: failed cast on MCLink" << std::endl;
 			return TCL_ERROR;
-		}  
+		}
 		std::cerr << "TCL error: setMCLink mac MCLink" << std::endl;
 		return TCL_ERROR;
 	}
@@ -133,19 +147,19 @@ UnderwaterHMMPhysical::command(int argc, const char *const *argv)
 } /* UnderwaterHMMPhysical::command */
 
 void
-UnderwaterHMMPhysical::setMCLink(int mac, MCLink *link) 
+UnderwaterHMMPhysical::setMCLink(int mac, MCLink *link)
 {
 	link_map[mac] = link;
 } /* UnderwaterHMMPhysical::setMCLink */
 
-
 void
-UnderwaterHMMPhysical::endRx(Packet *p){
+UnderwaterHMMPhysical::endRx(Packet *p)
+{
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
 	hdr_mac *mach = HDR_MAC(p);
 	const int mac_addr = mach->macSA();
-	
+
 	if (PktRx != 0) {
 		if (PktRx == p) {
 
@@ -155,7 +169,7 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 				auto ch_state = (*link->second).updateChState();
 				bool error_hmm = false;
 				double ber_hmm = (*link->second).getBER();
-				double per_hmm = ber2per(ber_hmm,p);
+				double per_hmm = ber2per(ber_hmm, p);
 				double chance_hmm = RNG::defaultrng()->uniform_double();
 				if (per_hmm > chance_hmm) {
 					error_hmm = true;
@@ -172,7 +186,7 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 				double sinr = ph->Pr / ph->Pn;
 				bool error_interf = false;
 				double chance_interf = RNG::defaultrng()->uniform_double();
-				
+
 				if (interference_) {
 					if (Interference_Model == "CHUNK") {
 						const PowerChunkList &power_chunk_list =
@@ -186,7 +200,8 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 							if (interf_power > 0.0) {
 								perr_interf = getPER(
 										ph->Pr / interf_power, nbits2, p);
-								chance_interf = RNG::defaultrng()->uniform_double();
+								chance_interf =
+										RNG::defaultrng()->uniform_double();
 								error_interf = chance_interf < perr_interf;
 								if (error_interf) {
 									break;
@@ -197,14 +212,14 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 						interf_power = interference_->getInterferencePower(p);
 						sinr = ph->Pr / (ph->Pn + interf_power);
 						if (interf_power > 0.0) {
-							perr_interf = getPER(
-								ph->Pr / interf_power, nbits, p);
+							perr_interf =
+									getPER(ph->Pr / interf_power, nbits, p);
 							error_interf = chance_interf < perr_interf;
 						}
 					} else {
 						std::cerr << "Please choose the interference model "
-									"CHUNK or MEANPOWER"
-								<< std::endl;
+									 "CHUNK or MEANPOWER"
+								  << std::endl;
 						exit(1);
 					}
 					interferent_pkts = interference_->getCounters(p);
@@ -221,11 +236,18 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 				/* update and trigger the modules that collect the stats */
 				auto uwphystats = dynamic_cast<UwHMMPhysicalStats *>(stats_ptr);
 				if (uwphystats) {
-					uwphystats->updateStats(getId(),getStackId(), ph->Pr,
-						ph->Pn, interf_power, sinr, ber_hmm, per_hmm,
-						(error_hmm || error_interf),ch_state);
+					uwphystats->updateStats(getId(),
+							getStackId(),
+							ph->Pr,
+							ph->Pn,
+							interf_power,
+							sinr,
+							ber_hmm,
+							per_hmm,
+							(error_hmm || error_interf),
+							ch_state);
 				}
-				
+
 				ClMsgTriggerStats m = ClMsgTriggerStats();
 				sendSyncClMsg(&m);
 
@@ -238,7 +260,7 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 				time_ready_to_end_rx_ =
 						Scheduler::instance().clock() + ph->duration;
 				Energy_Rx_ += consumedEnergyRx(ph->duration);
-			
+
 				ch->error() = (error_hmm || error_interf);
 
 				/* update counters of UwPhysical */
@@ -263,7 +285,7 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 					if (error_hmm) {
 						incrErrorPktsNoise();
 					}
-				} else if (error_hmm) { //only HMM error, no interference
+				} else if (error_hmm) { // only HMM error, no interference
 					incrErrorPktsNoise();
 					if (mach->ftype() != MF_CONTROL) {
 						incrTot_pkts_lost();
@@ -275,8 +297,10 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 				sendUp(p);
 				PktRx = 0;
 			} else {
-				DEBUG(-100,"McLink not set for origin MAC: "<< mac_addr)
-				UnderwaterPhysical::endRx(p); // if no MCLink was set for this MAC the regular UwPhysical model is used
+				DEBUG(-100, "McLink not set for origin MAC: " << mac_addr)
+				UnderwaterPhysical::endRx(
+						p); // if no MCLink was set for this MAC the regular
+							// UwPhysical model is used
 			}
 		} else {
 			dropPacket(p);
@@ -286,10 +310,11 @@ UnderwaterHMMPhysical::endRx(Packet *p){
 	}
 } /* UnderwaterHMMPhysical::endRx */
 
-double 
-UnderwaterHMMPhysical::ber2per(double ber, Packet * p) {
-	if (HDR_CMN(p)->size() > 0 && ber >= 0 && ber <=1) {
-		return 1-pow(1-ber, 8*(HDR_CMN(p)->size()));
+double
+UnderwaterHMMPhysical::ber2per(double ber, Packet *p)
+{
+	if (HDR_CMN(p)->size() > 0 && ber >= 0 && ber <= 1) {
+		return 1 - pow(1 - ber, 8 * (HDR_CMN(p)->size()));
 	}
 	DEBUG(0, "called ber2per() with invalid packet size or BER")
 	return 0;

@@ -34,17 +34,15 @@
  *
  * \brief Definition of UwHermesPhy class.
  *
-**/
+ **/
 
 #ifndef UWHERMESPHY_H
 #define UWHERMESPHY_H
 
 #include "uwphysical.h"
-#include <math.h>
 #include <iostream>
 #include <map>
-
-
+#include <math.h>
 
 typedef ::std::map<double, double> PdrLut;
 typedef PdrLut::iterator PdrLutIt;
@@ -64,15 +62,15 @@ public:
 	virtual ~UwHermesPhy();
 
 	/**
-   * TCL command interpreter. It implements the following OTcl methods:
-   *
-   * @param argc Number of arguments in <i>argv</i>.
-   * @param argv Array of strings which are the command parameters (Note that
-   * <i>argv[0]</i> is the name of the object).
-   * @return TCL_OK or TCL_ERROR whether the command has been dispatched
-   * successfully or not.
-   *
-   */
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 * <i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * successfully or not.
+	 *
+	 */
 	virtual int command(int, const char *const *);
 
 protected:
@@ -101,28 +99,28 @@ protected:
 
 private:
 	/**
-	* Return the distance between source and destination.
-	*
-	* @param p Packet by witch the module gets information about source and
-	*destination.
-	**/
+	 * Return the distance between source and destination.
+	 *
+	 * @param p Packet by witch the module gets information about source and
+	 *destination.
+	 **/
 	virtual double getDistance(Packet *);
 
 	/**
-	* Return the PER via linear interpolation.
-	*
-	* @param distance: distance between source and destination.
-	* @param size: Packet size in bit.
-	**/
+	 * Return the PER via linear interpolation.
+	 *
+	 * @param distance: distance between source and destination.
+	 * @param size: Packet size in bit.
+	 **/
 	virtual double matchPS(double distance, int size);
 
 	/**
-	* Return y via linear interpolation given two points.
-	*
-	* @param x: input.
-	* @param x1, y1: coordinates of the first point.
-	* @param x2, y2: coordinates of the second point.
-	**/
+	 * Return y via linear interpolation given two points.
+	 *
+	 * @param x: input.
+	 * @param x1, y1: coordinates of the first point.
+	 * @param x2, y2: coordinates of the second point.
+	 **/
 	virtual double linearInterpolator(
 			double x, double x1, double y1, double x2, double y2);
 
@@ -134,12 +132,12 @@ private:
 	bool initLUT_;
 
 	/**
-   *
-   * BCH(n,k,t) : correction of t errors via BCH code
-   * new frame length= FRAME_BIT/k*n, example: 9152/11*15
-   * by default BCH(15,11,1)
-   *
-  **/
+	 *
+	 * BCH(n,k,t) : correction of t errors via BCH code
+	 * new frame length= FRAME_BIT/k*n, example: 9152/11*15
+	 * by default BCH(15,11,1)
+	 *
+	 **/
 	int BCH_N; // by default = 15; BCH(15,11,1)
 	int BCH_K; // by default = 11
 	int BCH_T; // by default = 1; unused, just for completeness

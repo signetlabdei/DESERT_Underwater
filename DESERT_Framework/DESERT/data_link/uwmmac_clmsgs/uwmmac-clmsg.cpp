@@ -38,82 +38,84 @@
 #include "uwmmac-clmsg.h"
 
 ClMsgUwMmac::ClMsgUwMmac(ClMessage_t type)
-: ClMessage(CLMSG_UWMMAC_VERBOSITY, type),
-  stack_id(CLMSG_UWMMAC_STACK_ID_NOT_VALID),
-  req_type(NOT_VALID)
+	: ClMessage(CLMSG_UWMMAC_VERBOSITY, type)
+	, stack_id(CLMSG_UWMMAC_STACK_ID_NOT_VALID)
+	, req_type(NOT_VALID)
 {
 }
-
 
 ClMsgUwMmac::ClMsgUwMmac(int sid, int dest_module_id, ClMessage_t type)
-: ClMessage(CLMSG_UWMMAC_VERBOSITY, type, UNICAST, dest_module_id),
-  stack_id(sid),
-  req_type(NOT_VALID)
+	: ClMessage(CLMSG_UWMMAC_VERBOSITY, type, UNICAST, dest_module_id)
+	, stack_id(sid)
+	, req_type(NOT_VALID)
 {
 }
 
-ClMsgUwMmac::ClMsgUwMmac(const ClMsgUwMmac& msg)
-: ClMessage(msg),
-  stack_id(CLMSG_UWMMAC_STACK_ID_NOT_VALID)
+ClMsgUwMmac::ClMsgUwMmac(const ClMsgUwMmac &msg)
+	: ClMessage(msg)
+	, stack_id(CLMSG_UWMMAC_STACK_ID_NOT_VALID)
 {
-  req_type = msg.req_type;
+	req_type = msg.req_type;
 }
 
 ClMsgUwMmac::~ClMsgUwMmac()
 {
 }
 
-ClMsgUwMmac* ClMsgUwMmac::copy()
+ClMsgUwMmac *
+ClMsgUwMmac::copy()
 {
-  return new ClMsgUwMmac(*this);
+	return new ClMsgUwMmac(*this);
 }
 
-void ClMsgUwMmac::setReqType(ReqType type)
+void
+ClMsgUwMmac::setReqType(ReqType type)
 {
-  req_type = type;
+	req_type = type;
 }
 
-ClMsgUwMmac::ReqType ClMsgUwMmac::getReqType()
+ClMsgUwMmac::ReqType
+ClMsgUwMmac::getReqType()
 {
-  return req_type;
+	return req_type;
 }
-
 
 ClMsgUwMmacEnable::ClMsgUwMmacEnable()
-: ClMsgUwMmac(CLMSG_UWMMAC_ENABLE),
-  enable_(true)
+	: ClMsgUwMmac(CLMSG_UWMMAC_ENABLE)
+	, enable_(true)
 {
 }
 
 ClMsgUwMmacEnable::ClMsgUwMmacEnable(int sid, int dest_module_id)
-: ClMsgUwMmac(sid, dest_module_id,CLMSG_UWMMAC_ENABLE),
-  enable_(true)
+	: ClMsgUwMmac(sid, dest_module_id, CLMSG_UWMMAC_ENABLE)
+	, enable_(true)
 {
 }
 
-ClMsgUwMmacEnable::ClMsgUwMmacEnable(const ClMsgUwMmacEnable& msg)
-: ClMsgUwMmac(msg)
+ClMsgUwMmacEnable::ClMsgUwMmacEnable(const ClMsgUwMmacEnable &msg)
+	: ClMsgUwMmac(msg)
 {
-  enable_ = msg.enable_;
+	enable_ = msg.enable_;
 }
 
 ClMsgUwMmacEnable::~ClMsgUwMmacEnable()
 {
 }
 
-double ClMsgUwMmacEnable::getEnable()
+double
+ClMsgUwMmacEnable::getEnable()
 {
 	return enable_;
 }
 
-void ClMsgUwMmacEnable::enable()
+void
+ClMsgUwMmacEnable::enable()
 {
 	enable_ = true;
 }
 
-
-void ClMsgUwMmacEnable::disable()
+void
+ClMsgUwMmacEnable::disable()
 {
-  enable_ = false;
+	enable_ = false;
 }
-

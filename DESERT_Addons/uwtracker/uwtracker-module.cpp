@@ -27,13 +27,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwtracker-module.cc
-* @author Filippo Campagnaro
-* @version 1.0.0
-*
-* \brief Provides the <i>UWTRACKER</i> class implementation.
-*
-*/
+ * @file uwtracker-module.cc
+ * @author Filippo Campagnaro
+ * @version 1.0.0
+ *
+ * \brief Provides the <i>UWTRACKER</i> class implementation.
+ *
+ */
 
 #include "uwtracker-module.h"
 #include "mphy_pktheader.h"
@@ -43,31 +43,35 @@
 #include <uwsmposition.h>
 #define HDR_UWTRACK(p) (hdr_uwTracker::access(p))
 extern packet_t PT_UWTRACK;
-int hdr_uwTracker::offset_; /**< Offset used to access in 
+int hdr_uwTracker::offset_; /**< Offset used to access in
 									<i>hdr_uwTracker</i> packets header. */
 
 /**
- * Class that represents the binding with the tcl configuration script 
+ * Class that represents the binding with the tcl configuration script
  */
-static class UwTrackerModuleClass : public TclClass {
+static class UwTrackerModuleClass : public TclClass
+{
 public:
-
 	/**
-   * Constructor of the class
-   */
-	UwTrackerModuleClass() : TclClass("Module/UW/TRACKER") {
+	 * Constructor of the class
+	 */
+	UwTrackerModuleClass()
+		: TclClass("Module/UW/TRACKER")
+	{
 	}
 
 	/**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
-	TclObject* create(int, const char*const*) {
+	 * Creates the TCL object needed for the tcl language interpretation
+	 * @return Pointer to an TclObject
+	 */
+	TclObject *
+	create(int, const char *const *)
+	{
 		return (new UwTrackerModule());
 	}
 } class_module_uwTrack;
 
-UwTrackerModule::UwTrackerModule() 
+UwTrackerModule::UwTrackerModule()
 	: UwCbrModule()
 	, track_position(nullptr)
 	, track_measure{0}
@@ -76,12 +80,12 @@ UwTrackerModule::UwTrackerModule()
 	, tracking_period(0)
 	, measure_timer(this)
 {
-	bind("max_tracking_distance_", (double*) &max_tracking_distance);
-	bind("send_only_active_trace_", (int*) &send_only_active_trace);
-	bind("tracking_period_", (double*) &tracking_period);
+	bind("max_tracking_distance_", (double *) &max_tracking_distance);
+	bind("send_only_active_trace_", (int *) &send_only_active_trace);
+	bind("tracking_period_", (double *) &tracking_period);
 }
 
-UwTrackerModule::UwTrackerModule(UWSMPosition* p) 
+UwTrackerModule::UwTrackerModule(UWSMPosition *p)
 	: UwCbrModule()
 	, track_position(p)
 	, max_tracking_distance(std::numeric_limits<int>::max())
@@ -89,21 +93,25 @@ UwTrackerModule::UwTrackerModule(UWSMPosition* p)
 	, track_my_position(0)
 	, tracking_period(0)
 	, measure_timer(this)
-{	
-	bind("max_tracking_distance_", (double*) &max_tracking_distance);
-	bind("send_only_active_trace_", (int*) &send_only_active_trace);
-	bind("track_my_position_", (int*) &track_my_position);
-	bind("tracking_period_", (double*) &tracking_period);
+{
+	bind("max_tracking_distance_", (double *) &max_tracking_distance);
+	bind("send_only_active_trace_", (int *) &send_only_active_trace);
+	bind("track_my_position_", (int *) &track_my_position);
+	bind("tracking_period_", (double *) &tracking_period);
 }
 
-UwTrackerModule::~UwTrackerModule() {}
+UwTrackerModule::~UwTrackerModule()
+{
+}
 
-int UwTrackerModule::command(int argc, const char*const* argv) {
-	Tcl& tcl = Tcl::instance();
-	if(argc == 3){
+int
+UwTrackerModule::command(int argc, const char *const *argv)
+{
+	Tcl &tcl = Tcl::instance();
+	if (argc == 3) {
 		if (strcasecmp(argv[1], "setTrack") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
-			track_position=p;
+			UWSMPosition *p = dynamic_cast<UWSMPosition *>(tcl.lookup(argv[2]));
+			track_position = p;
 			tcl.resultf("%s", "position Setted\n");
 			return TCL_OK;
 		}
@@ -118,7 +126,7 @@ int UwTrackerModule::command(int argc, const char*const* argv) {
 			return TCL_OK;
 		}
 	}
-	return UwCbrModule::command(argc,argv);
+	return UwCbrModule::command(argc, argv);
 }
 
 void
@@ -128,63 +136,66 @@ UwTrackerModule::sendPkt()
 	track_tmp_pos.setX(track_measure.x());
 	track_tmp_pos.setY(track_measure.y());
 	track_tmp_pos.setZ(track_measure.z());
-	if(!send_only_active_trace || 
-		track_tmp_pos.getDist(getPosition()) < max_tracking_distance) {
+	if (!send_only_active_trace ||
+			track_tmp_pos.getDist(getPosition()) < max_tracking_distance) {
 		return UwCbrModule::sendPkt();
 	}
-	
 }
 
-void UwTrackerModule::initPkt(Packet* p) {
-	hdr_uwTracker* uw_track_h = HDR_UWTRACK(p);
+void
+UwTrackerModule::initPkt(Packet *p)
+{
+	hdr_uwTracker *uw_track_h = HDR_UWTRACK(p);
 	*uw_track_h = track_measure;
 	if (debug_)
-		std::cout << NOW << " UwTrackerModule::initPkt(Packet *p) Track current "
-			<< "position: X = " << uw_track_h->x() << 
-			", Y = " << uw_track_h->y() 
-			<< ", Z = " << uw_track_h->z() 
-			<< ", speed = " << uw_track_h->speed() << std::endl;
-	if(track_my_position) {
+		std::cout << NOW
+				  << " UwTrackerModule::initPkt(Packet *p) Track current "
+				  << "position: X = " << uw_track_h->x()
+				  << ", Y = " << uw_track_h->y() << ", Z = " << uw_track_h->z()
+				  << ", speed = " << uw_track_h->speed() << std::endl;
+	if (track_my_position) {
 		printReceivedPacket(p);
 	}
 	UwCbrModule::initPkt(p);
 }
 
-void 
+void
 UwTrackerModule::printReceivedPacket(Packet *p)
 {
 	hdr_MPhy *ph = HDR_MPHY(p);
-	hdr_uwTracker* uw_track_h = HDR_UWTRACK(p);
+	hdr_uwTracker *uw_track_h = HDR_UWTRACK(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	hdr_cmn *ch = hdr_cmn::access(p);
 	hdr_uwip *uwiph = hdr_uwip::access(p);
 	if (tracefile_enabler_) {
-		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() 
-			<< " " << (int) uwiph->saddr() << " " << (int) uwiph->daddr() 
-			<< " " << ch->size();
+		tracefile << NOW << " " << ch->timestamp() << " " << uwcbrh->sn() << " "
+				  << (int) uwiph->saddr() << " " << (int) uwiph->daddr() << " "
+				  << ch->size();
 		Position track_tmp_pos;
 		track_tmp_pos.setX(uw_track_h->x());
 		track_tmp_pos.setY(uw_track_h->y());
 		track_tmp_pos.setZ(uw_track_h->z());
-		if(track_my_position || track_tmp_pos.getDist(ph->srcPosition) < max_tracking_distance) {			
-			tracefile << " " << uw_track_h->timestamp()
-				<< " " << uw_track_h->x() << " " 
-				<< uw_track_h->y() << " " << uw_track_h->z() << " " 
-				<< uw_track_h->speed(); 
+		if (track_my_position ||
+				track_tmp_pos.getDist(ph->srcPosition) <
+						max_tracking_distance) {
+			tracefile << " " << uw_track_h->timestamp() << " "
+					  << uw_track_h->x() << " " << uw_track_h->y() << " "
+					  << uw_track_h->z() << " " << uw_track_h->speed();
 		} else {
-			tracefile << " NO TRACKS IN RANGE, distance = " 
-				<< track_tmp_pos.getDist(ph->srcPosition) << " max distance = "
-				<< max_tracking_distance;
+			tracefile << " NO TRACKS IN RANGE, distance = "
+					  << track_tmp_pos.getDist(ph->srcPosition)
+					  << " max distance = " << max_tracking_distance;
 		}
-		tracefile <<"\n";
+		tracefile << "\n";
 		tracefile.flush();
 	}
 }
 
-void UwTrackerModule::updateTrackMeasure()
+void
+UwTrackerModule::updateTrackMeasure()
 {
 	track_measure.timestamp() = NOW;
-	if(track_position) {
+	if (track_position) {
 		track_measure.x() = track_position->getX();
 		track_measure.y() = track_position->getY();
 		track_measure.z() = track_position->getZ();
@@ -198,19 +209,22 @@ void UwTrackerModule::updateTrackMeasure()
 	measure_timer.resched(tracking_period); // schedule next measure
 }
 
-void UwTrackerModule::start()
+void
+UwTrackerModule::start()
 {
 	measure_timer.resched(tracking_period);
 	UwCbrModule::start();
 }
 
-void UwTrackerModule::stop()
+void
+UwTrackerModule::stop()
 {
 	measure_timer.force_cancel();
 	UwCbrModule::stop();
 }
 
-void UwUpdateTrackMeasure::expire(Event *e) 
+void
+UwUpdateTrackMeasure::expire(Event *e)
 {
 	module->updateTrackMeasure();
 }

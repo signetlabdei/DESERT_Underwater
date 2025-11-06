@@ -42,7 +42,8 @@
 
 #include <packet.h>
 
-#define HDR_JAMMER(p)  (hdr_JAMMER::access(p)) /**< alias defined to access the JAMMER HEADER */
+#define HDR_JAMMER(p) \
+	(hdr_JAMMER::access(p)) /**< alias defined to access the JAMMER HEADER */
 
 extern packet_t PT_JAMMER;
 
@@ -51,28 +52,33 @@ extern packet_t PT_JAMMER;
  */
 typedef struct hdr_JAMMER {
 
-	uint JAMMER_uid_;	/**< JAMMER packet unique ID. */
-	uint id_node_;		/**< ID of the node. */
+	uint JAMMER_uid_; /**< JAMMER packet unique ID. */
+	uint id_node_; /**< ID of the node. */
 	static int offset_;
 
 	/**
 	 * Reference to the offset variable
 	 */
-	inline static int & offset() {
+	inline static int &
+	offset()
+	{
 		return offset_;
 	}
 
 	/**
 	 * Reference to id_node variable
 	 */
-	uint & id_node() {
+	uint &
+	id_node()
+	{
 		return id_node_;
 	}
 
 	/**
 	 * Reference to the JAMMER_uid variable
 	 */
-	uint & JAMMER_uid()
+	uint &
+	JAMMER_uid()
 	{
 		return JAMMER_uid_;
 	}
@@ -81,7 +87,7 @@ typedef struct hdr_JAMMER {
 	access(const Packet *p)
 	{
 		return (struct hdr_JAMMER *) p->access(offset_);
-	}	
+	}
 } hdr_JAMMER;
 
 #endif

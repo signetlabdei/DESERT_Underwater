@@ -42,11 +42,12 @@
 #include <packet.h>
 
 extern ClMessage_t CLMSG_TAP_PKT;
-enum class clmsg_tap_type {START_TX,END_TX,START_RX,END_RX,NONE};
+enum class clmsg_tap_type { START_TX, END_TX, START_RX, END_RX, NONE };
 
-class ClMsgTapPkt : public ClMessage {
+class ClMsgTapPkt : public ClMessage
+{
 
-public:	
+public:
 	/**
 	 * Constructor for broadcast ClMsg
 	 */
@@ -55,7 +56,8 @@ public:
 	/**
 	 * Constructor for broadcast ClMsg
 	 */
-	ClMsgTapPkt(Packet* packet,clmsg_tap_type type ,double timestamp = NOW, double tx_duration = 0.0);
+	ClMsgTapPkt(Packet *packet, clmsg_tap_type type, double timestamp = NOW,
+			double tx_duration = 0.0);
 
 	/**
 	 * Constructor for UNICAST ClMsg
@@ -73,7 +75,7 @@ public:
 	 * @param packet pointer reference to the packet to be returned
 	 * @return true if the packet is present, false otherwise
 	 */
-	bool getPacket(Packet* packet);
+	bool getPacket(Packet *packet);
 
 	/**
 	 * Returns the timestamp of the overheard packet
@@ -91,13 +93,13 @@ public:
 	 * @param packet pointer to the packet
 	 * @return true if the packet is present, false otherwise
 	 */
-	void setPacket(Packet* packet);
+	void setPacket(Packet *packet);
 
 	static const uint CLMSG_TAP_VERBOSITY = 3; /** Verbosity level.*/
-	Packet* pkt; /** packet to send via clmsg to other layers. */
+	Packet *pkt; /** packet to send via clmsg to other layers. */
 	clmsg_tap_type clmsg_type;
 	double timestamp; /**rx or tx timestamp*/
 	double tx_duration; /** stores Mac2PhyTxDuration(p)*/
-}; 
+};
 
-#endif  
+#endif

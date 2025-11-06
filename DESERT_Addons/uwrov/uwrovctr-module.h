@@ -47,21 +47,24 @@
 #ifndef UWROV_CTR_MODULE_H
 #define UWROV_CTR_MODULE_H
 
+#include "uwrov-packet.h"
 #include <node-core.h>
 #include <uwcbr-module.h>
-#include "uwrov-packet.h"
 
-#define UWROV_DROP_REASON_UNKNOWN_TYPE "UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
-#define UWROV_DROP_REASON_OUT_OF_SEQUENCE "OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
-#define UWROV_DROP_REASON_DUPLICATED_PACKET "DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_UNKNOWN_TYPE \
+	"UKT" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_OUT_OF_SEQUENCE \
+	"OOS" /**< Reason for a drop in a <i>UWROV</i> module. */
+#define UWROV_DROP_REASON_DUPLICATED_PACKET \
+	"DPK" /**< Reason for a drop in a <i>UWROV</i> module. */
 #define HDR_UWROV_MONITORING(p) (hdr_uwROV_monitoring::access(p))
 #define HDR_UWROV_CTR(p) (hdr_uwROV_ctr::access(p))
 
 class UwROVCtrModule;
 
 /**
- * UwROVCtrSendTimer class is used to handle the scheduling period of <i>UWROV</i>
- * packets.
+ * UwROVCtrSendTimer class is used to handle the scheduling period of
+ * <i>UWROV</i> packets.
  */
 class UwROVCtrSendTimer : public UwSendTimer
 {
@@ -71,8 +74,7 @@ public:
 	 * @param UwROVCtrModule *m pointer to an object of type UwROVCtrModule
 	 */
 	UwROVCtrSendTimer(UwROVCtrModule *m)
-		: UwSendTimer((UwCbrModule *) (m))
-	{};
+		: UwSendTimer((UwCbrModule *) (m)) {};
 };
 
 /**
@@ -174,7 +176,8 @@ public:
 
 protected:
 	int sn; /**Sequence number of the last control packet sent.*/
-	int adaptiveRTO; /**< 1 if an adaptive RTO is used, 0 if a constant RTO is used.*/
+	int adaptiveRTO; /**< 1 if an adaptive RTO is used, 0 if a constant RTO is
+						used.*/
 	double adaptiveRTO_parameter; /**< Parameter for the adaptive RTO.*/
 	float x_rov; /**< X of the last ROV position monitored.*/
 	float y_rov; /**< Y of the last ROV position monitored.*/
@@ -183,7 +186,7 @@ protected:
 	float newY; /**< Y of the new position sent to the ROV.*/
 	float newZ; /**< Z of the new position sent to the ROV.*/
 	float speed; /**< Moving speed sent to the ROV.*/
-	Position* posit; /**< Controller position.*/
+	Position *posit; /**< Controller position.*/
 	Packet *pkt;
 };
 

@@ -39,19 +39,19 @@
 #ifndef UWPHYSICALDB_H
 #define UWPHYSICALDB_H
 
-#include <uwphysical.h>
-#include <uwip-module.h>
 #include "uwinterference.h"
+#include <uwip-module.h>
+#include <uwphysical.h>
 
-#include <packet.h>
 #include <module.h>
+#include <packet.h>
 #include <tclcl.h>
 
 #include <fstream>
-#include <sstream>
-#include <vector>
-#include <stdint.h>
 #include <set>
+#include <sstream>
+#include <stdint.h>
+#include <vector>
 
 namespace uwphysicaldb
 {
@@ -158,22 +158,20 @@ protected:
 	std::set<double> snr; /**< Set of the available SNRs. */
 	std::set<double> overlap; /**< Set of the available Overlaps. */
 	std::set<double> sir; /**< Set of the available SIRs. */
-	std::map<uint8_t, std::set<double> >
+	std::map<uint8_t, std::set<double>>
 			range; /**< Set of the available Ranges. */
 	std::map<uint8_t, string>
 			type_of_node; /**< Set of the available type of nodes. */
-	std::map<string, uint8_t>
-			range_nums; /**< Set of the number of ranges for a given pathtype,
-						   e.g "AA". */
+	std::map<string, uint8_t> range_nums; /**< Set of the number of ranges for a
+											 given pathtype, e.g "AA". */
 	string country; /**< Name of the Country. */
 	string modulation; /**< Name of the Modulation. */
 	uint8_t ipAddr_; /**< IP of the node. */
 
 	std::pair<double, double> interf_val; /**< (SIR, Overlap) */
 
-	char
-			token_separator; /**< Token used to parse the elements in a line of
-								the database. */
+	char token_separator; /**< Token used to parse the elements in a line of
+							 the database. */
 
 private:
 	ostringstream osstream;

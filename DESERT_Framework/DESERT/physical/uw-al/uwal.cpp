@@ -582,8 +582,8 @@ Uwal::recvSyncClMsg(ClMessage *m)
 			Phy2MacEndTx(((ClMsgPhy2MacEndTx *) m)->pkt);
 		}
 		return 0;
-	} else if (m->type() == CLMSG_MAC2PHY_GETTXDURATION
-			&& m->direction() == DOWN) {
+	} else if (m->type() == CLMSG_MAC2PHY_GETTXDURATION &&
+			m->direction() == DOWN) {
 		Packet *p = ((ClMsgMac2PhyGetTxDuration *) m)->pkt;
 		hdr_cmn *ch = HDR_CMN(p);
 

@@ -36,8 +36,8 @@
  *
  */
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "uwoptical-channel.h"
 
@@ -61,6 +61,4 @@ public:
 UwOpticalChannel::UwOpticalChannel()
 	: UwElectroMagneticChannel()
 {
-	
 }
-

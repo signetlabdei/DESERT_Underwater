@@ -39,11 +39,11 @@
 #include "mmac.h"
 #include "uwUFetch_NODE.h"
 #include "uwUFetch_cmn_hdr.h"
-//#include "uwmphy_modem_cmn_hdr.h"
+// #include "uwmphy_modem_cmn_hdr.h"
+#include "rng.h"
 #include "uwcbr-module.h"
 #include <sstream>
 #include <time.h>
-#include "rng.h"
 
 /**< class uwUFetchNODEModuleClass*/
 static class uwUFetchNODEModuleClass : public TclClass
@@ -809,8 +809,9 @@ uwUFetch_NODE::Phy2MacEndRx(Packet *p)
 								if (debugMio_)
 									out_file_logging
 											<< NOW << "uwUFetch_SENSOR_NODE("
-											<< addr << ")::Phy2MacEndRx()______"
-													   "_____________SN("
+											<< addr
+											<< ")::Phy2MacEndRx()______"
+											   "_____________SN("
 											<< addr
 											<< ")_is_waiting_a_POLL_from_HN("
 											<< mach->macSA() << ")"
@@ -865,10 +866,12 @@ uwUFetch_NODE::Phy2MacEndRx(Packet *p)
 								if (debugMio_)
 									out_file_logging
 											<< NOW << "uwUFetch_SENSOR_NODE("
-											<< addr << ")::Phy2MacEndRx()______"
-													   "_____________SN("
-											<< addr << ")_is_waiting_a_CBEACON_"
-													   "pck_from_HN("
+											<< addr
+											<< ")::Phy2MacEndRx()______"
+											   "_____________SN("
+											<< addr
+											<< ")_is_waiting_a_CBEACON_"
+											   "pck_from_HN("
 											<< mach->macSA() << ")_"
 											<< ":return_in_IDLE_STATE."
 											<< std::endl;
@@ -950,10 +953,12 @@ uwUFetch_NODE::Phy2MacEndRx(Packet *p)
 								if (debugMio_)
 									out_file_logging
 											<< NOW << "uwUFetch_SENSOR_NODE("
-											<< addr << ")::Phy2MacEndRx()______"
-													   "_____________SN("
-											<< addr << ")_is_waiting_a_POLL_"
-													   "pck_from_HN("
+											<< addr
+											<< ")::Phy2MacEndRx()______"
+											   "_____________SN("
+											<< addr
+											<< ")_is_waiting_a_POLL_"
+											   "pck_from_HN("
 											<< mach->macSA() << ")_"
 											<< ":return_in_IDLE_STATE."
 											<< std::endl;
@@ -1005,10 +1010,12 @@ uwUFetch_NODE::Phy2MacEndRx(Packet *p)
 								if (debugMio_)
 									out_file_logging
 											<< NOW << "uwUFetch_SENSOR_NODE("
-											<< addr << ")::Phy2MacEndRx()______"
-													   "_____________SN("
-											<< addr << ")_is_waiting_a_CBEACON_"
-													   "pck_from_HN("
+											<< addr
+											<< ")::Phy2MacEndRx()______"
+											   "_____________SN("
+											<< addr
+											<< ")_is_waiting_a_CBEACON_"
+											   "pck_from_HN("
 											<< mach->macSA() << ")"
 											<< ":return in IDLE STATE."
 											<< std::endl;
@@ -2822,7 +2829,8 @@ uwUFetch_NODE::isHeadNode()
 double
 uwUFetch_NODE::choiceBackOffTimer()
 {
-	int random = (int) RNG::defaultrng()->uniform(T_min_bck_probe_node, T_max_bck_probe_node);
+	int random = (int) RNG::defaultrng()->uniform(
+			T_min_bck_probe_node, T_max_bck_probe_node);
 
 	if (debug_)
 		std::cout << NOW << "uwUFetch_NODE(" << addr

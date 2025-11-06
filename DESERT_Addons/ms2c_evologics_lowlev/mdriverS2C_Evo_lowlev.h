@@ -38,10 +38,10 @@
 #ifndef UWMDRIVERS2CLOWLEVEL_H
 #define UWMDRIVERS2CLOWLEVEL_H
 
-#include <msocket.h>
 #include "minterpreterTEL.h"
-#include <uwmdriver.h>
+#include <msocket.h>
 #include <queue>
+#include <uwmdriver.h>
 
 enum LL_STATE_TX {
 	TX_STATE_IDLE = 0,
@@ -86,9 +86,8 @@ class MdriverS2C_Evo_lowlev : public UWMdriver
 
 	std::queue<std::string> queue_tx; /**< Queue used to buffer incoming strings
 															  for tx messages.*/
-	std::queue<std::string>
-			queue_rx; /**< Queue used to buffer incoming strings for
-														 rx messages.*/
+	std::queue<std::string> queue_rx; /**< Queue used to buffer incoming strings
+										 for rx messages.*/
 	int _gain; /**< Variable holding the Gain level of the low level driver*/
 	int _SL; /**< Variable holding the Source Level of the low level driver*/
 	int _bitrate_i; /**< Variable holding the bitrate index of the low level
@@ -98,12 +97,12 @@ class MdriverS2C_Evo_lowlev : public UWMdriver
 					 firmware*/
 	int _th; /**< Variable holding the threshold used by the low level
 				firmware*/
-	int _mps_th; /**< Variable holding the MPS treshold used by the low level
-																		 firmware*/
-	double
-			_delay; /**< Variable that holds the delay required for doing some
-						  operations, e.g., sending a message, stopping
-					   listening */
+	int
+			_mps_th; /**< Variable holding the MPS treshold used by the low
+						level firmware*/
+	double _delay; /**< Variable that holds the delay required for doing some
+						 operations, e.g., sending a message, stopping
+					  listening */
 	int _delay_flag; /**< Variable that holds that flag that triggers the
 			  waiting
 			  time for some operations e.g., sending a packet, stopping

@@ -36,8 +36,8 @@
  *
  */
 
-#include <tclcl.h>
 #include <sap.h>
+#include <tclcl.h>
 
 #include "uw-mac-TLohi.h"
 #include "uw-phy-WakeUp.h"
@@ -54,7 +54,7 @@ Uwtlohi_Init()
 	 * Put here all the commands which must be execute when the library
 	 * is loaded (i.e. TCL script execution)
 	 * Remember to return 0 if all is OK, otherwise return 1
-	*/
+	 */
 
 	PT_TLOHI = p_info::addPacket("TLOHI");
 	PT_WKUP = p_info::addPacket("WKUP");

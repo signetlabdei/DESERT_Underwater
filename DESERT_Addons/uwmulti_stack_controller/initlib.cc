@@ -34,23 +34,27 @@
  * \brief file to initialize the libuwphysical.so library
  */
 
-#include <tclcl.h>
 #include <controller-clmsg.h>
+#include <tclcl.h>
 
 // old protocol
 extern EmbeddedTcl UwMultiStackControllerInitTclCode;
 
 packet_t PT_MULTI_ST_SIGNALING;
 
-extern "C" int Uwmulti_stack_controller_Init() {
-  // old protocol
-  PT_MULTI_ST_SIGNALING = p_info::addPacket((char*) "MULTI_ST_SIGNALING");
+extern "C" int
+Uwmulti_stack_controller_Init()
+{
+	// old protocol
+	PT_MULTI_ST_SIGNALING = p_info::addPacket((char *) "MULTI_ST_SIGNALING");
 
 	UwMultiStackControllerInitTclCode.load();
 	return 0;
 }
 
-extern "C" int Cygmulti_stack_controller_Init() {
-  Uwmulti_stack_controller_Init();
-  return 0;
+extern "C" int
+Cygmulti_stack_controller_Init()
+{
+	Uwmulti_stack_controller_Init();
+	return 0;
 }

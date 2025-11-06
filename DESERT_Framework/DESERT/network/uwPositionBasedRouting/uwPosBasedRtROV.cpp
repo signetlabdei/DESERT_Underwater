@@ -41,7 +41,6 @@
 
 extern packet_t PT_UWPOSITIONBASEDROUTING;
 
-
 static class UwPosBasedRtROVModuleClass : public TclClass
 {
 public:
@@ -57,8 +56,6 @@ public:
 	}
 } class_module_uwposbasedrt_rov;
 
-
-
 UwPosBasedRtROV::UwPosBasedRtROV()
 	: ipAddr(0)
 	, maxTxRange(3000)
@@ -66,10 +63,10 @@ UwPosBasedRtROV::UwPosBasedRtROV()
 	, list_posIP()
 {
 	bind("debug_", &debug_);
-	bind("maxTxRange_",(double *) &maxTxRange);
+	bind("maxTxRange_", (double *) &maxTxRange);
 	if (maxTxRange <= 0) {
 		std::cout << " UwPosBasedRtROV::maxTxRange value not valid, value set "
-			<< " by default to 3000 m" << std::endl;
+				  << " by default to 3000 m" << std::endl;
 		maxTxRange = 3000;
 	}
 }
@@ -78,18 +75,17 @@ UwPosBasedRtROV::~UwPosBasedRtROV()
 {
 }
 
-
-
-int UwPosBasedRtROV::command(int argc, const char *const *argv)
+int
+UwPosBasedRtROV::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
 
-	if(argc == 3) {
-		if (strcasecmp(argv[1],"setMaxTxRange") == 0) {
+	if (argc == 3) {
+		if (strcasecmp(argv[1], "setMaxTxRange") == 0) {
 			if (atof(argv[2]) <= 0) {
-				std::cerr << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-					<< ")::invalid value for max transmission range, "
-					<< "use a value >= 0";
+				std::cerr << " UwPosBasedRtROV(IP=" << (int) ipAddr
+						  << ")::invalid value for max transmission range, "
+						  << "use a value >= 0";
 				return TCL_ERROR;
 			}
 			setMaxTxRange(atof(argv[2]));
@@ -99,33 +95,35 @@ int UwPosBasedRtROV::command(int argc, const char *const *argv)
 			ipAddr = static_cast<uint8_t>(atoi(argv[2]));
 			if (ipAddr == 0) {
 				std::cerr << "UwPosBasedRtROV::0 is not a valid IP address"
-					<< std::endl;
+						  << std::endl;
 				return TCL_ERROR;
 			}
 			return TCL_OK;
 		}
-		if (strcasecmp(argv[1],"setROVPosition") == 0) {
-			UWSMPosition *p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2])); 
+		if (strcasecmp(argv[1], "setROVPosition") == 0) {
+			UWSMPosition *p = dynamic_cast<UWSMPosition *>(tcl.lookup(argv[2]));
 			ROV_pos = p;
-			std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-				<< ")::ROV position, x: " <<ROV_pos->getX() << ", y: " 
-				<< ROV_pos->getY()<< ", z: " <<ROV_pos->getZ() << std::endl;
+			std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+					  << ")::ROV position, x: " << ROV_pos->getX()
+					  << ", y: " << ROV_pos->getY()
+					  << ", z: " << ROV_pos->getZ() << std::endl;
 			return TCL_OK;
 		}
 	} else if (argc == 4) {
-		if (strcasecmp(argv[1], "addPosition_IPotherNodes") == 0) { 
-			//add node position with its IP address
-			Position *p = dynamic_cast<Position*> (tcl.lookup(argv[2]));
+		if (strcasecmp(argv[1], "addPosition_IPotherNodes") == 0) {
+			// add node position with its IP address
+			Position *p = dynamic_cast<Position *>(tcl.lookup(argv[2]));
 			uint8_t ip = static_cast<uint8_t>(atoi(argv[3]));
 			if (ip == 0) {
 				std::cerr << "UwPosBasedRtROV::0 is not a valid IP address"
-					<< std::endl;
+						  << std::endl;
 				return TCL_ERROR;
 			}
-			std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr
-				<< ")::add node position, x:" << p->getX() << " y: "<< p->getY()
-				<< " z: " << p->getZ() << " with IP " << (int)ip << std::endl;
-			pair_posIP provv = std::pair<Position,uint8_t>(*p,ip);
+			std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+					  << ")::add node position, x:" << p->getX()
+					  << " y: " << p->getY() << " z: " << p->getZ()
+					  << " with IP " << (int) ip << std::endl;
+			pair_posIP provv = std::pair<Position, uint8_t>(*p, ip);
 			list_posIP.push_back(provv);
 
 			return TCL_OK;
@@ -134,13 +132,13 @@ int UwPosBasedRtROV::command(int argc, const char *const *argv)
 	return Module::command(argc, argv);
 }
 
-
-void UwPosBasedRtROV::recv(Packet* p) 
+void
+UwPosBasedRtROV::recv(Packet *p)
 {
 
 	if (ipAddr == 0) {
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::node IP addres not set, drop packet" << std::endl;
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::node IP addres not set, drop packet" << std::endl;
 		drop(p, 1, DROP_IP_NOT_SET);
 	}
 
@@ -149,53 +147,54 @@ void UwPosBasedRtROV::recv(Packet* p)
 
 	if (ch->direction() == hdr_cmn::UP) {
 
-		if (iph->daddr() == ipAddr) {//I'm the intended node
+		if (iph->daddr() == ipAddr) { // I'm the intended node
 
 			sendUp(p);
 			return;
-		} else { //find next hop
-			ch->next_hop() = (nsaddr_t)findNextHop(p);
+		} else { // find next hop
+			ch->next_hop() = (nsaddr_t) findNextHop(p);
 			if (ch->next_hop() == 0) {
-				std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-					<< ")::next hop not found, drop packet" << std::endl;
+				std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+						  << ")::next hop not found, drop packet" << std::endl;
 				drop(p, 1, DROP_NEXT_HOP_NOT_FOUND);
 			}
 			if (debug_) {
-				std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-					<< ")::next hop: " << (int)ch->next_hop() << std::endl;
+				std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+						  << ")::next hop: " << (int) ch->next_hop()
+						  << std::endl;
 			}
 			sendDown(p);
 			return;
 		}
 
-	} else {//DOWN
-		
+	} else { // DOWN
+
 		initPkt(p);
 
-		ch->next_hop() = (nsaddr_t)findNextHop(p);
+		ch->next_hop() = (nsaddr_t) findNextHop(p);
 		if (ch->next_hop() == 0) {
-			std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-				<< ")::next hop not found, drop packet" << std::endl;
+			std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+					  << ")::next hop not found, drop packet" << std::endl;
 			drop(p, 1, DROP_NEXT_HOP_NOT_FOUND);
 		}
 		if (debug_) {
-			std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-				<< ")::next hop: " << (int)ch->next_hop() << std::endl;
+			std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+					  << ")::next hop: " << (int) ch->next_hop() << std::endl;
 		}
 		sendDown(p);
 		return;
 	}
 }
 
-void UwPosBasedRtROV::initPkt(Packet* p)
+void
+UwPosBasedRtROV::initPkt(Packet *p)
 {
-	if (debug_) 
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::initPkt, init header fields" << std::endl;
-	
+	if (debug_)
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::initPkt, init header fields" << std::endl;
+
 	hdr_uwpos_based_rt *pbrh = HDR_UWPOS_BASED_RT(p);
 
-	
 	pbrh->x_ROV() = ROV_pos->getX();
 	pbrh->y_ROV() = ROV_pos->getY();
 	pbrh->z_ROV() = ROV_pos->getZ();
@@ -207,35 +206,35 @@ void UwPosBasedRtROV::initPkt(Packet* p)
 	pbrh->IP_ROV() = ipAddr;
 
 	if (debug_) {
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::initPkt, init header fields" << std::endl;
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::Inserted information"
-			<< ", x waypoint: " << pbrh->x_waypoint() 
-			<< " ,y waypoint: " << pbrh->y_waypoint() 
-			<< " ,z waypoint: " << pbrh->z_waypoint() 
-			<< " ,x ROV: " << pbrh->x_ROV() 
-			<< " ,y ROV: " << pbrh->y_ROV()
-			<< " ,z ROV: " << pbrh->z_ROV() 
-			<< " ,timestamp: " << pbrh->timestamp() 
-			<< " ,ROV speed: " << pbrh->ROV_speed() << std::endl;
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::initPkt, init header fields" << std::endl;
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::Inserted information"
+				  << ", x waypoint: " << pbrh->x_waypoint()
+				  << " ,y waypoint: " << pbrh->y_waypoint()
+				  << " ,z waypoint: " << pbrh->z_waypoint()
+				  << " ,x ROV: " << pbrh->x_ROV()
+				  << " ,y ROV: " << pbrh->y_ROV()
+				  << " ,z ROV: " << pbrh->z_ROV()
+				  << " ,timestamp: " << pbrh->timestamp()
+				  << " ,ROV speed: " << pbrh->ROV_speed() << std::endl;
 	}
-	
 }
 
-
-uint8_t UwPosBasedRtROV::findNextHop(const Packet* p)
+uint8_t
+UwPosBasedRtROV::findNextHop(const Packet *p)
 {
 	if (list_posIP.empty()) {
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::List of position not setted" << std::endl;
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::List of position not setted" << std::endl;
 		return 0;
 	} else {
 		double minDist = 10000000;
 		double tempDist;
 		uint8_t ipCloserNode;
-		for (std::list<pair_posIP>::iterator it=list_posIP.begin(); 
-										it != list_posIP.end(); ++it) {
+		for (std::list<pair_posIP>::iterator it = list_posIP.begin();
+				it != list_posIP.end();
+				++it) {
 			tempDist = nodesDistance(it->first, *ROV_pos);
 			if (tempDist < minDist) {
 				minDist = tempDist;
@@ -243,19 +242,20 @@ uint8_t UwPosBasedRtROV::findNextHop(const Packet* p)
 			}
 		}
 		if (minDist < maxTxRange) {
-			if (debug_) 
-				std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-					<< ")::findNextHop,the closest node in the tx range " 
-					<< "has IP equal to " << (int)ipCloserNode << std::endl;
+			if (debug_)
+				std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+						  << ")::findNextHop,the closest node in the tx range "
+						  << "has IP equal to " << (int) ipCloserNode
+						  << std::endl;
 			return ipCloserNode;
 		} else {
-			return (uint8_t)0;
+			return (uint8_t) 0;
 		}
 	}
 }
 
-
-double UwPosBasedRtROV::nodesDistance(Position& p1, Position& p2)
+double
+UwPosBasedRtROV::nodesDistance(Position &p1, Position &p2)
 {
 	double x1 = p1.getX();
 	double y1 = p1.getY();
@@ -264,19 +264,21 @@ double UwPosBasedRtROV::nodesDistance(Position& p1, Position& p2)
 	double y2 = p2.getY();
 	double z2 = p2.getZ();
 
-	return sqrt(pow(x2-x1,2) + pow(y2-y1,2) + pow(z2-z1,2));
+	return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) + pow(z2 - z1, 2));
 }
 
-
-void UwPosBasedRtROV::setMaxTxRange(double newRange)
+void
+UwPosBasedRtROV::setMaxTxRange(double newRange)
 {
 	if (newRange == 0) {
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::value for max transmission range not valid" << std::endl;
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::value for max transmission range not valid"
+				  << std::endl;
 		return;
 	}
 	maxTxRange = newRange;
-	if (debug_) 		
-		std::cout << NOW << " UwPosBasedRtROV(IP=" <<(int)ipAddr 
-			<< ")::max transmission range set to "  << maxTxRange << std::endl;
+	if (debug_)
+		std::cout << NOW << " UwPosBasedRtROV(IP=" << (int) ipAddr
+				  << ")::max transmission range set to " << maxTxRange
+				  << std::endl;
 }

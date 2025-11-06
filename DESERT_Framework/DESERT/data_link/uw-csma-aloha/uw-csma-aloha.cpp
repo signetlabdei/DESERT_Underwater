@@ -396,7 +396,7 @@ CsmaAloha::getBackoffTime()
 void
 CsmaAloha::recvFromUpperLayers(Packet *p)
 {
-	if ( (has_buffer_queue && (Q.size() < buffer_pkts)) || !has_buffer_queue) {
+	if ((has_buffer_queue && (Q.size() < buffer_pkts)) || !has_buffer_queue) {
 		initPkt(p, CSMA_DATA_PKT);
 		Q.push(p);
 		incrUpperDataRx();
@@ -440,7 +440,8 @@ CsmaAloha::initPkt(Packet *p, CSMA_PKT_TYPE type, int dest_addr)
 			printOnLog(Logger::LogLevel::ERROR,
 					"CSMA_ALOHA",
 					"initPkt(Packet *, CSMA_PKT_TYPE, int)::invalid packet "
-					"type =  " + to_string(type));
+					"type =  " +
+							to_string(type));
 	}
 }
 
@@ -526,7 +527,8 @@ CsmaAloha::Phy2MacEndTx(const Packet *p)
 				printOnLog(Logger::LogLevel::DEBUG,
 						"CSMA_ALOHA",
 						"Phy2MacEndTx(Packet *)::logical error in timers, "
-						"current state = " + status_info[curr_state]);
+						"current state = " +
+								status_info[curr_state]);
 				stateIdle();
 			}
 		} break;
@@ -535,7 +537,8 @@ CsmaAloha::Phy2MacEndTx(const Packet *p)
 			printOnLog(Logger::LogLevel::DEBUG,
 					"CSMA_ALOHA",
 					"Phy2MacEndTx(Packet *)::logical error in timers, "
-					"current state = " + status_info[curr_state]);
+					"current state = " +
+							status_info[curr_state]);
 
 			stateIdle();
 		} break;
@@ -668,7 +671,7 @@ CsmaAloha::stateRxPacketNotForMe(Packet *p)
 				"stateRxPacketNotForMe(Packet *)::dropping packet for another "
 				"address");
 
-			Packet::free(p);
+		Packet::free(p);
 	}
 
 	refreshState(CSMA_STATE_WRONG_PKT_RX);
@@ -695,7 +698,8 @@ CsmaAloha::stateRxPacketNotForMe(Packet *p)
 			printOnLog(Logger::LogLevel::ERROR,
 					"CSMA_ALOHA",
 					"stateRxPacketNotForMe(Packet *)::cannot RX in previous "
-					"state = " + status_info[prev_state]);
+					"state = " +
+							status_info[prev_state]);
 
 			stateIdle();
 	}
@@ -727,7 +731,8 @@ CsmaAloha::stateCheckListenExpired()
 		printOnLog(Logger::LogLevel::ERROR,
 				"CSMA_ALOHA",
 				"stateCheckListenExpired()::cannot RX in current listen timer "
-				"state = " + status_info[curr_state]);
+				"state = " +
+						status_info[curr_state]);
 
 		stateIdle();
 	}
@@ -752,7 +757,8 @@ CsmaAloha::stateCheckAckExpired()
 		printOnLog(Logger::LogLevel::ERROR,
 				"CSMA_ALOHA",
 				"stateCheckAckExpired()::cannot RX in current ack timer "
-				"state = " + status_info[curr_state]);
+				"state = " +
+						status_info[curr_state]);
 
 		stateIdle();
 	}
@@ -780,7 +786,8 @@ CsmaAloha::stateCheckBackoffExpired()
 		printOnLog(Logger::LogLevel::ERROR,
 				"CSMA_ALOHA",
 				"stateCheckAckExpired()::cannot RX in current backoff timer "
-				"state = " + status_info[curr_state]);
+				"state = " +
+						status_info[curr_state]);
 
 		stateIdle();
 	}
@@ -1020,7 +1027,8 @@ CsmaAloha::stateRxData(Packet *data_pkt)
 			printOnLog(Logger::LogLevel::ERROR,
 					"CSMA_ALOHA",
 					"stateRxData(Packet *)::cannot RX in previous "
-					"state = " + status_info[prev_state]);
+					"state = " +
+							status_info[prev_state]);
 	}
 }
 
@@ -1061,7 +1069,8 @@ CsmaAloha::stateRxAck(Packet *p)
 			printOnLog(Logger::LogLevel::ERROR,
 					"CSMA_ALOHA",
 					"stateRxAck(Packet *)::cannot RX in previous "
-					"state = " + status_info[prev_state]);
+					"state = " +
+							status_info[prev_state]);
 	}
 }
 

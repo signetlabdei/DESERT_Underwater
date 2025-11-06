@@ -39,8 +39,8 @@
 
 #include "uwudp-module.h"
 
-#include <tclcl.h>
 #include <stdio.h>
+#include <tclcl.h>
 
 packet_t PT_UWUDP;
 

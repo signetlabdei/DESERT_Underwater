@@ -37,13 +37,13 @@
  */
 
 #include "uw-mac-TLohi.h"
-#include "wake-up-pkt-hdr.h"
 #include "uw-phy-WakeUp.h"
+#include "wake-up-pkt-hdr.h"
 #include <clmsg-discovery.h>
-#include <mac.h>
 #include <cmath>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <mac.h>
 #include <rng.h>
 
 enum { NOT_SET = -1, SESSION_DISTANCE_NOT_SET = 0 };
@@ -392,9 +392,9 @@ MMacTLOHI::crLayCommand(ClMessage *m)
 {
 	switch (m->type()) {
 
-		// case whatever:
-		//    return 0;
-		//    break;
+			// case whatever:
+			//    return 0;
+			//    break;
 
 		default:
 			return Module::crLayCommand(m);
@@ -824,9 +824,8 @@ MMacTLOHI::Phy2MacStartRx(const Packet *p)
 	hdr_MPhy *ph = HDR_MPHY(p);
 
 	if ((ch->ptype() == PT_TLOHI) // if the data PHY signal an incoming pkt
-			&&
-			(((HDR_TLOHI(p))->pkt_type == DATA_PKT) ||
-					((HDR_TLOHI(p))->pkt_type == ACK_PKT))) {
+			&& (((HDR_TLOHI(p))->pkt_type == DATA_PKT) ||
+					   ((HDR_TLOHI(p))->pkt_type == ACK_PKT))) {
 		data_phy_timer.resched(ph->duration + wait_costant);
 
 		if (debug_)

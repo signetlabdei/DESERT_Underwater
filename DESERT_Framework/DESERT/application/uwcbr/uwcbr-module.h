@@ -44,10 +44,10 @@
 #ifndef UWCBR_MODULE_H
 #define UWCBR_MODULE_H
 
+#include <climits>
 #include <module.h>
 #include <uwip-module.h>
 #include <uwudp-module.h>
-#include <climits>
 
 #define UWCBR_DROP_REASON_UNKNOWN_TYPE \
 	"UKT" /**< Reason for a drop in a <i>UWCBR</i> module. */

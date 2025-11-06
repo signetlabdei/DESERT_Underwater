@@ -52,8 +52,8 @@ extern packet_t PT_UWICRP_STATUS;
  */
 typedef struct hdr_uwicrp_status {
 
-	nsaddr_t list_of_hops_
-			[MAX_HOP_NUMBER]; /**< List of IPs saved in the header */
+	nsaddr_t list_of_hops_[MAX_HOP_NUMBER]; /**< List of IPs saved in the header
+											 */
 	int pointer_to_list_of_hops_; /**< Pointer used to keep track of the last
 									 IPs processed */
 	int list_of_hops_length_; /**< Current number of IPs stored in the header */

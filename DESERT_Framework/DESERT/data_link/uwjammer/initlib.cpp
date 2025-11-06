@@ -35,8 +35,8 @@
  *
  */
 
-#include <tclcl.h>
 #include "uwjammer_cmn_hdr.h"
+#include <tclcl.h>
 
 extern EmbeddedTcl uwjammer_default;
 
@@ -53,17 +53,17 @@ public:
 	/**
 	 * Constructor of the class
 	 */
-	JammerHeaderClass() : PacketHeaderClass("PacketHeader/UW/JAMMER", sizeof(hdr_JAMMER))
+	JammerHeaderClass()
+		: PacketHeaderClass("PacketHeader/UW/JAMMER", sizeof(hdr_JAMMER))
 	{
 		this->bind();
 		bind_offset(&hdr_JAMMER::offset_);
-	} 
+	}
 } class_hdr_JAMMER;
-
 
 extern "C" int
 Uwjammer_Init()
-{	
+{
 	PT_JAMMER = p_info::addPacket("UW/JAMMER");
 	uwjammer_default.load();
 	return 0;

@@ -40,253 +40,258 @@
 #include <mphy_pktheader.h>
 
 /**
- * Class that represents the binding with the tcl configuration script 
+ * Class that represents the binding with the tcl configuration script
  */
-static class UwMultiStackControllerPhyMasterClass : public TclClass 
+static class UwMultiStackControllerPhyMasterClass : public TclClass
 {
-  public:
-  /**
-   * Constructor of the class
-   */
-  UwMultiStackControllerPhyMasterClass() : TclClass("Module/UW/MULTI_STACK_CONTROLLER_PHY_MASTER") {}
+public:
+	/**
+	 * Constructor of the class
+	 */
+	UwMultiStackControllerPhyMasterClass()
+		: TclClass("Module/UW/MULTI_STACK_CONTROLLER_PHY_MASTER")
+	{
+	}
 
-  /**
-   * Creates the TCL object needed for the tcl language interpretation
-   * @return Pointer to an TclObject
-   */
-  TclObject* create(int, const char*const*) 
-  {
-    return (new UwMultiStackControllerPhyMaster);
-  }
+	/**
+	 * Creates the TCL object needed for the tcl language interpretation
+	 * @return Pointer to an TclObject
+	 */
+	TclObject *
+	create(int, const char *const *)
+	{
+		return (new UwMultiStackControllerPhyMaster);
+	}
 } class_uwmulti_stack_controller_phy_master;
 
-UwMultiStackControllerPhyMaster::UwMultiStackControllerPhyMaster() 
-: 
-  UwMultiStackControllerPhy(),
-  signaling_active_(0),
-  last_layer_used_(0),
-  power_statistics_(0),
-  power_stat_node_(MAC_BROADCAST),
-  alpha_(0.5),
-  signaling_period_(10),
-  signaling_sent_(0),
-  signaling_timer_(this)
-{ 
-  bind("alpha_", &alpha_);
-  bind("signaling_active_", &signaling_active_);
-  bind("signaling_period_", &signaling_period_);
+UwMultiStackControllerPhyMaster::UwMultiStackControllerPhyMaster()
+	: UwMultiStackControllerPhy()
+	, signaling_active_(0)
+	, last_layer_used_(0)
+	, power_statistics_(0)
+	, power_stat_node_(MAC_BROADCAST)
+	, alpha_(0.5)
+	, signaling_period_(10)
+	, signaling_sent_(0)
+	, signaling_timer_(this)
+{
+	bind("alpha_", &alpha_);
+	bind("signaling_active_", &signaling_active_);
+	bind("signaling_period_", &signaling_period_);
 }
 
-int UwMultiStackControllerPhyMaster::command(int argc, const char*const* argv) 
+int
+UwMultiStackControllerPhyMaster::command(int argc, const char *const *argv)
 {
-  Tcl& tcl = Tcl::instance();
-  if (argc == 2) 
-  {
-    if(strcasecmp(argv[1], "signalingON") == 0)
-    {
-      signaling_active_ = 1;
-      return TCL_OK;
-    }
-    else if(strcasecmp(argv[1], "signalingOFF") == 0)
-    {
-      signaling_active_ = 0;
-      return TCL_OK;
-    }
-    else if(strcasecmp(argv[1], "getSignalsSent") == 0)
-    {
-      tcl.resultf("%d", signaling_sent_);
-      return TCL_OK;
-    }
-  }
-  else if (argc == 3) 
-  {
-    if(strcasecmp(argv[1], "setAlpha") == 0)
-    {
-      alpha_ = atof(argv[2]);
-      return TCL_OK;
-    }
-		else if(strcasecmp(argv[1], "setManualLowerlId") == 0)
-    {
-      lower_id_active_ = atoi(argv[2]);
-      last_layer_used_ = lower_id_active_;
+	Tcl &tcl = Tcl::instance();
+	if (argc == 2) {
+		if (strcasecmp(argv[1], "signalingON") == 0) {
+			signaling_active_ = 1;
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "signalingOFF") == 0) {
+			signaling_active_ = 0;
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "getSignalsSent") == 0) {
+			tcl.resultf("%d", signaling_sent_);
 			return TCL_OK;
 		}
-  }
-  return UwMultiStackControllerPhy::command(argc, argv);     
+	} else if (argc == 3) {
+		if (strcasecmp(argv[1], "setAlpha") == 0) {
+			alpha_ = atof(argv[2]);
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "setManualLowerlId") == 0) {
+			lower_id_active_ = atoi(argv[2]);
+			last_layer_used_ = lower_id_active_;
+			return TCL_OK;
+		}
+	}
+	return UwMultiStackControllerPhy::command(argc, argv);
 } /* UwMultiStackControllerPhyMaster::command */
 
-//signaling TIMER
-void UwMultiStackControllerPhyMaster::UwMultiStackSignalingTimer::expire(Event *e) {
-  assert(module->signaling_active_);
-  if (module->debug_)
-  {
-    std::cout << NOW << " expired! " << std::endl;
-  }
-  ((UwMultiStackControllerPhyMaster *)module)->resetCheckAndSignal();
-}
-
-void UwMultiStackControllerPhyMaster::recv(Packet *p, int idSrc)
+// signaling TIMER
+void
+UwMultiStackControllerPhyMaster::UwMultiStackSignalingTimer::expire(Event *e)
 {
-  hdr_cmn *ch = HDR_CMN(p);
-  if (ch->direction() == hdr_cmn::UP)
-    updateMasterStatistics(p,idSrc);
-  // Filippo: signaling con risposta
-  if (ch->ptype() == PT_MULTI_ST_SIGNALING)
-    Packet::free(p);
-  else
-    UwMultiStackControllerPhy::recv(p, idSrc);
+	assert(module->signaling_active_);
+	if (module->debug_) {
+		std::cout << NOW << " expired! " << std::endl;
+	}
+	((UwMultiStackControllerPhyMaster *) module)->resetCheckAndSignal();
 }
 
-int UwMultiStackControllerPhyMaster::getBestLayer(Packet *p) 
+void
+UwMultiStackControllerPhyMaster::recv(Packet *p, int idSrc)
 {
-  assert(switch_mode_ == UW_AUTOMATIC_SWITCH);
-  if (!signaling_active_)
-  {
-    last_layer_used_ = checkBestLayer();
-    power_statistics_ = 0;
-  }
-  return lower_id_active_;
+	hdr_cmn *ch = HDR_CMN(p);
+	if (ch->direction() == hdr_cmn::UP)
+		updateMasterStatistics(p, idSrc);
+	// Filippo: signaling con risposta
+	if (ch->ptype() == PT_MULTI_ST_SIGNALING)
+		Packet::free(p);
+	else
+		UwMultiStackControllerPhy::recv(p, idSrc);
 }
 
-void  UwMultiStackControllerPhyMaster::checkAndSignal() 
+int
+UwMultiStackControllerPhyMaster::getBestLayer(Packet *p)
 {
-  assert(signaling_active_);
-
-  checkBestLayer();
-  if (lower_id_active_ != last_layer_used_)
-  {
-    last_layer_used_ = lower_id_active_;
-    signalsBestPhy();
-    power_statistics_ = 0;
-  }
+	assert(switch_mode_ == UW_AUTOMATIC_SWITCH);
+	if (!signaling_active_) {
+		last_layer_used_ = checkBestLayer();
+		power_statistics_ = 0;
+	}
+	return lower_id_active_;
 }
 
-void  UwMultiStackControllerPhyMaster::resetCheckAndSignal() //due to timer expired!
+void
+UwMultiStackControllerPhyMaster::checkAndSignal()
 {
-  assert(signaling_active_);
-  if (debug_)
-  {
-    std::cout << NOW << " UwMultiStackControllerPhyMaster::resetCheckAndSignal " << std::endl;
-  }
-  checkAndSignal();
-  power_statistics_ = 0;
-  power_stat_node_ = MAC_BROADCAST;
+	assert(signaling_active_);
+
+	checkBestLayer();
+	if (lower_id_active_ != last_layer_used_) {
+		last_layer_used_ = lower_id_active_;
+		signalsBestPhy();
+		power_statistics_ = 0;
+	}
 }
 
-int UwMultiStackControllerPhyMaster::checkBestLayer()
+void
+UwMultiStackControllerPhyMaster::resetCheckAndSignal() // due to timer expired!
 {
-  int mac_addr = -1;
-  ClMsgPhy2MacAddr msg;
-  sendSyncClMsg(&msg);
-  mac_addr = msg.getAddr();
-
-  int id_short_range = getShorterRangeLayer(last_layer_used_);
-  int id_long_range = getLongerRangeLayer(last_layer_used_);
-  double upper_threshold; //meaningful value only if (upper_threshold_valid)
-  double lower_threshold; //meaningful value only if (lower_threshold_valid)
-  bool upper_threshold_valid = getThreshold(last_layer_used_,id_short_range,upper_threshold);
-  bool lower_threshold_valid = getThreshold(last_layer_used_,id_long_range,lower_threshold);
-
-  if (upper_threshold_valid && (power_statistics_ > upper_threshold)) {
-    lower_id_active_ = id_short_range;
-  }                    
-  if (lower_threshold_valid && (power_statistics_ < lower_threshold)) {
-    lower_id_active_ = id_long_range;
-  }
-
-  if (debug_)
-  {
-    std::cout << NOW << " ControllerPhyMaster("<< mac_addr 
-              <<")::checkBestLayer(), power_statistics_= " << power_statistics_
-              << " best layer id = " << lower_id_active_ << " upper_threshold = " << upper_threshold
-              << " lower_threshold = " << lower_threshold << std::endl;
-  }   
-  if (signaling_active_) {
-    signaling_timer_.force_cancel();
-    signaling_timer_.resched(signaling_period_);
-  }
-  return lower_id_active_;
+	assert(signaling_active_);
+	if (debug_) {
+		std::cout << NOW
+				  << " UwMultiStackControllerPhyMaster::resetCheckAndSignal "
+				  << std::endl;
+	}
+	checkAndSignal();
+	power_statistics_ = 0;
+	power_stat_node_ = MAC_BROADCAST;
 }
 
-void UwMultiStackControllerPhyMaster::signalsBestPhy()
+int
+UwMultiStackControllerPhyMaster::checkBestLayer()
 {
-  assert(signaling_active_);
-  //Retreive my mac to set macSA
-  int my_mac_addr = -1;
-  ClMsgPhy2MacAddr msg;
-  sendSyncClMsg(&msg);
-  my_mac_addr = msg.getAddr(); 
+	int mac_addr = -1;
+	ClMsgPhy2MacAddr msg;
+	sendSyncClMsg(&msg);
+	mac_addr = msg.getAddr();
 
-  Packet *p = Packet::alloc();
-  hdr_cmn* ch = hdr_cmn::access(p);
-  ch->ptype() = PT_MULTI_ST_SIGNALING;
-  ch->size() = signaling_pktSize_;
-  hdr_mac* mach = HDR_MAC(p);
-  //mach->macDA() = MAC_BROADCAST;
-  mach->macDA() = power_stat_node_;
-  mach->macSA() = my_mac_addr;
-  if (debug_)
-  {
-    std::cout << NOW << " ControllerPhyMaster::signalsBestPhy()" << std::endl;
-  } 
-  signaling_sent_ ++;
-  sendDown(lower_id_active_, p, min_delay_);
+	int id_short_range = getShorterRangeLayer(last_layer_used_);
+	int id_long_range = getLongerRangeLayer(last_layer_used_);
+	double upper_threshold; // meaningful value only if (upper_threshold_valid)
+	double lower_threshold; // meaningful value only if (lower_threshold_valid)
+	bool upper_threshold_valid =
+			getThreshold(last_layer_used_, id_short_range, upper_threshold);
+	bool lower_threshold_valid =
+			getThreshold(last_layer_used_, id_long_range, lower_threshold);
 
+	if (upper_threshold_valid && (power_statistics_ > upper_threshold)) {
+		lower_id_active_ = id_short_range;
+	}
+	if (lower_threshold_valid && (power_statistics_ < lower_threshold)) {
+		lower_id_active_ = id_long_range;
+	}
+
+	if (debug_) {
+		std::cout << NOW << " ControllerPhyMaster(" << mac_addr
+				  << ")::checkBestLayer(), power_statistics_= "
+				  << power_statistics_
+				  << " best layer id = " << lower_id_active_
+				  << " upper_threshold = " << upper_threshold
+				  << " lower_threshold = " << lower_threshold << std::endl;
+	}
+	if (signaling_active_) {
+		signaling_timer_.force_cancel();
+		signaling_timer_.resched(signaling_period_);
+	}
+	return lower_id_active_;
 }
 
-int UwMultiStackControllerPhyMaster::recvSyncClMsg(ClMessage* m) {
-  //It blocks the clmsg caused by our signaling
-  if (m->type() == CLMSG_PHY2MAC_ENDTX)
-  {
-    hdr_cmn* ch = hdr_cmn::access( static_cast<ClMsgPhy2MacEndTx *>(m)->pkt);
-    if (ch->ptype() == PT_MULTI_ST_SIGNALING)
-      return 0;
-  }
-  else if (m->type() == CLMSG_PHY2MAC_STARTRX)
-  {
-    hdr_cmn* ch = hdr_cmn::access( static_cast<ClMsgPhy2MacStartRx *>(m)->pkt);
-    if (ch->ptype() == PT_MULTI_ST_SIGNALING)
-      return 0;
-  }
-  return UwMultiStackControllerPhy::recvSyncClMsg(m);
-}
-
-void UwMultiStackControllerPhyMaster::updateMasterStatistics(Packet *p, int idSrc)
+void
+UwMultiStackControllerPhyMaster::signalsBestPhy()
 {
-  int mac_addr = -1;
-  ClMsgPhy2MacAddr msg;
-  sendSyncClMsg(&msg);
-  mac_addr = msg.getAddr();
+	assert(signaling_active_);
+	// Retreive my mac to set macSA
+	int my_mac_addr = -1;
+	ClMsgPhy2MacAddr msg;
+	sendSyncClMsg(&msg);
+	my_mac_addr = msg.getAddr();
 
-  hdr_mac* mach = HDR_MAC(p);
-  hdr_MPhy* ph = HDR_MPHY(p);
-  double power_statistics_to_print = power_statistics_;
-  /*if (mach->macDA() == mac_addr && idSrc == last_layer_used_)*/
-  if (mach->macDA() == mac_addr && idSrc == lower_id_active_)
-  {
-    if (power_stat_node_ == mach->macSA())
-      power_statistics_ = power_statistics_ ? (1-alpha_)*power_statistics_ + alpha_*ph->Pr 
-                          : ph->Pr;
-    else if (ph->Pr > power_statistics_){
-      power_statistics_ = ph->Pr;
-      power_stat_node_ = mach->macSA();
-    }
-    power_statistics_to_print = power_statistics_;
-
-    if (debug_)
-    {
-      std::cout << NOW << " ControllerPhyMaster("<< mac_addr <<
-                ")::updateMasterStatistics(Packet *p, int idSrc), Pr = " << ph->Pr << " idSrc = " << idSrc 
-                << " lower_id_active_ = " << lower_id_active_ << " power_statistics_ = " << power_statistics_to_print << std::endl;
-    }
-
-    if (signaling_active_)
-      checkAndSignal();
-  }
-  else if (debug_)
-    std::cout << NOW << " ControllerPhyMaster("<< mac_addr <<
-              ")::updateMasterStatistics(Packet *p, int idSrc), Pr = " << ph->Pr << " idSrc = " << idSrc  
-              << " lower_id_active_ = " << lower_id_active_ << " power_statistics_ = " << power_statistics_to_print << std::endl;
+	Packet *p = Packet::alloc();
+	hdr_cmn *ch = hdr_cmn::access(p);
+	ch->ptype() = PT_MULTI_ST_SIGNALING;
+	ch->size() = signaling_pktSize_;
+	hdr_mac *mach = HDR_MAC(p);
+	// mach->macDA() = MAC_BROADCAST;
+	mach->macDA() = power_stat_node_;
+	mach->macSA() = my_mac_addr;
+	if (debug_) {
+		std::cout << NOW << " ControllerPhyMaster::signalsBestPhy()"
+				  << std::endl;
+	}
+	signaling_sent_++;
+	sendDown(lower_id_active_, p, min_delay_);
 }
 
+int
+UwMultiStackControllerPhyMaster::recvSyncClMsg(ClMessage *m)
+{
+	// It blocks the clmsg caused by our signaling
+	if (m->type() == CLMSG_PHY2MAC_ENDTX) {
+		hdr_cmn *ch = hdr_cmn::access(static_cast<ClMsgPhy2MacEndTx *>(m)->pkt);
+		if (ch->ptype() == PT_MULTI_ST_SIGNALING)
+			return 0;
+	} else if (m->type() == CLMSG_PHY2MAC_STARTRX) {
+		hdr_cmn *ch =
+				hdr_cmn::access(static_cast<ClMsgPhy2MacStartRx *>(m)->pkt);
+		if (ch->ptype() == PT_MULTI_ST_SIGNALING)
+			return 0;
+	}
+	return UwMultiStackControllerPhy::recvSyncClMsg(m);
+}
 
+void
+UwMultiStackControllerPhyMaster::updateMasterStatistics(Packet *p, int idSrc)
+{
+	int mac_addr = -1;
+	ClMsgPhy2MacAddr msg;
+	sendSyncClMsg(&msg);
+	mac_addr = msg.getAddr();
+
+	hdr_mac *mach = HDR_MAC(p);
+	hdr_MPhy *ph = HDR_MPHY(p);
+	double power_statistics_to_print = power_statistics_;
+	/*if (mach->macDA() == mac_addr && idSrc == last_layer_used_)*/
+	if (mach->macDA() == mac_addr && idSrc == lower_id_active_) {
+		if (power_stat_node_ == mach->macSA())
+			power_statistics_ = power_statistics_
+					? (1 - alpha_) * power_statistics_ + alpha_ * ph->Pr
+					: ph->Pr;
+		else if (ph->Pr > power_statistics_) {
+			power_statistics_ = ph->Pr;
+			power_stat_node_ = mach->macSA();
+		}
+		power_statistics_to_print = power_statistics_;
+
+		if (debug_) {
+			std::cout
+					<< NOW << " ControllerPhyMaster(" << mac_addr
+					<< ")::updateMasterStatistics(Packet *p, int idSrc), Pr = "
+					<< ph->Pr << " idSrc = " << idSrc
+					<< " lower_id_active_ = " << lower_id_active_
+					<< " power_statistics_ = " << power_statistics_to_print
+					<< std::endl;
+		}
+
+		if (signaling_active_)
+			checkAndSignal();
+	} else if (debug_)
+		std::cout << NOW << " ControllerPhyMaster(" << mac_addr
+				  << ")::updateMasterStatistics(Packet *p, int idSrc), Pr = "
+				  << ph->Pr << " idSrc = " << idSrc
+				  << " lower_id_active_ = " << lower_id_active_
+				  << " power_statistics_ = " << power_statistics_to_print
+				  << std::endl;
+}

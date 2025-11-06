@@ -59,15 +59,17 @@ public:
 	/**
 	 * Enum type for the modem general state.
 	 * AVAILABLE: immediately available to perform an operation
-	 * TRANSMITTING: executing a tranmission command: must wait for it ot complete
-	 * CONFIGURING: executing a configuration command: must wait for it to complete
+	 * TRANSMITTING: executing a tranmission command: must wait for it ot
+	 * complete CONFIGURING: executing a configuration command: must wait for it
+	 * to complete
 	 */
 	enum class ModemState { AVAILABLE = 0, TRANSMITTING, CONFIGURING };
 
 	/**
 	 * Enum type for the trasnmission state.
 	 * TX_IDLE: the modem is available for transmission of a new packet
-	 * TX_WAITING: a packet was tranmitted but the *command* was not acknowledged
+	 * TX_WAITING: a packet was tranmitted but the *command* was not
+	 * acknowledged
 	 */
 	enum class TransmissionState { TX_IDLE = 0, TX_WAITING };
 

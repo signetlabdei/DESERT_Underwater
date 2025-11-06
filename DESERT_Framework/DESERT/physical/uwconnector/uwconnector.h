@@ -56,29 +56,29 @@ public:
 	 * UwConnector constructor
 	 * @param address string representing an address, whatever that is
 	 */
-	inline UwConnector(){};
+	inline UwConnector() {};
 
 	/**
 	 * UwConnector destructor
 	 */
-	inline virtual ~UwConnector(){};
+	inline virtual ~UwConnector() {};
 
 	/**
 	 * Method required in client-server connection (e.g. TCP)
 	 */
-	virtual void setServer(){};
+	virtual void setServer() {};
 
 	/**
 	 * Method that should set, for a socket connector, the TCP transport
 	 * protocol. To be left untouched by other types of connectors.
 	 */
-	virtual void setTCP(){};
+	virtual void setTCP() {};
 
 	/**
 	 * Method that should set, for a socket connector, the UDP transport
 	 * protocol. To be left untouched by other types of connectors.
 	 */
-	virtual void setUDP(){};
+	virtual void setUDP() {};
 
 	/**
 	 * Method that opens up a connection to a device. This method can open
@@ -101,7 +101,7 @@ public:
 	 * @param cmd string command to write to the device
 	 * @return boolean true if command is correctly written to the device
 	 */
-	virtual int writeToDevice(const std::string& msg) = 0;
+	virtual int writeToDevice(const std::string &msg) = 0;
 
 	/**
 	 * Function that dumps data from the device's memory to data char array.
@@ -117,7 +117,8 @@ public:
 	 * Function that retrieves the last saved errno code: to be implemented
 	 * @return error code from <cerrno> system library
 	 */
-	virtual const int getErrno()
+	virtual const int
+	getErrno()
 	{
 		return local_errno;
 	};
@@ -129,7 +130,6 @@ public:
 	virtual const bool isConnected() = 0;
 
 protected:
-
 	int local_errno; /** Local variable to stoe the errno of connectors */
 };
 

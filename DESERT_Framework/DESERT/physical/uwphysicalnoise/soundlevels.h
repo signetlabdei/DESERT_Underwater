@@ -134,6 +134,6 @@ double fishing_vessel(double freq, double speed, double length);
  * @return double Sound level of a fishing vessel
  */
 double auv(double freq);
-}
+} // namespace ship_noise
 
 #endif

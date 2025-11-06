@@ -35,8 +35,8 @@
  * \brief file to initialize the libuwstats_utilities.so library
  */
 
-#include <tclcl.h>
 #include "uwstats-utilities.h"
+#include <tclcl.h>
 
 ClMessage_t CLMSG_TRIGGER_STATS;
 

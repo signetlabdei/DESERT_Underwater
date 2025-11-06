@@ -41,21 +41,21 @@
 
 #include <bpsk.h>
 
-#include <rng.h>
-#include <packet.h>
 #include <module.h>
+#include <packet.h>
+#include <rng.h>
 #include <tclcl.h>
 
-#include <iostream>
-#include <string.h>
-#include <cmath>
-#include <limits>
 #include <climits>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <map>
 #include <math.h>
 #include <node-core.h>
-#include <fstream>
 #include <sstream>
-#include <map>
+#include <string.h>
 #include <vector>
 
 #define OPTICAL_MODULATION_TYPE "OPTIC_BPSK"
@@ -109,7 +109,7 @@ protected:
 
 	/**
 	 * Inizialize LUT of c_variable values
-	*/
+	 */
 	virtual void initializeLUT();
 
 	double getVarTemperature(Packet *p);

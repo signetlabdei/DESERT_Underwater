@@ -36,13 +36,13 @@
  *
  */
 
-#include <string.h>
-#include <rng.h>
-#include <tclcl.h>
-#include <iostream>
 #include "mclink.h"
+#include <iostream>
+#include <rng.h>
+#include <string.h>
+#include <tclcl.h>
 
-MCLink::MCLink() 
+MCLink::MCLink()
 	: ber_good(0.0)
 	, ber_bad(0.0)
 	, p_gb(0.0)
@@ -50,12 +50,11 @@ MCLink::MCLink()
 	, last_update(NOW)
 	, step_period(5.0)
 	, ch_state(GOOD)
-{	
+{
 }
 
-
-MCLink::MCLink(double ber_good, double ber_bad,double p_gb, double p_bg, 
-		double step_period,ChState ch_state)
+MCLink::MCLink(double ber_good, double ber_bad, double p_gb, double p_bg,
+		double step_period, ChState ch_state)
 	: ber_good(ber_good)
 	, ber_bad(ber_bad)
 	, p_gb(p_gb)
@@ -64,9 +63,9 @@ MCLink::MCLink(double ber_good, double ber_bad,double p_gb, double p_bg,
 	, step_period(step_period)
 	, ch_state(ch_state)
 {
-	assert(ber_good >=0.0 && ber_good <= 1.0 && 
-			ber_bad >= 0.0 && ber_bad <= 1.0 &&
-			p_gb >= 0.0 && p_gb <= 1.0 && p_bg >= 0.0 && p_bg <= 1.0);
+	assert(ber_good >= 0.0 && ber_good <= 1.0 && ber_bad >= 0.0 &&
+			ber_bad <= 1.0 && p_gb >= 0.0 && p_gb <= 1.0 && p_bg >= 0.0 &&
+			p_bg <= 1.0);
 }
 
 MCLink::ChState
@@ -88,20 +87,20 @@ MCLink::updateChState()
 	} else if (ch_state == MCLink::BAD) {
 		double new_p_bb = c1 * p_gb + c2 * p_bg;
 		if (RNG::defaultrng()->uniform_double() > new_p_bb) {
-			ch_state = MCLink::GOOD;	
+			ch_state = MCLink::GOOD;
 		}
 	}
 	last_update += n_step * step_period;
 	return ch_state;
 }
 
-double 
+double
 MCLink::getBER()
 {
 	updateChState();
 	if (ch_state == GOOD) {
 		return ber_good;
-	} else { 
+	} else {
 		return ber_bad;
 	}
 }
@@ -129,16 +128,19 @@ static class MCLinkClass : public TclClass
 {
 public:
 	MCLinkClass()
-	: TclClass("Module/UW/HMMPHYSICAL/MCLINK")
+		: TclClass("Module/UW/HMMPHYSICAL/MCLINK")
 	{
 	}
 	TclObject *
-	create(int argc, const char *const * argv)
+	create(int argc, const char *const *argv)
 	{
 		if (argc > 8) {
 			if (argc == 9) {
-				return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
-						std::stod(argv[6]), std::stod(argv[7]),std::stod(argv[8])));
+				return (new MCLink(std::stod(argv[4]),
+						std::stod(argv[5]),
+						std::stod(argv[6]),
+						std::stod(argv[7]),
+						std::stod(argv[8])));
 			}
 			if (argc == 10) {
 				MCLink::ChState ch_state;
@@ -148,11 +150,15 @@ public:
 					ch_state = MCLink::BAD;
 				} else {
 					std::cerr << "TCL: MCLink state must be GOOD or BAD"
-					<< std::endl;
+							  << std::endl;
 					exit(1);
 				}
-				return (new MCLink(std::stod(argv[4]), std::stod(argv[5]), 
-						std::stod(argv[6]), std::stod(argv[7]),std::stod(argv[8]),ch_state));
+				return (new MCLink(std::stod(argv[4]),
+						std::stod(argv[5]),
+						std::stod(argv[6]),
+						std::stod(argv[7]),
+						std::stod(argv[8]),
+						ch_state));
 			}
 			std::cerr << "TCL: check MCLink constructor args" << std::endl;
 			exit(1);

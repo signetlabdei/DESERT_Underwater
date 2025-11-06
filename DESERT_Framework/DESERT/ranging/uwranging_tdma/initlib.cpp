@@ -35,8 +35,8 @@
  * @brief Provides the initializazion of the uwranging_tdma libraries
  */
 
-#include <tclcl.h>
 #include "uwranging_tdma_hdr.h"
+#include <tclcl.h>
 
 int hdr_ranging_tdma::offset_ = 0;
 packet_t PT_UWRANGING_TDMA;
@@ -51,15 +51,13 @@ public:
 	 * Constructor of the class
 	 */
 	UwRangingTDMAHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWRANGING_TDMA", sizeof(hdr_ranging_tdma))
+		: PacketHeaderClass(
+				  "PacketHeader/UWRANGING_TDMA", sizeof(hdr_ranging_tdma))
 	{
 		this->bind();
 		bind_offset(&hdr_ranging_tdma::offset_);
 	}
 } class_hdr_ranging_tdma;
-
-
-
 
 extern EmbeddedTcl Uwranging_tdmaTclCode;
 
@@ -70,4 +68,3 @@ Uwranging_tdma_Init()
 	Uwranging_tdmaTclCode.load();
 	return 0;
 }
-

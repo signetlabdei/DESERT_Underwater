@@ -45,9 +45,9 @@
 
 #include "uwflooding-hdr.h"
 
-#include <uwip-module.h>
-#include <uwip-clmsg.h>
 #include <uwcbr-module.h>
+#include <uwip-clmsg.h>
+#include <uwip-module.h>
 
 #include "mphy.h"
 #include "packet.h"
@@ -55,19 +55,18 @@
 #include <tclcl.h>
 
 #include <cmath>
+#include <ctime>
+#include <fstream>
+#include <iostream>
 #include <limits>
+#include <list>
+#include <map>
+#include <rng.h>
 #include <sstream>
 #include <string>
-#include <iostream>
-#include <rng.h>
-#include <ctime>
 #include <vector>
-#include <fstream>
-#include <map>
-#include <list>
 
 #include "uwbase_reputation.h"
-
 
 /** Forward declaration of uwflooding.*/
 class UwFloodingSec;
@@ -79,7 +78,6 @@ class UwFloodingSec;
 class NeighborReputationHandler : public TimerHandler
 {
 public:
-
 	/**
 	 * Class constructor
 	 * @param neigh_addr address of the neighbor
@@ -87,8 +85,8 @@ public:
 	 * @param alpha_val paramer to be used to combine new and old snr values
 	 * @param dbg debug variable
 	 */
-	NeighborReputationHandler(uint8_t neigh_addr, UwFloodingSec* m, 
-			double alpha_val, int dbg);
+	NeighborReputationHandler(
+			uint8_t neigh_addr, UwFloodingSec *m, double alpha_val, int dbg);
 
 	/**
 	 * Class destructor
@@ -125,7 +123,6 @@ public:
 	void updateInstantNoise(double inst_noise_val);
 
 protected:
-
 	/**
 	 * Returns as reference the uid of the next packet that id going to expire.
 	 * Returns false if there are no packets in the map.
@@ -133,7 +130,7 @@ protected:
 	 * @param exp_time expire time of the next packet that is going to expire.
 	 * @return false if there is no packets in the map, true otherwise.
 	 */
-	bool getNextPacket(int& uid, double& exp_time) const;
+	bool getNextPacket(int &uid, double &exp_time) const;
 
 	/**
 	 * Removes packet with an old expire time.
@@ -146,16 +143,16 @@ protected:
 	 */
 	virtual void expire(Event *e);
 
-	UwFloodingSec* module; /**< Pointer to the uwflooding module.*/
+	UwFloodingSec *module; /**< Pointer to the uwflooding module.*/
 	uint8_t neighbor_addr; /**<Address of the considered neighbor.*/
-	std::map<int, double> unconfirmed_pkts; /**< Map with the uid of the 
+	std::map<int, double> unconfirmed_pkts; /**< Map with the uid of the
 			unconfirmed packets, with the corresponding forwarding timeout.*/
-	bool is_running; /**< True if a timer has been already scheduled and not 
+	bool is_running; /**< True if a timer has been already scheduled and not
 						expired yet. */
 	int waiting_uid; /** Uid of the packet that should be forwarded.*/
 	double avg_snr; /**< Average SNR of the last received packets. */
 	double alpha; /**< weight for the new SNR value. */
-	bool is_first_pkt; /** Boolean variable to check if the packet is the first 
+	bool is_first_pkt; /** Boolean variable to check if the packet is the first
 			received one or not. Used to correctly averaged snr.*/
 	double last_noise; /**< Noise power of the last correctly received packet.*/
 	double inst_noise; /**< Instantaneous noise level.*/
@@ -273,18 +270,18 @@ protected:
 	 * @param p pointer to the packet
 	 * @param delay (optional) delay introduced before transmission [sec.]
 	 */
-	void sendDown(Packet* p,  double delay=0);
+	void sendDown(Packet *p, double delay = 0);
 
 	/**
 	 * Send ClMsgStats message when triggered by the reception of an overherd
 	 * packets. The ClMsg is sent in unicast only to the module
 	 * which sent the trigger message
-	 * @param neighbor_addr IP address of the neighbor 
+	 * @param neighbor_addr IP address of the neighbor
 	 */
 	virtual void sendStatsClMsg(int neighbor_addr);
 
 	/**
-	 * Send ClMsgStats to retreive instantaneous noise. The ClMsg is sent in 
+	 * Send ClMsgStats to retreive instantaneous noise. The ClMsg is sent in
 	 * unicast only to the module which sent the trigger message
 	 * @param neighbor_addr IP address of the neighbor
 	 */
@@ -301,10 +298,9 @@ private:
 	long packets_forwarded_; /**< Number of packets forwarded by this module. */
 	bool trace_path_; /**< Flag used to enable or disable the path trace file
 						 for nodes, */
-	char
-			*trace_file_path_name_; /**< Name of the trace file that contains
-									   the list of paths of the data packets
-									   received. */
+	char *trace_file_path_name_; /**< Name of the trace file that contains
+									the list of paths of the data packets
+									received. */
 	ofstream trace_file_path_; /**< Ofstream used to write the path trace file
 								  in the disk. */
 	ostringstream osstream_; /**< Used to convert to string. */
@@ -318,7 +314,8 @@ private:
 	map_forwarded_packets
 			my_forwarded_packets_; /**< Map of the packet forwarded. */
 
-	std::map<uint16_t,uint8_t> ttl_traffic_map; /**< Map with ttl per traffic.*/
+	std::map<uint16_t, uint8_t>
+			ttl_traffic_map; /**< Map with ttl per traffic.*/
 
 	bool use_reputation; /**< True if the reputation system is used. */
 
@@ -326,18 +323,19 @@ private:
 						neighbor with the number of packets received from him.*/
 	neighbor_map neighbor; /**< Map with the neighbor. */
 
-	typedef std::map<uint8_t, NeighborReputationHandler> neighbor_timer_map;/**< 
-						Typedef for the forwardig timer of the neigbors.*/
+	typedef std::map<uint8_t, NeighborReputationHandler>
+			neighbor_timer_map; /**<
+Typedef for the forwardig timer of the neigbors.*/
 	neighbor_timer_map neighbor_tmr; /**< Map with the neighbor timer. */
 
 	double fwd_to; /**<Time out within which the forwarding is expected.*/
 
-	uint8_t prev_hop_temp; /**< Previous hop IP address of the last received 
+	uint8_t prev_hop_temp; /**< Previous hop IP address of the last received
 							packet. */
 
-	UwReputationInterface* reputation; /**< Reputation of the neighbor. */
-	
-	double alpha_snr; /**< Value to be used by the NeighborReputationHandler 
+	UwReputationInterface *reputation; /**< Reputation of the neighbor. */
+
+	double alpha_snr; /**< Value to be used by the NeighborReputationHandler
 			object to combine new snr values and average snr. */
 
 	bool valid_phy_id; /**< True if the id of the phy layer from which obtain
@@ -346,7 +344,8 @@ private:
 			statistics. */
 	/**
 	 * Copy constructor declared as private. It is not possible to create a new
-	 * UwFloodingSec object passing to its constructor another UwFloodingSec object.
+	 * UwFloodingSec object passing to its constructor another UwFloodingSec
+	 * object.
 	 *
 	 * @param UwFloodingSec& UwFloodingSec object.
 	 */
@@ -359,7 +358,7 @@ private:
 	 *
 	 * @return the ttl for that packet
 	 */
-	uint8_t getTTL(Packet* p) const;
+	uint8_t getTTL(Packet *p) const;
 };
 
 #endif // UWFLOODING_H

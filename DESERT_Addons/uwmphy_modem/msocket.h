@@ -31,27 +31,25 @@
  * \version 2.0.0
  * \brief  Header of the class derived from UWMconnector to handle the TCP/IP
  * socket connection of a client between NS-Miracle and a modem.
-*/
+ */
 
 #ifndef MSOCKET_H
 #define MSOCKET_H
 
 #include <uwmconnector.h>
 
+#include <arpa/inet.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <string>
 #include <string.h>
-#include <sys/types.h>
+#include <string>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <errno.h>
-
-
+#include <sys/types.h>
+#include <unistd.h>
 
 /**
  * Class used to manage host/modem string exchange via TCP/IP connection (this
@@ -71,8 +69,8 @@ class Msocket : public UWMconnector
 															be connected as
 								client. */
 	struct hostent *server; /**< Structure to define the server host. */
-	char msg_tx
-			[_MAX_MSG_LENGTH]; /**< Message to be transmitted host to modem. */
+	char msg_tx[_MAX_MSG_LENGTH]; /**< Message to be transmitted host to modem.
+								   */
 	int modem_queue_length;
 
 	/**

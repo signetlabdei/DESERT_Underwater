@@ -27,70 +27,74 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 /**
-* @file uwsc-rovctr-module.h
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the definition of the class <i>UWSCROVCTR</i>.
-*
-* Provides the definition of the class UwSCROVCtr.
-* UwSCROVCTR receives cross layer messages containing the next waypoint that has to be sent to the associated node follower. In addition it receives monitoring packets containing the current node folllower position.
-* SCROVCtr stands for Swarm control ROV Controller.
-*/
-
+ * @file uwsc-rovctr-module.h
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the definition of the class <i>UWSCROVCTR</i>.
+ *
+ * Provides the definition of the class UwSCROVCtr.
+ * UwSCROVCTR receives cross layer messages containing the next waypoint that
+ * has to be sent to the associated node follower. In addition it receives
+ * monitoring packets containing the current node folllower position. SCROVCtr
+ * stands for Swarm control ROV Controller.
+ */
 
 #ifndef UWSCROV_CTR_MODULE_H
 #define UWSCROV_CTR_MODULE_H
-#include <uwrovctr-module.h>
 #include "uwsc-clmsg.h"
+#include <uwrovctr-module.h>
 
 /**
-* UwSCROVCtrModule class adds to the UwROVCtrModule class the possibility
-* to receive and send cross layer messages.
-*
-*/
-class UwSCROVCtrModule : public UwROVCtrModule {
+ * UwSCROVCtrModule class adds to the UwROVCtrModule class the possibility
+ * to receive and send cross layer messages.
+ *
+ */
+class UwSCROVCtrModule : public UwROVCtrModule
+{
 public:
 	/**
-	* Constructor of UwSCROVCtrModule class.
-	*/
+	 * Constructor of UwSCROVCtrModule class.
+	 */
 	UwSCROVCtrModule();
 
 	/**
-	* Destructor of UwSCROVCtrModule class.
-	*/
+	 * Destructor of UwSCROVCtrModule class.
+	 */
 	virtual ~UwSCROVCtrModule() = default;
 
 	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	*
-	* @param argc Number of arguments in <i>argv</i>.
-	* @param argv Array of strings which are the command parameters (Note that <i>argv[0]</i> is the name of the object).
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched successfully or not.
-	*
-	**/
-	virtual int command(int argc, const char*const* argv) override;
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 *
+	 * @param argc Number of arguments in <i>argv</i>.
+	 * @param argv Array of strings which are the command parameters (Note that
+	 *<i>argv[0]</i> is the name of the object).
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 *successfully or not.
+	 *
+	 **/
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
-	* Performs the reception of packets from upper and lower layers.
-	*
-	* @param Packet* Pointer to the packet will be received.
-	*/
-	virtual void recv(Packet*) override;
-
+	 * Performs the reception of packets from upper and lower layers.
+	 *
+	 * @param Packet* Pointer to the packet will be received.
+	 */
+	virtual void recv(Packet *) override;
 
 	/**
-	 * Recv syncronous cross layer messages to require an operation from another module.
+	 * Recv syncronous cross layer messages to require an operation from another
+	 * module.
 	 *
 	 * @param m Pointer cross layer message
 	 * @return int Zero if successful
 	 *
 	 */
-	virtual int recvSyncClMsg(ClMessage* m) override;
+	virtual int recvSyncClMsg(ClMessage *m) override;
 
 protected:
-	int leader_id;		/**< Id of the Mission Coordinator module. */
-	bool rov_status;	/**< Status of the ROV follower, true if detected a mine */
+	int leader_id; /**< Id of the Mission Coordinator module. */
+	bool rov_status; /**< Status of the ROV follower, true if detected a mine */
 };
 
 #endif // UWSCROVCtr_MODULE_H

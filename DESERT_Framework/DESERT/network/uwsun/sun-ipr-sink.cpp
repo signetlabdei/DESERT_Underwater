@@ -37,8 +37,8 @@
  */
 
 #include "sun-ipr-sink.h"
-#include "sun-ipr-common-structures.h"
 #include "mphy_pktheader.h"
+#include "sun-ipr-common-structures.h"
 
 extern packet_t PT_SUN_ACK;
 extern packet_t PT_SUN_DATA;
@@ -95,7 +95,8 @@ SunIPRoutingSink::~SunIPRoutingSink()
 	if (STACK_TRACE)
 		std::cout << "> ~SunIPRoutingSink()" << std::endl;
 	if (printDebug_ > 10)
-		std::cout << "S: " << this->printIP(ipAddr_) << " deleted." << std::endl;
+		std::cout << "S: " << this->printIP(ipAddr_) << " deleted."
+				  << std::endl;
 }
 
 int
@@ -223,7 +224,7 @@ void
 SunIPRoutingSink::recv(Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> recv()" << std::endl;
+		std::cout << "> recv()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwip *iph = HDR_UWIP(p);
 	hdr_sun_data *hdata = HDR_SUN_DATA(p);
@@ -241,14 +242,15 @@ SunIPRoutingSink::recv(Packet *p)
 				//                UP." << endl;
 				if (ch->next_hop() == ipAddr_ || iph->daddr() == ipAddr_) {
 
-				  if (printDebug_ > 5) {
-					  std::cout << "[" <<  NOW
-								<< "]::Node[IP:" << this->printIP(ipAddr_)
-								<< "]::RECEIVED_PACKET_FROM:" << printIP(iph->saddr())
-								<< "::UID:" << ch->uid()
-								<< "::::::PREV_HOP:" << printIP(ch->prev_hop_)
-								<< std::endl;
-				  }
+					if (printDebug_ > 5) {
+						std::cout << "[" << NOW
+								  << "]::Node[IP:" << this->printIP(ipAddr_)
+								  << "]::RECEIVED_PACKET_FROM:"
+								  << printIP(iph->saddr())
+								  << "::UID:" << ch->uid()
+								  << "::::::PREV_HOP:" << printIP(ch->prev_hop_)
+								  << std::endl;
+					}
 
 					this->sendBackAck(p);
 
@@ -292,7 +294,7 @@ void
 SunIPRoutingSink::initialize()
 {
 	if (STACK_TRACE)
-	    std::cout << "> initialize()" << std::endl;
+		std::cout << "> initialize()" << std::endl;
 	// Asking for the IP of the current Node.
 	if (ipAddr_ == 0) {
 		UWIPClMsgReqAddr *m = new UWIPClMsgReqAddr(getId());
@@ -305,7 +307,7 @@ void
 SunIPRoutingSink::sendProbe()
 {
 	if (STACK_TRACE)
-	    std::cout << "> sendProbe()" << std::endl;
+		std::cout << "> sendProbe()" << std::endl;
 	Packet *p = Packet::alloc();
 
 	hdr_cmn *ch = HDR_CMN(p);
@@ -326,11 +328,9 @@ SunIPRoutingSink::sendProbe()
 	ch->timestamp() = Scheduler::instance().clock();
 
 	if (printDebug_ > 5) {
-		std::cout << "[" <<  NOW
-				  << "]::Node[IP:" << this->printIP(ipAddr_)
+		std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 				  << "]::PROBE_SENT"
-				  << "::UID:" << ch->uid()
-				  << std::endl;
+				  << "::UID:" << ch->uid() << std::endl;
 	}
 
 	probe_count_++; // Only for statistics
@@ -435,7 +435,7 @@ void
 SunIPRoutingSink::sendBackAck(const Packet *p)
 {
 	if (STACK_TRACE)
-	    std::cout << "> sendBackAck()" << std::endl;
+		std::cout << "> sendBackAck()" << std::endl;
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 
@@ -451,11 +451,9 @@ SunIPRoutingSink::sendBackAck(const Packet *p)
 	hack->uid() = uwcbrh->sn();
 
 	if (printDebug_ > 5) {
-		std::cout << "[" <<  NOW
-				  << "]::Node[IP:" << this->printIP(ipAddr_)
+		std::cout << "[" << NOW << "]::Node[IP:" << this->printIP(ipAddr_)
 				  << "]::UID:" << ch->uid()
-				  << "::ACK_TO:" << printIP(ch->prev_hop_)
-				  << std::endl;
+				  << "::ACK_TO:" << printIP(ch->prev_hop_) << std::endl;
 	}
 	number_of_ackpkt_++;
 	//    cout << printIP(ipAddr_) << ":ack:" << printIP(ch->prev_hop_) << endl;

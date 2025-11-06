@@ -39,26 +39,26 @@
 #define UWMPHY_MODEM_H
 
 #include "uwmdriver.h"
-#include <uwal.h>
 #include <hdr-uwal.h>
-#include <uwip-module.h>
 #include <mac.h>
 #include <mphy.h>
+#include <uwal.h>
+#include <uwip-module.h>
 
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <string.h>
-#include <errno.h>
-#include <cstring>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <cmath>
+#include <cstring>
+#include <errno.h>
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
 #define _MTBL                                                                  \
 	5 /**< Defintion of the maximum length of the transmission buffer to store \
@@ -66,8 +66,6 @@
 
 #define MIN_MODEM_QUEUE_LENGTH 2
 #define MAX_MODEM_QUEUE_LENGTH 30
-
-
 
 // Forward declaration
 class DropTimer;
@@ -179,10 +177,10 @@ public:
 		return debug_;
 	}
 	/**
-	* Method to return the name of the file where to log messages.
-	*
-	* @return UWMPhy_modem::logFile
-	*/
+	 * Method to return the name of the file where to log messages.
+	 *
+	 * @return UWMPhy_modem::logFile
+	 */
 	std::string
 	getLogFile()
 	{
@@ -190,11 +188,11 @@ public:
 	}
 
 	/**
-	* Method to return the flag used to enable the printing of log messages in
-	*UWMPhy_modem::logFile.
-	*
-	* @return UWMPhy_modem::log_
-	*/
+	 * Method to return the flag used to enable the printing of log messages in
+	 *UWMPhy_modem::logFile.
+	 *
+	 * @return UWMPhy_modem::log_
+	 */
 	log_level_t
 	getLogLevel()
 	{
@@ -377,11 +375,11 @@ class CheckTimer : public TimerHandler
 {
 public:
 	/**
- * Class constructor.
- *
- * @param pmModem_ pointer to the UWMPhy_modem object to link with this
- *CheckTimer object.
- */
+	 * Class constructor.
+	 *
+	 * @param pmModem_ pointer to the UWMPhy_modem object to link with this
+	 *CheckTimer object.
+	 */
 	CheckTimer(UWMPhy_modem *pmModem_)
 		: TimerHandler()
 	{
@@ -395,10 +393,10 @@ public:
 
 protected:
 	/**
-* Method to handle the expiration of a given event.
-*
-* @param e event to be handled.
-*/
+	 * Method to handle the expiration of a given event.
+	 *
+	 * @param e event to be handled.
+	 */
 	virtual void expire(Event *e);
 
 	UWMPhy_modem *pmModem; /**< Pointer to an UWMPhy_modem object. It is used to

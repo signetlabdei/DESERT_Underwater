@@ -37,12 +37,12 @@
  */
 
 #include "uwpolling_NODE.h"
-#include "uwpolling_cmn_hdr.h"
 #include "mac.h"
 #include "mmac.h"
+#include "uwpolling_cmn_hdr.h"
 
-#include "uwcbr-module.h"
 #include "rng.h"
+#include "uwcbr-module.h"
 
 #include <sstream>
 #include <sys/time.h>
@@ -76,8 +76,8 @@ void
 Uwpolling_NODE::BackOffTimer::expire(Event *e)
 {
 	if (module->debug_)
-	    std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << module->addr
-				  << ")::BACKOFF_TIMER::EXPIRED" << std::endl;
+		std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+				  << module->addr << ")::BACKOFF_TIMER::EXPIRED" << std::endl;
 	timer_status = UWPOLLING_EXPIRED;
 	if (module->Triggered) {
 		module->BackOffTimerExpired();
@@ -95,8 +95,8 @@ void
 Uwpolling_NODE::Rx_Poll_Timer::expire(Event *e)
 {
 	if (module->debug_)
-	    std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << module->addr
-				  << ")::RX_POLL_TIMER::EXPIRED" << std::endl;
+		std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+				  << module->addr << ")::RX_POLL_TIMER::EXPIRED" << std::endl;
 	timer_status = UWPOLLING_EXPIRED;
 	module->RxPollTimerExpired();
 }
@@ -105,8 +105,8 @@ void
 Uwpolling_NODE::Tx_Data_Timer::expire(Event *e)
 {
 	if (module->debug_)
-	    std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << module->addr
-				  << ")::DATA_TIMER::EXPIRED" << std::endl;
+		std::cout << module->getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+				  << module->addr << ")::DATA_TIMER::EXPIRED" << std::endl;
 	timer_status = UWPOLLING_EXPIRED;
 	module->stateTxData();
 }
@@ -165,7 +165,7 @@ Uwpolling_NODE::Uwpolling_NODE()
 	, n_trigger_dropped(0)
 	, n_poll_dropped(0)
 	, useAdaptiveTpoll(0)
-	
+
 {
 
 	bind("T_poll_guard_", (double *) &T_poll_guard);
@@ -179,7 +179,6 @@ Uwpolling_NODE::Uwpolling_NODE()
 	bind("intra_data_guard_time_", (double *) &Intra_data_Guard_Time);
 	bind("n_run_", (int *) &n_run);
 	bind("useAdaptiveTpoll_", (int *) &useAdaptiveTpoll);
-	
 
 	if (T_poll_guard <= 0)
 		T_poll_guard = MIN_T_POLL;
@@ -322,16 +321,17 @@ Uwpolling_NODE::stateTxProbe()
 							   << "_N_PKTS=" << (uint) probehdr->n_pkts_
 							   << endl;
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-						  << ")::STATE_TX_PROBE_ID_" << PROBE_uid
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr << ")::STATE_TX_PROBE_ID_" << PROBE_uid
 						  << "_N_PKTS=" << (uint) probehdr->n_pkts_ << endl;
 			TxPRobe();
 		} else {
 			if (debug_)
 				std::cout
-				  << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-				  << ")::STATE_TX_PROBE::NOT_TX_PROBE--->Empty Data Queue"
-				  << std::endl;
+						<< getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						<< addr
+						<< ")::STATE_TX_PROBE::NOT_TX_PROBE--->Empty Data Queue"
+						<< std::endl;
 			refreshReason(UWPOLLING_NODE_REASON_EMPTY_DATA_QUEUE);
 			Packet::free(curr_probe_pkt);
 			stateIdle();
@@ -352,7 +352,7 @@ Uwpolling_NODE::stateWaitPoll()
 {
 	refreshState(UWPOLLING_NODE_STATUS_WAIT_POLL);
 	if (debug_)
-	    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
 				  << ")::STATE_WAIT_POLL---> Timer_rx_poll =  "
 				  << rx_poll_timer.getDuration() << std::endl;
 	RxPollEnabled = true;
@@ -370,13 +370,15 @@ Uwpolling_NODE::stateRxPoll()
 		refreshState(UWPOLLING_NODE_STATUS_RX_POLL);
 		hdr_POLL *pollh = HDR_POLL(curr_poll_pkt);
 		if (debug_)
-		    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+					  << addr
 					  << ")::STATE_RX_POLL::Node_POLLED = " << pollh->id_
 					  << std::endl;
 		int polled_node = pollh->id_;
 		if (useAdaptiveTpoll) {
 			rx_poll_timer.schedule(pollh->POLL_time());
-			//std::cout << "Poll timer rescheduled " << pollh->POLL_time() << std::endl;
+			// std::cout << "Poll timer rescheduled " << pollh->POLL_time() <<
+			// std::endl;
 		}
 		if (node_id == (uint) polled_node) {
 			polled = true;
@@ -396,8 +398,8 @@ Uwpolling_NODE::stateRxPoll()
 		}
 	} else {
 		if (debug_)
-		    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-					  << ")::STATE_RX_POLL::NODE_NOT_POLLED" << endl;
+			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+					  << addr << ")::STATE_RX_POLL::NODE_NOT_POLLED" << endl;
 		refreshReason(UWPOLLING_NODE_REASON_WRONG_STATE);
 		drop(curr_poll_pkt, 1, UWPOLLING_NODE_DROP_REASON_WRONG_STATE);
 	}
@@ -409,14 +411,15 @@ Uwpolling_NODE::recvFromUpperLayers(Packet *p)
 	if ((int) Q_data.size() < buffer_data_pkts) {
 		hdr_uwcbr *cbrh = HDR_UWCBR(p);
 		if (debug_)
-		    std::cout << getEpoch() << "::" << NOW << "::UWPOLLING_NODE(" << addr
-					  << ")::RECV_FROM_U_LAYERS_ID_" << cbrh->sn_ << endl;
+			std::cout << getEpoch() << "::" << NOW << "::UWPOLLING_NODE("
+					  << addr << ")::RECV_FROM_U_LAYERS_ID_" << cbrh->sn_
+					  << endl;
 		if (sea_trial && print_stats)
 			out_file_stats << left << getEpoch() << "::" << NOW
 						   << "::Uwpolling_NODE(" << addr
 						   << ")::RECV_FROM_U_LAYERS_ID_" << cbrh->sn_ << endl;
-		//add Header
-		
+		// add Header
+
 		Q_data.push(p);
 	} else {
 		if (sea_trial && print_stats)
@@ -424,8 +427,8 @@ Uwpolling_NODE::recvFromUpperLayers(Packet *p)
 						   << "Uwpolling_NODE(" << addr << ")::DROP_FULL_QUEUE"
 						   << endl;
 		if (debug_)
-		    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-					  << ")::DROP_FULL_QUEUE" << std::endl;
+			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+					  << addr << ")::DROP_FULL_QUEUE" << std::endl;
 		incrDiscardedPktsTx();
 		drop(p, 1, UWPOLLING_NODE_DROP_REASON_BUFFER_FULL);
 	}
@@ -446,10 +449,10 @@ Uwpolling_NODE::stateTxData()
 		Q_data.pop();
 		hdr_uwcbr *cbrh = HDR_UWCBR(curr_data_pkt);
 		if (debug_)
-		    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-					  << ")::STATE_TX_DATA_ " << packet_index
-					  << "::OF::" << N_data_pkt_2_TX 
-					  << "_PACKET_INDEX_" << cbrh->sn_ << std::endl;
+			std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+					  << addr << ")::STATE_TX_DATA_ " << packet_index
+					  << "::OF::" << N_data_pkt_2_TX << "_PACKET_INDEX_"
+					  << cbrh->sn_ << std::endl;
 		if (sea_trial && print_stats)
 			out_file_stats << left << getEpoch() << "::" << NOW
 						   << "::Uwpolling_NODE(" << addr << ")::TX_DATA_"
@@ -522,8 +525,8 @@ Uwpolling_NODE::Phy2MacEndTx(const Packet *p)
 		}
 		default: {
 			if (debug_)
-			    std::cerr << getEpoch() << "::" << NOW << "::UWPOLLING_NODE(" << addr
-						  << ")::PHY2MACENDTX::logical_error,state = "
+				std::cerr << getEpoch() << "::" << NOW << "::UWPOLLING_NODE("
+						  << addr << ")::PHY2MACENDTX::logical_error,state = "
 						  << status_info[curr_state]
 						  << ", prev_state = " << status_info[prev_state]
 						  << std::endl;
@@ -543,7 +546,8 @@ Uwpolling_NODE::initPkt(UWPOLLING_PKT_TYPE pkt_type)
 			hdr_cmn *chd = hdr_cmn::access(Q_data.back());
 			MaxTimeStamp = chd->timestamp();
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr
 						  << ")::INIT_PROBE::"
 							 "Backoff_time="
 						  << BOffTime << "::MaxTimeStamp=" << MaxTimeStamp
@@ -555,7 +559,7 @@ Uwpolling_NODE::initPkt(UWPOLLING_PKT_TYPE pkt_type)
 			// probehdr->backoff_time() = BOffTime;
 			// probehdr->ts() = MaxTimeStamp;
 			// probehdr->backoff_time() = (uint16_t)(BOffTime * 100);
-			probehdr->ts() = (uint16_t)(MaxTimeStamp * 100);
+			probehdr->ts() = (uint16_t) (MaxTimeStamp * 100);
 			probehdr->id_node() = node_id;
 			if ((int) Q_data.size() <= max_data_pkt_tx) {
 				probehdr->n_pkts() = (int) Q_data.size();
@@ -579,8 +583,8 @@ void
 Uwpolling_NODE::stateIdle()
 {
 	if (debug_)
-	    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr << ")::IDLE_STATE"
-				  << std::endl;
+		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+				  << ")::IDLE_STATE" << std::endl;
 	refreshState(UWPOLLING_NODE_STATUS_IDLE);
 	polled = false;
 	Triggered = false;
@@ -594,7 +598,7 @@ Uwpolling_NODE::stateRxTrigger()
 {
 	refreshState(UWPOLLING_NODE_STATUS_RX_TRIGGER);
 	Triggered = true;
-	if (RxPollEnabled) { //probe was sent, but no poll has been received by AUV
+	if (RxPollEnabled) { // probe was sent, but no poll has been received by AUV
 		RxPollEnabled = false;
 		rx_poll_timer.force_cancel();
 	}
@@ -606,7 +610,7 @@ Uwpolling_NODE::stateRxTrigger()
 					   << "::Uwpolling_NODE(" << addr << ")::RX_TRIGGER_ID_"
 					   << triggerhdr->TRIGGER_uid_ << endl;
 	if (debug_) {
-	    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
 				  << ")::STATE_RX_TRIGGER --> HEADER :: T_fin = "
 				  << triggerhdr->t_fin() << " T_in = " << triggerhdr->t_in()
 				  << std::endl;
@@ -628,9 +632,12 @@ Uwpolling_NODE::stateRxTrigger()
 double
 Uwpolling_NODE::getBackOffTime()
 {
-	double random = ((double)(RNG::defaultrng()->uniform(INT_MAX) % (int)((T_fin-T_in)*100)))/100 + T_in;
+	double random = ((double) (RNG::defaultrng()->uniform(INT_MAX) %
+							(int) ((T_fin - T_in) * 100))) /
+					100 +
+			T_in;
 	if (debug_)
-	    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+		std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
 				  << ")::BACKOFF_TIMER_VALUE = " << backoff_tuner * random
 				  << std::endl;
 	return (backoff_tuner * random);
@@ -647,8 +654,9 @@ Uwpolling_NODE::Phy2MacEndRx(Packet *p)
 
 		if (ch->ptype() == PT_TRIGGER) {
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-						  << ")::PHY2MACENDRX::DROP_TRIGGER" << std::endl;
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr << ")::PHY2MACENDRX::DROP_TRIGGER"
+						  << std::endl;
 			if (sea_trial && print_stats)
 				out_file_stats << left << getEpoch() << "::" << NOW
 							   << "::Uwpolling_NODE(" << addr
@@ -656,8 +664,8 @@ Uwpolling_NODE::Phy2MacEndRx(Packet *p)
 			incrTriggerDropped();
 		} else if (ch->ptype() == PT_POLL) {
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-						  << ")::PHY2MACENDRX::DROP_POLL" << std::endl;
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr << ")::PHY2MACENDRX::DROP_POLL" << std::endl;
 			if (sea_trial && print_stats)
 				out_file_stats << left << getEpoch() << "::" << NOW
 							   << "::Uwpolling_NODE(" << addr
@@ -676,8 +684,8 @@ Uwpolling_NODE::Phy2MacEndRx(Packet *p)
 			refreshReason(UWPOLLING_NODE_REASON_RX_POLL);
 			hdr_POLL *pollh = HDR_POLL(p);
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
-						  << ")::PHY2MACENDRX::RX_POLL::POLLED_NODE= "
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr << ")::PHY2MACENDRX::RX_POLL::POLLED_NODE= "
 						  << pollh->id_ << std::endl;
 			rx_poll_timer.force_cancel();
 			curr_poll_pkt = p->copy();
@@ -690,14 +698,16 @@ Uwpolling_NODE::Phy2MacEndRx(Packet *p)
 		incrXCtrlPktsRx();
 		if (rx_pkt_type == PT_TRIGGER) {
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr
 						  << ")::PHY2MACENDRX::WARNING!!TRIGGER packet not in "
 							 "broadcast!!"
 						  << std::endl;
 
 		} else if (rx_pkt_type == PT_POLL) {
 			if (debug_)
-			    std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE(" << addr
+				std::cout << getEpoch() << "::" << NOW << "::Uwpolling_NODE("
+						  << addr
 						  << ")::PHY2MACENDRX::WARNING!!POLL packet not in "
 							 "broadcast!!"
 						  << std::endl;

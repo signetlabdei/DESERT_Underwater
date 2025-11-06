@@ -36,61 +36,59 @@
  */
 
 #include "uwtap_clmsg.h"
-#include <phymac-clmsg.h>
 #include <mmac.h>
-
+#include <phymac-clmsg.h>
 
 ClMsgTapPkt::ClMsgTapPkt()
-    : ClMessage(ClMsgTapPkt::CLMSG_TAP_VERBOSITY, CLMSG_TAP_PKT)
-    , pkt(nullptr)
-    , clmsg_type(clmsg_tap_type::NONE)
-    ,timestamp(NOW)
-    , tx_duration(0.0)
+	: ClMessage(ClMsgTapPkt::CLMSG_TAP_VERBOSITY, CLMSG_TAP_PKT)
+	, pkt(nullptr)
+	, clmsg_type(clmsg_tap_type::NONE)
+	, timestamp(NOW)
+	, tx_duration(0.0)
 {
 }
 
-ClMsgTapPkt::ClMsgTapPkt(Packet* packet,clmsg_tap_type type,double timestamp, double tx_duration)
-    : ClMessage(ClMsgTapPkt::CLMSG_TAP_VERBOSITY, 
-			CLMSG_TAP_PKT)
-    , pkt(packet)
-    , clmsg_type(type)
-    , timestamp(timestamp)
-    , tx_duration(tx_duration)
+ClMsgTapPkt::ClMsgTapPkt(Packet *packet, clmsg_tap_type type, double timestamp,
+		double tx_duration)
+	: ClMessage(ClMsgTapPkt::CLMSG_TAP_VERBOSITY, CLMSG_TAP_PKT)
+	, pkt(packet)
+	, clmsg_type(type)
+	, timestamp(timestamp)
+	, tx_duration(tx_duration)
 {
 }
 
 ClMsgTapPkt::ClMsgTapPkt(int dest_id)
-    : ClMessage(ClMsgTapPkt::CLMSG_TAP_VERBOSITY,
-			CLMSG_TAP_PKT,UNICAST,dest_id)
-    , pkt(nullptr)
+	: ClMessage(
+			  ClMsgTapPkt::CLMSG_TAP_VERBOSITY, CLMSG_TAP_PKT, UNICAST, dest_id)
+	, pkt(nullptr)
 {
 }
-
 
 bool
 ClMsgTapPkt::getPacket(Packet *packet)
 {
-    if(pkt != nullptr) {
-        packet = pkt;
-        return true;
-    }
-    return false;
+	if (pkt != nullptr) {
+		packet = pkt;
+		return true;
+	}
+	return false;
 }
 
 void
-ClMsgTapPkt::setPacket(Packet* packet)
+ClMsgTapPkt::setPacket(Packet *packet)
 {
-    pkt = packet;
+	pkt = packet;
 }
 
-double 
+double
 ClMsgTapPkt::getTimestamp() const
 {
-    return timestamp;
+	return timestamp;
 }
 
-double 
+double
 ClMsgTapPkt::getTxDuration() const
 {
-    return tx_duration;
+	return tx_duration;
 }

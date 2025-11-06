@@ -41,8 +41,8 @@
 
 #include <uwphysical.h>
 
-#include <packet.h>
 #include <module.h>
+#include <packet.h>
 #include <tclcl.h>
 
 #include <fstream>

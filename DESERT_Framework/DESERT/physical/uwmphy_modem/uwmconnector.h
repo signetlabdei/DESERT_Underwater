@@ -37,19 +37,19 @@
 #ifndef UWMCONNECTOR_H
 #define UWMCONNECTOR_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <pthread.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <termios.h>
-#include <pthread.h>
 #include <unistd.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 
 #include <queue>
 
@@ -60,8 +60,6 @@
 				exchanged between host and modem */
 #define _MAX_QUEUE_LENGTH \
 	20 /**< Maximum length of queue containing the messages from modem */
-
-
 
 // Forward declaration to avoid dependence from UWMdriver.h
 class UWMdriver;
@@ -80,8 +78,8 @@ struct msgModem {
 class UWMconnector
 {
 public:
-	std::queue<msgModem> queueMsg; /**< Queue used to buffer incoming strings from
-								 the modem.*/
+	std::queue<msgModem> queueMsg; /**< Queue used to buffer incoming strings
+								 from the modem.*/
 
 	/**
 	 * Class constructor.

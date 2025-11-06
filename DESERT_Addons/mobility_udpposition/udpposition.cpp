@@ -37,8 +37,8 @@
  * Provides the <i>UDPPosition</i> class implementation.
  */
 
-#include <iostream>
 #include "udpposition.h"
+#include <iostream>
 
 /* ======================================================================
    TCL Hooks for the simulator
@@ -46,107 +46,111 @@
 static class UDPPositionClass : public TclClass
 {
 public:
-    UDPPositionClass()
-        : TclClass("Position/UDP")
-    {
-    }
-    TclObject *
-    create(int, const char *const *)
-    {
-        return (new UDPPosition());
-    }
+	UDPPositionClass()
+		: TclClass("Position/UDP")
+	{
+	}
+	TclObject *
+	create(int, const char *const *)
+	{
+		return (new UDPPosition());
+	}
 } class_uwsmposition;
 
 UDPPosition::UDPPosition()
-    : Position()
+	: Position()
 {
-    bind("debug_", &debug_);
-    bind("udp_receive_port_", &m_UdpReceivePort);
+	bind("debug_", &debug_);
+	bind("udp_receive_port_", &m_UdpReceivePort);
 }
 
-int UDPPosition::command(int argc, const char *const *argv)
+int
+UDPPosition::command(int argc, const char *const *argv)
 {
-    // Tcl &tcl = Tcl::instance();
-    if (strcasecmp(argv[1], "start") == 0)
-    {
-        if (p_PositionListener) {
-            LOG_MSG_ERROR(NOW << "::UDPPosition: position listener thread already started!");
-            return TCL_ERROR;
-        }
+	// Tcl &tcl = Tcl::instance();
+	if (strcasecmp(argv[1], "start") == 0) {
+		if (p_PositionListener) {
+			LOG_MSG_ERROR(NOW << "::UDPPosition: position listener thread "
+								 "already started!");
+			return TCL_ERROR;
+		}
 
-        struct timeval tv;
-        tv.tv_sec = 0;
-        tv.tv_usec = m_SocketReadTimeout;
-        p_PositionListener = new PositionListener(this, m_UdpReceivePort, tv);
-        if (p_PositionListener)
-        {
-            if (debug_ >= 1)
-                LOG_MSG_INFO(NOW << "::UDPPosition: starting position listener on port " << m_UdpReceivePort);
-            if (p_PositionListener->Start())
-                return TCL_OK;
-        }
+		struct timeval tv;
+		tv.tv_sec = 0;
+		tv.tv_usec = m_SocketReadTimeout;
+		p_PositionListener = new PositionListener(this, m_UdpReceivePort, tv);
+		if (p_PositionListener) {
+			if (debug_ >= 1)
+				LOG_MSG_INFO(NOW
+						<< "::UDPPosition: starting position listener on port "
+						<< m_UdpReceivePort);
+			if (p_PositionListener->Start())
+				return TCL_OK;
+		}
 
-        return TCL_ERROR;
-    }
-    else if (strcasecmp(argv[1], "stop") == 0)
-    {
-        if (p_PositionListener)
-        {
-            if (p_PositionListener->Running())
-            {
-                if (debug_ >= 1)
-                    LOG_MSG_INFO(NOW << "::UDPPosition: stopping position listener");
-                p_PositionListener->Stop(true);
-            }
-            delete p_PositionListener;
-            p_PositionListener = nullptr;
-        }
-        return TCL_OK;
-    }
-    return Position::command(argc, argv);
+		return TCL_ERROR;
+	} else if (strcasecmp(argv[1], "stop") == 0) {
+		if (p_PositionListener) {
+			if (p_PositionListener->Running()) {
+				if (debug_ >= 1)
+					LOG_MSG_INFO(
+							NOW << "::UDPPosition: stopping position listener");
+				p_PositionListener->Stop(true);
+			}
+			delete p_PositionListener;
+			p_PositionListener = nullptr;
+		}
+		return TCL_OK;
+	}
+	return Position::command(argc, argv);
 }
 
-void UDPPosition::setPosition(const PositionData &pos)
+void
+UDPPosition::setPosition(const PositionData &pos)
 {
-    if (debug_ >= 1)
-        LOG_MSG_INFO(NOW << "::UDPPosition: setting position to [" << pos.x << "," << pos.y << "," << pos.z << "]");
-    std::unique_lock<std::mutex> lock(mutex_);
-    Position::setX(pos.x);
-    Position::setY(pos.y);
-    Position::setZ(pos.z);
+	if (debug_ >= 1)
+		LOG_MSG_INFO(NOW << "::UDPPosition: setting position to [" << pos.x
+						 << "," << pos.y << "," << pos.z << "]");
+	std::unique_lock<std::mutex> lock(mutex_);
+	Position::setX(pos.x);
+	Position::setY(pos.y);
+	Position::setZ(pos.z);
 }
 
 double
 UDPPosition::getX()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    return Position::getX();
+	std::unique_lock<std::mutex> lock(mutex_);
+	return Position::getX();
 }
 double
 UDPPosition::getY()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    return Position::getY();
+	std::unique_lock<std::mutex> lock(mutex_);
+	return Position::getY();
 }
 double
 UDPPosition::getZ()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    return Position::getZ();
+	std::unique_lock<std::mutex> lock(mutex_);
+	return Position::getZ();
 }
 
-void UDPPosition::setX(double x)
+void
+UDPPosition::setX(double x)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    Position::setX(x);
+	std::unique_lock<std::mutex> lock(mutex_);
+	Position::setX(x);
 }
-void UDPPosition::setY(double y)
+void
+UDPPosition::setY(double y)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    Position::setY(y);
+	std::unique_lock<std::mutex> lock(mutex_);
+	Position::setY(y);
 }
-void UDPPosition::setZ(double z)
+void
+UDPPosition::setZ(double z)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    Position::setZ(z);
+	std::unique_lock<std::mutex> lock(mutex_);
+	Position::setZ(z);
 }

@@ -10,135 +10,155 @@
 // 2. Redistributions in binary form must reproduce the above copyright
 //    notice, this list of conditions and the following disclaimer in the
 //    documentation and/or other materials provided with the distribution.
-// 3. Neither the name of the University of Padova (SIGNET lab) nor the 
-//    names of its contributors may be used to endorse or promote products 
+// 3. Neither the name of the University of Padova (SIGNET lab) nor the
+//    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
-// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file packer-uwpolling.h
  * @author Federico Favaro
  * \version 1.0.0
- * \brief  Header of the class responsible to map the ns2 packet of Uwpolling into a bit stream, and vice-versa.
+ * \brief  Header of the class responsible to map the ns2 packet of Uwpolling
+ * into a bit stream, and vice-versa.
  */
 
- #ifndef PACKER_UWPOLLING_H
+#ifndef PACKER_UWPOLLING_H
 #define PACKER_UWPOLLING_H
 
 #include "packer.h"
 
-#include "uwpolling_cmn_hdr.h"
 #include "mac.h"
+#include "uwpolling_cmn_hdr.h"
 
 #include <iostream>
 
 /**
  * Class to map a Uwpolling header into a bit stream, and vice-versa.
  */
-class packerUwpolling : public packer {
+class packerUwpolling : public packer
+{
 public:
+	/**
+	 * Class constructor.
+	 *
+	 */
+	packerUwpolling();
 
-    /** 
-     * Class constructor.
-     * 
-     */
-    packerUwpolling();
-
-    /** 
-     * Class destructor.
-     * 
-     */
-    ~packerUwpolling();
-
+	/**
+	 * Class destructor.
+	 *
+	 */
+	~packerUwpolling();
 
 private:
-    /**
-     * Init the Packer
-     */
-    void init();
-    /**
-     * Method to transform the headers of Uwpolling into a stream of bits
-     * @param Pointer to the packet to serialize
-     * @param Pointer to the buffer
-     * @param Offset from the begin of the buffer
-     * @return New offset after packing the headers of the packets
-     */
-    size_t packMyHdr(Packet*, unsigned char*, size_t);
-    /**
-     * Method responsible to take the informations from the received buffer and store it into the headers of the packet
-     * @param Pointer to the buffer received
-     * @param Offset from the begin of the buffer
-     * @param Pointer to the new packet
-     * @return New offset after unpacking the headers
-     */
-    size_t unpackMyHdr(unsigned char*, size_t, Packet*);
-    /**
-     * Method used for debug purposes. It prints the number of bits for each header serialized
-     */
-    void printMyHdrMap();
-    /**
-     * Method used for debug purposes. It prints the value of the headers of a packet
-     * @param Pointer of the packet 
-     */
-    void printMyHdrFields(Packet*);
-    
-    enum nbits_index {
-        T_IN = 0,
-        T_FIN,
-        UID_TRIGGER,
-        ID_POLLED,
-        BACKOFF_TIME,
-        TS_BITS,
-        N_PKTS,
-        UID_PROBE,
-        ID_NODE,
-        UID_POLL,
-        POLL_TIME,
-        UID_SINK,
-        UID_PROBE_SINK,
-        UID_ACK,
-        UID_PACKET,
-        UID_LAST_PACKET,
-        UID_ACKS,
-        ACK_ARRAY_SIZE,
-        ACK_ELEM_BITS,
+	/**
+	 * Init the Packer
+	 */
+	void init();
+	/**
+	 * Method to transform the headers of Uwpolling into a stream of bits
+	 * @param Pointer to the packet to serialize
+	 * @param Pointer to the buffer
+	 * @param Offset from the begin of the buffer
+	 * @return New offset after packing the headers of the packets
+	 */
+	size_t packMyHdr(Packet *, unsigned char *, size_t);
+	/**
+	 * Method responsible to take the informations from the received buffer and
+	 * store it into the headers of the packet
+	 * @param Pointer to the buffer received
+	 * @param Offset from the begin of the buffer
+	 * @param Pointer to the new packet
+	 * @return New offset after unpacking the headers
+	 */
+	size_t unpackMyHdr(unsigned char *, size_t, Packet *);
+	/**
+	 * Method used for debug purposes. It prints the number of bits for each
+	 * header serialized
+	 */
+	void printMyHdrMap();
+	/**
+	 * Method used for debug purposes. It prints the value of the headers of a
+	 * packet
+	 * @param Pointer of the packet
+	 */
+	void printMyHdrFields(Packet *);
+
+	enum nbits_index {
+		T_IN = 0,
+		T_FIN,
+		UID_TRIGGER,
+		ID_POLLED,
+		BACKOFF_TIME,
+		TS_BITS,
+		N_PKTS,
+		UID_PROBE,
+		ID_NODE,
+		UID_POLL,
+		POLL_TIME,
+		UID_SINK,
+		UID_PROBE_SINK,
+		UID_ACK,
+		UID_PACKET,
+		UID_LAST_PACKET,
+		UID_ACKS,
+		ACK_ARRAY_SIZE,
+		ACK_ELEM_BITS,
 
 		LAST_ELEM
-    };
+	};
 
-    size_t t_in_Bits;           /**< number of Bits used for t_in field on TRIGGER header */
-    size_t t_fin_Bits;          /**< number of Bits used for t_fin field on TRIGGER header */
-    size_t uid_trigger_Bits;    /**< number of Bits used for uid field on TRIGGER header */
-    size_t id_polled_Bits;      /**< number of Bits used for id_polled field on POLL header */
-    size_t backoff_time_Bits;   /**< number of Bits used for backoff field on PROBE header */
-    size_t ts_Bits;             /**< number of Bits used for ts field on PROBE header */
-    size_t n_pkts_Bits;         /**< number of Bits used for n_pkts field on PROBE header */
-    size_t uid_probe_Bits;      /**< number of Bits used for uid field on PROBE header */
-    size_t id_node_Bits;        /**< number of Bits used for id_node field on PROBE header */
-    size_t uid_poll_Bits;       /**< number of Bits used for uid field on POLL header */
-    size_t poll_time_Bits;		/**< number of Bits used for POLL_time field on POLL header */
-    size_t uid_sink_Bits;		/**< number of Bits used for id_sink_ field on PROBE_SINK header */
-    size_t uid_probe_sink_Bits; /**< number of Bits used for PROBE_uid_ field on PROBE_SINK header */
-    size_t uid_ack_Bits;		/**< number of Bits used for id_ack_ field on PROBE_SINK header */
-    size_t uid_packet_Bits; 	/**< number of Bits used for pkt_uid_ field on AUV_MULE header */
-    size_t uid_last_packet_Bits;/**< number of Bits used for last_pkt_uid_ field on AUV_MULE header */
-    size_t uid_acks_Bits;
-    size_t ack_array_size_Bits; /**< number of Bits used for number of ACKs on ACK_SINK header */
-    size_t ack_array_el_Bits;	/**< number of Bits used for each ACK on ACK_SINK header */
-    size_t ack_array_size;		/**< Maximum number of elements for the ACK vector */
+	size_t t_in_Bits; /**< number of Bits used for t_in field on TRIGGER header
+					   */
+	size_t t_fin_Bits; /**< number of Bits used for t_fin field on TRIGGER
+						  header */
+	size_t uid_trigger_Bits; /**< number of Bits used for uid field on TRIGGER
+								header */
+	size_t id_polled_Bits; /**< number of Bits used for id_polled field on POLL
+							  header */
+	size_t backoff_time_Bits; /**< number of Bits used for backoff field on
+								 PROBE header */
+	size_t ts_Bits; /**< number of Bits used for ts field on PROBE header */
+	size_t n_pkts_Bits; /**< number of Bits used for n_pkts field on PROBE
+						   header */
+	size_t uid_probe_Bits; /**< number of Bits used for uid field on PROBE
+							  header */
+	size_t id_node_Bits; /**< number of Bits used for id_node field on PROBE
+							header */
+	size_t uid_poll_Bits; /**< number of Bits used for uid field on POLL header
+						   */
+	size_t poll_time_Bits; /**< number of Bits used for POLL_time field on POLL
+							  header */
+	size_t uid_sink_Bits; /**< number of Bits used for id_sink_ field on
+							 PROBE_SINK header */
+	size_t uid_probe_sink_Bits; /**< number of Bits used for PROBE_uid_ field on
+								   PROBE_SINK header */
+	size_t uid_ack_Bits; /**< number of Bits used for id_ack_ field on
+							PROBE_SINK header */
+	size_t uid_packet_Bits; /**< number of Bits used for pkt_uid_ field on
+							   AUV_MULE header */
+	size_t uid_last_packet_Bits; /**< number of Bits used for last_pkt_uid_
+									field on AUV_MULE header */
+	size_t uid_acks_Bits;
+	size_t ack_array_size_Bits; /**< number of Bits used for number of ACKs on
+								   ACK_SINK header */
+	size_t ack_array_el_Bits; /**< number of Bits used for each ACK on ACK_SINK
+								 header */
+	size_t ack_array_size; /**< Maximum number of elements for the ACK vector */
 
-    int sink_mac; /**< Mac addres of the destination that need AUV_MULE hdr */
-};	
+	int sink_mac; /**< Mac addres of the destination that need AUV_MULE hdr */
+};
 
 #endif

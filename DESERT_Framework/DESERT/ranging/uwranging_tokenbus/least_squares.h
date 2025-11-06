@@ -27,7 +27,6 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-
 #ifndef UWTOKENBUS_RANGH
 #define UWTOKENBUS_RANGH
 
@@ -35,17 +34,24 @@
 
 namespace LSSQ
 {
-    enum LeastSqResult {OK = 0, TIMEOUT = 1, ERROR = 2}; /**< enumerates the possible outputs of nnLeastSquares() */
+enum LeastSqResult {
+	OK = 0,
+	TIMEOUT = 1,
+	ERROR = 2
+}; /**< enumerates the possible outputs of nnLeastSquares() */
 
-    /** 
-    * 	@brief Least Squares Linear Regressor solves the least squares problem A * X = B, X>=0 
-    *	@param a NxM matrix A: the first index returns the vector of samples related to a single unknown, the second index individuates the sample
-    *	@param b vector of known terms of size M 
-    *	@param x vector of size N to hold the solution output
-    *	@param resid (optional) outputs the squared norm of the residual vector
-    *	@return 0 = OK, 1 = TIMEOUT, 2 = ERROR
-    */
-    LeastSqResult nnLeastSquares(std::vector<std::vector<double>> a,std::vector<double> b,std::vector<double> &x,double* resid = nullptr);
+/**
+ * 	@brief Least Squares Linear Regressor solves the least squares problem A * X
+ *= B, X>=0
+ *	@param a NxM matrix A: the first index returns the vector of samples related
+ *to a single unknown, the second index individuates the sample
+ *	@param b vector of known terms of size M
+ *	@param x vector of size N to hold the solution output
+ *	@param resid (optional) outputs the squared norm of the residual vector
+ *	@return 0 = OK, 1 = TIMEOUT, 2 = ERROR
+ */
+LeastSqResult nnLeastSquares(std::vector<std::vector<double>> a,
+		std::vector<double> b, std::vector<double> &x, double *resid = nullptr);
 
-}
+} // namespace LSSQ
 #endif

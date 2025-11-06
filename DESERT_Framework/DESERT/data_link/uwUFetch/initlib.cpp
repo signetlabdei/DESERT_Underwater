@@ -34,11 +34,11 @@
  * \brief file to initialize the libuwufetch.so library
  */
 
-#include <tclcl.h>
 #include "packet.h"
 #include "uwUFetch_AUV.h"
 #include "uwUFetch_NODE.h"
 #include "uwUFetch_cmn_hdr.h"
+#include <tclcl.h>
 
 int hdr_TRIGGER_UFETCH::offset_ = 0;
 int hdr_RTS_UFETCH::offset_ = 0;

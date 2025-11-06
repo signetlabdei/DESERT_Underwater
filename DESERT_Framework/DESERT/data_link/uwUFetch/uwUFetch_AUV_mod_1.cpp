@@ -1431,8 +1431,7 @@ uwUFetch_AUV::DATA_rx()
 	 * save the data packet in the QUEUE of the AUV
 	 * an pass it to the application layer
 	 */
-	Q_data_AUV.push(
-			curr_DATA_pck_rx
+	Q_data_AUV.push(curr_DATA_pck_rx
 					->copy()); // Save the data packets in the QUEUE of the AUV
 	sendUp(curr_DATA_pck_rx->copy()); // Pass the DATA packets received from the
 									  // AUV at the CBR level

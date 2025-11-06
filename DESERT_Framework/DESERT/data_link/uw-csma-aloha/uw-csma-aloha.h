@@ -44,10 +44,10 @@
 #include <queue>
 #include <string>
 
-#include <mphy.h>
 #include <mmac.h>
+#include <mphy.h>
 
-#define CSMA_DROP_REASON_WRONG_STATE                                         \
+#define CSMA_DROP_REASON_WRONG_STATE \
 	"WST" /**< Cannot receive packets in this state */
 #define CSMA_DROP_REASON_WRONG_RECEIVER \
 	"WRCV" /**< The packet is for another node */

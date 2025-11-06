@@ -37,16 +37,16 @@
 #ifndef UWUFETCH_AUV_H_
 #define UWUFETCH_AUV_H_
 
-#include <mmac.h>
-#include <iostream>
-#include <clmessage.h>
-#include <mphy.h>
-#include <string>
-#include <fstream>
-#include <ostream>
 #include <cassert>
+#include <clmessage.h>
+#include <fstream>
+#include <iostream>
 #include <map>
+#include <mmac.h>
+#include <mphy.h>
+#include <ostream>
 #include <queue>
+#include <string>
 
 #define UWFETCH_AUV_DROP_REASON_ERROR \
 	"DERR" /**<  Packet dropped: Packet corrupted */
@@ -194,7 +194,7 @@ protected:
 		/**
 		 * Destructor of uwUFetch_timer class
 		 */
-		virtual ~uwUFetch_timer(){};
+		virtual ~uwUFetch_timer() {};
 
 		/**
 		 *  Freeze the timer
@@ -222,9 +222,9 @@ protected:
 			start_time = NOW;
 			assert(left_duration > 0);
 			sched(left_duration); /**check the state of the timer before
-										 * sheduling the event. If the timer is
-										 * set, then the call are aborted
-										 */
+								   * sheduling the event. If the timer is
+								   * set, then the call are aborted
+								   */
 			timer_status = UWUFETCH_TIMER_STATUS_RUNNING;
 		}
 
@@ -990,9 +990,8 @@ protected:
 	uwUFetch_TRIGGER_timer
 			Trigger_timer; /**< Interval time. After that the AUV start the
 							  transmission of the TRIGGER packet */
-	uwUFetch_RTS_timer
-			RTS_timer; /**< Interval time in which the AUV wait a RTS packets
-						  from the HNs */
+	uwUFetch_RTS_timer RTS_timer; /**< Interval time in which the AUV wait a RTS
+									 packets from the HNs */
 	uwUFetch_DATA_timer DATA_timer; /**< Interval time in which the AUV want to
 									   receive all DATA packets from the HN */
 	uwUFetch_FIRST_DATA_timer
@@ -1017,9 +1016,8 @@ protected:
 									 of TRIGGER packet */
 	double tx_TRIGGER_finish_time; /**< Indicates when AUV end the transmission
 									  of TRIGGER packet */
-	double
-			rx_RTS_start_time; /**< Indicates when AUV start the reception of
-								  RTS packet */
+	double rx_RTS_start_time; /**< Indicates when AUV start the reception of
+								 RTS packet */
 	double rx_RTS_finish_time; /**< Indicates when AUV end the reception of RTS
 								  packet */
 	double tx_CTS_start_time; /**< Indicates when AUV start a transmission of
@@ -1030,10 +1028,9 @@ protected:
 								  DATA packet */
 	double rx_DATA_finish_time; /**< Indicates when AUV end the reception of
 								   DATA packet */
-	int
-			n_tot_TRIGGER_tx_by_AUV; /**< Counter of the number of TRIGGER
-										packets transmitted by AUV during an
-										entire duration of simulation */
+	int n_tot_TRIGGER_tx_by_AUV; /**< Counter of the number of TRIGGER
+									packets transmitted by AUV during an
+									entire duration of simulation */
 	int n_tot_RTS_rx_by_AUV; /**< Counter of the number of RTS packets received
 								by AUV during an entire duration of simulation
 								*/
@@ -1046,29 +1043,25 @@ protected:
 	int n_tot_DATA_rx_by_AUV; /**< Counter of the number of DATA packets
 								 received by AUV during an entire duration of
 								 simulation */
-	int
-			n_tot_DATA_rx_corr_by_AUV; /**< Counter of the number of DATA
-										  packets corrupted received by AUV
-										  during an entire duration of
-										  simulation */
-	int
-			number_data_pck_AUV_rx_exact; /**< Number of DATA packets that AUV
-											 want exactly received from the HN
-											 */
-	int
-			mac_addr_HN_ctsed; /**< Mac address of the HN from which the AUV
-								  want to receive the DATA packets */
+	int n_tot_DATA_rx_corr_by_AUV; /**< Counter of the number of DATA
+									  packets corrupted received by AUV
+									  during an entire duration of
+									  simulation */
+	int number_data_pck_AUV_rx_exact; /**< Number of DATA packets that AUV
+										 want exactly received from the HN
+										 */
+	int mac_addr_HN_ctsed; /**< Mac address of the HN from which the AUV
+							  want to receive the DATA packets */
 	double data_timeout; /**< Interval time within AUV want to receive all DATA
 							packets from the HN */
 	double T_tx_TRIGGER; /**< Time required to transimt a single TRIGGER packet
-							*/
+						  */
 	double Trts; /**< Time needed to transmit a RTS packet. It contain also the
 					propagation delay */
 	double Tcts; /**< Time needed to transmit a CTS packet. It contain also the
 					propagation delay */
-	double
-			Tdata; /**<Time needed to transmit a DATA packet. It contain also
-					  the propagation delay */
+	double Tdata; /**<Time needed to transmit a DATA packet. It contain also
+					 the propagation delay */
 	double RTT; /**< Round Trip Time*/
 	int mac_addr_HN_in_data; /**< MAC address of the HN from which the AUV has
 								received the DATA packet  */
@@ -1077,21 +1070,16 @@ protected:
 	int hn_trigg; /**< Index of the HN that will be triggered with the next
 					 cycle of TRIGGER-RTS-CTS */
 	int index; /**< */
-	int
-			mac_addr_hn_triggered; /**< MAC address of the HN triggered by the
-									  AUV.  */
-	int
-			num_pck_hn_1; /**< Counter of the correct DATA packets received by
-							 HN 1 from SNs */
-	int
-			num_pck_hn_2; /**< Counter of the correct DATA packets received by
-							 HN 2 from SNs */
-	int
-			num_pck_hn_3; /**< Counter of the correct DATA packets received by
-							 HN 3 from SNs */
-	int
-			num_pck_hn_4; /**< Counter of the correct DATA packets received by
-							 HN 4 from SNs */
+	int mac_addr_hn_triggered; /**< MAC address of the HN triggered by the
+								  AUV.  */
+	int num_pck_hn_1; /**< Counter of the correct DATA packets received by
+						 HN 1 from SNs */
+	int num_pck_hn_2; /**< Counter of the correct DATA packets received by
+						 HN 2 from SNs */
+	int num_pck_hn_3; /**< Counter of the correct DATA packets received by
+						 HN 3 from SNs */
+	int num_pck_hn_4; /**< Counter of the correct DATA packets received by
+						 HN 4 from SNs */
 
 	// VARIABLES THAT ENABLES OR NOT AN OPERATION
 	bool txTRIGGEREnabled; /**< <i>true</i> if AUV is enabled to transmit a
@@ -1111,10 +1099,9 @@ protected:
 							AUV during a single cycle of simulation */
 	int n_CTS_tx_by_AUV; /**< Counter of the number of CTS packets transmitted
 							by AUV during a single cycle of simulation */
-	int
-			n_DATA_rx_by_AUV; /**< Counter of the number of DATA packets
-								 transmitted by AUV during a single cycle of
-								 simulation */
+	int n_DATA_rx_by_AUV; /**< Counter of the number of DATA packets
+							 transmitted by AUV during a single cycle of
+							 simulation */
 
 	// PACKETS CREATED
 	Packet *curr_TRIGGER_pck_tx; /**< Pointer to the TRIGGER packet that is
@@ -1142,11 +1129,11 @@ protected:
 	// VARIABLES THAT INDICATE IN WHICH STATE THE NODE IS IN THAT MOMENT AND THE
 	// REASON BECAUSE THE NODE PASS FROM A STATE TO ANOTHER ONE
 	UWUFETCH_AUV_STATUS_CHANGE
-			last_reason; /**< Last reason because the NODE change his state */
+	last_reason; /**< Last reason because the NODE change his state */
 	UWUFETCH_AUV_STATUS
-			curr_state; /**< Current state in which the node is located */
+	curr_state; /**< Current state in which the node is located */
 	UWUFETCH_AUV_STATUS
-			prev_state; /**< Previous state in which the node it was located */
+	prev_state; /**< Previous state in which the node it was located */
 
 	static std::map<UWUFETCH_AUV_STATUS, std::string>
 			statusInfo; /**< Map the UWUFETCH_AUV_STATUS to the description of
@@ -1154,28 +1141,23 @@ protected:
 	static std::map<UWUFETCH_AUV_STATUS_CHANGE, std::string>
 			statusChange; /**< Map the UWUFETCH_AUV_STATUS_CHANGE to the
 							 description the reason of changing state */
-	static std::
-			map<UWUFETCH_AUV_PACKET_TYPE, std::string>
-					packetType; /**< Map the UWUFETCH_AUV_PACKET_TYPE to the
-								   description of  packet type*/
+	static std::map<UWUFETCH_AUV_PACKET_TYPE, std::string>
+			packetType; /**< Map the UWUFETCH_AUV_PACKET_TYPE to the
+						   description of  packet type*/
 	static std::map<UWUFETCH_TIMER_STATUS, std::string>
 			statusTimer; /**< Map the UWUFETCH_TIMER_STATUS to the description
 							of the timers*/
 
 	// VARIABLES FOR DEBUG
-	std::
-			ofstream fout; /**< Variable that handle the file in which the
-							  protocol write the state transition for debug
-							  purposes */
-	std::ofstream
-			out_file_logging; /**< Variable that handle the file in which the
-								 protocol write the statistics */
-	static bool
-			initialized; /**< Indicate if the protocol has been initialized or
-							not */
-	bool
-			print_transitions; /**< <i>true</i> if the writing of state
-								  transitions in the file is enabled. */
+	std::ofstream fout; /**< Variable that handle the file in which the
+						   protocol write the state transition for debug
+						   purposes */
+	std::ofstream out_file_logging; /**< Variable that handle the file in which
+									   the protocol write the statistics */
+	static bool initialized; /**< Indicate if the protocol has been initialized
+								or not */
+	bool print_transitions; /**< <i>true</i> if the writing of state
+							   transitions in the file is enabled. */
 
 	static const int MAX_RTS_RX =
 			100; /**< Maximum number of RTS packets that AUV can receive */

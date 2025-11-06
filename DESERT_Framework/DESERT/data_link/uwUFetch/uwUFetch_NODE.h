@@ -38,19 +38,19 @@
 #ifndef UWUFETCH_NODE_H_
 #define UWUFETCH_NODE_H_
 
-#include <mmac.h>
-#include <stdio.h>
-#include <time.h>
-#include <iostream>
-#include <clmessage.h>
-#include <mphy.h>
-#include <string>
-#include <fstream>
-#include <ostream>
 #include <cassert>
-#include <queue>
+#include <clmessage.h>
+#include <fstream>
+#include <iostream>
 #include <map>
-//#include "uwmphy_modem_cmn_hdr.h"
+#include <mmac.h>
+#include <mphy.h>
+#include <ostream>
+#include <queue>
+#include <stdio.h>
+#include <string>
+#include <time.h>
+// #include "uwmphy_modem_cmn_hdr.h"
 
 #define UWFETCH_NODE_DROP_REASON_UNKNOWN_TYPE \
 	"DUT" /**<Packet dropped: unknown type */
@@ -274,7 +274,7 @@ protected:
 		/**
 		 *  Destructor of the class uwUFetch_NODE_timer
 		 */
-		virtual ~uwUFetch_NODE_timer(){};
+		virtual ~uwUFetch_NODE_timer() {};
 
 		/**
 		 *  Freeze the timer
@@ -302,9 +302,9 @@ protected:
 			start_time = NOW;
 			assert(left_duration > 0);
 			sched(left_duration); /**check the state of the timer before
-										 * sheduling the event. If the timer is
-										 * set, then the call are aborted
-										 */
+								   * sheduling the event. If the timer is
+								   * set, then the call are aborted
+								   */
 			timer_status = UWUFETCH_TIMER_STATUS_RUNNING;
 		}
 
@@ -462,7 +462,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_BEACON_timer
 		 */
-		virtual ~uwUFetch_BEACON_timer(){};
+		virtual ~uwUFetch_BEACON_timer() {};
 
 	protected:
 		/**
@@ -531,7 +531,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_PROBE_timer
 		 */
-		virtual ~uwUFetch_PROBE_timer(){};
+		virtual ~uwUFetch_PROBE_timer() {};
 
 	protected:
 		/**
@@ -567,7 +567,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_POLL_timer
 		 */
-		virtual ~uwUFetch_POLL_timer(){};
+		virtual ~uwUFetch_POLL_timer() {};
 
 	protected:
 		/**
@@ -601,7 +601,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_DATA_BEFORE_TX_timer class
 		 */
-		virtual ~uwUFetch_DATA_BEFORE_TX_timer(){};
+		virtual ~uwUFetch_DATA_BEFORE_TX_timer() {};
 
 	protected:
 		/**
@@ -636,7 +636,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_DATA_timer class
 		 */
-		virtual ~uwUFetch_DATA_timer(){};
+		virtual ~uwUFetch_DATA_timer() {};
 
 	protected:
 		/**
@@ -671,7 +671,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_Beacon_timer class
 		 */
-		virtual ~uwUFetch_CBeacon_timer(){};
+		virtual ~uwUFetch_CBeacon_timer() {};
 
 	protected:
 		/**
@@ -706,7 +706,7 @@ protected:
 		/*
 		 * Destructor of UWUFetch_CTS_timer class
 		 */
-		virtual ~uwUFetch_CTS_timer(){};
+		virtual ~uwUFetch_CTS_timer() {};
 
 	protected:
 		/**
@@ -741,7 +741,7 @@ protected:
 		/*
 		 * Destructor of uwUFetch_TRIGGER_time class
 		 */
-		virtual ~uwUFetch_TRIGGER_timer(){};
+		virtual ~uwUFetch_TRIGGER_timer() {};
 
 	protected:
 		/**
@@ -2080,9 +2080,8 @@ protected:
 	 ****************************************************************************/
 	// TCL variables
 	int MAX_PAYLOAD; /**< Maximum size of payload DATA packet */
-	double
-			T_GUARD; /**< Guard interval used for successive transmission of
-						DATA packets */
+	double T_GUARD; /**< Guard interval used for successive transmission of
+					   DATA packets */
 	int MAXIMUM_BUFFER_DATA_PCK_NODE; /**< Maximum number of DATA packets that
 										 the SN can store in Its queue */
 	double T_POLL; /**< Interval time in which the SN wait a POLL packet from
@@ -2095,9 +2094,8 @@ protected:
 	int MODE_COMM_HN_AUV; /**< Indicate the type of communication between HN and
 							 AUV, 0 = communication with RTS-CTS, 1 =
 							 communication without RTS-CTS */
-	int
-			MODE_BURST_DATA; /**< Indicate if it's used or not the burst data.
-								0=not use burst date, 1=use burst data. */
+	int MODE_BURST_DATA; /**< Indicate if it's used or not the burst data.
+							0=not use burst date, 1=use burst data. */
 
 	// Timers
 	uwUFetch_BackOffTimer BCK_timer_probe; /**< Interval time in which HN is
@@ -2115,9 +2113,8 @@ protected:
 										  // from HN */
 
 	// Global Variables that should be never reset
-	double
-			rx_BEACON_start_time; /**< Indicates when SN started the reception
-									 of BEACON packet from HN */
+	double rx_BEACON_start_time; /**< Indicates when SN started the reception
+									of BEACON packet from HN */
 	double rx_BEACON_finish_time; /**< Indicates when SN finished the reception
 									 of BEACON packet from HN*/
 	double tx_PROBE_start_time; /**< Indicates when SN start a transmission of
@@ -2126,18 +2123,16 @@ protected:
 									of PROBE packet */
 	double rx_POLL_start_time; /**< Indicates when SN started the reception of
 								  POLL packet from HN */
-	double
-			rx_POLL_finish_time; /**< Indicates when SN finished the reception
-									of POLL packet from HN */
+	double rx_POLL_finish_time; /**< Indicates when SN finished the reception
+								   of POLL packet from HN */
 	double tx_DATA_start_time; /**< Indicates when SN start a transmission of
 								  DATA packet to the HN */
 	double tx_DATA_finish_time; /**< Indicates when SN finished a transmission
 								   of DATA packet to the HN */
 	double rx_CBEACON_start_time; /**< Indicates when SN started the reception
 									 of CBEACON packet from HN */
-	double
-			rx_CBEACON_finish_time; /**< Indicates when SN finished the
-									   reception of BEACON packet from HN */
+	double rx_CBEACON_finish_time; /**< Indicates when SN finished the
+									  reception of BEACON packet from HN */
 	int n_tot_BEACON_pck_rx_by_NODE; /**< Total number of BEACON packets
 										received correctly or not by SN during
 										an entire duration of simulation */
@@ -2156,11 +2151,10 @@ protected:
 	int n_tot_DATA_pck_tx_by_NODE; /**< Total number of DATA packets transmitted
 									  by the SN during an entire duration of
 									  simulation */
-	int
-			n_tot_CBEACON_pck_rx_by_NODE; /**< Total number of CBEACON packets
-											 received correctly or not by SN
-											 during an entire duration of
-											 simulation */
+	int n_tot_CBEACON_pck_rx_by_NODE; /**< Total number of CBEACON packets
+										 received correctly or not by SN
+										 during an entire duration of
+										 simulation */
 	int n_tot_CBEACON_pck_rx_corr_by_NODE; /**< Total number of CBEACON packets
 											  received corrupted by the SN
 											  during an entire duration of
@@ -2171,10 +2165,9 @@ protected:
 	double T_max_bck_probe_node; /**< Upper bound timer interval used by the SN
 									to choice the interval time before to
 									transmit a PROBE packet to the HN */
-	int
-			num_cbeacon_node_rx; /**< Number of CBEACON that the node have
-									received from the specific HN before to
-									receive an another BEACON packet */
+	int num_cbeacon_node_rx; /**< Number of CBEACON that the node have
+								received from the specific HN before to
+								receive an another BEACON packet */
 	int mac_addr_HN_in_beacon; /**< HN MAC address from which the SN has
 								  received PROBE packet */
 	double bck_before_tx_probe; /**< Backoff time choiced by SN before to
@@ -2185,13 +2178,11 @@ protected:
 						  packet to the HN. It include the time delay
 						  propagation. */
 	double RTT; /**< Round trip time value */
-	int
-			mac_addr_HN_in_poll; /**< HN MAC address from which the SN has
-									received the POLL packet */
-	int
-			num_pck_to_tx_by_NODE; /**< Number of DATA packets that the SN at
-									  the instant time of BEACON reception has
-									  available to transmit to the HN */
+	int mac_addr_HN_in_poll; /**< HN MAC address from which the SN has
+								received the POLL packet */
+	int num_pck_to_tx_by_NODE; /**< Number of DATA packets that the SN at
+								  the instant time of BEACON reception has
+								  available to transmit to the HN */
 	double Tdata_NODE_pck; /**< Time duration need for SN for transmit a DATA
 							  packet to the HN */
 	int num_cbeacon_at_now_HN_tx; /**< NUmber of CBEACON packets transmitted by
@@ -2199,22 +2190,19 @@ protected:
 									 BEACON-PROBE-POLL-DATA-CBEACON */
 	int mac_addr_HN_in_cbeacon; /**< HN MAC address from which the SN has
 								   received the CBEACON packet */
-	double
-			T_min_bck_DATA; /**< Lower bound time interval from which the HN
-							   choice its backoff timer before to transmit a
-							   DATA packet to the AUV */
-	double
-			T_max_bck_DATA; /**< Upper bound time interval from which the HN
-							   choice its backoff timer before to transmit a
-							   DATA packet to the AUV */
+	double T_min_bck_DATA; /**< Lower bound time interval from which the HN
+							  choice its backoff timer before to transmit a
+							  DATA packet to the AUV */
+	double T_max_bck_DATA; /**< Upper bound time interval from which the HN
+							  choice its backoff timer before to transmit a
+							  DATA packet to the AUV */
 	double bck_before_tx_data; /**< Time value chosen by the HN and used by It
 								  for transmit a DATA packet to the AUV */
 	// Variables that should be reseted when a cycle is end
-	int
-			n_BEACON_pck_rx_by_NODE; /**< Number of BEACON receive by the SN
-										during a single cycle
-										BEACON-PROBE-POLL-DATA-CBEACON of the
-										simulation */
+	int n_BEACON_pck_rx_by_NODE; /**< Number of BEACON receive by the SN
+									during a single cycle
+									BEACON-PROBE-POLL-DATA-CBEACON of the
+									simulation */
 	int n_PROBE_pck_tx_by_NODE; /**< Number of PROBE transmitted by the SN
 								   during a single cycle
 								   BEACON-PROBE-POLL-DATA-CBEACON of the
@@ -2222,11 +2210,10 @@ protected:
 	int n_POLL_pck_rx_by_NODE; /**< Number of POLL received by the SN during a
 								  single cycle BEACON-PROBE-POLL-DATA-CBEACON of
 								  the simulation */
-	int
-			n_DATA_pck_tx_by_NODE; /**< Number of DATA transmitted by the SN
-									  during a single cycle
-									  BEACON-PROBE-POLL-DATA-CBEACON of the
-									  simulation */
+	int n_DATA_pck_tx_by_NODE; /**< Number of DATA transmitted by the SN
+								  during a single cycle
+								  BEACON-PROBE-POLL-DATA-CBEACON of the
+								  simulation */
 	int n_CBEACON_pck_rx_by_NODE; /**< Number of CBEACON received by the SN
 									 during a single cycle
 									 BEACON-PROBE-POLL-DATA-CBEACON of the
@@ -2238,9 +2225,8 @@ protected:
 	// Variables that enable or not an operation
 	bool rxBEACONEnabled; /**< <i> true </i> if SN is enabled to receive a
 							 BEACON packet from the HN */
-	bool
-			txPROBEEnabled; /**< <i> true </i> if SN is enabled to transmit a
-							   PROBE packet to the HN */
+	bool txPROBEEnabled; /**< <i> true </i> if SN is enabled to transmit a
+							PROBE packet to the HN */
 	bool rxPOLLEnabled; /**< <i> true </i> if SN is enabled to receive a POLL
 						   packet from the HN */
 	bool txDATAEnabled; /**< <i> true </i> if SN is enabled to transmit a DATA
@@ -2253,15 +2239,12 @@ protected:
 										being received by SN */
 	Packet *curr_PROBE_NODE_pck_tx; /**< Pointer to the PROBE packet that is
 									   being transmitted by SN */
-	Packet
-			*curr_POLL_NODE_pck_rx; /**< Pointer to the POLL packet that is
-									   being received by SN */
-	Packet
-			*curr_DATA_NODE_pck_tx; /**< Pointer to the DATA packet that is
-									   being transmitted by SN */
-	Packet
-			*curr_CBEACON_NODE_pck_rx; /**< Pointer to the CBEACON packet that
-										  is being received by SN  */
+	Packet *curr_POLL_NODE_pck_rx; /**< Pointer to the POLL packet that is
+									  being received by SN */
+	Packet *curr_DATA_NODE_pck_tx; /**< Pointer to the DATA packet that is
+									  being transmitted by SN */
+	Packet *curr_CBEACON_NODE_pck_rx; /**< Pointer to the CBEACON packet that
+										 is being received by SN  */
 
 	// Queue
 	std::queue<Packet *> Q_data; /**< Queue of DATA packets stored by the SN */
@@ -2270,12 +2253,11 @@ protected:
 	 *                          HEAD NODE VARIABLES *
 	 ******************************************************************************/
 	// TCL variables
-	double
-			T_START_PROCEDURE_HN_NODE; /**< Time within HN is enabled to
-										  received a TRIGGER packet from AUV. If
-										  in this time the AUV never receive a
-										  TRIGGER packet start the communication
-										  with the SN */
+	double T_START_PROCEDURE_HN_NODE; /**< Time within HN is enabled to
+										 received a TRIGGER packet from AUV. If
+										 in this time the AUV never receive a
+										 TRIGGER packet start the communication
+										 with the SN */
 	double T_MAX_BACKOFF_PROBE; /**< Upper bound timer interval of back-off
 								   value used by the SN to choice its back-off
 								   time before to transmit a PROBE packet */
@@ -2285,10 +2267,9 @@ protected:
 	int PRINT_TRANSITIONS_INT; /**< <i> 0 </i> reason because the SN or HN is
 								  passed from a state to another state is not
 								  logged in a file*/
-	double
-			T_PROBE; /**< Interval time in which HN is enabled to received PROBE
-						packets from SNs after the transmission of TRIGGER
-						packet */
+	double T_PROBE; /**< Interval time in which HN is enabled to received PROBE
+					   packets from SNs after the transmission of TRIGGER
+					   packet */
 	int MAX_ALLOWED_CBEACON_TX; // Maximum number of CBEACON cycles that HN can
 								// start after the transmission of a BEACON
 								// packet. */
@@ -2301,10 +2282,9 @@ protected:
 	int MAX_POLLED_NODE; /**< Maximum number of PROBE packets that the HN can
 							receive from the SN after the transmission of a
 							BEACON or CBEACON */
-	double
-			TIME_BETWEEN_2_TX_DATA_HN_AUV; /**< Interval time used by  HN before
-											  to transmit the next DATA packet
-											  to the AUV */
+	double TIME_BETWEEN_2_TX_DATA_HN_AUV; /**< Interval time used by  HN before
+											 to transmit the next DATA packet
+											 to the AUV */
 
 	// Timers
 	uwUFetch_BEACON_timer
@@ -2322,10 +2302,9 @@ protected:
 	double tx_BEACON_start_HN_time; /**< Indicates when HN started the
 									   transmission of BEACON packet to the SNs
 									   */
-	double
-			tx_BEACON_finish_HN_time; /**< Indicates when HN finished the
-										 transmission of BEACON packet to the
-										 SNs */
+	double tx_BEACON_finish_HN_time; /**< Indicates when HN finished the
+										transmission of BEACON packet to the
+										SNs */
 	double rx_PROBE_start_HN_time; /**< Indicates when HN started the reception
 									  of PROBE packet from the SNs */
 	double rx_PROBE_finish_HN_time; /**< Indicates when HN finished the
@@ -2338,30 +2317,26 @@ protected:
 									  SN */
 	double rx_DATA_start_HN_time; /**< Indicates when HN started the reception
 									 of DATA packet from the SNs */
-	double
-			rx_DATA_finish_HN_time; /**< Indicates when HN finished the
-									   reception of DATA packet from the SNs */
+	double rx_DATA_finish_HN_time; /**< Indicates when HN finished the
+									  reception of DATA packet from the SNs */
 	double tx_CBEACON_start_HN_time; /**< Indicates when HN started the
 										transmission of CBEACON packet to the
 										SNs */
 	double tx_CBEACON_finish_HN_time; /**< Indicates when HN finished the
 										 transmission of CBEACON packet to the
 										 SNs */
-	double
-			rx_TRIGGER_start_HN_time; /**< Indicates when HN started the
-										 reception of TRIGGER packet from the
-										 AUV */
+	double rx_TRIGGER_start_HN_time; /**< Indicates when HN started the
+										reception of TRIGGER packet from the
+										AUV */
 	double rx_TRIGGER_finish_HN_time; /**< Indicates when HN finished the
 										 reception of TRIGGER packet from the
 										 AUV */
-	double
-			tx_RTS_start_HN_time; /**< Indicates when HN started the
-									 transmission of RTS packet to the AUV */
+	double tx_RTS_start_HN_time; /**< Indicates when HN started the
+									transmission of RTS packet to the AUV */
 	double tx_RTS_finish_HN_time; /**< Indicates when HN finished the
 									 transmission of RTS packet to the AUV */
-	double
-			rx_CTS_start_HN_time; /**< Indicates when HN started the reception
-									 of CTS packet from the AUV */
+	double rx_CTS_start_HN_time; /**< Indicates when HN started the reception
+									of CTS packet from the AUV */
 	double rx_CTS_finish_HN_time; /**< Indicates when HN finished the reception
 									 of CTS packet from the SNs */
 	double tx_DATA_start_HN_time; /**< Indicates when HN started the
@@ -2371,10 +2346,9 @@ protected:
 	int n_tot_BEACON_pck_tx_by_HN; /**< Total number of BEACON packets
 									  transmitted by the HN during an entire
 									  simulation */
-	int
-			n_tot_PROBE_pck_rx_by_HN; /**< Total number of PROBE packets
-										 correctly or not received by the HN
-										 during an entire simulation */
+	int n_tot_PROBE_pck_rx_by_HN; /**< Total number of PROBE packets
+									 correctly or not received by the HN
+									 during an entire simulation */
 	int n_tot_PROBE_pck_corr_rx_by_HN; /**< Total number of corrupted PROBE
 										  packets received by the HN during an
 										  entire simulation */
@@ -2392,11 +2366,10 @@ protected:
 	int n_tot_TRIGGER_pck_rx_by_HN; /**< Total number of TRIGGER packets
 									   correctly or not received by the HN
 									   during an entire simulation */
-	int
-			n_tot_TRIGGER_pck_rx_corr_by_HN; /**< Total number of corrupted
-												TRIGGER packets received by the
-												HN during an entire simulation
-												*/
+	int n_tot_TRIGGER_pck_rx_corr_by_HN; /**< Total number of corrupted
+											TRIGGER packets received by the
+											HN during an entire simulation
+											*/
 	int n_tot_RTS_pck_tx_by_HN; /**< Total number of RTS packets transmitted by
 								   the HN during an entire simulation */
 	int n_tot_CTS_pck_rx_by_HN; /**< Total number of CTS packets correctly or
@@ -2410,18 +2383,16 @@ protected:
 	int mac_addr_NODE_polled; /**< SN-MAC address of the node that the HN is
 								 going to be poll and from which It want to
 								 receive DATA packets */
-	int
-			number_data_pck_HN_rx_exact; /**< Exact number of DATA packets that
-											the HN want to receive from the SN
-											that have polled */
+	int number_data_pck_HN_rx_exact; /**< Exact number of DATA packets that
+										the HN want to receive from the SN
+										that have polled */
 	int pck_number_id; /**< Unique identifier of the DATA packet received*/
 	double data_timeout; /**< Interval time in which the HN want to receive all
 							DATA packets from the node that have polled */
 	double Tbeacon; /**< Time needed to transmit a BEACON packet. It consider
 					   also a propagation delay. */
-	double
-			Tpoll; /**< Time needed to transmit a POLL packet. It consider also
-					  a propagation delay. */
+	double Tpoll; /**< Time needed to transmit a POLL packet. It consider also
+					 a propagation delay. */
 	double Trts; /**< Time needed to transmit a RTS packet. It consider also a
 					propagation delay. */
 	double Tdata_HN; /**< Time needed to transmit a DATA packet. It consider
@@ -2440,9 +2411,8 @@ protected:
 									packet received by the HN*/
 	int mac_addr_AUV_in_CTS; /**< AUV-MAC address contained int the CTS packet
 								received by HN */
-	int
-			max_data_HN_can_tx; /**< Maximum number of DATA packets that the HN
-								   must transmit to the AUV */
+	int max_data_HN_can_tx; /**< Maximum number of DATA packets that the HN
+							   must transmit to the AUV */
 	int max_pck_HN_can_tx; /**< Maximum number of DATA packets that AUV want to
 							  receive from HN */
 	double Tdata_HN_pck; /**< Time to transmit a DATA packet by the HN */
@@ -2463,24 +2433,21 @@ protected:
 								 during a single cycle
 								 BEACON-PROBE-POLL-DATA-CBEACON of the
 								 simulation */
-	int
-			n_POLL_pck_tx_by_HN; /**< Number of POLL packet transmitted by the
-									HN during a single cycle
-									BEACON-PROBE-POLL-DATA-CBEACON of the
-									simulation */
-	int
-			n_DATA_pck_rx_by_HN; /**< Number of DATA packet received by the HN
-									during a single cycle
-									BEACON-PROBE-POLL-DATA-CBEACON of the
-									simulation */
+	int n_POLL_pck_tx_by_HN; /**< Number of POLL packet transmitted by the
+								HN during a single cycle
+								BEACON-PROBE-POLL-DATA-CBEACON of the
+								simulation */
+	int n_DATA_pck_rx_by_HN; /**< Number of DATA packet received by the HN
+								during a single cycle
+								BEACON-PROBE-POLL-DATA-CBEACON of the
+								simulation */
 	int n_CBEACON_pck_tx_by_HN; /**< Number of CBEACON packet transmitted by the
 								   HN during a single cycle
 								   BEACON-PROBE-POLL-DATA-CBEACON of the
 								   simulation */
-	int
-			n_TRIGGER_pck_rx_by_HN; /**< Number of TRIGGER packet received by
-									   the HN during a single cycle
-									   TRIGGER-RTS-CTS-DATA of the simulation */
+	int n_TRIGGER_pck_rx_by_HN; /**< Number of TRIGGER packet received by
+								   the HN during a single cycle
+								   TRIGGER-RTS-CTS-DATA of the simulation */
 	int n_RTS_pck_tx_by_HN; /**< Number of RTS packet transmitted by the HN
 							   during a  single cycle TRIGGER-RTS-CTS-DATA of
 							   the simulation */
@@ -2494,9 +2461,8 @@ protected:
 	// Variables that enable or not an operation
 	bool txBEACONEnabled; /**< <i> true </i> if HN is enabled to transmit a
 							 BEACON packet to the SN */
-	bool
-			rxPROBEEnabled; /**< <i> true </i> if HN is enabled to receive a
-							   PROBE packet from the SN */
+	bool rxPROBEEnabled; /**< <i> true </i> if HN is enabled to receive a
+							PROBE packet from the SN */
 	bool txPOLLEnabled; /**< <i> true </i> if HN is enabled to transmit a POLL
 						   packet to the SN */
 	bool rxDATAEnabled; /**< <i> true </i> if HN is enabled to receive a DATA
@@ -2509,16 +2475,14 @@ protected:
 						  packet to the AUV */
 	bool rxCTSEnabled; /**< <i> true </i> if HN is enabled to receive a CTS
 						  packet from the AUV */
-	bool
-			txDATAEnabledHN; /**< <i> true </i> if HN is enabled to transmit a
-								DATA packet to the AUV */
+	bool txDATAEnabledHN; /**< <i> true </i> if HN is enabled to transmit a
+							 DATA packet to the AUV */
 
 	// PACKETS create
 	Packet *curr_BEACON_HN_pck_tx; /**< Pointer to the BEACON packet that is
 									  being transmitted by HN */
-	Packet
-			*curr_PROBE_HN_pck_rx; /**< Pointer to the PROBE packet that is
-									  being received by HN */
+	Packet *curr_PROBE_HN_pck_rx; /**< Pointer to the PROBE packet that is
+									 being received by HN */
 	Packet *curr_POLL_HN_pck_tx; /**< Pointer to the POLL packet that is being
 									transmitted by HN */
 	Packet *curr_DATA_HN_pck_rx; /**< Pointer to the DATA packet that is being
@@ -2537,10 +2501,8 @@ protected:
 										 being transmitted by HN */
 
 	// QUEUE
-	std::
-			queue<Packet *>
-					Q_data_HN; /**< Queue of DATA packets stored by the HNs and
-								  received from SN */
+	std::queue<Packet *> Q_data_HN; /**< Queue of DATA packets stored by the HNs
+									   and received from SN */
 	std::queue<int> Q_data_source_SN; /**< Queue that contain the MAC address
 										 from which the HN has received the DATA
 										 packet */
@@ -2561,23 +2523,20 @@ protected:
 	UWUFETCH_NODE_STATUS_CHANGE last_reason; /**< Last reason because the SN or
 												HN change its state */
 	UWUFETCH_NODE_STATUS
-			curr_state; /**< Current state in which the SN or HN is located */
+	curr_state; /**< Current state in which the SN or HN is located */
 	UWUFETCH_NODE_STATUS prev_state; /**< Previous state in which the SN or HN
 										it was located */
 
-	static bool
-			initialized; /**< Indicate if the protocol has been initialized or
-							not */
-	bool
-			print_transitions; /**< <i>true</i> if the writing of state
-								  transitions in the file is enabled. */
+	static bool initialized; /**< Indicate if the protocol has been initialized
+								or not */
+	bool print_transitions; /**< <i>true</i> if the writing of state
+							   transitions in the file is enabled. */
 	int HEADNODE; /**< Indicate if the node work as HEAD NODE or SENSOR NODE */
 
 	// Mapping
-	static std::
-			map<UWUFETCH_NODE_STATUS, std::string>
-					statusInfo; /**< Map the UWUFETCH_NODE_STATUS to the
-								   description of each state */
+	static std::map<UWUFETCH_NODE_STATUS, std::string>
+			statusInfo; /**< Map the UWUFETCH_NODE_STATUS to the
+						   description of each state */
 	static std::map<UWUFETCH_NODE_STATUS_CHANGE, std::string>
 			statusChange; /**< Map the UWUFETCH_NODE_STATUS_CHANGE to the
 							 description the reason of changing state */
@@ -2588,12 +2547,10 @@ protected:
 			statusTimer; /**< Map the UWUFETCH_TIMER_STATUS to the description
 							of the timers */
 
-	std::
-			ofstream fout; /**< Variable that handle the file in which the
-							  protocol write the state transition for debug
-							  purposes */
-	std::ofstream
-			out_file_logging; /**< Variable that handle the file in which the
-								 protocol write the statistics */
+	std::ofstream fout; /**< Variable that handle the file in which the
+						   protocol write the state transition for debug
+						   purposes */
+	std::ofstream out_file_logging; /**< Variable that handle the file in which
+									   the protocol write the statistics */
 };
 #endif

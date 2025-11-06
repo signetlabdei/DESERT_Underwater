@@ -39,19 +39,19 @@
 #ifndef MMAC_UW_DACAP_H
 #define MMAC_UW_DACAP_H
 
-#include <mmac.h>
-#include <queue>
-#include <string>
-#include <map>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <mmac.h>
 #include <mphy.h>
+#include <queue>
+#include <string>
 
 #define HDR_DACAP(P) (hdr_dacap::access(P))
 
 #define DACAP_DROP_REASON_WRONG_STATE                                        \
 	"WST" /**< The protocol cannot receive this kind of packet in this state \
-			 */
+		   */
 #define DACAP_DROP_REASON_WRONG_RECEIVER \
 	"WRCV" /**< The packet is intended for another receiver */
 #define DACAP_DROP_REASON_UNKNOWN_TYPE \
@@ -747,17 +747,15 @@ protected:
 
 	bool TxActive; /**< <i> true </i> if a transmission process is occuring */
 	bool RxActive; /**< <i> true </i> if a reception process is occuring */
-	bool
-			defer_data; /**< <i> true </i> if a node has to defer the
-						   transmission of a data packet */
+	bool defer_data; /**< <i> true </i> if a node has to defer the
+						transmission of a data packet */
 	bool session_active; /**< <i> true </i> if a session is active (i.e. an
 							hand-shaking process is occurring */
 	bool backoff_pending; /**< <i> true </i> if the backoff-timer is active
 							 (i.e. there's a backoff process) */
 	bool warning_sent; /**< <i> true </i> if a WRN packet has been just sent */
-	bool
-			backoff_freeze_mode; /**< <i> true </i> if the backoff-timer is
-									freezed */
+	bool backoff_freeze_mode; /**< <i> true </i> if the backoff-timer is
+								 freezed */
 	bool print_transitions; /**< <i> true </i> if the state-transitions of the
 							   protocol is printed on a file */
 	bool has_buffer_queue; /**< <i> true </i> if the node has a buffer queue to
@@ -787,9 +785,8 @@ protected:
 	double backoff_tuner; /**< Multiplicative factor in the calculation of
 							 backoff */
 	double wait_costant; /**< Additive factor in the calculation of ACK timer */
-	int
-			max_payload; /**< Dimension of the maximum allowed data paylaod in
-							bytes */
+	int max_payload; /**< Dimension of the maximum allowed data paylaod in
+						bytes */
 	double max_backoff_counter; /**< Number of times a backoff is calculated */
 	double alpha_; /**< smoothing factor used for statistics using first order
 					  IIR filter */
@@ -835,9 +832,8 @@ protected:
 	static map<int, string> info; /**< Relationship between the state and its
 									 textual description */
 
-	ofstream
-			fout; /**< Object that handle the file where the state transitions
-					 is written (if the print_transitions option is active) */
+	ofstream fout; /**< Object that handle the file where the state transitions
+					  is written (if the print_transitions option is active) */
 };
 
 #endif /* MMAC_UW_DACAP_H */

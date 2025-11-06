@@ -39,10 +39,10 @@
 #ifndef UWOPTICAL_MPROPAGATION_H
 #define UWOPTICAL_MPROPAGATION_H
 
-#include <mpropagation.h>
-#include <mphy.h>
 #include <iostream>
 #include <map>
+#include <mphy.h>
+#include <mpropagation.h>
 
 #define NOT_FOUND_C_VALUE -1
 #define NOT_VARIABLE_TEMPERATURE -20
@@ -102,7 +102,7 @@ public:
 	 *
 	 */
 	double getTemperature(double depth);
-	
+
 	/**
 	 * Provide angle between transmitter and receiver.
 	 *
@@ -161,7 +161,7 @@ protected:
 	 *
 	 * @param x x-coordinate of which we need to finde the value.
 	 * @param x1 x-coordinate of the first point
- 	 * @param x2 x-coordinate of the second point
+	 * @param x2 x-coordinate of the second point
 	 * @param y1 y-coordinate of the first point
 	 * @param y2 y-coordinate of the second point
 	 * @return the value assumed by y obtained by linear interpolation

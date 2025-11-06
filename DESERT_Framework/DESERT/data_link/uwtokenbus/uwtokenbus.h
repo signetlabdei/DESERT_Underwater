@@ -40,8 +40,8 @@
 #define UWTOKENBUS_H
 
 #include "uwtokenbus_hdr.h"
-#include <mmac.h>
 #include <deque>
+#include <mmac.h>
 
 extern packet_t PT_UWTOKENBUS;
 
@@ -63,16 +63,17 @@ public:
 	virtual ~UwTokenBus();
 
 	/**
- * TimerBusIdle when expires calls UwTokenBus::TxData() to start the transmission
- */
+	 * TimerBusIdle when expires calls UwTokenBus::TxData() to start the
+	 * transmission
+	 */
 	class TimerBusIdle : public TimerHandler
 	{
 
 	public:
 		/**
-	 * Costructor of the class TimerBusIdle
-	 * @param Pointer of a UwTokenBus object
-	 */
+		 * Costructor of the class TimerBusIdle
+		 * @param Pointer of a UwTokenBus object
+		 */
 		TimerBusIdle(UwTokenBus *m)
 			: TimerHandler()
 		{
@@ -82,25 +83,25 @@ public:
 
 	protected:
 		/**
-	 * Method call when the timer expire
-	 * @param Event*  pointer to an object of type Event
-	 */
+		 * Method call when the timer expire
+		 * @param Event*  pointer to an object of type Event
+		 */
 		virtual void expire(Event *e);
 		UwTokenBus *module;
 	};
 
 	/**
- * TimerTokenPass when expires it resends the token
- */
+	 * TimerTokenPass when expires it resends the token
+	 */
 
 	class TimerTokenPass : public TimerHandler
 	{
 
 	public:
 		/**
-	 * Costructor of the class TimerTokenPass
-	 * @param Pointer of a UwTokenBus object
-	 */
+		 * Costructor of the class TimerTokenPass
+		 * @param Pointer of a UwTokenBus object
+		 */
 		TimerTokenPass(UwTokenBus *m)
 			: TimerHandler()
 		{
@@ -110,22 +111,16 @@ public:
 
 	protected:
 		/**
-	 * Method call when the timer expire
-	 * @param Event*  pointer to an object of type Event
-	 */
+		 * Method call when the timer expire
+		 * @param Event*  pointer to an object of type Event
+		 */
 		virtual void expire(Event *e);
 		UwTokenBus *module;
 	};
 
-	enum UWTokenBus_STATUS
-	{
-		IDLE,
-		TRANSMITTING,
-		RECEIVING
-	}; /**<rtx state */
+	enum UWTokenBus_STATUS { IDLE, TRANSMITTING, RECEIVING }; /**<rtx state */
 
 protected:
-
 	/**
 	 * called when bus_idle_timer expires
 	 */
@@ -142,9 +137,9 @@ protected:
 	virtual void initRing();
 
 	/**
-	 * Assert if the received token id is valid, i.e it follows the monotonic progression
-	 * taking in account uint16 overflow.
-	 * 
+	 * Assert if the received token id is valid, i.e it follows the monotonic
+	 * progression taking in account uint16 overflow.
+	 *
 	 * @param p Packet with token
 	 */
 	virtual bool validToken(Packet *p) const;
@@ -226,44 +221,62 @@ protected:
 	 */
 	virtual int command(int argc, const char *const *argv) override;
 
-	int node_id;				  /**<id of the node (0 to n_nodes-1)*/
-	int n_nodes;				  /**< number of nodes in the ring */
+	int node_id; /**<id of the node (0 to n_nodes-1)*/
+	int n_nodes; /**< number of nodes in the ring */
 	int last_token_id_heard = 0; /**<last token id heard on the bus */
 	int last_token_id_owned = 0; /**<last token id owned */
 
-	double max_token_hold_time;	 /**<max token holding time */
-	double min_token_hold_time;	 /**< if the node has en empty queue when it receive the token, it waits this time before passing the token */
-	double token_rx_time;		 /**< time of token reception */
-	int max_queue_size;			 /**<max packets in the queue */
+	double max_token_hold_time; /**<max token holding time */
+	double min_token_hold_time; /**< if the node has en empty queue when it
+								   receive the token, it waits this time before
+								   passing the token */
+	double token_rx_time; /**< time of token reception */
+	int max_queue_size; /**<max packets in the queue */
 	std::deque<Packet *> buffer; /**<outgoing packets dequeue */
 	UWTokenBus_STATUS rtx_status;
-	bool got_token;					 /**<set if node is currently holding the token */
-	double slot_time;				 /**<max travel time between any pair of nodes, used as time unit for some of the timers timeouts */
-	double token_pass_timeout;		 /**<timeout for the namesake timer for token retransmission attempt, should be 2*slot_time+min_token_hold_time */
-	double bus_idle_timeout;		 /**<base timeout for the namesake timer should be (slot_time+max_token_hold_time) */
-	TimerTokenPass token_pass_timer; /**token_pass_timer is scheduled when a node pass the token, 
-										* it's cancelled when activity from the following node is heard
-										* and when it expires it resends the token.*/
-	TimerBusIdle bus_idle_timer;	 /** bus_idle_timer is rescheduled everytime a new token_id is heard on the bus:
- 									the first time node n hears a token_id meant to node k, it sets the timeout to
-									(3*(n-k+1)*bus_idle_timeout) in order to allow all the previous nodes to regenerate the token first
-									When it expires, it regenerates the token and starts transmitting. */
+	bool got_token; /**<set if node is currently holding the token */
+	double slot_time; /**<max travel time between any pair of nodes, used as
+						 time unit for some of the timers timeouts */
+	double token_pass_timeout; /**<timeout for the namesake timer for token
+								  retransmission attempt, should be
+								  2*slot_time+min_token_hold_time */
+	double bus_idle_timeout; /**<base timeout for the namesake timer should be
+								(slot_time+max_token_hold_time) */
+	TimerTokenPass
+			token_pass_timer; /**token_pass_timer is scheduled when a node pass
+							   * the token, it's cancelled when activity from
+							   * the following node is heard and when it expires
+							   * it resends the token.*/
+	TimerBusIdle
+			bus_idle_timer; /** bus_idle_timer is rescheduled everytime a new
+						   token_id is heard on the bus: the first time node n
+						   hears a token_id meant to node k, it sets the timeout
+						   to (3*(n-k+1)*bus_idle_timeout) in order to allow all
+						   the previous nodes to regenerate the token first When
+						   it expires, it regenerates the token and starts
+						   transmitting. */
 
-	int count_token_resend;	 /**< node count of token retransmissions */
-	int count_token_regen ;	 /**< node count of token regeneration */
+	int count_token_resend; /**< node count of token retransmissions */
+	int count_token_regen; /**< node count of token regeneration */
 	int count_token_invalid; /**< node count of invalid received token */
 
-	int debug;		   /**<Debug variable: 0 for no info*/
-	int drop_old_;	   /**<flag to set the drop packet policy in case of buffer overflow: 
-					if 0 (default) drops the new packet, if 1 the oldest*/
-	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with priority,
-						set to 0 otherwise. Priority can be used only with UWCBR module */
+	int debug; /**<Debug variable: 0 for no info*/
+	int drop_old_; /**<flag to set the drop packet policy in case of buffer
+				overflow: if 0 (default) drops the new packet, if 1 the oldest*/
+	int checkPriority; /**<flag to set to 1 if UWCBR module uses packets with
+						priority, set to 0 otherwise. Priority can be used only
+						with UWCBR module */
 
-	static int count_nodes;	/**< counter of the instantiated nodes, used for assigning node ids in default contructor*/
+	static int count_nodes; /**< counter of the instantiated nodes, used for
+							   assigning node ids in default contructor*/
 	static int count_token_pass_exp; /**< count token pass timer expirations */
 	static int count_bus_idle_exp; /**< count bus idle timer expirations */
-	constexpr int NMOD(int n) {return ((n_nodes + (n % n_nodes)) % n_nodes);} /**< given any int returns the corresponding node id via modulo operations*/
+	constexpr int
+	NMOD(int n)
+	{
+		return ((n_nodes + (n % n_nodes)) % n_nodes);
+	} /**< given any int returns the corresponding node id via modulo
+		 operations*/
 };
-
 
 #endif

@@ -27,35 +27,39 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
-* @file uwsc-tracker-follower-module.cc
-* @author Vincenzo Cimino
-* @version 1.0.0
-*
-* \brief Provides the <i>UWSCFTRACKER</i> class implementation.
-*
-* Provides the UwSFCTracker class implementation.
-*/
+ * @file uwsc-tracker-follower-module.cc
+ * @author Vincenzo Cimino
+ * @version 1.0.0
+ *
+ * \brief Provides the <i>UWSCFTRACKER</i> class implementation.
+ *
+ * Provides the UwSFCTracker class implementation.
+ */
 
 #include "uwsc-tracker-follower-module.h"
 #include <iostream>
 
 /**
-* Class that represents the binding with the tcl configuration script.
-*/
-static class UwSCFTrackerModuleClass : public TclClass {
+ * Class that represents the binding with the tcl configuration script.
+ */
+static class UwSCFTrackerModuleClass : public TclClass
+{
 public:
-
 	/**
-	* Constructor of the class
-	*/
-	UwSCFTrackerModuleClass() : TclClass("Module/UW/SC/TRACKERF") {
+	 * Constructor of the class
+	 */
+	UwSCFTrackerModuleClass()
+		: TclClass("Module/UW/SC/TRACKERF")
+	{
 	}
 
 	/**
-	* Creates the TCL object needed for the tcl language interpretation.
-	* @return Pointer to an TclObject
-	*/
-	TclObject* create(int, const char*const*) {
+	 * Creates the TCL object needed for the tcl language interpretation.
+	 * @return Pointer to an TclObject
+	 */
+	TclObject *
+	create(int, const char *const *)
+	{
 		return (new UwSCFTrackerModule());
 	}
 } class_module_uwSCFTracker;
@@ -69,19 +73,19 @@ UwSCFTrackerModule::UwSCFTrackerModule()
 	, mine_measure{0}
 	, mine_timer(this)
 {
-	bind("demine_period_", (double*) &demine_period);
+	bind("demine_period_", (double *) &demine_period);
 }
 
+int
+UwSCFTrackerModule::command(int argc, const char *const *argv)
+{
+	Tcl &tcl = Tcl::instance();
 
-int UwSCFTrackerModule::command(int argc, const char*const* argv) {
-	Tcl& tcl = Tcl::instance();
-
-	if(argc == 3){
+	if (argc == 3) {
 		if (strcasecmp(argv[1], "setTrack") == 0) {
-			UWSMPosition* p = dynamic_cast<UWSMPosition*> (tcl.lookup(argv[2]));
+			UWSMPosition *p = dynamic_cast<UWSMPosition *>(tcl.lookup(argv[2]));
 
-			if(p)
-			{
+			if (p) {
 				mine_positions.emplace_back(p);
 				track_position = p;
 				tcl.resultf("%s", "position Setted\n");
@@ -93,7 +97,7 @@ int UwSCFTrackerModule::command(int argc, const char*const* argv) {
 		}
 	}
 
-	return UwTrackerModule::command(argc,argv);
+	return UwTrackerModule::command(argc, argv);
 }
 
 void
@@ -101,38 +105,32 @@ UwSCFTrackerModule::sendPkt()
 {
 	UwTrackerModule::sendPkt();
 
-	if (auv_state == FollowerState::DETECT && mine_positions.size() > 1)
-	{
+	if (auv_state == FollowerState::DETECT && mine_positions.size() > 1) {
 		Position temp_position;
 		temp_position.setX(track_measure.x());
 		temp_position.setY(track_measure.y());
 		temp_position.setZ(track_measure.z());
 
-		for (auto it = mine_positions.begin(); it != mine_positions.end();++it)
-	    {
-			if((*it)->getDist(&temp_position) < 1e-3)
-			{
-				if (it == mine_positions.end()-1)
-				{
+		for (auto it = mine_positions.begin(); it != mine_positions.end();
+				++it) {
+			if ((*it)->getDist(&temp_position) < 1e-3) {
+				if (it == mine_positions.end() - 1) {
 					track_position = *(--it);
 					mine_positions.erase(++it);
-				}
-				else
-				{
+				} else {
 					track_position = *(++it);
 					mine_positions.erase(--it);
 				}
 				break;
 			}
-	    }
+		}
 
 		mine_measure.mine_remove() = false;
 
 		auv_state = FollowerState::DEMINE;
 	}
 
-	if (auv_state == FollowerState::DETECT && mine_positions.size() <= 1)
-	{
+	if (auv_state == FollowerState::DETECT && mine_positions.size() <= 1) {
 		mine_measure.mine_remove() = false;
 		auv_state = FollowerState::IDLE;
 	}
@@ -141,13 +139,13 @@ UwSCFTrackerModule::sendPkt()
 }
 
 void
-UwSCFTrackerModule::initPkt(Packet* p)
+UwSCFTrackerModule::initPkt(Packet *p)
 {
 	mine_measure.x() = track_measure.x();
 	mine_measure.y() = track_measure.y();
 	mine_measure.z() = track_measure.z();
 
-	hdr_uwSCFTracker* uwscf_track_h = HDR_UWSCFTRACK(p);
+	hdr_uwSCFTracker *uwscf_track_h = HDR_UWSCFTRACK(p);
 	*uwscf_track_h = mine_measure;
 
 	UwTrackerModule::initPkt(p);
@@ -159,8 +157,7 @@ UwSCFTrackerModule::updateMineRemove()
 	if (auv_state == FollowerState::TRACK &&
 			auv_position.getX() == track_measure.x() &&
 			auv_position.getY() == track_measure.y() &&
-			auv_position.getZ() == track_measure.z())
-	{
+			auv_position.getZ() == track_measure.z()) {
 		mine_measure.mine_remove() = true;
 
 		auv_state = FollowerState::DETECT;
@@ -171,10 +168,10 @@ UwSCFTrackerModule::updateMineRemove()
 
 		if (debug_)
 			std::cout << NOW << "UwSCFTrackerModule::updateMineRemove()"
-					<< " Mine at position: X = " << track_measure.x()
-					<< ", Y = " << track_measure.y()
-					<< ", Z = " << track_measure.z()
-					<< " is detected" << std::endl;
+					  << " Mine at position: X = " << track_measure.x()
+					  << ", Y = " << track_measure.y()
+					  << ", Z = " << track_measure.z() << " is detected"
+					  << std::endl;
 	}
 
 	auv_position.setX(getPosition()->getX());
@@ -185,26 +182,23 @@ UwSCFTrackerModule::updateMineRemove()
 		auv_state = FollowerState::TRACK;
 
 	if (auv_state != FollowerState::DETECT &&
-			auv_state != FollowerState::IDLE)
-	{
+			auv_state != FollowerState::IDLE) {
 		track_position = updateTrackPosition();
 		mine_timer.resched(tracking_period);
 	}
 }
 
-UWSMPosition* 
+UWSMPosition *
 UwSCFTrackerModule::updateTrackPosition()
 {
-	UWSMPosition* new_track_position (track_position);
+	UWSMPosition *new_track_position(track_position);
 	double min_distance = new_track_position->getDist(&auv_position);
 
 	mine_measure.timestamp() = NOW;
 
-	for (const auto& pos : mine_positions)
-	{
+	for (const auto &pos : mine_positions) {
 		double distance = pos->getDist(&auv_position);
-		if(distance < min_distance)
-		{
+		if (distance < min_distance) {
 			min_distance = distance;
 			new_track_position = pos;
 		}
@@ -212,10 +206,9 @@ UwSCFTrackerModule::updateTrackPosition()
 
 	if (debug_)
 		std::cout << NOW << " UwSCFTrackerModule::updateTrackPosition()"
-				<< "New track position: X = " << new_track_position->getX()
-				<< " Y = " << new_track_position->getY()
-				<< " Z = " << new_track_position->getZ()
-				<< std::endl;
+				  << "New track position: X = " << new_track_position->getX()
+				  << " Y = " << new_track_position->getY()
+				  << " Z = " << new_track_position->getZ() << std::endl;
 
 	return new_track_position;
 }
@@ -240,7 +233,7 @@ UwSCFTrackerModule::stop()
 }
 
 void
-UwUpdateMineStatus::expire(Event *e) 
+UwUpdateMineStatus::expire(Event *e)
 {
 	module->updateMineRemove();
 }

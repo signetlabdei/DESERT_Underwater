@@ -46,9 +46,11 @@
 
 extern packet_t PT_UWRANGING_TOKENBUS;
 
-// #include "half.hpp" //for using half precision library from https://half.sourceforge.net/
-//using half_float::half;
-typedef float uwrange_time_t;	/**< set here the size and precision of the time measures (half/float/double/uint16...)*/
+// #include "half.hpp" //for using half precision library from
+// https://half.sourceforge.net/
+// using half_float::half;
+typedef float uwrange_time_t; /**< set here the size and precision of the time
+								 measures (half/float/double/uint16...)*/
 
 /**
  * Header of the token bus protocol
@@ -56,15 +58,19 @@ typedef float uwrange_time_t;	/**< set here the size and precision of the time m
 typedef struct hdr_uwranging_tokenbus {
 public:
 	static int offset_; /**< Required by the PacketHeaderManager. */
-	uwrange_time_t token_hold_; /**< time elapsed from token rx and token pass */
-	std::vector<uwrange_time_t> times_; /**< Holds the times calculated by the node */
-	bool token_resend_ = false; /**< flag set if token is retransmitted when TokenPass timer expires */
+	uwrange_time_t
+			token_hold_; /**< time elapsed from token rx and token pass */
+	std::vector<uwrange_time_t>
+			times_; /**< Holds the times calculated by the node */
+	bool token_resend_ = false; /**< flag set if token is retransmitted when
+								   TokenPass timer expires */
 
 	/**
 	 * Returns a reference to the travel times array
 	 * @returns a reference to the travel times array
 	 */
-	std::vector<uwrange_time_t> & times()
+	std::vector<uwrange_time_t> &
+	times()
 	{
 		return (times_);
 	}
@@ -73,7 +79,8 @@ public:
 	 * Returns a reference to token_hold_ value
 	 * @returns a reference to token_hold_
 	 */
-	uwrange_time_t & token_hold()
+	uwrange_time_t &
+	token_hold()
 	{
 		return (token_hold_);
 	}
@@ -82,7 +89,8 @@ public:
 	 * Returns a reference to token_resend_
 	 * @returns a reference to token_resend_
 	 */
-	bool & token_resend()
+	bool &
+	token_resend()
 	{
 		return (token_resend_);
 	}
@@ -90,16 +98,19 @@ public:
 	 * Returns the size of this header
 	 * @returns the size of this header
 	 */
-	size_t getSize() const
+	size_t
+	getSize() const
 	{
-		return sizeof(uwrange_time_t)*(times_.size() + 1); //1 bit for bool token_resend missing
+		return sizeof(uwrange_time_t) *
+				(times_.size() + 1); // 1 bit for bool token_resend missing
 	}
 
 	/**
 	 * Returns a reference to the offset_ variable
 	 * @returns a reference to the offset_ variable
 	 */
-	inline static int & offset()
+	inline static int &
+	offset()
 	{
 		return offset_;
 	}
@@ -116,7 +127,8 @@ public:
 	}
 } hdr_uwranging_tokenbus;
 
-#define HDR_UWRANGING_TOKENBUS(p) \
-	(hdr_uwranging_tokenbus::access(p))	/**< alias defined to access the TOKEN BUS HEADER*/
+#define HDR_UWRANGING_TOKENBUS(p)    \
+	(hdr_uwranging_tokenbus::access( \
+			p)) /**< alias defined to access the TOKEN BUS HEADER*/
 
 #endif

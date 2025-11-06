@@ -39,6 +39,8 @@
 #ifndef UW_WAKEUP_PKT_H
 #define UW_WAKEUP_PKT_H
 
+#include <packet.h>
+
 #define HDR_WKUP(P) (hdr_wkup::access(P))
 
 extern packet_t PT_WKUP;

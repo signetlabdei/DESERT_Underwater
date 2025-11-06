@@ -55,19 +55,19 @@ public:
 } class_UnderwaterPhysicaldb;
 
 UnderwaterPhysicaldb::UnderwaterPhysicaldb()
-	: path_(nullptr),
-	interference_(nullptr),
-	snr({}),
-	overlap({}),
-	sir({}),
-	range({}),
-	type_of_node({}),
-	range_nums({}),
-	country(nullptr),
-	modulation(nullptr),
-	interf_val({0.0,0.0}),
-	token_separator(0),
-	osstream(0)
+	: path_(nullptr)
+	, interference_(nullptr)
+	, snr({})
+	, overlap({})
+	, sir({})
+	, range({})
+	, type_of_node({})
+	, range_nums({})
+	, country(nullptr)
+	, modulation(nullptr)
+	, interf_val({0.0, 0.0})
+	, token_separator(0)
+	, osstream(0)
 
 {
 	bind_error("token_separator_", &token_separator);
@@ -115,13 +115,13 @@ UnderwaterPhysicaldb::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "addRange") == 0) {
 			uint8_t node_id_ = atoi(argv[2]);
 			double range_ = atof(argv[3]);
-			std::map<uint8_t, std::set<double> >::iterator it =
+			std::map<uint8_t, std::set<double>>::iterator it =
 					range.find(node_id_);
 			if (it == range.end()) {
 				std::set<double> tmp_set_;
 				tmp_set_.insert(range_);
 				range.insert(
-						pair<uint8_t, std::set<double> >(node_id_, tmp_set_));
+						pair<uint8_t, std::set<double>>(node_id_, tmp_set_));
 			} else {
 				it->second.insert(range_);
 			}
@@ -375,7 +375,7 @@ UnderwaterPhysicaldb::getPERfromSNR(
 			(y_ - y_dst_) * (y_ - y_dst_) + (z_ - z_dst_) * (z_ - z_dst_));
 	const double distance_miles_ = this->fromKmToMiles(distance_ / 1000);
 
-	std::map<uint8_t, std::set<double> >::const_iterator it2 =
+	std::map<uint8_t, std::set<double>>::const_iterator it2 =
 			range.find(ch->prev_hop_);
 	double nn_range_;
 	if (it2 != range.end()) {

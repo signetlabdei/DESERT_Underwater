@@ -40,8 +40,8 @@
 #define UWRANGINGTDOA_H
 
 #include "uwranging_tdoa_hdr.h"
-#include <module.h>
 #include <limits>
+#include <module.h>
 #include <vector>
 
 class UwRangingTDOA;
@@ -138,28 +138,29 @@ protected:
 	virtual bool isValid(const tdoa_entry &entry) const;
 
 	/**
-	 * Send a ranging message down to the MAC layer. 
+	 * Send a ranging message down to the MAC layer.
 	 */
 	virtual void rangeTX();
- 
+
 	/* Performs the reception of a ranging message.
 	 * @param Packet* Pointer to the packet received.
 	 */
-	virtual void rangeRX(const Packet * p);
+	virtual void rangeRX(const Packet *p);
 
 	/** Update the holdover time with the actual time of transmission.
 	 * @param Packet* Pointer to the packet received.
 	 * @param double Transmission duration computed by the physical layer.
 	 */
-	virtual void updateHoldoverTime(Packet *p, double tx_duration); 
+	virtual void updateHoldoverTime(Packet *p, double tx_duration);
 
-	/** Compute the optimal number of entries for the ranging message. 
+	/** Compute the optimal number of entries for the ranging message.
 	 * @param std::vector<int> Vector of entries to sort.
 	 * @return int Number of optimal entries.
 	 */
-	virtual int calcOptEntries(std::vector<int> *sorted_entries = nullptr) const; 
+	virtual int calcOptEntries(
+			std::vector<int> *sorted_entries = nullptr) const;
 
-	/** Compute the weight of the entry given the packet size in bits. 
+	/** Compute the weight of the entry given the packet size in bits.
 	 * @param int n-th entries.
 	 * @param int size of the n-th entries in bit
 	 * @param int mode to use to compute the optimal number of entries
@@ -167,25 +168,33 @@ protected:
 	virtual double entryWeight(int entry, int pkt_size, int mode) const;
 
 	/** Schedule the transmission of a rangig message. */
-	virtual void throttleTX(); 
+	virtual void throttleTX();
 
-	bool scheduler_active; /**< True if the ranging scheduler is been activated with Tcl "start" command. */
+	bool scheduler_active; /**< True if the ranging scheduler is been activated
+							  with Tcl "start" command. */
 	int debug_tdoa;
 	int node_id; /**< Id of the current node. */
-	int packet_id; /**< id of the last ranging packet sent (= node_id + k*n_nodes)*/
+	int packet_id; /**< id of the last ranging packet sent (= node_id +
+					  k*n_nodes)*/
 	int n_nodes; /**< Number of nodes. */
 	int dist_num; /**< Number of distances each node computes. */
-	int range_entries; /**< Number of entries per ranging packet, if <= 0 enable adaptive payload size. */
-	int poisson_traffic; /**< If true the ranging packets are sent according to a poisson process with rate range_period. */
+	int range_entries; /**< Number of entries per ranging packet, if <= 0 enable
+						  adaptive payload size. */
+	int poisson_traffic; /**< If true the ranging packets are sent according to
+							a poisson process with rate range_period. */
 	int range_pkts_sent; /**< Counter of sent ranging packets. */
 	int range_bytes_sent; /**< Counter of sent ranging bytes. */
 	int range_pkts_recv; /**< Counter of received ranging packets. */
 	int range_pkts_err; /**< Counter of lost ranging packets. */
-	int saved_entries; /**< Total number of entries not sent in the ranging packets. */
+	int saved_entries; /**< Total number of entries not sent in the ranging
+						  packets. */
 	int phy_id; /**< Id of the PHY module. */
-	int queue_size; /**< Counts the packet sent to the MAC waiting to be transmitted. */
-	UwRangeTimer send_timer; /**< Timer that schedules ranging packet transmissions. */
-	double mac2phy_delay; /** Floating numbers within this value won't be discarded by NNLS. */
+	int queue_size; /**< Counts the packet sent to the MAC waiting to be
+					   transmitted. */
+	UwRangeTimer send_timer; /**< Timer that schedules ranging packet
+								transmissions. */
+	double mac2phy_delay; /** Floating numbers within this value won't be
+							 discarded by NNLS. */
 	double max_tt; /**< Max travel time between nodes in seconds. */
 	double max_age; /**< Max age of a ranging packet in seconds. */
 	double range_period; /**< Ranging period in seconds. */
@@ -193,17 +202,28 @@ protected:
 	double full_pkt_tx_dur; /**< TX duration for a full range packet. */
 	double soundspeed; /**< Speed of sound in m/s */
 
-	std::vector<std::vector<int>> tof_map; /*< Map between couples of nodes to a distance. */
-	std::vector<std::vector<std::vector<tdoa_entry>>> entries_mat; /*< Matrix containing the entries for each packet. */
-	std::vector<std::vector<double>> times_mat; /*< Matrix containing the tx/rx times of each packet. */
+	std::vector<std::vector<int>>
+			tof_map; /*< Map between couples of nodes to a distance. */
+	std::vector<std::vector<std::vector<tdoa_entry>>>
+			entries_mat; /*< Matrix containing the entries for each packet. */
+	std::vector<std::vector<double>>
+			times_mat; /*< Matrix containing the tx/rx times of each packet. */
 	std::vector<int> last_ids; /*< Vector of ids of the last rx/tx packet. */
-	std::vector<double> time_of_flights; /*< Vector of one way travel times between each nodes in the network. */
-	std::vector<double> entries_timestamps; /*< Vector of the times at which each one way travel time is computed. */
-	std::vector<double> entry_last_tx; /**< Vector of the last (actual) TX times of each entry. */
-	std::vector<uwrange_time_t> tx_timestamp; /**< Vector of the TX timestamp for each packet to be sent. */
-	std::vector<double> ber; /*< Vector fo the BER of each channel (symmetry assumption). */
+	std::vector<double>
+			time_of_flights; /*< Vector of one way travel times between each
+								nodes in the network. */
+	std::vector<double>
+			entries_timestamps; /*< Vector of the times at which each one way
+								   travel time is computed. */
+	std::vector<double> entry_last_tx; /**< Vector of the last (actual) TX times
+										  of each entry. */
+	std::vector<uwrange_time_t> tx_timestamp; /**< Vector of the TX timestamp
+												 for each packet to be sent. */
+	std::vector<double>
+			ber; /*< Vector fo the BER of each channel (symmetry assumption). */
 
-	const size_t PKTIDMAX = std::numeric_limits<uwrange_pkt_t>::max(); /**< Max number of ranging packets that can be saved. */
+	const size_t PKTIDMAX = std::numeric_limits<uwrange_pkt_t>::
+			max(); /**< Max number of ranging packets that can be saved. */
 };
 
 #endif

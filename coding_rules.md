@@ -1,45 +1,68 @@
 # Coding rules
 
-This file shows the coding rules of the project
+This file shows the coding rules of the project.
 
 ## Indentation
 
-* Tab, length 4, no spaces
-* the maximum line length is 80 columns
-* do not mix tab and spaces
-* For multi-line commands (e.g. commands that goes over 80 columns, use double indentation)
+* Tab, length 4, no spaces (do not mix tab and spaces).
+* The maximum line length is 80 columns. A line may exceed the maximum length, only if it is:
+    * A comment line which is not feasible to split without harming readability, ease of cut and paste or auto (e.g., a literal URL),
+    * a string literal that cannot easily be wrapped at 80 columns,
+    * an include statement,
+    * a header guard,
+    * a using-declaration.
+* For multi-line commands (e.g. commands that goes over 80 columns), use double indentation.
 ```C
-x = super_mega_long_function_with_a_lot_of_params(int a,
+x = superMegaLongFunctionWithALotOfParams(int a,
 		int b, int c, int d, int e, int f, int g, int as,
 		int z);
 ```
+## Naming
+
+* Filenames should be all lowercase and can include underscores (_) or dashes (-). Specifically, C++ files should have a .cpp filename extension, and header files a .h extension. 
+```
+my-cool-module.cpp
+my-cool-module.h
+my_cool_hdr.h
+```
+* Type names start with a capital letter and have a capital letter for each new word (`PascalCase`). The only exception are packet header structs which should start with the word `hdr_` followed by lowercase words separated by underscores (`snake_case`).
+```C
+// Classes and structs
+class MyCoolModule { ...
+struct MyCoolStruct { ...
+struct hdr_mycoolmodule { ...
+
+// typedefs
+typedef std::map<int , Status> StatusMap;
+
+// using aliases
+using StatusMap = std::map<int , Status>;
+
+// enums
+enum class LogLevel { ...
+```
+* Functions/Methods start with a lowercase letter and have a capital letter for each new word (`camelCase`). The only exception are packet header functions which should be `snake_case`.
+* Variables and data members are `snake_case`. Additionally data members (of both classes and structs) have a trailing underscore.
+
 ## Functions/Methods
 
-* On declaration return type and method modifiers shall be on the same line
+* On declaration return type and method modifiers shall be on the same line.
 ```C
-static int FooClass::my_method(int a, int b);
+static int FooClass::myMethod(int a, int b);
 ```
-* On implementation return type and method modifiers shall be on a single line
+* On implementation return type and method modifiers shall be on a single line.
 ```C
 static int
-FooClass::my_method(int a, int)
+FooClass::myMethod(int a, int)
 {
 	/* code here */
 }
 ```
-* Curly brackets (opening and closing shall be on a separate line
-* Return values shall be around round brackets
+* Curly brackets (opening and closing shall be on a separate line).
+* Use empty lines to create logical separations between actions into methods.
 ```C
 static int
-FooClass::my_method(int a,int b)
-{
-	return (1);
-}
-```
-* Use empty lines to create logical separations between actions into methods
-```C
-static int
-FooClass::my_other_method(int c)
+FooClass::myOtherMethod(int c)
 {
 	/* Variable declarations*/
 	
@@ -48,12 +71,18 @@ FooClass::my_other_method(int c)
 	/* return types or error/failure paths*/
 }
 ```
-* Use lowercase letters for methods and CamelCase for Classes
+* Use parentheses in `return expr` only if needed.
+```C
+// No parentheses in the simple case.
+return result;
+// Parentheses OK to make a complex expression more readable.
+return (some_long_condition && another_condition);
+```
 ## Control flow
 
-* Put a space before the parentheses in `if`, `switch`, `for` and `while`
-* Open curly brackets on the same line of loops and `if`
-* Put a space before and after binary operators
+* Put a space before the parentheses in `if`, `switch`, `for` and `while`.
+* Open curly brackets on the same line of loops and `if`.
+* Put a space before and after binary operators.
 
 ```C
 if (a == b) {
@@ -78,12 +107,11 @@ switch (a) {
 
 ## Doxygen
 
-* Doxygen shall be only on .h file
-
-* The file should have this header (Please note that copyright date should be updated regularly)
+* Doxygen shall be only on .h file.
+* The file should have this header (Please note that copyright date should be updated regularly).
 ```C
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -120,8 +148,8 @@ switch (a) {
  *
  */
 ```
-* Method definition should have this doxygen
-```
+* Method definitions should have this doxygen.
+```C
     /**
      * TCL command interpreter. It implements the following OTcl methods:
      * 
@@ -132,7 +160,9 @@ switch (a) {
      **/
 	 virtual int command(int argc, const char*const* argv);
 ```
-* Variables should have this doxygen
+* Data members should have this doxygen.
 ```C
-Packet* curr_data_pkt; /**< Pointer to the current DATA packet */
+Packet* curr_data_pkt_; /**< Pointer to the current DATA packet */
+int pkts_lost; /**< Total number of lost packets, including packets received
+                    out of sequence. */
 ```

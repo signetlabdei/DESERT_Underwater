@@ -37,8 +37,8 @@
  */
 
 #include "soundlevels.h"
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 namespace ship_noise
 {
@@ -98,10 +98,11 @@ cargo_ship(double freq, double speed, double length)
 	if ((freq > 200) && (speed > 10))
 		SL_cav = 129 - 20 * std::log10(freq) + 60 * std::log10(speed);
 
-	double SL_tot = 10 * std::log10(std::pow(10, (SL_mach / 10))
-							+ std::pow(10, (SL_prop / 10))
-							+ std::pow(10, (SL_cav / 10)))
-							+ 25 * std::log10(length / 180);
+	double SL_tot = 10 *
+					std::log10(std::pow(10, (SL_mach / 10)) +
+							std::pow(10, (SL_prop / 10)) +
+							std::pow(10, (SL_cav / 10))) +
+			25 * std::log10(length / 180);
 
 	return (std::pow(10, (SL_tot / 10)));
 }
@@ -127,10 +128,11 @@ cargoL_ship(double freq, double speed, double length)
 	if ((freq > 50) && (speed > 13))
 		SL_cav = 120 - 20 * std::log10(freq) + 60 * std::log10(speed);
 
-	double SL_tot = 10 * std::log10(std::pow(10, (SL_mach / 10))
-							+ std::pow(10, (SL_prop / 10))
-							+ std::pow(10, (SL_cav / 10)))
-							+ 25 * std::log10(length / 280);
+	double SL_tot = 10 *
+					std::log10(std::pow(10, (SL_mach / 10)) +
+							std::pow(10, (SL_prop / 10)) +
+							std::pow(10, (SL_cav / 10))) +
+			25 * std::log10(length / 280);
 
 	return (std::pow(10, (SL_tot / 10)));
 }
@@ -156,10 +158,11 @@ cruise_ship(double freq, double speed, double length)
 	if ((freq > 60) && (speed > 12))
 		SL_cav = 125 - 20 * std::log10(freq) + 60 * std::log10(speed);
 
-	double SL_tot = 10 * std::log10(std::pow(10, (SL_mach / 10))
-							+ std::pow(10, (SL_prop / 10))
-							+ std::pow(10, (SL_cav / 10)))
-							+ 25 * std::log10(length / 250);
+	double SL_tot = 10 *
+					std::log10(std::pow(10, (SL_mach / 10)) +
+							std::pow(10, (SL_prop / 10)) +
+							std::pow(10, (SL_cav / 10))) +
+			25 * std::log10(length / 250);
 
 	return (std::pow(10, (SL_tot / 10)));
 }
@@ -185,10 +188,11 @@ ferry(double freq, double speed, double length)
 	if ((freq > 200) && (speed > 10))
 		SL_cav = 127 - 20 * std::log10(freq) + 60 * std::log10(speed);
 
-	double SL_tot = 10 * std::log10(std::pow(10, (SL_mach / 10))
-							+ std::pow(10, (SL_prop / 10))
-							+ std::pow(10, (SL_cav / 10)))
-							+ 25 * std::log10(length / 180);
+	double SL_tot = 10 *
+					std::log10(std::pow(10, (SL_mach / 10)) +
+							std::pow(10, (SL_prop / 10)) +
+							std::pow(10, (SL_cav / 10))) +
+			25 * std::log10(length / 180);
 
 	return (std::pow(10, (SL_tot / 10)));
 }
@@ -214,10 +218,11 @@ fishing_vessel(double freq, double speed, double length)
 	if ((freq > 80) && (speed > 8) && (speed < 12))
 		SL_cav = 180 - 20 * std::log10(freq);
 
-	double SL_tot = 10 * std::log10(std::pow(10, (SL_mach / 10))
-							+ std::pow(10, (SL_prop / 10))
-							+ std::pow(10, (SL_cav / 10)))
-							+ 25 * std::log10(length / 50);
+	double SL_tot = 10 *
+					std::log10(std::pow(10, (SL_mach / 10)) +
+							std::pow(10, (SL_prop / 10)) +
+							std::pow(10, (SL_cav / 10))) +
+			25 * std::log10(length / 50);
 
 	return (std::pow(10, (SL_tot / 10)));
 }
@@ -238,4 +243,4 @@ auv(double freq)
 	return std::pow(10, SL_tot / 10);
 }
 
-}
+} // namespace ship_noise

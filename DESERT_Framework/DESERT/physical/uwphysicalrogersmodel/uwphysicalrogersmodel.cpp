@@ -148,10 +148,11 @@ UnderwaterPhysicalRogersModel::getGain(Packet *p)
 	// getAttenuation is in dB. The attanuation is converted in linear and it is
 	// converted in gain.
 	const double gain = pow(10,
-			-0.1 * getAttenuation(sound_speed_water_bottom,
-									distance_,
-									frequency_,
-									bottom_depth));
+			-0.1 *
+					getAttenuation(sound_speed_water_bottom,
+							distance_,
+							frequency_,
+							bottom_depth));
 	// const double gainUrick = uwlib_AInv(distance_/1000.0,
 	// uw.practical_spreading, frequency_/1000.0);
 

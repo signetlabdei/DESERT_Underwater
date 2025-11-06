@@ -39,8 +39,8 @@
 #ifndef UWCSMA_CA_HDRS
 #define UWCSMA_CA_HDRS
 
-#include <stdint.h>
 #include <packet.h>
+#include <stdint.h>
 
 #define CA_RTS_HDR_ACCESS(p) (hdr_ca_RTS::access(p))
 #define CA_CTS_HDR_ACCESS(p) (hdr_ca_CTS::access(p))

@@ -40,10 +40,8 @@
 #ifndef MS2CEVOLOWLEV_H
 #define MS2CEVOLOWLOV_H
 
-#include <uwmphy_modem.h>
 #include "mdriverS2C_Evo_lowlev.h"
-
-
+#include <uwmphy_modem.h>
 
 /**
  *  Class that implements the interface between ns2/NS-Miracle and the S2C

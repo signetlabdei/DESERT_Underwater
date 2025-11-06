@@ -116,7 +116,7 @@ UwROVCtrModule::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "setPosition") == 0) {
 			Position *p = dynamic_cast<Position *>(tcl.lookup(argv[2]));
 
-			if(p) {
+			if (p) {
 				posit = p;
 
 				return TCL_OK;
@@ -175,7 +175,8 @@ UwROVCtrModule::transmit()
 	sendPkt();
 
 	if (adaptiveRTO == 1 && rttsamples > 0) {
-		period_ = sumrtt / rttsamples + adaptiveRTO_parameter * sumrtt / rttsamples;
+		period_ = sumrtt / rttsamples +
+				adaptiveRTO_parameter * sumrtt / rttsamples;
 
 		if (debug_) {
 			std::cout << NOW << " UwROVCtrModule::RTO set to " << period_

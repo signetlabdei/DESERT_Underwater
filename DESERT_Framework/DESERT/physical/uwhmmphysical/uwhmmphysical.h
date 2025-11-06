@@ -39,24 +39,23 @@
 #ifndef UWHMMPHYSICAL_H
 #define UWHMMPHYSICAL_H
 
-#include "uwphysical.h"
 #include "mclink.h"
-
+#include "uwphysical.h"
 
 class UwHMMPhysicalStats : public UwPhysicalStats
 {
 public:
-
 	/**
 	 * Destructor of UwPhysicalStats class
 	 */
 	virtual ~UwHMMPhysicalStats() = default;
 	/**
-	 * Virtual method used by the Module class in order to copy its stats an a generic fashion,
-	 * without the need to know the derived stats implementation.
+	 * Virtual method used by the Module class in order to copy its stats an a
+	 *generic fashion, without the need to know the derived stats
+	 *implementation.
 	 * @return the copy of a module the stats.
-  	**/
-	virtual Stats* clone() const;
+	 **/
+	virtual Stats *clone() const;
 
 	/**
 	 * Method to update stats with the param of last received packet
@@ -68,15 +67,15 @@ public:
 	 * @param per, packet error rate according to HMM channel state
 	 * @param error, true if packet has error
 	 * @param channel_state, HMM channel state
-	 */	
-	virtual void updateStats(int mod_id, int stck_id, double rx_pwr, 
-		double noise_pwr, double interf_pwr, double sinr, double ber, double per, bool error, 
-		MCLink::ChState channel_state = MCLink::ChState::NOT_DEFINED);
-	
-	MCLink::ChState channel_state = MCLink::ChState::NOT_DEFINED; /**<HMM channel state*/
+	 */
+	virtual void updateStats(int mod_id, int stck_id, double rx_pwr,
+			double noise_pwr, double interf_pwr, double sinr, double ber,
+			double per, bool error,
+			MCLink::ChState channel_state = MCLink::ChState::NOT_DEFINED);
+
+	MCLink::ChState channel_state =
+			MCLink::ChState::NOT_DEFINED; /**<HMM channel state*/
 };
-
-
 
 /**
  * \brief UnderwaterHMMPhysical models an hidden Markov Model phy channel
@@ -109,17 +108,18 @@ public:
 
 	/**
 	 * Adds the Markov Chain transition matrix for each source MAC
-	 * 
+	 *
 	 * @param mac MAC of the transmitting node
 	 * @param link Pointer to associated MCLink
-	 */	
+	 */
 	void setMCLink(int mac, MCLink *link);
 
 	/**
 	 *
 	 * @return the number of packets sent with bad channel
 	 */
-	int	getPktsTotBad() const
+	int
+	getPktsTotBad() const
 	{
 		return pkts_tot_bad;
 	}
@@ -128,7 +128,8 @@ public:
 	 *
 	 * @return the number of packets sent with medium channel
 	 */
-	int getPktsTotMedium() const
+	int
+	getPktsTotMedium() const
 	{
 		return pkts_tot_medium;
 	}
@@ -137,7 +138,8 @@ public:
 	 *
 	 * @return the number of packets sent with good channel
 	 */
-	int getPktsTotGood() const
+	int
+	getPktsTotGood() const
 	{
 		return pkts_tot_good;
 	}
@@ -147,7 +149,8 @@ public:
 	 * increase the counter of packets sent taking into account
 	 * the channel state
 	 */
-	void incrTotPkts(MCLink::ChState ch_state)
+	void
+	incrTotPkts(MCLink::ChState ch_state)
 	{
 		if (ch_state == MCLink::GOOD) {
 			pkts_tot_good++;
@@ -156,10 +159,9 @@ public:
 		} else if (ch_state == MCLink::BAD) {
 			pkts_tot_bad++;
 		}
-	} 
+	}
 
 protected:
-	
 	/**
 	 * Handles the end of a packet reception
 	 *
@@ -176,17 +178,18 @@ protected:
 	 * @param p Packet
 	 * @return PER of the packet.
 	 */
-	virtual double ber2per(double ber, Packet * p);
-	
+	virtual double ber2per(double ber, Packet *p);
 
 	// Variables
-	std::map<int, MCLink*> link_map; /**< maps source mac to associated MCLink*/
+	std::map<int, MCLink *>
+			link_map; /**< maps source mac to associated MCLink*/
 	int pkts_tot_good; /**< Total number of packets arrived with good channel*/
-	int pkts_tot_medium; /**< Total number of packets arrived with medium channel*/
+	int pkts_tot_medium; /**< Total number of packets arrived with medium
+							channel*/
 	int pkts_tot_bad; /**< Total number of packets arrived with bad channel*/
 
 private:
-	// Variables	
+	// Variables
 };
 
 #endif /* UWHMMPHYSICAL_H  */

@@ -53,7 +53,8 @@ extern packet_t PT_SUN_DATA;
  */
 typedef struct hdr_sun_data {
 
-	uint8_t list_of_hops_ [MAX_HOP_NUMBER]; /**< List of IPs saved in the header */
+	uint8_t list_of_hops_[MAX_HOP_NUMBER]; /**< List of IPs saved in the header
+											*/
 	int8_t pointer_to_list_of_hops_; /**< Pointer used to keep track of the
 										 last IPs processed */
 	u_int8_t list_of_hops_length_; /**< Current number of IPs stored in the

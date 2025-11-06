@@ -105,7 +105,7 @@ public:
 	 * Method that writes a command to the modem interface
 	 * @param msg std::string command to be sent to the device
 	 */
-	virtual int writeToDevice(const std::string& msg);
+	virtual int writeToDevice(const std::string &msg);
 
 	/**
 	 * Function that dumps data from the device's memory to a backup buffer.
@@ -157,7 +157,7 @@ private:
 	bool isClient;
 
 	/**
-	 * 
+	 *
 	 */
 	struct sockaddr_in cl_addr;
 };

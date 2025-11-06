@@ -39,7 +39,6 @@
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 
-
 #include <iostream>
 #include <string_view>
 
@@ -49,28 +48,28 @@ namespace ConsoleColours
 #ifdef _WIN32
 #error Not implemented.
 #else
-    inline constexpr std::string_view Red = "\x1b[1;31m";
-    inline constexpr std::string_view Green = "\x1b[1;32m";
-    inline constexpr std::string_view Yellow = "\x1b[1;33m";
-    inline constexpr std::string_view Blue = "\x1b[1;34m";
-    inline constexpr std::string_view Magenta = "\x1b[1;35m";
-    inline constexpr std::string_view Cyan = "\x1b[1;36m";
-    inline constexpr std::string_view Reset = "\x1b[0m";
+inline constexpr std::string_view Red = "\x1b[1;31m";
+inline constexpr std::string_view Green = "\x1b[1;32m";
+inline constexpr std::string_view Yellow = "\x1b[1;33m";
+inline constexpr std::string_view Blue = "\x1b[1;34m";
+inline constexpr std::string_view Magenta = "\x1b[1;35m";
+inline constexpr std::string_view Cyan = "\x1b[1;36m";
+inline constexpr std::string_view Reset = "\x1b[0m";
 #endif
 
-};
+}; // namespace ConsoleColours
 
-#define LOG_MSG(color, msg) std::cout << color << msg << ConsoleColours::Reset << std::endl;
+#define LOG_MSG(color, msg) \
+	std::cout << color << msg << ConsoleColours::Reset << std::endl;
 
 #define LOG_MSG_ONCE(color, msg)       \
-    {                                  \
-        static bool msg_shown = false; \
-        if (!msg_shown)                \
-        {                              \
-            msg_shown = true;          \
-            LOG_MSG(color, msg)        \
-        }                              \
-    }
+	{                                  \
+		static bool msg_shown = false; \
+		if (!msg_shown) {              \
+			msg_shown = true;          \
+			LOG_MSG(color, msg)        \
+		}                              \
+	}
 
 #define LOG_MSG_INFO(msg) LOG_MSG(ConsoleColours::Green, msg)
 #define LOG_MSG_WARN(msg) LOG_MSG(ConsoleColours::Yellow, msg)

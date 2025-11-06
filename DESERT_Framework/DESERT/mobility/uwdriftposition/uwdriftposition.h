@@ -41,10 +41,10 @@
 
 #include "node-core.h"
 
-#include <iostream>
-#include <ctime>
-#include <cstdlib>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 
 /**
  * UwDriftPosition class implements the drift mobility model.
@@ -101,9 +101,8 @@ protected:
 	double starting_speed_y_; /**< Initial speed of the node. y axis in m/s. */
 	double starting_speed_z_; /**< Initial speed of the node. z axis in m/s. */
 	double updateTime_; /**< Time between two update computation. */
-	double
-			nextUpdateTime_; /**< Internal variable used to evaluate the steps
-								to be computed. */
+	double nextUpdateTime_; /**< Internal variable used to evaluate the steps
+							   to be computed. */
 	int debug_; /**< Flag to enable or disable dirrefent levels of debug. */
 
 	/**

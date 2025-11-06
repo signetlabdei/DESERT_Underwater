@@ -40,20 +40,18 @@
 
 #include <uwminterpreter.h>
 
-#include <stdlib.h>
-#include <iostream>
-#include <stdio.h>
-#include <fstream>
-#include <string.h>
-#include <cstring>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <cmath>
 #include <climits>
-
-
+#include <cmath>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /** Class used to build and parse TELEGRAMS (this class derives UWMinterpreter);
  * currently, this class implements methods to build/parse:

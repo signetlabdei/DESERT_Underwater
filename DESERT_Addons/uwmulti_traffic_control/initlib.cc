@@ -34,8 +34,8 @@
  * \brief file to initialize the libuwphysical.so library
  */
 
-#include <tclcl.h>
 #include "uwmulti-traffic-range-crt.h"
+#include <tclcl.h>
 #include <uwmulti-cmn-hdr.h>
 
 extern EmbeddedTcl UwMultiTrafficControlInitTclCode;
@@ -56,15 +56,15 @@ packet_t PT_UWMULTIPHY_PONG;
 static class MultiTrHeaderClass : public PacketHeaderClass
 {
 public:
-    /**
-     * Constructor of the class
-     */
-    MultiTrHeaderClass()
-    : PacketHeaderClass("PacketHeader/MULTI_TR", sizeof(hdr_uwm_tr))
-    {
-        this->bind();
-        bind_offset(&hdr_uwm_tr::offset_);
-    }
+	/**
+	 * Constructor of the class
+	 */
+	MultiTrHeaderClass()
+		: PacketHeaderClass("PacketHeader/MULTI_TR", sizeof(hdr_uwm_tr))
+	{
+		this->bind();
+		bind_offset(&hdr_uwm_tr::offset_);
+	}
 } class_hdr_MULTI_TR;
 
 /**
@@ -77,7 +77,8 @@ public:
 	 * Constructor of the class
 	 */
 	UwmultiphyPingHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWMULTIPHY_PING", sizeof(hdr_uwmultiphy_ping))
+		: PacketHeaderClass(
+				  "PacketHeader/UWMULTIPHY_PING", sizeof(hdr_uwmultiphy_ping))
 	{
 		this->bind();
 		bind_offset(&hdr_uwmultiphy_ping::offset_);
@@ -94,7 +95,8 @@ public:
 	 * Constructor of the class
 	 */
 	UwmultiphyPongHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWMULTIPHY_PONG", sizeof(hdr_uwmultiphy_pong))
+		: PacketHeaderClass(
+				  "PacketHeader/UWMULTIPHY_PONG", sizeof(hdr_uwmultiphy_pong))
 	{
 		this->bind();
 		bind_offset(&hdr_uwmultiphy_pong::offset_);
@@ -111,29 +113,35 @@ public:
 	 * Constructor of the class
 	 */
 	UwmultiphyDataHeaderClass()
-		: PacketHeaderClass("PacketHeader/UWMULTIPHY_DATA", sizeof(hdr_uwmultiphy_data))
+		: PacketHeaderClass(
+				  "PacketHeader/UWMULTIPHY_DATA", sizeof(hdr_uwmultiphy_data))
 	{
 		this->bind();
 		bind_offset(&hdr_uwmultiphy_data::offset_);
 	}
 } class_hdr_uwmultiphy_data;
 
-extern "C" int Uwmulti_traffic_control_Init()
+extern "C" int
+Uwmulti_traffic_control_Init()
 {
-  	PT_MULTI_TR_PROBE = p_info::addPacket("MULTI_TR_PROBE");
-  	PT_MULTI_TR_PROBE_ACK = p_info::addPacket("MULTI_TR_PROBE_ACK");
+	PT_MULTI_TR_PROBE = p_info::addPacket("MULTI_TR_PROBE");
+	PT_MULTI_TR_PROBE_ACK = p_info::addPacket("MULTI_TR_PROBE_ACK");
 
-    PT_UWMULTIPHY_PING = p_info::addPacket((char*) "UWMULTIPHY/UWMULTIPHY_PING");
-    PT_UWMULTIPHY_PONG = p_info::addPacket((char*) "UWMULTIPHY/UWMULTIPHY_PONG");
+	PT_UWMULTIPHY_PING =
+			p_info::addPacket((char *) "UWMULTIPHY/UWMULTIPHY_PING");
+	PT_UWMULTIPHY_PONG =
+			p_info::addPacket((char *) "UWMULTIPHY/UWMULTIPHY_PONG");
 
-    PT_UWMULTIPHY_DATA = p_info::addPacket((char*) "UWMULTIPHY/UWMULTIPHY_DATA");
+	PT_UWMULTIPHY_DATA =
+			p_info::addPacket((char *) "UWMULTIPHY/UWMULTIPHY_DATA");
 
-  	UwMultiTrafficControlInitTclCode.load();
-  	return 0;
+	UwMultiTrafficControlInitTclCode.load();
+	return 0;
 }
 
-extern "C" int Cygmulti_traffic_control_Init()
+extern "C" int
+Cygmulti_traffic_control_Init()
 {
-    Uwmulti_traffic_control_Init();
-    return 0;
+	Uwmulti_traffic_control_Init();
+	return 0;
 }

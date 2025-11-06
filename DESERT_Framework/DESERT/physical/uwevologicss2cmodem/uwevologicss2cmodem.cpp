@@ -33,14 +33,14 @@
 #include <uwal.h>
 #include <uwevologicss2cmodem.h>
 #include <uwphy-clmsg.h>
-#include <uwsocket.h>
 #include <uwserial.h>
+#include <uwsocket.h>
 
 #include <cstring>
 #include <iostream>
 #include <iterator>
-#include <string>
 #include <ostream>
+#include <string>
 
 const std::chrono::milliseconds UwEvoLogicsS2CModem::MODEM_TIMEOUT =
 		std::chrono::milliseconds(210);
@@ -202,17 +202,18 @@ UwEvoLogicsS2CModem::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (!strcmp(argv[1], "setConnector")) {
-			if(!strcmp(argv[2], "SOCKET")) {
+			if (!strcmp(argv[2], "SOCKET")) {
 				p_connector.reset(new UwSocket());
 				p_interpreter->setTerminator("\n");
 				return TCL_OK;
 			}
-			if(!strcmp(argv[2], "SERIAL")) {
+			if (!strcmp(argv[2], "SERIAL")) {
 				p_connector.reset(new UwSerial());
 				p_interpreter->setTerminator("\r");
 				return TCL_OK;
 			}
-			fprintf(stderr, "Invalid connector type, choose between SOCKET and SERIAL");
+			fprintf(stderr,
+					"Invalid connector type, choose between SOCKET and SERIAL");
 			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "setSourceLevel")) {
@@ -273,15 +274,15 @@ UwEvoLogicsS2CModem::initializeLUT()
 
 			std::getline(line_stream, token, txdur_token_separator_);
 			double duration = 0;
-			char *end {};
+			char *end{};
 			if (token.length() > 0) {
 				duration = std::strtod(token.c_str(), &end);
 
 				if (!(duration > 0))
 					printOnLog(LogLevel::ERROR,
 							"EVOLOGICSS2CMODEM",
-							"initializeLUT::INVALID_DURATION_FOR_PKT_SIZE "
-							+ std::to_string(size));
+							"initializeLUT::INVALID_DURATION_FOR_PKT_SIZE " +
+									std::to_string(size));
 			}
 
 			std::getline(line_stream, token, txdur_token_separator_);
@@ -293,8 +294,8 @@ UwEvoLogicsS2CModem::initializeLUT()
 				if (!(proc_delay > 0))
 					printOnLog(LogLevel::ERROR,
 							"EVOLOGICSS2CMODEM",
-							"initializeLUT::INVALID_PROC_DELAY_FOR_PKT_SIZE "
-							+ std::to_string(size));
+							"initializeLUT::INVALID_PROC_DELAY_FOR_PKT_SIZE " +
+									std::to_string(size));
 			}
 
 			size2dur_[size] = duration;
@@ -925,32 +926,32 @@ UwEvoLogicsS2CModem::updateStatus(UwInterpreterS2C::Response cmd)
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();
 			break;
-	        }
-                case UwInterpreterS2C::Response::USBLANGLES: {
-                        status = ModemState::AVAILABLE;
-                        status_cv.notify_all();
-                        break;
-                }
-                case UwInterpreterS2C::Response::USBLLONG: {
-                        status = ModemState::AVAILABLE;
-                        std::shared_ptr<USBLInfo> pos = p_interpreter->getUSBLInfo();
+		}
+		case UwInterpreterS2C::Response::USBLANGLES: {
+			status = ModemState::AVAILABLE;
+			status_cv.notify_all();
+			break;
+		}
+		case UwInterpreterS2C::Response::USBLLONG: {
+			status = ModemState::AVAILABLE;
+			std::shared_ptr<USBLInfo> pos = p_interpreter->getUSBLInfo();
 
-                        std::string log_msg = "updateStatus::USBLLONG::curr_time=" +
-                            std::to_string(pos->curr_time) +
-                            ",meas_time=" + std::to_string(pos->meas_time) +
-                            ",remote_address=" + std::to_string(pos->r_address) +
-                            ",X=" + std::to_string(pos->X) +
-                            ",Y=" + std::to_string(pos->Y) +
-                            ",Z=" + std::to_string(pos->Z) +
-                            ",E=" + std::to_string(pos->E) +
-                            ",N=" + std::to_string(pos->N) +
-                            ",U=" + std::to_string(pos->U) +
-                            ",accuracy=" + std::to_string(pos->accuracy);
-                          printOnLog(LogLevel::INFO, "EVOLOGICSS2CMODEM", log_msg);
+			std::string log_msg = "updateStatus::USBLLONG::curr_time=" +
+					std::to_string(pos->curr_time) +
+					",meas_time=" + std::to_string(pos->meas_time) +
+					",remote_address=" + std::to_string(pos->r_address) +
+					",X=" + std::to_string(pos->X) +
+					",Y=" + std::to_string(pos->Y) +
+					",Z=" + std::to_string(pos->Z) +
+					",E=" + std::to_string(pos->E) +
+					",N=" + std::to_string(pos->N) +
+					",U=" + std::to_string(pos->U) +
+					",accuracy=" + std::to_string(pos->accuracy);
+			printOnLog(LogLevel::INFO, "EVOLOGICSS2CMODEM", log_msg);
 
-                        status_cv.notify_all();
-                        break;
-                }
+			status_cv.notify_all();
+			break;
+		}
 		case UwInterpreterS2C::Response::UNKNOWN: {
 			status = ModemState::AVAILABLE;
 			status_cv.notify_all();

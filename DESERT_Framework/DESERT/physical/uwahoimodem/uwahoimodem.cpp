@@ -183,12 +183,14 @@ UwAhoiModem::startTx(Packet *p)
 	// write the obtained command to the device, through the connector
 	std::unique_lock<std::mutex> tx_state_lock(tx_status_m);
 
-	if (!tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY, [&]
-	    { return tx_status == TransmissionState::TX_IDLE;	})) {
+	if (!tx_status_cv.wait_for(tx_state_lock, WAIT_DELIVERY, [&] {
+			return tx_status == TransmissionState::TX_IDLE;
+		})) {
 
 		tx_status = TransmissionState::TX_IDLE;
-		printOnLog(LogLevel::DEBUG, "AHOIMODEM",
-		    "startTx::FORCING_TX_STATUS_IDLE");
+		printOnLog(LogLevel::DEBUG,
+				"AHOIMODEM",
+				"startTx::FORCING_TX_STATUS_IDLE");
 	}
 
 	tx_status = TransmissionState::TX_WAITING;
@@ -210,8 +212,8 @@ UwAhoiModem::startTx(Packet *p)
 			}))) {
 
 		printOnLog(LogLevel::DEBUG,
-		    "AHOIMODEM",
-			"startTx::SENDING_PACKET[" + std::to_string(n_retx) + "]");
+				"AHOIMODEM",
+				"startTx::SENDING_PACKET[" + std::to_string(n_retx) + "]");
 
 		tx_status = TransmissionState::TX_WAITING;
 
@@ -229,14 +231,14 @@ ahoi::packet_t
 UwAhoiModem::fillAhoiPkt(Packet *p)
 {
 	hdr_uwal *uwalh = HDR_UWAL(p);
-	hdr_mac* mach = HDR_MAC(p);
+	hdr_mac *mach = HDR_MAC(p);
 
 	ahoi::packet_t packet = {0};
 
 	std::string payload(uwalh->binPkt(), uwalh->binPktLength());
 
 	ahoi::header_t header;
-	header.src = (unsigned int)modemID;
+	header.src = (unsigned int) modemID;
 	header.dst = mach->macDA();
 	header.type = ahoi::commands_id[ahoi::Command::send];
 	header.status = ahoi::ACK_NONE;
@@ -273,7 +275,7 @@ UwAhoiModem::start()
 		return;
 	}
 
-	//generate complete path with parameters for serial connection
+	// generate complete path with parameters for serial connection
 	if (parity_bit)
 		modem_address = modem_address + ":p=1";
 	else
@@ -292,15 +294,13 @@ UwAhoiModem::start()
 	if (baud_rate > 0)
 		modem_address = modem_address + ":b=" + std::to_string(baud_rate);
 	else {
-		printOnLog(
-		    LogLevel::ERROR, "AHOIMODEM", "start::BAUD_RATE_NOT_VALID");
+		printOnLog(LogLevel::ERROR, "AHOIMODEM", "start::BAUD_RATE_NOT_VALID");
 		exit(1);
 	}
 
-
 	if (!p_connector->openConnection(modem_address)) {
 		printOnLog(
-		    LogLevel::ERROR, "AHOIMODEM", "start::CONNECTION_OPEN_FAILED");
+				LogLevel::ERROR, "AHOIMODEM", "start::CONNECTION_OPEN_FAILED");
 		exit(1);
 	}
 
@@ -345,7 +345,7 @@ UwAhoiModem::transmittingData()
 
 		std::unique_lock<std::mutex> tx_q_lock(tx_queue_m);
 		tx_queue_cv.wait(
-		    tx_q_lock, [&] { return !tx_queue.empty() || !transmitting; });
+				tx_q_lock, [&] { return !tx_queue.empty() || !transmitting; });
 		if (!transmitting) {
 			break;
 		}
@@ -372,8 +372,9 @@ UwAhoiModem::transmittingData()
 			startTx(pck);
 
 		} else {
-			printOnLog(LogLevel::DEBUG, "AHOIMODEM",
-			    "transmittingData::INVALID_PACKET_RETRIEVED");
+			printOnLog(LogLevel::DEBUG,
+					"AHOIMODEM",
+					"transmittingData::INVALID_PACKET_RETRIEVED");
 		}
 
 		updateSN();
@@ -384,8 +385,9 @@ UwAhoiModem::transmittingData()
 		ModemEvent e = {callback, pck};
 		event_q.push(e);
 
-		printOnLog(LogLevel::DEBUG, "AHOIMODEM",
-		    "transmittingData::BLOCKING_ON_NEXT_PACKET");
+		printOnLog(LogLevel::DEBUG,
+				"AHOIMODEM",
+				"transmittingData::BLOCKING_ON_NEXT_PACKET");
 	}
 }
 
@@ -421,8 +423,8 @@ UwAhoiModem::receivingData()
 
 		end_it += r_bytes;
 
-		while (p_interpreter->findResponse(
-		    beg_it, end_it, cmd_b, cmd_e) != "") {
+		while (p_interpreter->findResponse(beg_it, end_it, cmd_b, cmd_e) !=
+				"") {
 
 			offset = std::distance(cmd_e, end_it);
 
@@ -432,8 +434,8 @@ UwAhoiModem::receivingData()
 
 				updateStatus(pck);
 				printOnLog(LogLevel::DEBUG,
-						   "AHOIMODEM",
-						   "receivingData::RX_MSG=" + std::string(cmd_b, cmd_e));
+						"AHOIMODEM",
+						"receivingData::RX_MSG=" + std::string(cmd_b, cmd_e));
 			}
 
 			offset = std::distance(cmd_e, end_it);
@@ -454,7 +456,7 @@ UwAhoiModem::createRxPacket(Packet *p)
 	std::memset(uwalh->binPkt(), 0, uwalh->binPktLength());
 	std::copy(rx_payload.begin(), rx_payload.end(), uwalh->binPkt());
 	HDR_CMN(p)->direction() = hdr_cmn::UP;
-	rx_payload = "";  // clean up the rx payload string
+	rx_payload = ""; // clean up the rx payload string
 }
 
 bool
@@ -480,7 +482,8 @@ UwAhoiModem::storePacketInfo(std::shared_ptr<ahoi::packet_t> packet, Packet *p)
 		agc_max = footer.agcMax;
 
 		printOnLog(LogLevel::INFO,
-			"AHOIMODEM", "storePacketInfo::PAYLOAD[" + rx_payload + "]");
+				"AHOIMODEM",
+				"storePacketInfo::PAYLOAD[" + rx_payload + "]");
 	}
 
 	return true;
@@ -521,7 +524,7 @@ UwAhoiModem::updateStatus(std::shared_ptr<ahoi::packet_t> packet)
 			"][DST::" + std::to_string((packet->header).dst) +
 			"][TYP::" + std::to_string((packet->header).type) +
 			"][DSN::" + std::to_string((packet->header).dsn) +
-		    "][LEN::" + std::to_string((packet->header).len) + "]";
+			"][LEN::" + std::to_string((packet->header).len) + "]";
 	printOnLog(LogLevel::DEBUG, "AHOIMODEM", dbg_str);
 
 	std::lock(status_m, tx_status_m);
@@ -540,18 +543,16 @@ UwAhoiModem::updateStatus(std::shared_ptr<ahoi::packet_t> packet)
 
 			if (packet->header.dst == modemID || packet->header.dst == 0xFF) {
 
-			  storePacketInfo(packet, p);
-			  createRxPacket(p);
+				storePacketInfo(packet, p);
+				createRxPacket(p);
 
-			  std::function<void(UwModem &, Packet * p)> callback =
-				&UwModem::recv;
-			  ModemEvent e = {callback, p};
-			  event_q.push(e);
-
+				std::function<void(UwModem &, Packet * p)> callback =
+						&UwModem::recv;
+				ModemEvent e = {callback, p};
+				event_q.push(e);
 			}
 
 			break;
-
 		}
 		case ahoi::Command::confirm: {
 			if ((packet->header).src == modemID && (packet->header).dsn == sn) {
@@ -567,8 +568,9 @@ UwAhoiModem::updateStatus(std::shared_ptr<ahoi::packet_t> packet)
 			break;
 		}
 		default: {
-			printOnLog(LogLevel::ERROR, "AHOIMODEM",
-			    "updateStatus::UNMANAGED_CMD_TYPE");
+			printOnLog(LogLevel::ERROR,
+					"AHOIMODEM",
+					"updateStatus::UNMANAGED_CMD_TYPE");
 		}
 	}
 }
@@ -577,6 +579,7 @@ void
 UwAhoiModem::updateSN()
 {
 	sn++;
-	printOnLog(LogLevel::ERROR, "AHOIMODEM",
-	    "updateSN::CURRENT_SEQ_NUM::[" + std::to_string(sn) + "]");
+	printOnLog(LogLevel::ERROR,
+			"AHOIMODEM",
+			"updateSN::CURRENT_SEQ_NUM::[" + std::to_string(sn) + "]");
 }

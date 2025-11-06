@@ -39,19 +39,19 @@
 #ifndef UW_CS_ALOHA_TRIG_NODE_H
 #define UW_CS_ALOHA_TRIG_NODE_H
 
-#include <mmac.h>
-#include <mac.h>
-#include <mphy.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
-#include <fstream>
-#include <cmath>
 #include <climits>
+#include <cmath>
+#include <fstream>
 #include <iomanip>
+#include <iostream>
+#include <mac.h>
+#include <map>
+#include <mmac.h>
+#include <mphy.h>
+#include <queue>
 #include <rng.h>
+#include <set>
+#include <string>
 
 #define UW_CS_ALOHA_TRIG_NODE_DROP_REASON_BUFFER_FULL \
 	"DBF" /**< The Buffer of DATA packets is full */
@@ -575,9 +575,8 @@ protected:
 
 	int last_data_id_rx; /**< ID of the last DATA packet received */
 
-	bool
-			has_buffer_queue; /**< flag that indicates if a node has a buffer
-								 where store DATA packets */
+	bool has_buffer_queue; /**< flag that indicates if a node has a buffer
+							  where store DATA packets */
 	bool can_transmit; /**< Flag that indicates if the node can transmit data
 						  packets to the sink */
 
@@ -588,13 +587,13 @@ protected:
 							change of the state */
 
 	UW_CS_ALOHA_TRIG_NODE_STATUS
-			curr_state; /**< Current state of the protocol */
+	curr_state; /**< Current state of the protocol */
 	UW_CS_ALOHA_TRIG_NODE_STATUS
-			prev_state; /**< Previous state of the protocol */
+	prev_state; /**< Previous state of the protocol */
 	UW_CS_ALOHA_TRIG_NODE_STATUS
-			prev_prev_state; /**< Previous previous state of the protocol */
+	prev_prev_state; /**< Previous previous state of the protocol */
 	UW_CS_ALOHA_TRIG_NODE_REASON_STATUS
-			last_reason; /**< Reason for the state transitions */
+	last_reason; /**< Reason for the state transitions */
 
 	ofstream fout; /**< Object that handles the output file where the protocol
 					  writes the state transistions */

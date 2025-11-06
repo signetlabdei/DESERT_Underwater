@@ -40,13 +40,13 @@
 #ifndef UWALOHA_H_
 #define UWALOHA_H_
 
-#include <mmac.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <queue>
 #include <fstream>
+#include <iostream>
+#include <map>
+#include <mmac.h>
+#include <queue>
+#include <set>
+#include <string>
 
 #include <mphy.h>
 
@@ -61,38 +61,38 @@ extern packet_t PT_MMAC_ACK;
 typedef int pktSeqNum;
 
 /**
-*@brief This is the base class of UWAloha protocol, which is a derived class of
-*MMac.
-*/
+ *@brief This is the base class of UWAloha protocol, which is a derived class of
+ *MMac.
+ */
 
 class UWAloha : public MMac
 {
 
 public:
 	/**
-	*Constructor of UWAloha Class
-	*/
+	 *Constructor of UWAloha Class
+	 */
 	UWAloha();
 
 	/**
-	*Destructor of UWAloha Class
-	*/
+	 *Destructor of UWAloha Class
+	 */
 	virtual ~UWAloha();
 
 	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	* @param argc number of arguments in <i>argv</i>
-	* @param argv array of strings which are the command parameters (Note that
-	* argv[0] is the name of the object)
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched
-	* succesfully or not
-	*/
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 * @param argc number of arguments in <i>argv</i>
+	 * @param argv array of strings which are the command parameters (Note that
+	 * argv[0] is the name of the object)
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * succesfully or not
+	 */
 	virtual int command(int argc, const char *const *argv);
 
 protected:
 	/**
-	*Enumeration class of UWAloha status. First enumerator is given value 1.
-	*/
+	 *Enumeration class of UWAloha status. First enumerator is given value 1.
+	 */
 	enum UWALOHA_STATUS {
 		UWALOHA_STATE_IDLE = 1,
 		UWALOHA_STATE_BACKOFF,
@@ -111,9 +111,9 @@ protected:
 	};
 
 	/**
-	*Enumeration class which tells the nodes the reason why it is in this state.
-	*First enumerator is given value 1.
-	*/
+	 *Enumeration class which tells the nodes the reason why it is in this
+	 *state. First enumerator is given value 1.
+	 */
 	enum UWALOHA_REASON_STATUS {
 		UWALOHA_REASON_DATA_PENDING,
 		UWALOHA_REASON_DATA_RX,
@@ -133,9 +133,9 @@ protected:
 	};
 
 	/**
-	*Enumeration class of UWAloha packet type. First enumerator is given value
-	*1. Three kinds of packets are supported by UWAloha protocol.
-	*/
+	 *Enumeration class of UWAloha packet type. First enumerator is given value
+	 *1. Three kinds of packets are supported by UWAloha protocol.
+	 */
 	enum UWALOHA_PKT_TYPE {
 		UWALOHA_ACK_PKT = 1,
 		UWALOHA_DATA_PKT,
@@ -143,17 +143,17 @@ protected:
 	};
 
 	/**
-	*Enumeration class of UWAloha acknowledgement mode. First enumerator is
-	*given value 1. This protocol supports both acknowledgement and
-	* non-acknowledgement technique. If Acknowledgement is set, it uses
-	*Stop-And-Wait ARQ technique.
-	*/
+	 *Enumeration class of UWAloha acknowledgement mode. First enumerator is
+	 *given value 1. This protocol supports both acknowledgement and
+	 * non-acknowledgement technique. If Acknowledgement is set, it uses
+	 *Stop-And-Wait ARQ technique.
+	 */
 	enum UWALOHA_ACK_MODES { UWALOHA_ACK_MODE = 1, UWALOHA_NO_ACK_MODE };
 
 	/**
-	*Enumeration class of UWAloha timer status. First enumerator is given value
-	*1. It is employed to know the current status of a timer.
-	*/
+	 *Enumeration class of UWAloha timer status. First enumerator is given value
+	 *1. It is employed to know the current status of a timer.
+	 */
 	enum UWALOHA_TIMER_STATUS {
 		UWALOHA_IDLE = 1,
 		UWALOHA_RUNNING,
@@ -162,16 +162,16 @@ protected:
 	};
 
 	/**
-	* Base class of all the timer used in this protocol. This is a derived class
-	* of TimerHandler.
-	*/
+	 * Base class of all the timer used in this protocol. This is a derived
+	 * class of TimerHandler.
+	 */
 	class UWAlohaTimer : public TimerHandler
 	{
 
 	public:
 		/**
-		* Constructor of UWAlohaTimer Class.
-		*/
+		 * Constructor of UWAlohaTimer Class.
+		 */
 		UWAlohaTimer(UWAloha *m)
 			: TimerHandler()
 			, start_time(0.0)
@@ -184,19 +184,19 @@ protected:
 		}
 
 		/**
-		* Destructor of UWAlohaTimer Class.
-		*/
+		 * Destructor of UWAlohaTimer Class.
+		 */
 		virtual ~UWAlohaTimer()
 		{
 		}
 
 		/**
-		* It freezes or in another word, it stops the timer for some time.
-		* Suppose, for some reason we want to stop
-		* a timer for some period and we want to run this timer from where it
-		* was stopped. This function stops the timer and
-		* save the left time duration it must run.
-		*/
+		 * It freezes or in another word, it stops the timer for some time.
+		 * Suppose, for some reason we want to stop
+		 * a timer for some period and we want to run this timer from where it
+		 * was stopped. This function stops the timer and
+		 * save the left time duration it must run.
+		 */
 		virtual void
 		freeze()
 		{
@@ -208,9 +208,9 @@ protected:
 			timer_status = UWALOHA_FROZEN;
 		}
 		/**
-		* It starts the timer from where it was stopped. To run any freeze
-		* timer, we can use unfreeze method.
-		*/
+		 * It starts the timer from where it was stopped. To run any freeze
+		 * timer, we can use unfreeze method.
+		 */
 		virtual void
 		unFreeze()
 		{
@@ -222,8 +222,8 @@ protected:
 		}
 
 		/**
-		* Stop the timer any way.
-		*/
+		 * Stop the timer any way.
+		 */
 		virtual void
 		stop()
 		{
@@ -232,9 +232,9 @@ protected:
 		}
 
 		/**
-		* Schedule the time, i.e., how long a timer is going to run.
-		* @param double time
-		*/
+		 * Schedule the time, i.e., how long a timer is going to run.
+		 * @param double time
+		 */
 		virtual void
 		schedule(double val)
 		{
@@ -245,9 +245,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is in Idle state or not.
-		* @return 1 if the timer is idle and 0 if it is not.
-		*/
+		 * It tells whether the timer is in Idle state or not.
+		 * @return 1 if the timer is idle and 0 if it is not.
+		 */
 		bool
 		isIdle()
 		{
@@ -255,9 +255,9 @@ protected:
 		}
 
 		/**
-		* This method tells whether the timer is in Running state or not.
-		* @return 1 if the timer is running and 0 if it is not.
-		*/
+		 * This method tells whether the timer is in Running state or not.
+		 * @return 1 if the timer is running and 0 if it is not.
+		 */
 		bool
 		isRunning()
 		{
@@ -265,9 +265,9 @@ protected:
 		}
 
 		/**
-		* Tells whether the timer is expired or not.
-		* @return 1 if the timer expired and 0 if it is not.
-		*/
+		 * Tells whether the timer is expired or not.
+		 * @return 1 if the timer expired and 0 if it is not.
+		 */
 		bool
 		isExpired()
 		{
@@ -275,9 +275,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is in freeze mode or not.
-		* @return 1 if the timer is in freeze mode and 0 if it is not.
-		*/
+		 * It tells whether the timer is in freeze mode or not.
+		 * @return 1 if the timer is in freeze mode and 0 if it is not.
+		 */
 		bool
 		isFrozen()
 		{
@@ -285,9 +285,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is active or not.
-		* @return 1 if the timer is active and 0 if it is not.
-		*/
+		 * It tells whether the timer is active or not.
+		 * @return 1 if the timer is active and 0 if it is not.
+		 */
 		bool
 		isActive()
 		{
@@ -296,8 +296,8 @@ protected:
 		}
 
 		/**
-		* Reset the timer counter.
-		*/
+		 * Reset the timer counter.
+		 */
 		void
 		resetCounter()
 		{
@@ -305,9 +305,9 @@ protected:
 		}
 
 		/**
-		* Increment the timer counter. It helps to know the statics of the
-		* timer.
-		*/
+		 * Increment the timer counter. It helps to know the statics of the
+		 * timer.
+		 */
 		void
 		incrCounter()
 		{
@@ -315,9 +315,9 @@ protected:
 		}
 
 		/**
-		* It provides, how many times a timer ran.
-		* @return number of times a timer ran (int).
-		*/
+		 * It provides, how many times a timer ran.
+		 * @return number of times a timer ran (int).
+		 */
 		int
 		getCounter()
 		{
@@ -325,9 +325,9 @@ protected:
 		}
 
 		/**
-		* This methods provide the duration of a timer.
-		* @return left time duration of a timer (double).
-		*/
+		 * This methods provide the duration of a timer.
+		 * @return left time duration of a timer (double).
+		 */
 		double
 		getDuration()
 		{
@@ -347,233 +347,233 @@ protected:
 	};
 
 	/**
-	* Base class of AckTimer, which is a derived class of UWAlohaTimer.
-	*/
+	 * Base class of AckTimer, which is a derived class of UWAlohaTimer.
+	 */
 	class AckTimer : public UWAlohaTimer
 	{
 
 	public:
 		/**
-		* Constructor of AckTimer Class.
-		*/
+		 * Constructor of AckTimer Class.
+		 */
 		AckTimer(UWAloha *m)
 			: UWAlohaTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of AckTimer Class.
-		*/
+		 * Destructor of AckTimer Class.
+		 */
 		virtual ~AckTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* Base class of BackoffTimer. It is derived class of UWAlohaTimer.
-	*/
+	 * Base class of BackoffTimer. It is derived class of UWAlohaTimer.
+	 */
 	class BackOffTimer : public UWAlohaTimer
 	{
 
 	public:
 		/**
-		* Constructor of BackOffTimer Class.
-		*/
+		 * Constructor of BackOffTimer Class.
+		 */
 		BackOffTimer(UWAloha *m)
 			: UWAlohaTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of BackOffTimer.
-		*/
+		 * Destructor of BackOffTimer.
+		 */
 		virtual ~BackOffTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* This function receives the packet from upper layer and save it in the
-	* queue.
-	* @param Packet pointer
-	*/
+	 * This function receives the packet from upper layer and save it in the
+	 * queue.
+	 * @param Packet pointer
+	 */
 	virtual void recvFromUpperLayers(Packet *p);
 
 	/**
-	* It informs that a packet transmission started.
-	* @param Packet pointer
-	*/
+	 * It informs that a packet transmission started.
+	 * @param Packet pointer
+	 */
 	virtual void Mac2PhyStartTx(Packet *p);
 
 	/**
-	* It infroms that a packet transmission end.
-	* @param Packet pointer
-	*/
+	 * It infroms that a packet transmission end.
+	 * @param Packet pointer
+	 */
 	virtual void Phy2MacEndTx(const Packet *p);
 
 	/**
-	* PHY layer informs the MAC layer that it is receiving a packet.
-	* @Param Packet pointer (constant)
-	*/
+	 * PHY layer informs the MAC layer that it is receiving a packet.
+	 * @Param Packet pointer (constant)
+	 */
 	virtual void Phy2MacStartRx(const Packet *p);
 
 	/**
-	* PHY layer informs the MAC layer that the reception of the packet is over.
-	* @param Packet pointer.
-	*/
+	 * PHY layer informs the MAC layer that the reception of the packet is over.
+	 * @param Packet pointer.
+	 */
 	virtual void Phy2MacEndRx(Packet *p);
 
 	/**
-	* Compute the transmission time of a packet. It uses a cross-layer message
-	* to calculate the duration of that packet.
-	* @param type is a UWALOHA_PKT_TYPE
-	* @return tranmission time of a packet which is a double data type.
-	*/
+	 * Compute the transmission time of a packet. It uses a cross-layer message
+	 * to calculate the duration of that packet.
+	 * @param type is a UWALOHA_PKT_TYPE
+	 * @return tranmission time of a packet which is a double data type.
+	 */
 	virtual double computeTxTime(UWALOHA_PKT_TYPE type);
 
 	/**
-	* This method, initialize the packet. If the packet is received from the
-	* upper layer, it adds the header (if any). In case of UWAloha with ARQ
-	* technique, it set the fields of ACK packet.
-	* @param Packet pointer P. The packet can be <i>Data</i> packet or
-	* <i>ACK</i> packet.
-	* @param pkt_type is an UWALOHA_PKT_TYPE. Packet can be either <i>Data</i>
-	* packet or <i>ACK</i> packet.
-	* @param dest_addr is a integer data type. It is initialized as 0.
-	*/
+	 * This method, initialize the packet. If the packet is received from the
+	 * upper layer, it adds the header (if any). In case of UWAloha with ARQ
+	 * technique, it set the fields of ACK packet.
+	 * @param Packet pointer P. The packet can be <i>Data</i> packet or
+	 * <i>ACK</i> packet.
+	 * @param pkt_type is an UWALOHA_PKT_TYPE. Packet can be either <i>Data</i>
+	 * packet or <i>ACK</i> packet.
+	 * @param dest_addr is a integer data type. It is initialized as 0.
+	 */
 	virtual void initPkt(
 			Packet *p, UWALOHA_PKT_TYPE pkt_type, int dest_addr = 0);
 
 	/**
-	* This function calculates the backoff duration and return the backoff
-	* time.It employs the exponential backoff algorithm.
-	* @return backoff duration which is a double data type.
-	*/
+	 * This function calculates the backoff duration and return the backoff
+	 * time.It employs the exponential backoff algorithm.
+	 * @return backoff duration which is a double data type.
+	 */
 	virtual double getBackoffTime();
 
 	/**
-	* This method transmits <i>Data</i> packets from MAC layer to PHY layer.
-	*/
+	 * This method transmits <i>Data</i> packets from MAC layer to PHY layer.
+	 */
 	virtual void txData();
 
 	/**
-	* This methods transmits <i>ACK</i> packet from MAC layer to PHY layer.
-	* @param dest_addr which is an integer data type.
-	*/
+	 * This methods transmits <i>ACK</i> packet from MAC layer to PHY layer.
+	 * @param dest_addr which is an integer data type.
+	 */
 	virtual void txAck(int dest_addr);
 
 	/**
-	* Node is in Idle state. It only changes its state if it has packet(s) to
-	* transmit or it receives a packet.
-	*/
+	 * Node is in Idle state. It only changes its state if it has packet(s) to
+	 * transmit or it receives a packet.
+	 */
 	virtual void stateIdle();
 
 	/**
-	* If a node start receiving a packet in Idle state.
-	*/
+	 * If a node start receiving a packet in Idle state.
+	 */
 	virtual void stateRxIdle();
 
 	/**
-	* If a node has packet to transmits. In such case, it moves from Idle state
-	* to data transmits state.
-	*/
+	 * If a node has packet to transmits. In such case, it moves from Idle state
+	 * to data transmits state.
+	 */
 	virtual void stateTxData();
 
 	/**
-	* If the protocl uses ARQ technique, in that case, after receiving a
-	* <i>Data</i> packet the node sends an <i>ACK</i> packet.
-	*/
+	 * If the protocl uses ARQ technique, in that case, after receiving a
+	 * <i>Data</i> packet the node sends an <i>ACK</i> packet.
+	 */
 	virtual void stateTxAck(int dest_addr);
 
 	/**
-	* After transmitting a <i>Data</i> packet, a node waits for the <i>ACK</i>
-	* packet.
-	*/
+	 * After transmitting a <i>Data</i> packet, a node waits for the <i>ACK</i>
+	 * packet.
+	 */
 	virtual void stateWaitAck();
 
 	/**
-	* If a node receives any packet while it was waiting for <i>ACK</i> packet,
-	* it moves to this state. The packet it is receiving can be a <i>Data</i>
-	* packet
-	* from another node or <i>ACK</i> packet.
-	*/
+	 * If a node receives any packet while it was waiting for <i>ACK</i> packet,
+	 * it moves to this state. The packet it is receiving can be a <i>Data</i>
+	 * packet
+	 * from another node or <i>ACK</i> packet.
+	 */
 	virtual void stateRxWaitAck();
 
 	/**
-	* If <i>ACK</i> packet is not received within the acknowledgement expire
-	* time.
-	*/
+	 * If <i>ACK</i> packet is not received within the acknowledgement expire
+	 * time.
+	 */
 	virtual void stateBackoff();
 
 	/**
-	* If a node start receiving a packet when it is in backoff state. The node
-	* first freeze (or another word, hold) the backoff timer and start receiving
-	* the packet.
-	*/
+	 * If a node start receiving a packet when it is in backoff state. The node
+	 * first freeze (or another word, hold) the backoff timer and start
+	 * receiving the packet.
+	 */
 	virtual void stateRxBackoff();
 
 	/**
-	* It checks whether the ack timer is already expired while it was busy with
-	* other activities.
-	*/
+	 * It checks whether the ack timer is already expired while it was busy with
+	 * other activities.
+	 */
 	virtual void stateCheckAckExpired();
 
 	/**
-	* It checks whether the backoff timer is already expired while it was busy
-	* with other activities.
-	*/
+	 * It checks whether the backoff timer is already expired while it was busy
+	 * with other activities.
+	 */
 	virtual void stateCheckBackoffExpired();
 
 	/**
-	* It process the packet which is received. After receiving a packet it
-	* changes it states according to the previously stored status information.
-	* @param <i>Data</i> packet pointer
-	*/
+	 * It process the packet which is received. After receiving a packet it
+	 * changes it states according to the previously stored status information.
+	 * @param <i>Data</i> packet pointer
+	 */
 	virtual void stateRxData(Packet *p);
 
 	/**
-	* The node comes to this state if it receives an <i>ACK</i> packet. After
-	* receiving an <i>ACK</i> packet it changes it states according
-	* to the previously stored status information.
-	*/
+	 * The node comes to this state if it receives an <i>ACK</i> packet. After
+	 * receiving an <i>ACK</i> packet it changes it states according
+	 * to the previously stored status information.
+	 */
 	virtual void stateRxAck(Packet *p);
 
 	/**
-	* It stops the backoff timer.
-	*/
+	 * It stops the backoff timer.
+	 */
 	virtual void exitBackoff();
 
 	/**
-	* This methods print the state information of the nodes.
-	* @param delay is a double data type.
-	*/
+	 * This methods print the state information of the nodes.
+	 * @param delay is a double data type.
+	 */
 	virtual void printStateInfo(double delay = 0);
 
 	/**
-	* This function is used to initialize the UWAloha protocol.
-	*/
+	 * This function is used to initialize the UWAloha protocol.
+	 */
 	virtual void initInfo();
 
 	/**
-	* Refreshes the states of the node. The node save the information of three
-	* states, they are: previous to previous state, previous state and
-	* current state of the node.
-	* @param state which is an UWALOHA_STATUS type.
-	*/
+	 * Refreshes the states of the node. The node save the information of three
+	 * states, they are: previous to previous state, previous state and
+	 * current state of the node.
+	 * @param state which is an UWALOHA_STATUS type.
+	 */
 	virtual void
 	refreshState(UWALOHA_STATUS state)
 	{
@@ -583,9 +583,9 @@ protected:
 	}
 
 	/**
-	* To know the reason why a node is in this current state.
-	* @param reason is an UWALOHA_REASON_STATUS type.
-	*/
+	 * To know the reason why a node is in this current state.
+	 * @param reason is an UWALOHA_REASON_STATUS type.
+	 */
 	virtual void
 	refreshReason(UWALOHA_REASON_STATUS reason)
 	{
@@ -593,9 +593,9 @@ protected:
 	}
 
 	/**
-	* Increments the current transmission round of a packet. It keeps track of
-	* the number of retransmition of a packet.
-	*/
+	 * Increments the current transmission round of a packet. It keeps track of
+	 * the number of retransmition of a packet.
+	 */
 	virtual void
 	incrCurrTxRounds()
 	{
@@ -603,8 +603,8 @@ protected:
 	}
 
 	/**
-	* If a node is going to transmit a new packet, it resets the tx counter.
-	*/
+	 * If a node is going to transmit a new packet, it resets the tx counter.
+	 */
 	virtual void
 	resetCurrTxRounds()
 	{
@@ -612,16 +612,16 @@ protected:
 	}
 
 	/**
-	* Update the Round Trip Time (RTT) which is necessary to compute the
-	* acknowledgement duration as well as backoff duration.
-	* @param rtt is a double data type.
-	*/
+	 * Update the Round Trip Time (RTT) which is necessary to compute the
+	 * acknowledgement duration as well as backoff duration.
+	 * @param rtt is a double data type.
+	 */
 	virtual void updateRTT(double rtt);
 
 	/**
-	* This method is used to get the average RTT over all the receives RTT.
-	* @return average RTT time which is a double data type.
-	*/
+	 * This method is used to get the average RTT over all the receives RTT.
+	 * @return average RTT time which is a double data type.
+	 */
 	virtual double
 	getRTT()
 	{
@@ -629,14 +629,14 @@ protected:
 	}
 
 	/**
-	* Like updateRTT() function.
-	*/
+	 * Like updateRTT() function.
+	 */
 	virtual void updateAckTimeout(double rtt);
 
 	/**
-	* It updates the sequence number of the last data packet rx.
-	* @param id is an integer data type.
-	*/
+	 * It updates the sequence number of the last data packet rx.
+	 * @param id is an integer data type.
+	 */
 	virtual void
 	updateLastDataIdRx(int id)
 	{
@@ -645,10 +645,10 @@ protected:
 	virtual void waitForUser();
 
 	/**
-	* This method is used to get the sequence number from a packet.
-	* @param packet pointer
-	* @return it returns sequence number which is an integer data type.
-	*/
+	 * This method is used to get the sequence number from a packet.
+	 * @param packet pointer
+	 * @return it returns sequence number which is an integer data type.
+	 */
 	inline int
 	getPktSeqNum(Packet *p)
 	{
@@ -659,10 +659,10 @@ protected:
 	}
 
 	/**
-	* A node receives packet(s) from upper layer and store them in the
-	* container.
-	* @param packet pointer
-	*/
+	 * A node receives packet(s) from upper layer and store them in the
+	 * container.
+	 * @param packet pointer
+	 */
 	inline void
 	putPktInQueue(Packet *p)
 	{
@@ -670,25 +670,24 @@ protected:
 	}
 
 	/**
-	* It erases the packet from the container.
-	* @param seq_num which is an integer data type.
-	*/
+	 * It erases the packet from the container.
+	 * @param seq_num which is an integer data type.
+	 */
 	inline void
 	eraseItemFromPktQueue(int seq_num)
 	{
 		map<pktSeqNum, Packet *>::iterator it_p;
 		it_p = mapPacket.find(seq_num);
-		if (it_p != mapPacket.end())
-		{
+		if (it_p != mapPacket.end()) {
 			Packet::free((*it_p).second);
 			mapPacket.erase((*it_p).first);
 		}
 	}
 
 	/**
-	* Put acknowledgement timer in the container.
-	* @param seq_num which is an integer data type.
-	*/
+	 * Put acknowledgement timer in the container.
+	 * @param seq_num which is an integer data type.
+	 */
 	inline void
 	putAckTimerInMap(int seq_num)
 	{
@@ -696,25 +695,24 @@ protected:
 	}
 
 	/**
-	* Erase an item from acknowledgement stored container.
-	* @param seq_num which is an integer data type.
-	*/
+	 * Erase an item from acknowledgement stored container.
+	 * @param seq_num which is an integer data type.
+	 */
 	inline void
 	eraseItemFrommapAckTimer(int seq_num)
 	{
 		map<pktSeqNum, AckTimer>::iterator it_a;
 		it_a = mapAckTimer.find(seq_num);
-		if (it_a != mapAckTimer.end())
-		{
+		if (it_a != mapAckTimer.end()) {
 			mapAckTimer.erase((*it_a).first);
 		}
 	}
 
 	/**
-	* Number of packets which MAC layer receives form upper layer(s) but were
-	* not transmitted.
-	* @return an integer value.
-	*/
+	 * Number of packets which MAC layer receives form upper layer(s) but were
+	 * not transmitted.
+	 * @return an integer value.
+	 */
 	virtual int
 	getRemainingPkts()
 	{
@@ -722,8 +720,8 @@ protected:
 	}
 
 	/**
-	* Increment the number of <i>Data</i> packet receive for the upper layer.
-	*/
+	 * Increment the number of <i>Data</i> packet receive for the upper layer.
+	 */
 	virtual void
 	incrUpperDataRx()
 	{
@@ -754,16 +752,15 @@ protected:
 	/////////////////////////////
 
 	static bool initialized; /**< It checks whether UWAloha protocol is
-				 * initialized or not. If <i>FALSE</i> means, not initialized
-				 * and if <i>TRUE</i>
-				 * means it is initialized */
+							  * initialized or not. If <i>FALSE</i> means, not
+							  * initialized and if <i>TRUE</i> means it is
+							  * initialized */
 
 	int last_sent_data_id; /**< sequence number of the last sent packet */
 
 	bool print_transitions; /**< Whether to print the state of the nodes */
-	bool
-			has_buffer_queue; /**< Whether the node has buffer to store data or
-								 not */
+	bool has_buffer_queue; /**< Whether the node has buffer to store data or
+							  not */
 
 	double start_tx_time; /**< Time when a packet start transmitting */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP */
@@ -774,7 +771,7 @@ protected:
 	int curr_tx_rounds; /**< How many times a packet is transmitted */
 	int last_data_id_rx; /**< The sequence number of last received packet */
 	int recv_data_id; /**< The sequence number of the packet which is received
-						 */
+					   */
 
 	Packet *curr_data_pkt; /**< Pointer of the latest selected data packet. */
 
@@ -786,25 +783,25 @@ protected:
 	BackOffTimer backoff_timer; /**< An object of the backoff timer class */
 
 	UWALOHA_REASON_STATUS
-			last_reason; /**< Enum variable which stores the last reason why a
-							node changes its state */
+	last_reason; /**< Enum variable which stores the last reason why a
+					node changes its state */
 	UWALOHA_STATUS curr_state; /**< Enum variable. It stores the current state
 								  of a node */
 	UWALOHA_STATUS
-			prev_state; /**< Enum variable. It stores the previous state of a
-						   node */
+	prev_state; /**< Enum variable. It stores the previous state of a
+				   node */
 	UWALOHA_STATUS prev_prev_state; /**< Enum variable. It stores the previous
 									   to previous state of a node */
 
 	UWALOHA_ACK_MODES
-			ack_mode; /**< Enum variable. It tells the node whether to use ARQ
-						 technique or not. */
+	ack_mode; /**< Enum variable. It tells the node whether to use ARQ
+				 technique or not. */
 	static map<UWALOHA_STATUS, string> status_info; /**< Container which stores
 													   all the status
 													   information */
 	static map<UWALOHA_REASON_STATUS, string>
 			reason_info; /**< Container which stores all the reason information
-							*/
+						  */
 	static map<UWALOHA_PKT_TYPE, string>
 			pkt_type_info; /**< Container which stores all the packet type
 							  information of UWAloha*/

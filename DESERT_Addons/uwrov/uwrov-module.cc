@@ -38,8 +38,10 @@
 #include "uwrov-module.h"
 #include <iostream>
 
-int hdr_uwROV_monitoring::offset_; /**< Offset used to access in <i>hdr_uwROV</i> packets header. */
-int hdr_uwROV_ctr::offset_; /**< Offset used to access in <i>hdr_uwROV</i> packets header. */
+int hdr_uwROV_monitoring::offset_; /**< Offset used to access in
+									  <i>hdr_uwROV</i> packets header. */
+int hdr_uwROV_ctr::offset_; /**< Offset used to access in <i>hdr_uwROV</i>
+							   packets header. */
 
 /**
  * Class that represents the binding with the tcl configuration script
@@ -176,7 +178,8 @@ UwROVModule::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 6) {
 		if (strcasecmp(argv[1], "setdest") == 0) {
-			posit->setdest(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
+			posit->setdest(
+					atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]));
 
 			return TCL_OK;
 		}

@@ -35,10 +35,10 @@
  */
 
 #include "uwaloha.h"
-#include <mac.h>
-#include <cmath>
 #include <climits>
+#include <cmath>
 #include <iomanip>
+#include <mac.h>
 #include <rng.h>
 
 enum { NOT_SET = -1, SESSION_DISTANCE_NOT_SET = 0 };

@@ -38,9 +38,9 @@
  */
 
 #include "packet.h"
-#include <tclcl.h>
-#include <sap.h>
 #include "uwApplication_cmn_header.h"
+#include <sap.h>
+#include <tclcl.h>
 
 int hdr_DATA_APPLICATION::offset_ = 0;
 

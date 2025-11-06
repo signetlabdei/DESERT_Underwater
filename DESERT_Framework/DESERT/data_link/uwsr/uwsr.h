@@ -49,14 +49,14 @@
 #ifndef UWSR_H
 #define UWSR_H
 
-#include <mac.h>
-#include <mmac.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <set>
-#include <utility>
 #include <fstream>
+#include <iostream>
+#include <mac.h>
+#include <map>
+#include <mmac.h>
+#include <set>
+#include <string>
+#include <utility>
 
 #include <mphy.h>
 
@@ -77,38 +77,38 @@ typedef pair<double, double> rttPair;
 typedef pair<int, int> txStatusPair;
 
 /**
-*@brief This is the base class of MMacUWSR protocol, which is a derived class of
-*MMac.
-*/
+ *@brief This is the base class of MMacUWSR protocol, which is a derived class
+ *of MMac.
+ */
 
 class MMacUWSR : public MMac
 {
 
 public:
 	/**
-	*Constructor of MMacUWSR Class
-	*/
+	 *Constructor of MMacUWSR Class
+	 */
 	MMacUWSR();
 
 	/**
-	*Destructor of MMacUWSR Class
-	*/
+	 *Destructor of MMacUWSR Class
+	 */
 	virtual ~MMacUWSR();
 
 	/**
-	* TCL command interpreter. It implements the following OTcl methods:
-	* @param argc number of arguments in <i>argv</i>
-	* @param argv array of strings which are the command parameters (Note that
-	* argv[0] is the name of the object)
-	* @return TCL_OK or TCL_ERROR whether the command has been dispatched
-	* succesfully or not
-	*/
+	 * TCL command interpreter. It implements the following OTcl methods:
+	 * @param argc number of arguments in <i>argv</i>
+	 * @param argv array of strings which are the command parameters (Note that
+	 * argv[0] is the name of the object)
+	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
+	 * succesfully or not
+	 */
 	virtual int command(int argc, const char *const *argv);
 
 protected:
 	/**
-	*Enumeration class of MMacUWSR status. First enumerator is given value 1.
-	*/
+	 *Enumeration class of MMacUWSR status. First enumerator is given value 1.
+	 */
 	enum UWSR_STATUS {
 		UWSR_STATE_IDLE = 1,
 		UWSR_STATE_BACKOFF,
@@ -136,9 +136,9 @@ protected:
 	};
 
 	/**
-	*Enumeration class which tells the nodes the reason why it is in this state.
-	*First enumerator is given value 1.
-	*/
+	 *Enumeration class which tells the nodes the reason why it is in this
+	 *state. First enumerator is given value 1.
+	 */
 	enum UWSR_REASON_STATUS {
 		UWSR_REASON_DATA_PENDING,
 		UWSR_REASON_DATA_RX,
@@ -164,15 +164,16 @@ protected:
 	};
 
 	/**
-	*Enumeration class of packet type. First enumerator is given value 1. Three
-	*kinds of packets are supported by MMacUWSR protocol.
-	*/
+	 *Enumeration class of packet type. First enumerator is given value 1. Three
+	 *kinds of packets are supported by MMacUWSR protocol.
+	 */
 	enum UWSR_PKT_TYPE { UWSR_ACK_PKT = 1, UWSR_DATA_PKT, UWSR_DATAMAX_PKT };
 
 	/**
-	*Enumeration class of MMacUWSR timer status. First enumerator is given value
-	*1. It is employed to know the current status of a timer.
-	*/
+	 *Enumeration class of MMacUWSR timer status. First enumerator is given
+	 *value
+	 *1. It is employed to know the current status of a timer.
+	 */
 	enum UWSR_TIMER_STATUS {
 		UWSR_IDLE = 1,
 		UWSR_RUNNING,
@@ -181,22 +182,22 @@ protected:
 	};
 
 	/**
-	* This enumeration class is employed to know the current acknowledgement
-	* timer status. First enumerator is given value 1.
-	*/
+	 * This enumeration class is employed to know the current acknowledgement
+	 * timer status. First enumerator is given value 1.
+	 */
 	enum CHECK_ACK_TIMER { CHECK_ACTIVE = 1, CHECK_EXPIRED, CHECK_IDLE };
 
 	/**
-	* Base class of all the timer used in this protocol. This is a derived class
-	* of TimerHandler.
-	*/
+	 * Base class of all the timer used in this protocol. This is a derived
+	 * class of TimerHandler.
+	 */
 	class UWSRTimer : public TimerHandler
 	{
 
 	public:
 		/**
-		* Constructor of UWSRTimer Class.
-		*/
+		 * Constructor of UWSRTimer Class.
+		 */
 		UWSRTimer(MMacUWSR *m)
 			: TimerHandler()
 			, start_time(0.0)
@@ -209,18 +210,18 @@ protected:
 		}
 
 		/**
-		* Destructor of UWSRTimer Class.
-		*/
+		 * Destructor of UWSRTimer Class.
+		 */
 		virtual ~UWSRTimer()
 		{
 		}
 
 		/** It freezes or in another word, it stops the timer for some time.
-		* Suppose, for some reason we want to stop
-		* a timer for some period and we want to run this timer from where it
-		* was stopped. This function stops the timer and
-		* save the left time duration it must run.
-		*/
+		 * Suppose, for some reason we want to stop
+		 * a timer for some period and we want to run this timer from where it
+		 * was stopped. This function stops the timer and
+		 * save the left time duration it must run.
+		 */
 		virtual void
 		freeze()
 		{
@@ -233,9 +234,9 @@ protected:
 		}
 
 		/**
-		* It starts the timer from where it was stopped. To run any freeze
-		* timer, we can use unfreeze method.
-		*/
+		 * It starts the timer from where it was stopped. To run any freeze
+		 * timer, we can use unfreeze method.
+		 */
 		virtual void
 		unFreeze()
 		{
@@ -247,8 +248,8 @@ protected:
 		}
 
 		/**
-		* Stop the timer any way.
-		*/
+		 * Stop the timer any way.
+		 */
 		virtual void
 		stop()
 		{
@@ -257,9 +258,9 @@ protected:
 		}
 
 		/**
-		* Schedule the time, i.e., how long a timer is going to run.
-		* @param double time
-		*/
+		 * Schedule the time, i.e., how long a timer is going to run.
+		 * @param double time
+		 */
 		virtual void
 		schedule(double val)
 		{
@@ -270,9 +271,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is in Idle state or not.
-		* @return 1 if the timer is idle and 0 if it is not.
-		*/
+		 * It tells whether the timer is in Idle state or not.
+		 * @return 1 if the timer is idle and 0 if it is not.
+		 */
 		bool
 		isIdle()
 		{
@@ -280,9 +281,9 @@ protected:
 		}
 
 		/**
-		* This method tells whether the timer is in Running state or not.
-		* @return 1 if the timer is running and 0 if it is not.
-		*/
+		 * This method tells whether the timer is in Running state or not.
+		 * @return 1 if the timer is running and 0 if it is not.
+		 */
 		bool
 		isRunning()
 		{
@@ -290,9 +291,9 @@ protected:
 		}
 
 		/**
-		* Tells whether the timer is expired or not.
-		* @return 1 if the timer expired and 0 if it is not.
-		*/
+		 * Tells whether the timer is expired or not.
+		 * @return 1 if the timer expired and 0 if it is not.
+		 */
 		bool
 		isExpired()
 		{
@@ -300,9 +301,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is in freeze mode or not.
-		* @return 1 if the timer is in freeze mode and 0 if it is not.
-		*/
+		 * It tells whether the timer is in freeze mode or not.
+		 * @return 1 if the timer is in freeze mode and 0 if it is not.
+		 */
 		bool
 		isFrozen()
 		{
@@ -310,9 +311,9 @@ protected:
 		}
 
 		/**
-		* It tells whether the timer is active or not.
-		* @return 1 if the timer is active and 0 if it is not.
-		*/
+		 * It tells whether the timer is active or not.
+		 * @return 1 if the timer is active and 0 if it is not.
+		 */
 		bool
 		isActive()
 		{
@@ -321,8 +322,8 @@ protected:
 		}
 
 		/**
-		* Reset the timer counter.
-		*/
+		 * Reset the timer counter.
+		 */
 		void
 		resetCounter()
 		{
@@ -330,9 +331,9 @@ protected:
 		}
 
 		/**
-		* Increment the timer counter. It helps to know the statics of the
-		* timer.
-		*/
+		 * Increment the timer counter. It helps to know the statics of the
+		 * timer.
+		 */
 		void
 		incrCounter()
 		{
@@ -340,9 +341,9 @@ protected:
 		}
 
 		/**
-		* It provides, how many times a timer ran.
-		* @return number of times a timer ran (int).
-		*/
+		 * It provides, how many times a timer ran.
+		 * @return number of times a timer ran (int).
+		 */
 		int
 		getCounter()
 		{
@@ -350,9 +351,9 @@ protected:
 		}
 
 		/**
-		* This methods provide the duration of a timer.
-		* @return duration of a timer (double).
-		*/
+		 * This methods provide the duration of a timer.
+		 * @return duration of a timer (double).
+		 */
 		double
 		getDuration()
 		{
@@ -360,9 +361,9 @@ protected:
 		}
 
 		/**
-		* This methods provide the remaining duration of a timer.
-		* @return left time duration of a timer (double).
-		*/
+		 * This methods provide the remaining duration of a timer.
+		 * @return left time duration of a timer (double).
+		 */
 		double
 		leftDuration()
 		{
@@ -382,186 +383,186 @@ protected:
 	};
 
 	/**
-	* Base class of BackoffTimer. It is derived class of UWSRTimer.
-	*/
+	 * Base class of BackoffTimer. It is derived class of UWSRTimer.
+	 */
 	class BackOffTimer : public UWSRTimer
 	{
 
 	public:
 		/**
-		* Constructor of BackOffTimer Class.
-		*/
+		 * Constructor of BackOffTimer Class.
+		 */
 		BackOffTimer(MMacUWSR *m)
 			: UWSRTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of BackOffTimer.
-		*/
+		 * Destructor of BackOffTimer.
+		 */
 		virtual ~BackOffTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* Base class of AckTimer, which is a derived class of UWSRTimer.
-	*/
+	 * Base class of AckTimer, which is a derived class of UWSRTimer.
+	 */
 	class AckTimer : public UWSRTimer
 	{
 
 	public:
 		/**
-		* Constructor of AckTimer Class.
-		*/
+		 * Constructor of AckTimer Class.
+		 */
 		AckTimer(MMacUWSR *m)
 			: UWSRTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of AckTimer Class.
-		*/
+		 * Destructor of AckTimer Class.
+		 */
 		virtual ~AckTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* Base class of ListenTimer, which is a derived class of UWSRTimer.
-	*/
+	 * Base class of ListenTimer, which is a derived class of UWSRTimer.
+	 */
 	class ListenTimer : public UWSRTimer
 	{
 
 	public:
 		/**
-		* Constructor of ListenTimer class
-		*/
+		 * Constructor of ListenTimer class
+		 */
 		ListenTimer(MMacUWSR *m)
 			: UWSRTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of ListenTimer class
-		*/
+		 * Destructor of ListenTimer class
+		 */
 		virtual ~ListenTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* Base class of WaitTxTimer, which is a derived class of UWSRTimer.
-	*/
+	 * Base class of WaitTxTimer, which is a derived class of UWSRTimer.
+	 */
 	class WaitTxTimer : public UWSRTimer
 	{
 
 	public:
 		/**
-		* Constructor of WaitTxTimer class.
-		*/
+		 * Constructor of WaitTxTimer class.
+		 */
 		WaitTxTimer(MMacUWSR *m)
 			: UWSRTimer(m)
 		{
 		}
 
 		/**
-		* Destructor of WaitTxTimer class.
-		*/
+		 * Destructor of WaitTxTimer class.
+		 */
 		virtual ~WaitTxTimer()
 		{
 		}
 
 	protected:
 		/**
-		* What a node is going to do when a timer expire.
-		* @param Event
-		*/
+		 * What a node is going to do when a timer expire.
+		 * @param Event
+		 */
 		virtual void expire(Event *e);
 	};
 
 	/**
-	* This function receives the packet from upper layer and save it in the
-	* queue.
-	* @param Packet pointer
-	*/
+	 * This function receives the packet from upper layer and save it in the
+	 * queue.
+	 * @param Packet pointer
+	 */
 	virtual void recvFromUpperLayers(Packet *p);
 
 	/**
-	* It informs that a packet transmission started.
-	* @param Packet pointer
-	*/
+	 * It informs that a packet transmission started.
+	 * @param Packet pointer
+	 */
 	virtual void Mac2PhyStartTx(Packet *p);
 
 	/**
-	* It infroms that a packet transmission end.
-	* @param Packet pointer (constant)
-	*/
+	 * It infroms that a packet transmission end.
+	 * @param Packet pointer (constant)
+	 */
 	virtual void Phy2MacEndTx(const Packet *p);
 
 	/**
-	* PHY layer informs the MAC layer that it is receiving a packet.
-	* @Param Packet pointer (constant)
-	*/
+	 * PHY layer informs the MAC layer that it is receiving a packet.
+	 * @Param Packet pointer (constant)
+	 */
 	virtual void Phy2MacStartRx(const Packet *p);
 
 	/**
-	* PHY layer informs the MAC layer that the reception of the packet is over.
-	* @param Packet pointer.
-	*/
+	 * PHY layer informs the MAC layer that the reception of the packet is over.
+	 * @param Packet pointer.
+	 */
 	virtual void Phy2MacEndRx(Packet *p);
 
 	/**
-	* Compute the transmission time of a packet. It uses a cross-layer message
-	* to calculate the duration of that packet.
-	* @param type is a UWSR_PKT_TYPE
-	* @return tranmission time of a packet which is a double data type.
-	*/
+	 * Compute the transmission time of a packet. It uses a cross-layer message
+	 * to calculate the duration of that packet.
+	 * @param type is a UWSR_PKT_TYPE
+	 * @return tranmission time of a packet which is a double data type.
+	 */
 	virtual double computeTxTime(UWSR_PKT_TYPE type);
 
 	/**
-	* This method, initialize the packet. If the packet is received from the
-	* upper layer, it adds the header (if any). It also sets the fields of ACK
-	* packet.
-	* @param Packet pointer P. The packet can be <i>Data</i> packet or
-	* <i>ACK</i> packet.
-	* @param pkt_type is an UWSR_PKT_TYPE. Packet can be either <i>Data</i>
-	* packet or <i>ACK</i> packet.
-	* @param dest_addr is a integer data type. It is initialized as 0.
-	*/
+	 * This method, initialize the packet. If the packet is received from the
+	 * upper layer, it adds the header (if any). It also sets the fields of ACK
+	 * packet.
+	 * @param Packet pointer P. The packet can be <i>Data</i> packet or
+	 * <i>ACK</i> packet.
+	 * @param pkt_type is an UWSR_PKT_TYPE. Packet can be either <i>Data</i>
+	 * packet or <i>ACK</i> packet.
+	 * @param dest_addr is a integer data type. It is initialized as 0.
+	 */
 	virtual void initPkt(Packet *p, UWSR_PKT_TYPE pkt_type, int dest_addr = 0);
 
 	/**
-	* This function calculates the backoff duration and return the backoff
-	* time.It employs the exponential backoff algorithm.
-	* @return backoff duration which is a double data type.
-	*/
+	 * This function calculates the backoff duration and return the backoff
+	 * time.It employs the exponential backoff algorithm.
+	 * @return backoff duration which is a double data type.
+	 */
 	virtual double getBackoffTime();
 
 	/**
-	* It sets the number of times backoff cpounter is run.
-	*/
+	 * It sets the number of times backoff cpounter is run.
+	 */
 	inline void
 	setBackoffCount()
 	{
@@ -569,10 +570,10 @@ protected:
 	}
 
 	/**
-	* It returns the number of time backoff counter is run in the whole
-	* communication period.
-	* @return backoff_count which is an integer data type.
-	*/
+	 * It returns the number of time backoff counter is run in the whole
+	 * communication period.
+	 * @return backoff_count which is an integer data type.
+	 */
 	inline int
 	getBackoffCount()
 	{
@@ -580,144 +581,144 @@ protected:
 	}
 
 	/**
-	* This method finds out whether there is any packet to be transmitted to the
-	* destination.
-	*/
+	 * This method finds out whether there is any packet to be transmitted to
+	 * the destination.
+	 */
 	virtual void statePreTxData();
 
 	/**
-	* This methods transmits <i>ACK</i> packet from MAC layer to PHY layer.
-	* @param dest_addr which is an integer data type.
-	*/
+	 * This methods transmits <i>ACK</i> packet from MAC layer to PHY layer.
+	 * @param dest_addr which is an integer data type.
+	 */
 	virtual void txAck(int dest_addr);
 
 	/**
-	* Node is in Idle state. It only changes its state if it has packet(s) to
-	* transmit or it receives a packet.
-	*/
+	 * Node is in Idle state. It only changes its state if it has packet(s) to
+	 * transmit or it receives a packet.
+	 */
 	virtual void stateIdle();
 
 	/**
-	* If a node starts receiving a packet in Idle state.
-	*/
+	 * If a node starts receiving a packet in Idle state.
+	 */
 	virtual void stateRxIdle();
 
 	/**
-	* If a node has packet to transmits. In such case, it moves from Idle state
-	* to data transmits state.
-	*/
+	 * If a node has packet to transmits. In such case, it moves from Idle state
+	 * to data transmits state.
+	 */
 	virtual void stateTxData();
 
 	/**
-	* After receiving a <i>Data</i> packet the node sends an <i>ACK</i> packet.
-	*/
+	 * After receiving a <i>Data</i> packet the node sends an <i>ACK</i> packet.
+	 */
 	virtual void stateTxAck(int dest_addr);
 
 	/**
-	* If <i>ACK</i> packet is not received within the acknowledgement expire
-	* time.
-	*/
+	 * If <i>ACK</i> packet is not received within the acknowledgement expire
+	 * time.
+	 */
 	virtual void stateBackoff();
 
 	/**
-	* If a node starts receiving a packet when it is in backoff state. The node
-	* first freeze (or another word, hold) the backoff timer and start receiving
-	* the packet.
-	*/
+	 * If a node starts receiving a packet when it is in backoff state. The node
+	 * first freeze (or another word, hold) the backoff timer and start
+	 * receiving the packet.
+	 */
 	virtual void stateRxBackoff();
 
 	/**
-	* After transmitting a <i>Data</i> packet, a node waits for the <i>ACK</i>
-	* packet.
-	*/
+	 * After transmitting a <i>Data</i> packet, a node waits for the <i>ACK</i>
+	 * packet.
+	 */
 	virtual void stateWaitAck();
 
 	/**
-	* If a node starts receiving a packet when it was waiting for transmitting
-	* another packet in a singlet RTT.
-	*/
+	 * If a node starts receiving a packet when it was waiting for transmitting
+	 * another packet in a singlet RTT.
+	 */
 	virtual void stateRxinPreTxData();
 
 	/**
-	* If a node receives any packet while it was waiting for <i>ACK</i> packet,
-	* it moves to this state. The packet it is receiving can be a <i>Data</i>
-	* packet
-	* from another node or <i>ACK</i> packet.
-	*/
+	 * If a node receives any packet while it was waiting for <i>ACK</i> packet,
+	 * it moves to this state. The packet it is receiving can be a <i>Data</i>
+	 * packet
+	 * from another node or <i>ACK</i> packet.
+	 */
 	virtual void stateRxWaitAck();
 
 	/**
-	* A short time which is used to sense the channel condision.
-	*/
+	 * A short time which is used to sense the channel condision.
+	 */
 	virtual void stateListen();
 
 	/**
-	* If a node starts receiving a packet when it was listening the channel.
-	*/
+	 * If a node starts receiving a packet when it was listening the channel.
+	 */
 	virtual void stateRxListen();
 
 	/**
-	* It checks whether the listen timer is already expired while it was busy
-	* with other activities.
-	*/
+	 * It checks whether the listen timer is already expired while it was busy
+	 * with other activities.
+	 */
 	virtual void stateCheckListenExpired();
 
 	/**
-	* It checks whether the ack timer is already expired while it was busy with
-	* other activities.
-	*/
+	 * It checks whether the ack timer is already expired while it was busy with
+	 * other activities.
+	 */
 	virtual void stateCheckAckExpired();
 
 	/**
-	* It checks whether the backoff timer is already expired while it was busy
-	* with other activities.
-	*/
+	 * It checks whether the backoff timer is already expired while it was busy
+	 * with other activities.
+	 */
 	virtual void stateCheckBackoffExpired();
 
 	/**
-	* It checks whether the wait transmit timer is already expired while it was
-	* busy with other activities.
-	*/
+	 * It checks whether the wait transmit timer is already expired while it was
+	 * busy with other activities.
+	 */
 	virtual void stateCheckWaitTxExpired();
 
 	/**
-	* It process the packet which is received. After receiving a packet it
-	* changes it states according to the previously stored status information.
-	* @param <i>Data</i> packet pointer
-	*/
+	 * It process the packet which is received. After receiving a packet it
+	 * changes it states according to the previously stored status information.
+	 * @param <i>Data</i> packet pointer
+	 */
 	virtual void stateRxData(Packet *p);
 
 	/**
-	* The node comes to this state if it receives an <i>ACK</i> packet. After
-	* receiving an <i>ACK</i> packet it changes it states according
-	* to the previously stored status information.
-	*/
+	 * The node comes to this state if it receives an <i>ACK</i> packet. After
+	 * receiving an <i>ACK</i> packet it changes it states according
+	 * to the previously stored status information.
+	 */
 	virtual void stateRxAck(Packet *p);
 
 	/**
-	* The receive packet is not intended for this node. The node returns back to
-	* its own state.
-	* @param packet pointer
-	*/
+	 * The receive packet is not intended for this node. The node returns back
+	 * to its own state.
+	 * @param packet pointer
+	 */
 	virtual void stateRxPacketNotForMe(Packet *p);
 
 	/**
-	* This methods print the state information of the nodes.
-	* @param delay is a double data type.
-	*/
+	 * This methods print the state information of the nodes.
+	 * @param delay is a double data type.
+	 */
 	virtual void printStateInfo(double delay = 0);
 
 	/**
-	* This function is used to initialize the UWAloha protocol.
-	*/
+	 * This function is used to initialize the UWAloha protocol.
+	 */
 	virtual void initInfo();
 
 	/**
-	* Refreshes the states of the node. The node save the information of three
-	* states, they are: previous to previous state, previous state and
-	* current state of the node.
-	* @param state which is an UWSR_STATUS type.
-	*/
+	 * Refreshes the states of the node. The node save the information of three
+	 * states, they are: previous to previous state, previous state and
+	 * current state of the node.
+	 * @param state which is an UWSR_STATUS type.
+	 */
 	virtual void
 	refreshState(UWSR_STATUS state)
 	{
@@ -727,9 +728,9 @@ protected:
 	}
 
 	/**
-	* To know the reason why a node in this current state.
-	* @param reason is an UWSR_REASON_STATUS type.
-	*/
+	 * To know the reason why a node in this current state.
+	 * @param reason is an UWSR_REASON_STATUS type.
+	 */
 	virtual void
 	refreshReason(UWSR_REASON_STATUS reason)
 	{
@@ -737,14 +738,14 @@ protected:
 	}
 
 	/**
-	* It stops the backoff timer.
-	*/
+	 * It stops the backoff timer.
+	 */
 	virtual void exitBackoff();
 
 	/**
-	* This method is used to get the average RTT over all the receives RTT.
-	* @return average RTT time which is a double data type.
-	*/
+	 * This method is used to get the average RTT over all the receives RTT.
+	 * @return average RTT time which is a double data type.
+	 */
 	virtual double
 	getRTT()
 	{
@@ -752,9 +753,9 @@ protected:
 	}
 
 	/**
-	* It updates the sequence number of the last data packet rx.
-	* @param id is an integer data type.
-	*/
+	 * It updates the sequence number of the last data packet rx.
+	 * @param id is an integer data type.
+	 */
 	virtual void
 	updateLastDataIdRx(int id)
 	{
@@ -764,10 +765,10 @@ protected:
 
 	// stats functions
 	/**
-	* Number of packets which MAC layer receives form upper layer(s) but were
-	* not transmitted.
-	* @return an integer value.
-	*/
+	 * Number of packets which MAC layer receives form upper layer(s) but were
+	 * not transmitted.
+	 * @return an integer value.
+	 */
 	virtual int
 	getRemainingPkts()
 	{
@@ -775,8 +776,8 @@ protected:
 	}
 
 	/**
-	* Increment the number of <i>Data</i> packet receive for the upper layer.
-	*/
+	 * Increment the number of <i>Data</i> packet receive for the upper layer.
+	 */
 	virtual void
 	incrUpperDataRx()
 	{
@@ -784,10 +785,10 @@ protected:
 	}
 
 	/**
-	* This method is used to get the sequence number from a packet.
-	* @param packet pointer
-	* @return it returns sequence number which is an integer data type.
-	*/
+	 * This method is used to get the sequence number from a packet.
+	 * @param packet pointer
+	 * @return it returns sequence number which is an integer data type.
+	 */
 	virtual int
 	getPktSeqNum(Packet *p)
 	{
@@ -796,11 +797,11 @@ protected:
 	}
 
 	/**
-	* This method returns the destination mac address of the node which
-	* transmits the packet.
-	* @param packet pointer
-	* @return it returns the mac address of the node
-	*/
+	 * This method returns the destination mac address of the node which
+	 * transmits the packet.
+	 * @param packet pointer
+	 * @return it returns the mac address of the node
+	 */
 	virtual int
 	getMacAddress(Packet *p)
 	{
@@ -810,19 +811,19 @@ protected:
 
 	/// handling transmission round
 	/**
-	* It checks whether the same packet is transmitted before.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	* @return boolean data type. Returns <i>TRUE</i> when this packet was not
-	* transmitted before and <i>FALSE</i> when it was transmitted.
-	*/
+	 * It checks whether the same packet is transmitted before.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 * @return boolean data type. Returns <i>TRUE</i> when this packet was not
+	 * transmitted before and <i>FALSE</i> when it was transmitted.
+	 */
 	inline bool chkItemInmapTxRounds(int mac_addr, int seq_num);
 
 	/**
-	* It sets the current tranmission round of a packet.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * It sets the current tranmission round of a packet.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	setCurrTxRounds(int mac_addr, int seq_num)
 	{
@@ -832,10 +833,10 @@ protected:
 	}
 
 	/**
-	* Increment the number of times a packet is transmitted.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * Increment the number of times a packet is transmitted.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	incrCurrTxRounds(int mac_addr, int seq_num)
 	{
@@ -845,11 +846,11 @@ protected:
 	}
 
 	/**
-	* Returns the current transmission round of a <i>Data</i> packet.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	* @return an integer data type.
-	*/
+	 * Returns the current transmission round of a <i>Data</i> packet.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 * @return an integer data type.
+	 */
 	inline int
 	getCurrTxRounds(int mac_addr, int seq_num)
 	{
@@ -859,11 +860,11 @@ protected:
 	}
 
 	/**
-	* Erase an Item form the container where transmission round of various
-	* transmit packet are stored.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * Erase an Item form the container where transmission round of various
+	 * transmit packet are stored.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	eraseItemFromTxRounds(int mac_addr, int seq_num)
 	{
@@ -874,9 +875,9 @@ protected:
 
 	/// handling packets
 	/**
-	* Store the packet in a container.
-	* @param packet pointer
-	*/
+	 * Store the packet in a container.
+	 * @param packet pointer
+	 */
 	inline void
 	putPktInQueue(Packet *p)
 	{
@@ -885,9 +886,9 @@ protected:
 	}
 
 	/**
-	* Erase the packet which is delivered to the destination correctly or other
-	* reasons
-	*/
+	 * Erase the packet which is delivered to the destination correctly or other
+	 * reasons
+	 */
 	inline void
 	eraseItemFromPktQueue(int mac_addr, int seq_num)
 	{
@@ -899,11 +900,11 @@ protected:
 
 	/// managing ack
 	/**
-	* Put AckTimer Object in the container. For every transmitted packet an
-	* AckTimer object is created.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * Put AckTimer Object in the container. For every transmitted packet an
+	 * AckTimer object is created.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	putAckTimerInMap(int mac_addr, int seq_num)
 	{
@@ -911,11 +912,11 @@ protected:
 	}
 
 	/**
-	* If a node receives an <i>ACK</i> for its transmitted packet, it erases the
-	* related AckTimer object of that packet.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * If a node receives an <i>ACK</i> for its transmitted packet, it erases
+	 * the related AckTimer object of that packet.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	eraseItemFrommapAckTimer(int mac_addr, int seq_num)
 	{
@@ -925,10 +926,10 @@ protected:
 	}
 
 	/**
-	* It stores the initial transmission start time in a container.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * It stores the initial transmission start time in a container.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	putStartTxTimeInMap(int mac_addr, int seq_num, double start_tx_time)
 	{
@@ -937,11 +938,11 @@ protected:
 	}
 
 	/**
-	* Erases the transmission start time of a packet when an <i>ACK</i> is
-	* received correctly.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	*/
+	 * Erases the transmission start time of a packet when an <i>ACK</i> is
+	 * received correctly.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 */
 	inline void
 	eraseItemFrommapCalcAck(int mac_addr, int seq_num)
 	{
@@ -951,51 +952,51 @@ protected:
 	}
 
 	/**
-	* It checks whether any acknowledgement timer expire. Since, in UWSR, we are
-	* transmitting multiple packet in a single RTT, we have to check AckTimer
-	* container whether any acknowledgement timer expire or not.
-	* @param type which is a CHECK_ACK_TIMER data type.
-	* @return number of acknowledgements expire in the container.
-	*/
+	 * It checks whether any acknowledgement timer expire. Since, in UWSR, we
+	 * are transmitting multiple packet in a single RTT, we have to check
+	 * AckTimer container whether any acknowledgement timer expire or not.
+	 * @param type which is a CHECK_ACK_TIMER data type.
+	 * @return number of acknowledgements expire in the container.
+	 */
 	virtual int checkAckTimer(CHECK_ACK_TIMER type);
 
 	/**
-	* Erases those items whose acknowledgement timer expire from AckTimer
-	* containter and also from start trasmit time contaioner.
-	*/
+	 * Erases those items whose acknowledgement timer expire from AckTimer
+	 * containter and also from start trasmit time contaioner.
+	 */
 	virtual void eraseExpiredItemsFrommapAckandCalc();
 
 	/**
-	* This method checks whether the node is capable of sending multiple packets
-	* in a single RTT.
-	* @param mac address of the receiving node.
-	* @return Returns <i>TRUE</i> if multiple packet transmission is possible,
-	* <i>FALSE</i> otherwise.
-	*/
+	 * This method checks whether the node is capable of sending multiple
+	 * packets in a single RTT.
+	 * @param mac address of the receiving node.
+	 * @return Returns <i>TRUE</i> if multiple packet transmission is possible,
+	 * <i>FALSE</i> otherwise.
+	 */
 	virtual bool checkMultipleTx(int rcv_mac_addr);
 
 	/**
-	* Number of packets a node can transmits to a receiving node in a single
-	* RTT.
-	* @param mac address of the receiving node.
-	* @return number of packets can transmit in a single RTT (integer).
-	*/
+	 * Number of packets a node can transmits to a receiving node in a single
+	 * RTT.
+	 * @param mac address of the receiving node.
+	 * @return number of packets can transmit in a single RTT (integer).
+	 */
 	virtual int getPktsCanSendIn1RTT(int mac_addr);
 
 	/**
-	* Put RTT of all the nodes which are whithin the transmission range of a
-	* node. Whever a node receives a packet from another node, it put the RTT
-	* information of that node in a container.
-	* @param mac address of the node which transmits the packet
-	* @param RTT of the sender and receiver.
-	*/
+	 * Put RTT of all the nodes which are whithin the transmission range of a
+	 * node. Whever a node receives a packet from another node, it put the RTT
+	 * information of that node in a container.
+	 * @param mac address of the node which transmits the packet
+	 * @param RTT of the sender and receiver.
+	 */
 	virtual void putRTTInMap(int mac_addr, double rtt);
 
 	/**
-	* Returns the RTT between a sender-receiver pair.
-	* @param mac address of the receiving node.
-	* @return RTT which is a double data type.
-	*/
+	 * Returns the RTT between a sender-receiver pair.
+	 * @param mac address of the receiving node.
+	 * @return RTT which is a double data type.
+	 */
 	inline double
 	getRTTInMap(int mac_addr)
 	{
@@ -1005,8 +1006,8 @@ protected:
 	}
 
 	/**
-	* Increments the number of <i>Data</i> packets sent in single RTT.
-	*/
+	 * Increments the number of <i>Data</i> packets sent in single RTT.
+	 */
 	inline void
 	incrPktsSentIn1RTT()
 	{
@@ -1014,8 +1015,8 @@ protected:
 	}
 
 	/**
-	* Resets the number of <i>Data</i> packets sent in single RTT.
-	*/
+	 * Resets the number of <i>Data</i> packets sent in single RTT.
+	 */
 	inline void
 	rstPktsSentIn1RTT()
 	{
@@ -1023,9 +1024,9 @@ protected:
 	}
 
 	/**
-	* Returns number of <i>Data</i> packets transmit in single RTT.
-	* @return packets sent in single RTT (integer).
-	*/
+	 * Returns number of <i>Data</i> packets transmit in single RTT.
+	 * @return packets sent in single RTT (integer).
+	 */
 	inline int
 	getPktsSentIn1RTT()
 	{
@@ -1033,9 +1034,9 @@ protected:
 	}
 
 	/**
-	* Increments the number of <i>ACK</i> packets receive by a node in single
-	* RTT.
-	*/
+	 * Increments the number of <i>ACK</i> packets receive by a node in single
+	 * RTT.
+	 */
 	inline void
 	incrAcksRcvIn1RTT()
 	{
@@ -1043,8 +1044,8 @@ protected:
 	}
 
 	/**
-	* Resets the number of <i>ACK</i> packets receive by a node in single RTT.
-	*/
+	 * Resets the number of <i>ACK</i> packets receive by a node in single RTT.
+	 */
 	inline void
 	rstAcksRcvIn1RTT()
 	{
@@ -1052,9 +1053,9 @@ protected:
 	}
 
 	/**
-	* Returns number of <i>ACK</i> packets receive by a node in single RTT.
-	* @return number of <i>ACK</i> receive in single RTT.
-	*/
+	 * Returns number of <i>ACK</i> packets receive by a node in single RTT.
+	 * @return number of <i>ACK</i> receive in single RTT.
+	 */
 	inline int
 	getAcksRcvIn1RTT()
 	{
@@ -1062,8 +1063,8 @@ protected:
 	}
 
 	/**
-	* Increments the number of packets lost in a single RTT.
-	*/
+	 * Increments the number of packets lost in a single RTT.
+	 */
 	inline void
 	incrPktsLostCount()
 	{
@@ -1071,8 +1072,8 @@ protected:
 	}
 
 	/**
-	* Resets the number of packets lost in single RTT
-	*/
+	 * Resets the number of packets lost in single RTT
+	 */
 	inline void
 	rstPktsLostCount()
 	{
@@ -1080,9 +1081,9 @@ protected:
 	}
 
 	/**
-	* Returns number of packets lost in single RTT.
-	* @return number of packets lost in single RTT (integer).
-	*/
+	 * Returns number of packets lost in single RTT.
+	 * @return number of packets lost in single RTT (integer).
+	 */
 	inline int
 	getPktsLostCount()
 	{
@@ -1090,44 +1091,45 @@ protected:
 	}
 
 	/**
-	* It checks how many times a packet is transmitted. If it reaches the
-	* threshold of retransmission, the packet is deleted from the all
-	* containers.
-	* @param mac address of the node
-	* @param sequence number of the packet.
-	* @return whether this packet can be transmitted or not. <i>TRUE</i> means
-	* its retransmission does not exit the threshold and <i>FALSE</i> otherwise.
-	*/
+	 * It checks how many times a packet is transmitted. If it reaches the
+	 * threshold of retransmission, the packet is deleted from the all
+	 * containers.
+	 * @param mac address of the node
+	 * @param sequence number of the packet.
+	 * @return whether this packet can be transmitted or not. <i>TRUE</i> means
+	 * its retransmission does not exit the threshold and <i>FALSE</i>
+	 * otherwise.
+	 */
 	virtual bool prepBeforeTx(int mac_addr, int seq_num);
 
 	/**
-	* Calcultes the time a node has to wait before transmitting another packet
-	* in a single RTT.
-	* @param mac address of the receiving node.
-	* @return waiting time (double)
-	*/
+	 * Calcultes the time a node has to wait before transmitting another packet
+	 * in a single RTT.
+	 * @param mac address of the receiving node.
+	 * @return waiting time (double)
+	 */
 	virtual double calcWaitTxTime(int mac_addr);
 
 	/**
-	* How many acknowledgements receive for the transmitting packets in a single
-	* RTT. It stores this information to calculte the next window size (i.e.
-	* number
-	* of packets can be exchanged between a sender-receiver pair.
-	* @param mac address of the receiving node.
-	* @param number of receive acknowledgement packets in a single RTT
-	*/
+	 * How many acknowledgements receive for the transmitting packets in a
+	 * single RTT. It stores this information to calculte the next window size
+	 * (i.e. number of packets can be exchanged between a sender-receiver pair.
+	 * @param mac address of the receiving node.
+	 * @param number of receive acknowledgement packets in a single RTT
+	 */
 	inline void updateTxStatus(macAddress mac_addr, int rcv_acks);
 
 	/**
-	* Number of packets a node can transmits to a receving node in a single RTT.
-	* @return maximum number of packets a node can transmits to a receiving node
-	* (integer).
-	*/
+	 * Number of packets a node can transmits to a receving node in a single
+	 * RTT.
+	 * @return maximum number of packets a node can transmits to a receiving
+	 * node (integer).
+	 */
 	virtual int calWindowSize(macAddress mac_addr);
 
 	/**
-	* Total number of packets transmitted by a node.
-	*/
+	 * Total number of packets transmitted by a node.
+	 */
 	inline void
 	calTotalPktsTx()
 	{
@@ -1136,8 +1138,8 @@ protected:
 	}
 
 	/**
-	* Average number of packets transmitted in a single RTT.
-	*/
+	 * Average number of packets transmitted in a single RTT.
+	 */
 	inline double
 	getAvgPktsTxIn1RTT()
 	{
@@ -1168,16 +1170,15 @@ protected:
 	/////////////////////////////
 
 	static bool initialized; /**< It checks whether MMacUWSR protocol is
-				 * initialized or not. If <i>FALSE</i> means, not initialized
-				 * and if <i>TRUE</i>
-				 * means it is initialized */
+							  * initialized or not. If <i>FALSE</i> means, not
+							  * initialized and if <i>TRUE</i> means it is
+							  * initialized */
 	static const double prop_speed; /**< Speed of the sound signal*/
 	int last_sent_data_id; /**< sequence number of the latest sent packet */
 
 	bool print_transitions; /**< Whether to print the state of the nodes */
-	bool
-			has_buffer_queue; /**< Whether the node has buffer to store data or
-								 not */
+	bool has_buffer_queue; /**< Whether the node has buffer to store data or
+							  not */
 
 	double start_tx_time; /**< Time when a packet start transmitting */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP */
@@ -1186,10 +1187,10 @@ protected:
 	int rttsamples; /**< Number of RTT samples */
 
 	int curr_tx_rounds; /**< How many times the same packet is (re)transmitted
-						   */
+						 */
 	int last_data_id_rx; /**< The sequence number of last received packet */
 	int recv_data_id; /**< The sequence number of the packet which is received
-						 */
+					   */
 	int backoff_count; /**< This variable counts how many times a node move to
 						  the backoff state */
 	int pkt_tx_count; /**< Number of packets transmitted */
@@ -1203,23 +1204,20 @@ protected:
 	int wttsamples; /**< Number of waiting time samples */
 
 	int pkts_sent_1RTT; /**< Packets already sent in single RTT */
-	int
-			acks_rcv_1RTT; /**< Number of <i>ACK</i> packets receive in single
-							  RTT. */
+	int acks_rcv_1RTT; /**< Number of <i>ACK</i> packets receive in single
+						  RTT. */
 	int pkts_lost_counter; /**< Number of packets lost in a single RTT. */
 	int window_size; /**< Maximum number of packets a node can transmit in a
 						single RTT. */
 
 	int txsn; /**< Sequence number of the transmitted packet. */
 
-	double
-			latest_ack_timeout; /**< Latest timeout of an acknowledgement
-								   packet. */
+	double latest_ack_timeout; /**< Latest timeout of an acknowledgement
+								  packet. */
 	int prv_mac_addr; /**< Previous mac address */
 
-	int
-			hit_count; /**< This is a counter which is employed to calculate
-						  average number of packets transmit in a sigle RTT */
+	int hit_count; /**< This is a counter which is employed to calculate
+					  average number of packets transmit in a sigle RTT */
 	int total_pkts_tx; /**< Total number of packets transmit. */
 
 	AckTimer ack_timer; /**< An object of the AckTimer class */
@@ -1230,20 +1228,20 @@ protected:
 	UWSR_REASON_STATUS last_reason; /**< Enum variable which stores the last
 									   reason why a node changes its state */
 	UWSR_STATUS
-			curr_state; /**< Enum variable. It stores the current state of a
-						   node */
+	curr_state; /**< Enum variable. It stores the current state of a
+				   node */
 	UWSR_STATUS
-			prev_state; /**< Enum variable. It stores the previous state of a
-						   node */
+	prev_state; /**< Enum variable. It stores the previous state of a
+				   node */
 	UWSR_STATUS prev_prev_state; /**< Enum variable. It stores the previous to
 									previous state of a node */
 
 	static map<UWSR_STATUS, string>
 			status_info; /**< Container which stores all the status information
-							*/
+						  */
 	static map<UWSR_REASON_STATUS, string>
 			reason_info; /**< Container which stores all the reason information
-							*/
+						  */
 	static map<UWSR_PKT_TYPE, string>
 			pkt_type_info; /**< Container which stores all the packet type
 							  information of MMacUWSR*/
@@ -1260,10 +1258,11 @@ protected:
 											 packets are stored */
 	map<macAddress, rttPair> mapRTT; /**< Container where RTT between various
 										sender-receiver pairs are stored */
-	map<macAddress, txStatusPair> mapTxStatus; /**< Container which stores the
-						   * number of packets transmitted in a single RTT to a
-						   * receiving node and number
-						   * of acknowledgement receive among them. */
+	map<macAddress, txStatusPair>
+			mapTxStatus; /**< Container which stores the
+						  * number of packets transmitted in a single RTT to a
+						  * receiving node and number
+						  * of acknowledgement receive among them. */
 
 	ofstream fout; /**< An object of ofstream class */
 };

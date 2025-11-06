@@ -41,8 +41,8 @@
 #ifndef UWAPPLICATION_MODULE_H
 #define UWAPPLICATION_MODULE_H
 
-#include <uwApplication_cmn_header.h>
 #include <module.h>
+#include <uwApplication_cmn_header.h>
 
 #include <arpa/inet.h>
 #include <netdb.h>

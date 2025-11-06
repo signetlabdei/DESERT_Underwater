@@ -44,8 +44,8 @@
 #ifndef UW_ARPTABLE_H
 #define UW_ARPTABLE_H
 
-#include <packet.h>
 #include <map>
+#include <packet.h>
 
 #ifndef EADDRNOTAVAIL
 #define EADDRNOTAVAIL 125

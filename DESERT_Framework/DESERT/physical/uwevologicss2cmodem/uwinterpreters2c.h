@@ -47,16 +47,16 @@
  * Structure holding the info retreived via USBL message
  */
 struct USBLInfo {
-  double curr_time;
-  double meas_time;
-  int r_address;
-  double X;
-  double Y;
-  double Z;
-  double E;
-  double N;
-  double U;
-  double accuracy;
+	double curr_time;
+	double meas_time;
+	int r_address;
+	double X;
+	double Y;
+	double Z;
+	double E;
+	double N;
+	double U;
+	double accuracy;
 };
 
 class UwInterpreterS2C
@@ -75,7 +75,7 @@ public:
 		BUSY,
 		DELIVERING,
 		DELIVERED,
-                DELIVEREDIM,
+		DELIVEREDIM,
 		DROPCNT,
 		PHYOFF,
 		NOT_ACCEPTED,
@@ -99,8 +99,8 @@ public:
 		SENDEND,
 		BITRATE,
 		UNKNOWN,
-                USBLANGLES,
-                USBLLONG,
+		USBLANGLES,
+		USBLLONG,
 		NO_COMMAND
 	};
 	/**
@@ -227,21 +227,21 @@ public:
 	 */
 	void setExtProtoMode(bool enabled);
 
-        /**
-         * Method to retrieve the USBL information saved upon reception of a
-         * USBL message
-         * @return USBLinfo structure loaded with values
-         */
-       std::shared_ptr<USBLInfo> getUSBLInfo();
+	/**
+	 * Method to retrieve the USBL information saved upon reception of a
+	 * USBL message
+	 * @return USBLinfo structure loaded with values
+	 */
+	std::shared_ptr<USBLInfo> getUSBLInfo();
 
-
-        /** Method that sets the terminator for the AT commands wrtten to device
-         * @param[in] terminator type of the terminator
-         */
-       void setTerminator(std::string terminator)
-       {
-              w_term = terminator;
-       };
+	/** Method that sets the terminator for the AT commands wrtten to device
+	 * @param[in] terminator type of the terminator
+	 */
+	void
+	setTerminator(std::string terminator)
+	{
+		w_term = terminator;
+	};
 
 private:
 	std::string sep; /**< Separator for paramters fo the commands: a comma */
@@ -250,7 +250,8 @@ private:
 
 	bool ext_proto_mode; /**< Flag telling if Extened Protol Mode is in use*/
 
-        std::shared_ptr<USBLInfo> usbl_info; /**< Strucure holding info retrived via USBL message*/
+	std::shared_ptr<USBLInfo>
+			usbl_info; /**< Strucure holding info retrived via USBL message*/
 
 	/**
 	 * Vector holding all possible commands for the S2C syntax and
@@ -258,7 +259,7 @@ private:
 	 * It is important that RECV and RECVIM remain at the beginning, as the
 	 * other commands may be inside the binary payload of these two.
 	 */
-	static std::vector<std::pair<std::string, UwInterpreterS2C::Response> >
+	static std::vector<std::pair<std::string, UwInterpreterS2C::Response>>
 			syntax_pool;
 };
 

@@ -44,12 +44,15 @@
 #include <module.h>
 #include <packet.h>
 
-#define HDR_UWMULTIPHY_PING(p) \
-	(hdr_UWMULTIPHY_PING::access(p)) /**< alias defined to access the UWMULTIPHY_PING HEADER */
-#define HDR_UWMULTIPHY_PONG(p)                                          \
-	(hdr_UWMULTIPHY_PONG::access(p)) /**< alias defined to access the UWMULTIPHY_PONG HEADER */
-#define HDR_UWMULTIPHY_DATA(p)                                                       \
-	(hdr_uwmultiphy_data::access(p)) /**< alias defined to access the DATA HEADER */
+#define HDR_UWMULTIPHY_PING(p)    \
+	(hdr_UWMULTIPHY_PING::access( \
+			p)) /**< alias defined to access the UWMULTIPHY_PING HEADER */
+#define HDR_UWMULTIPHY_PONG(p)    \
+	(hdr_UWMULTIPHY_PONG::access( \
+			p)) /**< alias defined to access the UWMULTIPHY_PONG HEADER */
+#define HDR_UWMULTIPHY_DATA(p)    \
+	(hdr_uwmultiphy_data::access( \
+			p)) /**< alias defined to access the DATA HEADER */
 
 extern packet_t PT_UWMULTIPHY_DATA;
 extern packet_t PT_UWMULTIPHY_PING;
@@ -76,7 +79,6 @@ typedef struct hdr_uwmultiphy_data {
 		return (struct hdr_uwmultiphy_data *) p->access(offset_);
 	}
 } hdr_uwmultiphy_data;
-
 
 /**
  * Header of the uwmultiphy_pong message
@@ -118,6 +120,5 @@ typedef struct hdr_uwmultiphy_ping {
 		return (struct hdr_uwmultiphy_ping *) p->access(offset_);
 	}
 } hdr_uwmultiphy_ping;
-
 
 #endif

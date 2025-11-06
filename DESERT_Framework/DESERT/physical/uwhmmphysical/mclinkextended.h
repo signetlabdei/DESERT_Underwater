@@ -35,7 +35,7 @@
  * \brief Definition of MCLinkExtended class, extending MCLink.
  *
  */
- 
+
 #ifndef MCLINKEXTENDED_H
 #define MCLINKEXTENDED_H
 
@@ -48,7 +48,6 @@
 class MCLinkExtended : public MCLink
 {
 public:
-	
 	/**
 	 * Default constructor of MCLinkExtended class.
 	 */
@@ -56,7 +55,7 @@ public:
 
 	/**
 	 * Constructor of MCLinkExtended class.
-	 * 
+	 *
 	 * @param ber_good BER with channel in GOOD state
 	 * @param ber_medium BER with channel in MEDIUM state
 	 * @param ber_bad BER with channel in BAD state
@@ -70,18 +69,18 @@ public:
 	 * @param ch_state Optional initial channel state (default = GOOD)
 	 *  of type MCLink::{GOOD | MEDIUM | BAD}
 
-	 */	
-	MCLinkExtended(double ber_good, double ber_medium, double ber_bad, double p_gb,
-			double p_gm, double p_mg, double p_mb, double p_bg, double p_bm,
-			double step_period, ChState ch_state = MCLink::GOOD);
-			
+	 */
+	MCLinkExtended(double ber_good, double ber_medium, double ber_bad,
+			double p_gb, double p_gm, double p_mg, double p_mb, double p_bg,
+			double p_bm, double step_period, ChState ch_state = MCLink::GOOD);
+
 	/**
 	 * Default destructor of MCLinkExtended class.
 	 */
-	virtual ~MCLinkExtended() 
+	virtual ~MCLinkExtended()
 	{
 	}
-	
+
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 *
@@ -98,7 +97,7 @@ public:
 	 * Called upon packet reception, decides and returns the new channel state
 	 * updates the members state and last_step.
 	 * @param curr_step current step number at packet arrival
-	 * @return the channel state at curr_step as 
+	 * @return the channel state at curr_step as
 	 *	MCLink::{GOOD | MEDIUM | BAD}
 	 */
 	virtual ChState updateChState() override;
@@ -107,25 +106,25 @@ public:
 	 *
 	 * @return BER with current channel state
 	 */
-	virtual double getBER() override; //remember to call updateChState() before returning a BER value
-	
-protected:
+	virtual double getBER() override; // remember to call updateChState() before
+									  // returning a BER value
 
-		/**
+protected:
+	/**
 	 * Auxiliary function calculating the result of a 3x3 matrix multiplication;
 	 * result is stored in first argument.
 	 * @param A the first factor of matrix multiplication
 	 * @param B the second factor of matrix multiplication
 	 */
-	void mul_matrix (double (&A)[3][3], const double (&B)[3][3]);
+	void mul_matrix(double (&A)[3][3], const double (&B)[3][3]);
 
 	/**
 	 * Auxiliary function raising a 3x3 matrix to the power of n.
 	 * @param A the matrix to be elevated to the n-th power
 	 * @param n the exponent of the operation
-	 * @param R the matrix that stores the result of the operation 
+	 * @param R the matrix that stores the result of the operation
 	 */
-	void pow_matrix (const double (&A)[3][3], int n, double (&R)[3][3]);
+	void pow_matrix(const double (&A)[3][3], int n, double (&R)[3][3]);
 
 	// Variables
 	double ber_medium; /**< BER with medium channel*/
@@ -134,7 +133,6 @@ protected:
 	double p_mb; /**< Prob of transition from medium to bad channel */
 	double p_bm; /**< Prob of transition from bad to medium channel */
 	double P[3][3]; /**< Transition matrix for the channel */
-
 };
 
 #endif /* MCLINKEXTENDED_H  */

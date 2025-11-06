@@ -40,13 +40,14 @@
 // ClMessage_t CLMSG_S2C_RX_FAILED;
 
 ClMsgS2CPowerLevel::ClMsgS2CPowerLevel()
-	: ClMsgUwPhy(CLMSG_S2C_POWER_LEVEL), power_level(0)
+	: ClMsgUwPhy(CLMSG_S2C_POWER_LEVEL)
+	, power_level(0)
 {
 }
 
 ClMsgS2CPowerLevel::ClMsgS2CPowerLevel(int stack_id, int dest_module_id)
-	: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_S2C_POWER_LEVEL),
-	  power_level(0)
+	: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_S2C_POWER_LEVEL)
+	, power_level(0)
 {
 }
 
@@ -67,16 +68,19 @@ ClMsgS2CPowerLevel::set_power_level(int level)
 }
 
 ClMsgS2CTxMode::ClMsgS2CTxMode()
-	: ClMsgUwPhy(CLMSG_S2C_TX_MODE), tx_mode(ClMsgS2CTxMode::S2C_TX_MODE_IM)
+	: ClMsgUwPhy(CLMSG_S2C_TX_MODE)
+	, tx_mode(ClMsgS2CTxMode::S2C_TX_MODE_IM)
 {
 }
 
 ClMsgS2CTxMode::ClMsgS2CTxMode(int stack_id, int dest_module_id)
-	: ClMsgUwPhy(CLMSG_S2C_TX_MODE), tx_mode(ClMsgS2CTxMode::S2C_TX_MODE_IM)
+	: ClMsgUwPhy(CLMSG_S2C_TX_MODE)
+	, tx_mode(ClMsgS2CTxMode::S2C_TX_MODE_IM)
 {
 }
 
-ClMsgS2CTxMode::ClMsgS2CTxMode(const ClMsgS2CTxMode &msg) : ClMsgUwPhy(msg)
+ClMsgS2CTxMode::ClMsgS2CTxMode(const ClMsgS2CTxMode &msg)
+	: ClMsgUwPhy(msg)
 {
 	tx_mode = msg.tx_mode;
 }
@@ -85,27 +89,26 @@ ClMsgS2CTxMode::~ClMsgS2CTxMode()
 {
 }
 
-void ClMsgS2CTxMode::set_tx_mode(ClMsgS2CTxMode::tx_mode_t mode)
+void
+ClMsgS2CTxMode::set_tx_mode(ClMsgS2CTxMode::tx_mode_t mode)
 {
 	tx_mode = mode;
 }
 
-
 ClMsgS2CRxFailed::ClMsgS2CRxFailed()
-	: ClMsgUwPhy(CLMSG_S2C_RX_FAILED), n_rx_failed(0)
+	: ClMsgUwPhy(CLMSG_S2C_RX_FAILED)
+	, n_rx_failed(0)
 {
 }
 
 ClMsgS2CRxFailed::ClMsgS2CRxFailed(int stack_id, int dest_module_id)
-	:
-	ClMsgUwPhy(stack_id, dest_module_id, CLMSG_S2C_RX_FAILED),
-	n_rx_failed(0)
+	: ClMsgUwPhy(stack_id, dest_module_id, CLMSG_S2C_RX_FAILED)
+	, n_rx_failed(0)
 {
 }
 
 ClMsgS2CRxFailed::ClMsgS2CRxFailed(const ClMsgS2CRxFailed &msg)
-	:
-	ClMsgUwPhy(msg)
+	: ClMsgUwPhy(msg)
 {
 	n_rx_failed = msg.n_rx_failed;
 }
@@ -114,7 +117,8 @@ ClMsgS2CRxFailed::~ClMsgS2CRxFailed()
 {
 }
 
-void ClMsgS2CRxFailed::set_n_rx_failed(int rx_failed)
+void
+ClMsgS2CRxFailed::set_n_rx_failed(int rx_failed)
 {
 	n_rx_failed = rx_failed;
 }

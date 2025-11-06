@@ -37,10 +37,10 @@
 #ifndef UWINTERPRETERAHOI_H
 #define UWINTERPRETERAHOI_H
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
-#include <array>
 
 #include "ahoitypes.h"
 

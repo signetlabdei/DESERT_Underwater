@@ -44,7 +44,7 @@
 using namespace std::chrono_literals;
 
 /** A stoppable C++11 thread implementation.
- * 
+ *
  */
 class StoppableThread
 {
@@ -52,10 +52,11 @@ public:
 	StoppableThread() = default;
 	virtual ~StoppableThread() = default;
 	/** Start the thread.
-	 * @param exc_info prints a catched exception message to stderr 
+	 * @param exc_info prints a catched exception message to stderr
 	 * @return true if thread was started, false if not
 	 * */
-	bool Start(bool exc_info = false)
+	bool
+	Start(bool exc_info = false)
 	{
 		/* Check for double-start */
 		if (Running())
@@ -63,41 +64,40 @@ public:
 		try {
 			m_thread = std::thread(&StoppableThread::RunInternal, this);
 			return true;
-		}
-		catch (std::exception& ex) {
+		} catch (std::exception &ex) {
 			if (exc_info)
-				std::cerr << "StoppableThread::Start() exception: " << ex.what() << std::endl;
-		}
-		catch (...) {
+				std::cerr << "StoppableThread::Start() exception: " << ex.what()
+						  << std::endl;
+		} catch (...) {
 			if (exc_info)
-				std::cerr << "StoppableThread::Start() unknow exception catched" << std::endl;
+				std::cerr << "StoppableThread::Start() unknow exception catched"
+						  << std::endl;
 		}
 		return false;
 	}
 
-	/** Stop the thread, needs call(s) to StopRequested() in the Run() worker function to check for the stop request.
+	/** Stop the thread, needs call(s) to StopRequested() in the Run() worker
+	 * function to check for the stop request.
 	 * @param wait wait for the thread to end
 	 *
 	 */
-	void Stop(bool wait = false)
+	void
+	Stop(bool wait = false)
 	{
 		m_stop.store(true);
-		if (wait && m_thread.joinable())
-		{
-			try
-			{
+		if (wait && m_thread.joinable()) {
+			try {
 				m_thread.join();
-			}
-			catch (...)
-			{
+			} catch (...) {
 			}
 		}
 	}
-	/** Pure virtual stopable worker function of thread, use the test StopRequested() to check if it should stop.
+	/** Pure virtual stopable worker function of thread, use the test
+	 StopRequested() to check if it should stop.
 	 * Implementation example (use in derived class):
 	 *
 	   void Run() override {
-	     while (!StopRequested())
+		 while (!StopRequested())
 		 {
 			Sleep(100ms);
 		 }
@@ -107,22 +107,32 @@ public:
 
 	/** Sleep for the given duration, use literals like 1s, 100ms, 10us */
 	template <class Rep, class Period>
-	void Sleep(const std::chrono::duration<Rep, Period> &d)
+	void
+	Sleep(const std::chrono::duration<Rep, Period> &d)
 	{
 		std::this_thread::sleep_for(d);
 	}
 	/** Returns the current state of the thread.
 	 * @return true if running
 	 */
-	bool Running() { return m_running.load(); }
+	bool
+	Running()
+	{
+		return m_running.load();
+	}
 	/** Returns if a stop was requested.
 	 * @return true if a stop was requested
 	 */
-	bool StopRequested() { return m_stop.load(); }
+	bool
+	StopRequested()
+	{
+		return m_stop.load();
+	}
 
 private:
-    /** Internal thread function. */
-	void RunInternal()
+	/** Internal thread function. */
+	void
+	RunInternal()
 	{
 		m_running = true;
 		Run();

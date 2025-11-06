@@ -37,9 +37,9 @@
  */
 
 #include "uwhermesphy.h"
-#include "rng.h"
 #include "mac.h"
 #include "phymac-clmsg.h"
+#include "rng.h"
 #include <fstream>
 #include <sstream>
 
@@ -317,8 +317,9 @@ UwHermesPhy::linearInterpolator(
 		   ")::linearInterpolator( double x, double x1, double y1, double x2,
 		   double y2 )"
 			  << "m = " << m << " q= " << q << std::endl;*/
-		std::cout << NOW << "  UwHermesPhy::linearInterpolator( double x, "
-							"double x1, double y1, double x2, double y2 )"
+		std::cout << NOW
+				  << "  UwHermesPhy::linearInterpolator( double x, "
+					 "double x1, double y1, double x2, double y2 )"
 				  << "m = " << m << " q= " << q << std::endl;
 	return m * x + q;
 }

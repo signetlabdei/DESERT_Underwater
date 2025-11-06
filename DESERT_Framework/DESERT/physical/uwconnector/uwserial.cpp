@@ -28,8 +28,8 @@
 
 #include <uwserial.h>
 
-#include <cerrno>
 #include <algorithm>
+#include <cerrno>
 #include <iostream>
 
 UwSerial::UwSerial()
@@ -64,8 +64,7 @@ UwSerial::openConnection(const std::string &path)
 		std::cout << "Port not open. Unable to open port " << device_port
 				  << std::endl;
 		std::cout << "Error " << local_errno
-				  << " from open: " << strerror(local_errno)
-				  << std::endl;
+				  << " from open: " << strerror(local_errno) << std::endl;
 		return (false);
 
 	} else {
@@ -94,7 +93,7 @@ UwSerial::closeConnection()
 }
 
 int
-UwSerial::writeToDevice(const std::string& msg)
+UwSerial::writeToDevice(const std::string &msg)
 {
 	if (serialfd > 0) {
 		int s_bytes = write(serialfd, msg.c_str(), msg.size());
@@ -132,8 +131,7 @@ UwSerial::configurePort(const std::string &path)
 	if (tcgetattr(serialfd, &tty) != 0) {
 		local_errno = errno;
 		std::cout << "Error " << local_errno
-				  << "from tcgetattr: " << strerror(local_errno)
-				  << std::endl;
+				  << "from tcgetattr: " << strerror(local_errno) << std::endl;
 	}
 
 	while ((curs = path.find(":", curs)) != std::string::npos) {
@@ -223,7 +221,8 @@ UwSerial::configurePort(const std::string &path)
 							  << std::endl;
 				}
 			} else {
-				std::cout << "Baud rate [" << baud << "] not valid" << std::endl;
+				std::cout << "Baud rate [" << baud << "] not valid"
+						  << std::endl;
 				return -1;
 			}
 		} else {

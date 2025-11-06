@@ -35,8 +35,8 @@
  *
  */
 
-#include <tclcl.h>
 #include "uw-csma-ca-hdrs.h"
+#include <tclcl.h>
 
 extern EmbeddedTcl CsmaCaTclCode;
 

@@ -45,14 +45,14 @@
 #ifndef UWMLL_MODULE_H
 #define UWMLL_MODULE_H
 
-#include <module.h>
-#include <packet.h>
 #include <arp.h>
 #include <mac.h>
+#include <module.h>
+#include <packet.h>
 #include <uwip-module.h>
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "marptable.h"
 
@@ -142,7 +142,7 @@ protected:
 	int n_arp_pkt_drop;
 
 	int enable_addr_copy; /** enable the copy of the IP address as MAC address
-							 */
+						   */
 	/** valid only if MAC_ADDR = IP on the node*/
 };
 

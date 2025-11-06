@@ -36,8 +36,8 @@
 #ifndef MS2C_CL_MESSAGE_H
 #define MS2C_CL_MESSAGE_H
 
-#include "uwphy-clmsg.h"
 #include "packet.h"
+#include "uwphy-clmsg.h"
 
 extern ClMessage_t CLMSG_S2C_POWER_LEVEL;
 extern ClMessage_t CLMSG_S2C_TX_MODE;
@@ -51,7 +51,7 @@ class ClSAP;
  */
 class ClMsgS2CPowerLevel : public ClMsgUwPhy
 {
-  public:
+public:
 	/**
 	 * Class constructor
 	 */
@@ -60,7 +60,7 @@ class ClMsgS2CPowerLevel : public ClMsgUwPhy
 	/**
 	 * Class constructor, with parameters
 	 * @param int stack_id: id of the stack
-     * @param dest_mod_id: id of the destination module
+	 * @param dest_mod_id: id of the destination module
 	 */
 	ClMsgS2CPowerLevel(int stack_id, int dest_module_id);
 
@@ -84,13 +84,13 @@ class ClMsgS2CPowerLevel : public ClMsgUwPhy
 	 * Retrieve the power level specified in the Cl message
 	 * @return the power level value in the message
 	 */
-	int get_power_level() const
+	int
+	get_power_level() const
 	{
 		return power_level;
 	}
 
-
-  private:
+private:
 	int power_level; /**< Power level (source level) value */
 };
 
@@ -99,8 +99,7 @@ class ClMsgS2CPowerLevel : public ClMsgUwPhy
  */
 class ClMsgS2CTxMode : public ClMsgUwPhy
 {
-  public:
-
+public:
 	typedef enum tx_mode {
 		S2C_TX_MODE_IM = 0,
 		S2C_TX_MODE_BURST,
@@ -115,7 +114,7 @@ class ClMsgS2CTxMode : public ClMsgUwPhy
 	/**
 	 * Class constructor with parameters
 	 * @param int stack_id: id of the stack
-     * @param dest_mod_id: id of the destination module
+	 * @param dest_mod_id: id of the destination module
 	 */
 	ClMsgS2CTxMode(int stack_id, int dest_module_id);
 
@@ -139,12 +138,13 @@ class ClMsgS2CTxMode : public ClMsgUwPhy
 	 * Method used to retrieve the TX mode value in the message
 	 * @return Tx mode value in the message
 	 */
-	tx_mode_t get_tx_mode() const
+	tx_mode_t
+	get_tx_mode() const
 	{
 		return tx_mode;
 	}
 
-  private:
+private:
 	tx_mode_t tx_mode; /**< Tx mode set in the message: IM, Burst or PBM */
 };
 
@@ -154,7 +154,7 @@ class ClMsgS2CTxMode : public ClMsgUwPhy
  */
 class ClMsgS2CRxFailed : public ClMsgUwPhy
 {
-  public:
+public:
 	/**
 	 * Class constructor: no parameters
 	 */
@@ -163,7 +163,7 @@ class ClMsgS2CRxFailed : public ClMsgUwPhy
 	/**
 	 * Class constructor with parameters
 	 * @param int stack_id: id of the stack
-     * @param dest_mod_id: id of the destination module
+	 * @param dest_mod_id: id of the destination module
 	 */
 	ClMsgS2CRxFailed(int stack_id, int dest_module_id);
 
@@ -188,12 +188,13 @@ class ClMsgS2CRxFailed : public ClMsgUwPhy
 	 * from the message
 	 * @return number of failed receptions set in the message
 	 */
-	int get_n_rx_failed() const
+	int
+	get_n_rx_failed() const
 	{
 		return n_rx_failed;
 	}
 
-  private:
+private:
 	int n_rx_failed; /**< Number of failed receptions */
 };
 

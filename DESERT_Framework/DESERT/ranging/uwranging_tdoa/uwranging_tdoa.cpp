@@ -53,7 +53,7 @@
 // 0: NONE	-	1: ERR	-	2: DBG
 #define DEBUG(level, text)                                                    \
 	{                                                                         \
-		if (debug_tdoa >= level) {                                             \
+		if (debug_tdoa >= level) {                                            \
 			std::cout << NOW << " UwRangingTDOA(" << node_id << "): " << text \
 					  << std::endl;                                           \
 		}                                                                     \
@@ -226,14 +226,13 @@ UwRangingTDOA::recvSyncClMsg(ClMessage *m)
 
 							if (stats != 0)
 								ber[pkt_node_id] = stats->last_ber;
-
 						}
 					}
 					if (ch->error()) {
 						DEBUG(1,
 								" RX ERRORED ping with pkt_token_id "
-								<< pkt_id << " from node "
-								<< pkt_node_id)
+										<< pkt_id << " from node "
+										<< pkt_node_id)
 
 						range_pkts_err++;
 
@@ -242,8 +241,8 @@ UwRangingTDOA::recvSyncClMsg(ClMessage *m)
 
 						DEBUG(2,
 								"recvSyncClMsg::RX ping with pkt_token_id "
-								<< pkt_id << " from node "
-								<< pkt_node_id)
+										<< pkt_id << " from node "
+										<< pkt_node_id)
 
 						rangeRX(p);
 					}
@@ -301,8 +300,7 @@ UwRangingTDOA::calcOptEntries(std::vector<int> *sorted_entries) const
 {
 	int opt_n_entries = (range_entries > 0 ? range_entries : n_nodes - 1);
 
-	if (range_entries <= 0)
-	{
+	if (range_entries <= 0) {
 		std::multimap<double, int, std::greater<double>> sorted_pairs;
 		double max_weight = 0.0;
 
@@ -315,20 +313,23 @@ UwRangingTDOA::calcOptEntries(std::vector<int> *sorted_entries) const
 				if (entry == node_id)
 					continue;
 
-				double w = entryWeight(entry, pkt_size, 0); // weight is just PDR
+				double w =
+						entryWeight(entry, pkt_size, 0); // weight is just PDR
 
 				sorted_pairs.insert(std::pair<double, int>(w, entry));
 				DEBUG(2,
 						"entryWeight(" << entry << "," << n_entries
-						<< ")= " << w << "")
+									   << ")= " << w << "")
 			}
 
 			double weight = 0.0;
 			std::multimap<double, int>::iterator iter = sorted_pairs.begin();
 
-			for (int i = 0; i < n_entries; i++) // was i < n_entries for considering only best entries
+			for (int i = 0; i < n_entries;
+					i++) // was i < n_entries for considering only best entries
 			{
-				weight += 1 * (iter->first); // was without n_entries for considering only best entries
+				weight += 1 * (iter->first); // was without n_entries for
+											 // considering only best entries
 				iter++;
 				if (iter == sorted_pairs.end())
 					break;
@@ -339,8 +340,7 @@ UwRangingTDOA::calcOptEntries(std::vector<int> *sorted_entries) const
 				opt_n_entries = n_entries;
 			}
 
-			DEBUG(2,
-					"N entries: " << n_entries << " weight: " << weight << "")
+			DEBUG(2, "N entries: " << n_entries << " weight: " << weight << "")
 		}
 	}
 
@@ -352,7 +352,8 @@ UwRangingTDOA::calcOptEntries(std::vector<int> *sorted_entries) const
 		if (entry == node_id)
 			continue;
 
-		sorted_pairs.insert(std::pair<double, int>( entryWeight(entry, pkt_size, range_entries), entry));
+		sorted_pairs.insert(std::pair<double, int>(
+				entryWeight(entry, pkt_size, range_entries), entry));
 	}
 
 	std::multimap<double, int>::iterator iter = sorted_pairs.begin();
@@ -396,8 +397,8 @@ UwRangingTDOA::rangeTX()
 	rangh->times_size_ = sorted_entries.size();
 
 	DEBUG(2,
-			"rangeTX::OPT SIZE: " << sorted_entries.size() 
-			<< " n_nodes: " << n_nodes)
+			"rangeTX::OPT SIZE: " << sorted_entries.size()
+								  << " n_nodes: " << n_nodes)
 
 	for (auto i : sorted_entries) {
 		DEBUG(2,
@@ -413,22 +414,22 @@ UwRangingTDOA::rangeTX()
 
 			DEBUG(2,
 					"rangeTX::entries_mat["
-					<< node_id << "][" << packet_id << "][" << i
-					<< "].time\t= "
-					<< entries_mat[node_id][packet_id][i].time)
+							<< node_id << "][" << packet_id << "][" << i
+							<< "].time\t= "
+							<< entries_mat[node_id][packet_id][i].time)
 		} else {
 			DEBUG(1,
 					"rangeTX::entry not valid for node "
-					<< i << " times_mat:" << times_mat[i][last_ids[i]]
-					<< " last_ids:" << last_ids[i])
+							<< i << " times_mat:" << times_mat[i][last_ids[i]]
+							<< " last_ids:" << last_ids[i])
 		}
 	}
 
 	ch->size() += rangh->getSize();
 	DEBUG(2,
 			"rangeTX::queueing range packet with pkt_id: "
-			<< (int) rangh->source_pkt_id << " and size: " << ch->size()
-			<< " with # entries: " << (int) rangh->times_size_);
+					<< (int) rangh->source_pkt_id << " and size: " << ch->size()
+					<< " with # entries: " << (int) rangh->times_size_);
 
 	packet_id = (packet_id + 1) % PKTIDMAX;
 	last_ids[node_id] = rangh->source_pkt_id;
@@ -436,7 +437,8 @@ UwRangingTDOA::rangeTX()
 	if (!isValid(rangh->source_pkt_id))
 		DEBUG(1,
 				"ERROR! invalid pkt_id: " << rangh->source_pkt_id
-				<< " from node " << rangh->source_node_id)
+										  << " from node "
+										  << rangh->source_node_id)
 
 	++queue_size;
 	sendDown(p);
@@ -444,7 +446,7 @@ UwRangingTDOA::rangeTX()
 	if (UwRangingTDOA::range_period < 0) {
 		DEBUG(1,
 				"ERROR! packet period set as: " << range_period
-				<< " but must be >0!!!")
+												<< " but must be >0!!!")
 		range_period = 10;
 	}
 }
@@ -464,26 +466,26 @@ UwRangingTDOA::updateHoldoverTime(Packet *p, double tx_duration)
 
 	DEBUG(2,
 			"updateHoldoverTime::sending range packet with pkt_id: "
-			<< (int) rangh->source_pkt_id)
+					<< (int) rangh->source_pkt_id)
 	for (int i = 0; i < rangh->times_size(); i++) {
 		DEBUG(2, "updateHoldoverTime::elem[" << i << "]")
 		auto &elem = (*rangh).times_[i];
 
 		DEBUG(2, "updateHoldoverTime::elem.time = " << elem.time)
 
-		elem.time += NOW + tx_duration + mac2phy_delay
-				- tx_timestamp[rangh->source_pkt_id];
+		elem.time += NOW + tx_duration + mac2phy_delay -
+				tx_timestamp[rangh->source_pkt_id];
 		entries_mat[node_id][rangh->source_pkt_id][elem.node].time = elem.time;
 
 		DEBUG(2, "updateHoldoverTime::tx_duration = " << tx_duration)
 		DEBUG(2, "updateHoldoverTime::mac2phy_delay = " << mac2phy_delay)
 		DEBUG(2,
 				"updateHoldoverTime::tx_timestamp = "
-				<< tx_timestamp[rangh->source_pkt_id])
+						<< tx_timestamp[rangh->source_pkt_id])
 		DEBUG(2,
 				"updateHoldoverTime::entries_mat["
-				<< node_id << "][" << (int) rangh->source_pkt_id << "]["
-				<< (int) elem.node << "].time = " << elem.time)
+						<< node_id << "][" << (int) rangh->source_pkt_id << "]["
+						<< (int) elem.node << "].time = " << elem.time)
 
 		entry_last_tx[elem.node] = NOW;
 	}
@@ -510,11 +512,13 @@ UwRangingTDOA::rangeRX(const Packet *p)
 	last_ids[pkt_node_id] = pkt_id;
 
 	if (!isValid(pkt_id))
-		DEBUG(1, "ERROR! invalid pkt_id: "
-				<< pkt_id << " from node " << pkt_node_id)
+		DEBUG(1,
+				"ERROR! invalid pkt_id: " << pkt_id << " from node "
+										  << pkt_node_id)
 
 	for (size_t i = 0; i < entries_mat[pkt_node_id][pkt_id].size(); ++i) {
-		// reset all entries relative to the incoming packet present in the matrix
+		// reset all entries relative to the incoming packet present in the
+		// matrix
 		entries_mat[pkt_node_id][pkt_id][i] = tdoa_entry(-1, i, -1);
 	}
 
@@ -531,10 +535,10 @@ UwRangingTDOA::rangeRX(const Packet *p)
 										<< (int) elem.node
 										<< "].time = " << elem.time)
 
-		if (elem.node == node_id) { 
+		if (elem.node == node_id) {
 			// if packet referred in elem.id is not too old
 			if (NOW - times_mat[node_id][elem.id] < max_age) {
-				spherical_tof = 
+				spherical_tof =
 						(NOW - times_mat[node_id][elem.id] - elem.time) / 2.;
 				spherical_timestamp = (NOW + times_mat[node_id][elem.id]) / 2.;
 
@@ -560,18 +564,20 @@ UwRangingTDOA::rangeRX(const Packet *p)
 	for (int i = 0; i < rangh->times_size(); i++) {
 		auto &elem = (*rangh).times_[i];
 
-		if (isValid(elem) && elem.node != node_id && isValid(spherical_tof)
-				&& isValid(times_mat[elem.node][elem.id])
-				&& isValid(time_of_flights[tof_map[elem.node][node_id]])) {
+		if (isValid(elem) && elem.node != node_id && isValid(spherical_tof) &&
+				isValid(times_mat[elem.node][elem.id]) &&
+				isValid(time_of_flights[tof_map[elem.node][node_id]])) {
 
 			DEBUG(2, "rangeRX::elem[" << i << "]")
 
 			double hyperbolic_tof = (NOW -
 					times_mat[elem.node][elem.id] // RX time from elem.node
 					- spherical_tof // time distance from source node
-					+ time_of_flights[tof_map[elem.node][node_id]] // time distance from elem.node
+					+ time_of_flights[tof_map[elem.node]
+											 [node_id]] // time distance from
+														// elem.node
 					- elem.time // holdover between elem.node and source node
-					+ mac2phy_delay / (n_nodes-1));
+					+ mac2phy_delay / (n_nodes - 1));
 
 			DEBUG(2,
 					"rangeRX::times_mat[" << (int) elem.node << "]["
@@ -588,11 +594,12 @@ UwRangingTDOA::rangeRX(const Packet *p)
 			if (hyperbolic_tof >= -1e-3) {
 				time_of_flights[tof_map[pkt_node_id][elem.node]] =
 						std::abs(hyperbolic_tof);
-				entries_timestamps[tof_map[pkt_node_id][elem.node]] = 
-						std::min( spherical_timestamp,
-								entries_timestamps[tof_map[elem.node][node_id]]);
+				entries_timestamps[tof_map[pkt_node_id][elem.node]] = std::min(
+						spherical_timestamp,
+						entries_timestamps[tof_map[elem.node][node_id]]);
 			} else {
-				DEBUG(1, "Negative hyp range from node "
+				DEBUG(1,
+						"Negative hyp range from node "
 								<< (int) elem.node << " to " << pkt_node_id);
 			}
 		}
@@ -661,7 +668,8 @@ UwRangingTDOA::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "setId") == 0) {
 			node_id = atoi(argv[2]);
 
-			if (node_id < 0 || node_id > std::numeric_limits<uwrange_node_t>::max())
+			if (node_id < 0 ||
+					node_id > std::numeric_limits<uwrange_node_t>::max())
 				return TCL_ERROR;
 
 			return TCL_OK;
@@ -711,8 +719,7 @@ UwRangingTDOA::stop()
 void
 UwRangingTDOA::throttleTX()
 {
-	if (scheduler_active)
-	{
+	if (scheduler_active) {
 		int nextTX = range_period;
 		if (poisson_traffic) {
 			double u = RNG::defaultrng()->uniform_double();

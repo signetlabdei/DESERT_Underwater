@@ -48,7 +48,8 @@
 #define HDR_OFDM(p) \
 	(hdr_OFDM::access(p)) /**< alias defined to access the PROBE HEADER */
 
-#define MAX_CARRIERS 16 	//This can be changed to do simulations with more carriers 
+#define MAX_CARRIERS \
+	16 // This can be changed to do simulations with more carriers
 extern packet_t PT_OFDM;
 
 /**
@@ -56,13 +57,13 @@ extern packet_t PT_OFDM;
  */
 typedef struct hdr_OFDM {
 
-	static int offset_; 			/**< Required by the PacketHeaderManager. */
-	int carriers [MAX_CARRIERS]; 	// Carriers vector: 1 if used 0 otherwise 
-	double carrierSize;    			// Carrier size
-  	int carrierNum;     			// NUmber of subcarriers 
-	string carMod [MAX_CARRIERS];	// Carriers Modulation vector
-	bool nativeOFDM = false;		// If a packet was created by an OFDM node
-	int srcID;						// ID of the node creating the packet 
+	static int offset_; /**< Required by the PacketHeaderManager. */
+	int carriers[MAX_CARRIERS]; // Carriers vector: 1 if used 0 otherwise
+	double carrierSize; // Carrier size
+	int carrierNum; // NUmber of subcarriers
+	string carMod[MAX_CARRIERS]; // Carriers Modulation vector
+	bool nativeOFDM = false; // If a packet was created by an OFDM node
+	int srcID; // ID of the node creating the packet
 
 	/**
 	 * Reference to the offset_ variable.
@@ -79,6 +80,5 @@ typedef struct hdr_OFDM {
 		return (struct hdr_OFDM *) p->access(hdr_OFDM::offset_);
 	}
 } hdr_OFDM;
-
 
 #endif

@@ -50,13 +50,13 @@ class UwOpticalChannel : public UwElectroMagneticChannel
 
 public:
 	/**
-	* Constructor of UwOpticalChannel class.
-	*/
+	 * Constructor of UwOpticalChannel class.
+	 */
 	UwOpticalChannel();
 
 	/**
-	* Destructor of UwOpticalChannel class.
-	*/
+	 * Destructor of UwOpticalChannel class.
+	 */
 	virtual ~UwOpticalChannel() = default;
 };
 

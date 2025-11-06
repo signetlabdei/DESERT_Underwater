@@ -51,7 +51,8 @@ typedef struct hdr_uwopticalbeampattern {
 
 	double inclination_angle_; /**< inclination angle of the soruce modem. */
 
-	inline double& get_inclination_angle()
+	inline double &
+	get_inclination_angle()
 	{
 		return inclination_angle_;
 	}
@@ -65,9 +66,10 @@ typedef struct hdr_uwopticalbeampattern {
 		return offset_;
 	}
 
-	inline static struct hdr_uwopticalbeampattern* access(const Packet *p)
+	inline static struct hdr_uwopticalbeampattern *
+	access(const Packet *p)
 	{
-		return (struct hdr_uwopticalbeampattern*) p->access(offset_);
+		return (struct hdr_uwopticalbeampattern *) p->access(offset_);
 	}
 
 } hdr_uwopticalbeampattern;

@@ -39,11 +39,11 @@
 
 #include "uwgmposition.h"
 
-#include <rng.h>
 #include <cmath>
-#include <time.h>
+#include <rng.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 /**
  * Adds the module for UwGMPositionClass in ns2.
@@ -139,9 +139,8 @@ UwGMPosition::command(int argc, const char *const *argv)
 double
 UwGMPosition::Gaussian()
 {
-	return RNG::defaultrng()->normal(0.0,1.0);
+	return RNG::defaultrng()->normal(0.0, 1.0);
 }
-
 
 void
 UwGMPosition::update(double now)

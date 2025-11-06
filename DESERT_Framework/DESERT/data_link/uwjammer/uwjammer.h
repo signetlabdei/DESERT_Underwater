@@ -40,13 +40,11 @@
 #define UWJAMMER_H
 
 #include "mmac.h"
-#include <string>
 #include <map>
+#include <string>
 
-#define  UWJAMMER_DROP_REASON_BUFFER_FULL\
-	"DBF" /**< Buffer is full. */
-#define UWJAMMER_DROP_REASON_JAMMER_PROTOCOL \
-	"DJP" /**< Protocol rules. */
+#define UWJAMMER_DROP_REASON_BUFFER_FULL "DBF" /**< Buffer is full. */
+#define UWJAMMER_DROP_REASON_JAMMER_PROTOCOL "DJP" /**< Protocol rules. */
 
 /**
  * Class that describes a Uwjammer module
@@ -86,7 +84,6 @@ public:
 	virtual int crLayCommand(ClMessage *m) override;
 
 protected:
-
 	/**
 	 * Enum that rapresents the status of the protocol machine state.
 	 */
@@ -124,7 +121,6 @@ protected:
 	 */
 	virtual void stateIdle();
 
-
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet.
 	 * @param Packet* Pointer to an object of type Packet that represent the
@@ -137,43 +133,60 @@ protected:
 	 * @return int n_jam_sent the number of packets sent
 	 */
 	inline int
-	getJamSent() const { return n_jam_sent; }
+	getJamSent() const
+	{
+		return n_jam_sent;
+	}
 
 	/**
-	 * Returns the number of packets discarded during the simulation because the buffer is full.
+	 * Returns the number of packets discarded during the simulation because the
+	 * buffer is full.
 	 * @return int n_jam_discarded the number of packets discarded
 	 */
 	inline int
-	getJamDiscarded() const { return n_jam_discarded; }
+	getJamDiscarded() const
+	{
+		return n_jam_discarded;
+	}
 
 	/**
-	 * Returns the number of packets received and discarded during the simulation.
+	 * Returns the number of packets received and discarded during the
+	 * simulation.
 	 * @return int n_data_discarded the number of packets sent
 	 */
 	inline int
-	getDataDiscarded() const { return n_data_discarded; }
+	getDataDiscarded() const
+	{
+		return n_data_discarded;
+	}
 
 	/**
 	 * Refresh the state of the protocol.
 	 * @param JammerStatus current state of the protcol
 	 */
 	inline virtual void
-	refreshState(JammerStatus state) { curr_state = state; }
+	refreshState(JammerStatus state)
+	{
+		curr_state = state;
+	}
 
-	int buffer_data_pkts;	/**< Size of the buffer in number of packets. */
-	uint node_id;			/**< Unique Node ID. */
-	uint JAMMER_uid;		/**< JAMMER Unique ID. */
-	size_t n_jam_sent;		/**< Number of packets sent. */
-	size_t n_jam_discarded;	/**< Number of packets discarded because the buffer is full. */
-	size_t n_data_discarded;/**< Number of packets received and discarded. */
+	int buffer_data_pkts; /**< Size of the buffer in number of packets. */
+	uint node_id; /**< Unique Node ID. */
+	uint JAMMER_uid; /**< JAMMER Unique ID. */
+	size_t n_jam_sent; /**< Number of packets sent. */
+	size_t n_jam_discarded; /**< Number of packets discarded because the buffer
+							   is full. */
+	size_t n_data_discarded; /**< Number of packets received and discarded. */
 
-	Packet *curr_data_pkt;			/**< Pointer to the current DATA packet. */
-	std::queue<Packet *> Q_data;	/**< Queue of DATA in number of packets. */
+	Packet *curr_data_pkt; /**< Pointer to the current DATA packet. */
+	std::queue<Packet *> Q_data; /**< Queue of DATA in number of packets. */
 
-	JammerStatus curr_state;	/**< Current state of the protocol. */
-	static const std::map<JammerStatus, std::string> status_info; /**< Textual info of the state. */
+	JammerStatus curr_state; /**< Current state of the protocol. */
+	static const std::map<JammerStatus, std::string>
+			status_info; /**< Textual info of the state. */
 
-	constexpr static const int MAX_BUFFER_SIZE = 100; /**< Maximum size of the queue in number of packets. */
+	constexpr static const int MAX_BUFFER_SIZE =
+			100; /**< Maximum size of the queue in number of packets. */
 };
 
 #endif /* UWJAMMER_H */

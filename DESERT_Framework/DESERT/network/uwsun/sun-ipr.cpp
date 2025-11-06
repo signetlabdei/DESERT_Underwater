@@ -43,13 +43,16 @@
 
 #include <tclcl.h>
 
-int hdr_sun_ack::offset_ = 0; /**< Offset used to access in <i>hdr_sun_ack</i> packets header. */
+int hdr_sun_ack::offset_ =
+		0; /**< Offset used to access in <i>hdr_sun_ack</i> packets header. */
 
-int hdr_sun_data::offset_ =	0; /**< Offset used to access in <i>hdr_sun_data</i> packets header. */
+int hdr_sun_data::offset_ =
+		0; /**< Offset used to access in <i>hdr_sun_data</i> packets header. */
 
 int hdr_sun_path_est::offset_ = 0; /**< Offset used to access in
 									  <i>hdr_sun_path_est</i> packets header. */
-int hdr_sun_probe::offset_ = 0; /**< Offset used to access in <i>hdr_sun_probe</i> packets header. */
+int hdr_sun_probe::offset_ =
+		0; /**< Offset used to access in <i>hdr_sun_probe</i> packets header. */
 
 /**
  * Adds the header for <i>hdr_sun_ack</i> packets in ns2.

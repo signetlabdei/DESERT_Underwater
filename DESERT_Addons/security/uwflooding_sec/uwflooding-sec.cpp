@@ -37,10 +37,10 @@
  */
 
 #include "uwflooding-sec.h"
-#include "uwsecurity_clmsg.h"
-#include <clmsg-discovery.h>
-#include "uwstats-utilities.h"
 #include "uwphysical.h"
+#include "uwsecurity_clmsg.h"
+#include "uwstats-utilities.h"
+#include <clmsg-discovery.h>
 
 extern packet_t PT_UWFLOODING;
 
@@ -79,9 +79,8 @@ public:
 	}
 } class_uwflooding_pkt;
 
-
-NeighborReputationHandler::NeighborReputationHandler(uint8_t neigh_addr, 
-		UwFloodingSec* m, double alpha_val, int dbg)
+NeighborReputationHandler::NeighborReputationHandler(
+		uint8_t neigh_addr, UwFloodingSec *m, double alpha_val, int dbg)
 	: TimerHandler()
 	, module(m)
 	, neighbor_addr(neigh_addr)
@@ -93,7 +92,6 @@ NeighborReputationHandler::NeighborReputationHandler(uint8_t neigh_addr,
 	, is_first_pkt(true)
 	, debug(dbg)
 {
-
 }
 
 NeighborReputationHandler::~NeighborReputationHandler()
@@ -106,25 +104,26 @@ NeighborReputationHandler::addUnconfirmedPkt(int uid, double expire_time)
 	std::map<int, double>::iterator it = unconfirmed_pkts.find(uid);
 	if (it == unconfirmed_pkts.end()) {
 		if (debug)
-			std::cout << NOW << "::addUnconfirmedPkt::Node=" 
-					<< (int)module->ipAddr_ << "::Neighbor=" 
-					<< (int)neighbor_addr << "::uid=" << uid 
-					<< "::inserted unconfirmed packet" << std::endl;
-		
+			std::cout << NOW
+					  << "::addUnconfirmedPkt::Node=" << (int) module->ipAddr_
+					  << "::Neighbor=" << (int) neighbor_addr << "::uid=" << uid
+					  << "::inserted unconfirmed packet" << std::endl;
+
 		unconfirmed_pkts[uid] = expire_time;
 		if (!is_running) {
 			if (NOW < expire_time) {
 				if (debug)
-					std::cout << NOW << "::addUnconfirmedPkt::Node=" 
-							<< (int) module->ipAddr_ << "::Neighbor=" 
-							<< (int) neighbor_addr << "::expire time=" 
-							<< expire_time << std::endl;
-				resched(expire_time-NOW);
+					std::cout << NOW << "::addUnconfirmedPkt::Node="
+							  << (int) module->ipAddr_
+							  << "::Neighbor=" << (int) neighbor_addr
+							  << "::expire time=" << expire_time << std::endl;
+				resched(expire_time - NOW);
 				waiting_uid = uid;
 				is_running = true;
 			} else {
-				std::cerr<<NOW << "NeighborReputationHandler::addUnconfirmedPkt"
-						<< "::error:expire time already past"<< std::endl;
+				std::cerr << NOW
+						  << "NeighborReputationHandler::addUnconfirmedPkt"
+						  << "::error:expire time already past" << std::endl;
 			}
 		}
 		return true;
@@ -135,22 +134,22 @@ NeighborReputationHandler::addUnconfirmedPkt(int uid, double expire_time)
 bool
 NeighborReputationHandler::checkUnconfirmedPkt(int uid)
 {
-	std::map<int,double>::iterator it_uid = unconfirmed_pkts.find(uid);
+	std::map<int, double>::iterator it_uid = unconfirmed_pkts.find(uid);
 	if (it_uid != unconfirmed_pkts.end()) {
 		if (debug)
-			std::cout << NOW << "::checkUnconfirmedPkt::Node="
-					<<(int)module->ipAddr_ << "::Neighbor=" 
-					<< (int)neighbor_addr << "::uid=" << uid 
-					<< "::removed from the map" << std::endl;
-		
+			std::cout << NOW
+					  << "::checkUnconfirmedPkt::Node=" << (int) module->ipAddr_
+					  << "::Neighbor=" << (int) neighbor_addr << "::uid=" << uid
+					  << "::removed from the map" << std::endl;
+
 		unconfirmed_pkts.erase(it_uid);
-		if (module->reputation) { 
-			ChannelBasedMetricsReputation metrics = 
-					ChannelBasedMetricsReputation(true, avg_snr, last_noise,
-							inst_noise);
+		if (module->reputation) {
+			ChannelBasedMetricsReputation metrics =
+					ChannelBasedMetricsReputation(
+							true, avg_snr, last_noise, inst_noise);
 			module->reputation->updateReputation(neighbor_addr, &metrics);
 		}
-		if (waiting_uid == uid) { 
+		if (waiting_uid == uid) {
 			int next_uid;
 			double next_time;
 			if (getNextPacket(next_uid, next_time)) {
@@ -158,10 +157,11 @@ NeighborReputationHandler::checkUnconfirmedPkt(int uid)
 				is_running = true;
 				resched(next_time - NOW);
 				if (debug)
-					std::cout << NOW << "::checkUnconfirmedPkt::Node=" 
-							<< (int) module->ipAddr_ << "::Neighbor=" 
-							<< (int) neighbor_addr << "::next uid=" << next_uid
-							<< "::expire time=" << next_time << std::endl;
+					std::cout << NOW << "::checkUnconfirmedPkt::Node="
+							  << (int) module->ipAddr_
+							  << "::Neighbor=" << (int) neighbor_addr
+							  << "::next uid=" << next_uid
+							  << "::expire time=" << next_time << std::endl;
 			} else {
 				waiting_uid = -1;
 				is_running = false;
@@ -177,17 +177,17 @@ void
 NeighborReputationHandler::expire(Event *e)
 {
 	if (debug)
-		std::cout << NOW << "::NeighborReputationHandler::expire::Node=" 
-				<< (int)module->ipAddr_ << "::Neighbor=" << (int)neighbor_addr 
-				<< "::expected_uid=" << waiting_uid << "::timer expired" 
-				<< std::endl;
-	
+		std::cout << NOW << "::NeighborReputationHandler::expire::Node="
+				  << (int) module->ipAddr_
+				  << "::Neighbor=" << (int) neighbor_addr
+				  << "::expected_uid=" << waiting_uid << "::timer expired"
+				  << std::endl;
+
 	unconfirmed_pkts.erase(waiting_uid);
 	module->retrieveInstantNoise(neighbor_addr);
 	if (module->reputation) {
-		ChannelBasedMetricsReputation metrics = 
-				ChannelBasedMetricsReputation(false, avg_snr, last_noise,
-						inst_noise);
+		ChannelBasedMetricsReputation metrics = ChannelBasedMetricsReputation(
+				false, avg_snr, last_noise, inst_noise);
 		module->reputation->updateReputation(neighbor_addr, &metrics);
 	}
 	removeOldPackets();
@@ -196,34 +196,37 @@ NeighborReputationHandler::expire(Event *e)
 	if (getNextPacket(next_uid, next_time)) {
 		waiting_uid = next_uid;
 		is_running = true;
-		resched(next_time-NOW);
+		resched(next_time - NOW);
 		if (debug)
-			std::cout << NOW << "::NeighborReputationHandler::expire::Node=" 
-					<< (int)module->ipAddr_  << "::Neighbor=" 
-					<< (int)neighbor_addr << "::next uid=" << next_uid 
-					<< "::expire time=" << next_time << std::endl;
+			std::cout << NOW << "::NeighborReputationHandler::expire::Node="
+					  << (int) module->ipAddr_
+					  << "::Neighbor=" << (int) neighbor_addr
+					  << "::next uid=" << next_uid
+					  << "::expire time=" << next_time << std::endl;
 	} else {
 		waiting_uid = -1;
 		is_running = false;
 		if (debug)
-			std::cout << NOW << "::NeighborReputationHandler::expire::Node=" 
-					<< (int)module->ipAddr_ << "::Neighbor=" 
-					<< (int)neighbor_addr << "::no packet to schedule" 
-					<< std::endl;
+			std::cout << NOW << "::NeighborReputationHandler::expire::Node="
+					  << (int) module->ipAddr_
+					  << "::Neighbor=" << (int) neighbor_addr
+					  << "::no packet to schedule" << std::endl;
 	}
 }
 
 bool
-NeighborReputationHandler::getNextPacket(int& uid, double& exp_time) const
+NeighborReputationHandler::getNextPacket(int &uid, double &exp_time) const
 {
 	std::map<int, double>::const_iterator it = unconfirmed_pkts.begin();
 	if (it != unconfirmed_pkts.end()) {
-		for (std::map<int, double>::const_iterator it_f = unconfirmed_pkts.begin();
-				it_f != unconfirmed_pkts.end(); it_f++) {
+		for (std::map<int, double>::const_iterator it_f =
+						unconfirmed_pkts.begin();
+				it_f != unconfirmed_pkts.end();
+				it_f++) {
 			if (it_f->second < it->second) {
 				it = it_f;
-			}			
-		} 
+			}
+		}
 		if (NOW <= it->second) {
 			uid = it->first;
 			exp_time = it->second;
@@ -239,42 +242,44 @@ void
 NeighborReputationHandler::removeOldPackets()
 {
 	for (std::map<int, double>::iterator it = unconfirmed_pkts.begin();
-			it != unconfirmed_pkts.end(); it++) {
-		if (it->second < NOW ) {
+			it != unconfirmed_pkts.end();
+			it++) {
+		if (it->second < NOW) {
 			if (debug)
-				std::cout << NOW << "::removeOldPackets::Node=" 
-						<< (int)module->ipAddr_ << "::Neighbor="
-						<< (int)neighbor_addr << "::packet with uid=" 
-						<< it->first << "::not forwarded" << std::endl;
-		
+				std::cout << NOW << "::removeOldPackets::Node="
+						  << (int) module->ipAddr_
+						  << "::Neighbor=" << (int) neighbor_addr
+						  << "::packet with uid=" << it->first
+						  << "::not forwarded" << std::endl;
+
 			unconfirmed_pkts.erase(it);
 			if (module->reputation) {
-				ChannelBasedMetricsReputation metrics = 
-						ChannelBasedMetricsReputation(false, avg_snr,last_noise,
-								inst_noise);
+				ChannelBasedMetricsReputation metrics =
+						ChannelBasedMetricsReputation(
+								false, avg_snr, last_noise, inst_noise);
 				module->reputation->updateReputation(neighbor_addr, &metrics);
 			}
 		}
-	}	
+	}
 }
 
 void
-NeighborReputationHandler::updateChannelMetrics(double val_snr, 
-		double last_noise_val)
+NeighborReputationHandler::updateChannelMetrics(
+		double val_snr, double last_noise_val)
 {
 	if (is_first_pkt) {
 		avg_snr = val_snr;
 		is_first_pkt = false;
-	}
-	else {
-		avg_snr = (1-alpha)*avg_snr + alpha*val_snr;
+	} else {
+		avg_snr = (1 - alpha) * avg_snr + alpha * val_snr;
 	}
 	last_noise = last_noise_val;
 	inst_noise = last_noise_val;
 	if (debug)
-		std::cout << NOW << "::Node=" << (int)module->ipAddr_ << "::Neighbor=" 
-				<< (int)neighbor_addr  <<"::average snr=" << avg_snr 
-				<< "::val snr=" << val_snr << std::endl;
+		std::cout << NOW << "::Node=" << (int) module->ipAddr_
+				  << "::Neighbor=" << (int) neighbor_addr
+				  << "::average snr=" << avg_snr << "::val snr=" << val_snr
+				  << std::endl;
 }
 
 void
@@ -282,9 +287,10 @@ NeighborReputationHandler::updateInstantNoise(double inst_noise_val)
 {
 	inst_noise = inst_noise_val;
 	if (debug)
-		std::cout << NOW << "::Node=" << (int)module->ipAddr_ << "::Neighbor=" 
-				<< (int)neighbor_addr  << "::last rx noise=" << last_noise
-				<<"::inst noise =" << inst_noise << std::endl;
+		std::cout << NOW << "::Node=" << (int) module->ipAddr_
+				  << "::Neighbor=" << (int) neighbor_addr
+				  << "::last rx noise=" << last_noise
+				  << "::inst noise =" << inst_noise << std::endl;
 }
 
 UwFloodingSec::UwFloodingSec()
@@ -321,9 +327,9 @@ UwFloodingSec::recvSyncClMsg(ClMessage *m)
 {
 	if (m->type() == CLMSG_OVERHEARING_PKT) {
 		ClMsgOverhearingPkt *msg = dynamic_cast<ClMsgOverhearingPkt *>(m);
-		Packet* pkt;
+		Packet *pkt;
 		if (msg->getPacket(pkt)) {
-			hdr_cmn* ch = HDR_CMN(pkt);
+			hdr_cmn *ch = HDR_CMN(pkt);
 			if (use_reputation && !ch->error()) {
 				sendStatsClMsg(ch->prev_hop_);
 				checkUnconfirmedPkt(ch->prev_hop_, ch->uid());
@@ -334,34 +340,38 @@ UwFloodingSec::recvSyncClMsg(ClMessage *m)
 	return Module::recvSyncClMsg(m);
 } /* UwFlooding::recvSyncClMsg */
 
-void 
+void
 UwFloodingSec::sendStatsClMsg(int neighbor_addr)
 {
 	if (valid_phy_id) {
 		ClMsgStats stats_clmsg = ClMsgStats(stats_phy_id, UNICAST);
 		sendSyncClMsg(&stats_clmsg);
-		if (stats_clmsg.getStats()->type_id == (int)StatsEnum::STATS_PHY_LAYER){
-			const UwPhysicalStats* stats = dynamic_cast<const UwPhysicalStats*>(
-					stats_clmsg.getStats());
+		if (stats_clmsg.getStats()->type_id ==
+				(int) StatsEnum::STATS_PHY_LAYER) {
+			const UwPhysicalStats *stats =
+					dynamic_cast<const UwPhysicalStats *>(
+							stats_clmsg.getStats());
 			if (stats != 0) {
 				if (!stats->has_error) {
-					double snr_db = 10 * log10(stats->last_rx_power / 
-						(stats->last_noise_power + stats->last_interf_power));
+					double snr_db = 10 *
+							log10(stats->last_rx_power /
+									(stats->last_noise_power +
+											stats->last_interf_power));
 					if (debug_)
-						std::cout << NOW << "::Node=" << (int) ipAddr_ 
-								<< "::Neighbor=" << neighbor_addr 
-								<< "::Received packet with" 
-								<< "::rx power=" << stats->last_rx_power 
-								<< "::noise=" << stats->last_noise_power 
-								<< "::interference=" 
-								<< stats->last_interf_power 
+						std::cout
+								<< NOW << "::Node=" << (int) ipAddr_
+								<< "::Neighbor=" << neighbor_addr
+								<< "::Received packet with"
+								<< "::rx power=" << stats->last_rx_power
+								<< "::noise=" << stats->last_noise_power
+								<< "::interference=" << stats->last_interf_power
 								<< "::SNR=" << snr_db << std::endl;
 					if (use_reputation) {
 						addToNeighbor(neighbor_addr);
-						neighbor_timer_map::iterator it = 
+						neighbor_timer_map::iterator it =
 								neighbor_tmr.find(neighbor_addr);
-						it->second.updateChannelMetrics(snr_db, 
-								stats->last_noise_power);
+						it->second.updateChannelMetrics(
+								snr_db, stats->last_noise_power);
 					}
 				}
 			}
@@ -375,15 +385,18 @@ UwFloodingSec::retrieveInstantNoise(int neighbor_addr)
 	if (valid_phy_id) {
 		ClMsgStats stats_clmsg = ClMsgStats(stats_phy_id, UNICAST);
 		sendSyncClMsg(&stats_clmsg);
-		if (stats_clmsg.getStats()->type_id == (int)StatsEnum::STATS_PHY_LAYER){
-			const UwPhysicalStats* stats = dynamic_cast<const UwPhysicalStats*>(
-					stats_clmsg.getStats());
+		if (stats_clmsg.getStats()->type_id ==
+				(int) StatsEnum::STATS_PHY_LAYER) {
+			const UwPhysicalStats *stats =
+					dynamic_cast<const UwPhysicalStats *>(
+							stats_clmsg.getStats());
 			if (stats != 0) {
 				if (use_reputation) {
-					neighbor_timer_map::iterator it = 
+					neighbor_timer_map::iterator it =
 							neighbor_tmr.find(neighbor_addr);
 					if (it != neighbor_tmr.end())
-						it->second.updateInstantNoise(stats->instant_noise_power);
+						it->second.updateInstantNoise(
+								stats->instant_noise_power);
 				}
 			}
 		}
@@ -434,7 +447,8 @@ UwFloodingSec::command(int argc, const char *const *argv)
 			trace_file_path_.close();
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setReputation") == 0) {
-			reputation = dynamic_cast<UwReputationInterface *>(TclObject::lookup(argv[2]));
+			reputation = dynamic_cast<UwReputationInterface *>(
+					TclObject::lookup(argv[2]));
 			if (!reputation) {
 				return TCL_ERROR;
 			}
@@ -443,8 +457,12 @@ UwFloodingSec::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "setPhyTag") == 0) {
 			std::string tag = argv[2];
 			ClMsgDiscovery disc_m;
-			disc_m.addSenderData((const PlugIn*) this, getLayer(), getId(), 
-					getStackId(), name() , getTag());
+			disc_m.addSenderData((const PlugIn *) this,
+					getLayer(),
+					getId(),
+					getStackId(),
+					name(),
+					getTag());
 			sendSyncClMsg(&disc_m);
 			DiscoveryStorage phy_layer_storage = disc_m.findTag(argv[2]);
 			DiscoveryData phy_layer = (*phy_layer_storage.begin()).second;
@@ -454,8 +472,8 @@ UwFloodingSec::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addTtlPerTraffic") == 0) {
-			ttl_traffic_map[static_cast<uint16_t>(atoi(argv[2]))] = 
-				static_cast<uint8_t>(atoi(argv[3]));
+			ttl_traffic_map[static_cast<uint16_t>(atoi(argv[2]))] =
+					static_cast<uint8_t>(atoi(argv[3]));
 			return TCL_OK;
 		}
 	}
@@ -691,11 +709,11 @@ UwFloodingSec::recv(Packet *p)
 } /* UwFlooding::recv */
 
 uint8_t
-UwFloodingSec::getTTL(Packet* p) const
+UwFloodingSec::getTTL(Packet *p) const
 {
 	hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 	auto it = ttl_traffic_map.find(uwcbrh->traffic_type());
-	if(it != ttl_traffic_map.end()) {
+	if (it != ttl_traffic_map.end()) {
 		return it->second;
 	}
 	return ttl_;
@@ -748,57 +766,57 @@ UwFloodingSec::printIP(const nsaddr_t &ip_)
 	return out.str();
 } /* UwFlooding::printIP */
 
-
 void
 UwFloodingSec::addToNeighbor(uint8_t neighbor_addr)
 {
 	if (reputation) {
 		reputation->addNode(neighbor_addr);
 	}
-	//TODO vedere se togliere neighbor map e usare solo la mappa dei timer
+	// TODO vedere se togliere neighbor map e usare solo la mappa dei timer
 	if (neighbor.find(neighbor_addr) != neighbor.end()) {
 		neighbor[neighbor_addr]++;
 	} else {
 		neighbor[neighbor_addr] = 1;
-		NeighborReputationHandler tmp = NeighborReputationHandler(neighbor_addr,
-				this, alpha_snr, debug_);
-		neighbor_tmr.insert(std::make_pair(neighbor_addr,tmp));
+		NeighborReputationHandler tmp = NeighborReputationHandler(
+				neighbor_addr, this, alpha_snr, debug_);
+		neighbor_tmr.insert(std::make_pair(neighbor_addr, tmp));
 	}
 }
 
 void
 UwFloodingSec::printNeighbor()
 {
-	std::cout << "Node IP " << (int)ipAddr_ << std::endl;
-	for (neighbor_map::iterator it = neighbor.begin(); it != neighbor.end(); it++) {
+	std::cout << "Node IP " << (int) ipAddr_ << std::endl;
+	for (neighbor_map::iterator it = neighbor.begin(); it != neighbor.end();
+			it++) {
 		RepStatus status;
 		if (reputation) {
-			std::cout << "Neighbor=" << (int) it->first << "::received="
-					<< it->second << "::" 
-					<< reputation->getStatusReport((int) it->first)
-					<< std::endl;
+			std::cout << "Neighbor=" << (int) it->first
+					  << "::received=" << it->second
+					  << "::" << reputation->getStatusReport((int) it->first)
+					  << std::endl;
 		} else {
-			std::cout << "Neighbor=" << (int) it->first << "::received="
-					<< it->second << std::endl;
-		}		
+			std::cout << "Neighbor=" << (int) it->first
+					  << "::received=" << it->second << std::endl;
+		}
 	}
 	std::cout << std::endl;
 }
 
 void
-UwFloodingSec::sendDown(Packet* p,  double delay)
+UwFloodingSec::sendDown(Packet *p, double delay)
 {
 	if (use_reputation) {
-		hdr_cmn* ch = HDR_CMN(p);
-		hdr_uwip* iph = HDR_UWIP(p);
+		hdr_cmn *ch = HDR_CMN(p);
+		hdr_uwip *iph = HDR_UWIP(p);
 		int uid = ch->uid();
 		neighbor_timer_map::iterator it = neighbor_tmr.begin();
 		for (; it != neighbor_tmr.end(); it++) {
 			if (it->first != iph->daddr() && it->first != prev_hop_temp) {
-				it->second.addUnconfirmedPkt(uid, NOW+fwd_to);
+				it->second.addUnconfirmedPkt(uid, NOW + fwd_to);
 			}
 		}
-		prev_hop_temp = 0; //invalid ip
+		prev_hop_temp = 0; // invalid ip
 	}
 	Module::sendDown(p);
 }

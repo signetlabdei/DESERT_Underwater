@@ -40,8 +40,6 @@
 #include "uwip-module.h"
 #include <climits>
 
-
-
 static class UnderwaterGainFromDbClass : public TclClass
 {
 public:

@@ -121,9 +121,9 @@ public:
 	/**
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 * <ul>
-	 * <li><b>setdest &lt;<i>x</i>&gt; &lt;<i>y</i>&gt; &lt;<i>z</i>&gt; &lt;<i>speed</i>&gt;</b>
-	 * <li><b>setdest &lt;<i>x</i>&gt;&lt; <i>y</i>&gt;&lt; <i>z</i>&gt;</b>
-	 * <li><b>update</b>
+	 * <li><b>setdest &lt;<i>x</i>&gt; &lt;<i>y</i>&gt; &lt;<i>z</i>&gt;
+	 * &lt;<i>speed</i>&gt;</b> <li><b>setdest &lt;<i>x</i>&gt;&lt;
+	 * <i>y</i>&gt;&lt; <i>z</i>&gt;</b> <li><b>update</b>
 	 * </ul>
 	 * Moreover it inherits all the OTcl method of Position
 	 *
@@ -145,7 +145,8 @@ public:
 	 * @param double Coordinate along z-axis of destination point
 	 * @param double Speed of the node
 	 */
-	virtual void setdest(double x_dest, double y_dest, double z_dest, double speed);
+	virtual void setdest(
+			double x_dest, double y_dest, double z_dest, double speed);
 
 	/*
 	 * Set the destination of the node with default speed.
@@ -168,7 +169,7 @@ public:
 	 * Set the projection on x-axis of the node postion
 	 *
 	 * @param double Projection on the x-axis of the node position
-	 * 
+	 *
 	 **/
 	virtual void setX(double x) override;
 
@@ -176,7 +177,7 @@ public:
 	 * Set the projection on y-axis of the node postion
 	 *
 	 * @param double Projection on the y-axis of the node position
-	 * 
+	 *
 	 **/
 	virtual void setY(double y) override;
 
@@ -184,7 +185,7 @@ public:
 	 * Set the projection on z-axis of the node postion
 	 *
 	 * @param double Projection on the z-axis of the node position
-	 * 
+	 *
 	 **/
 	virtual void setZ(double z) override;
 
@@ -197,8 +198,10 @@ private:
 	virtual void update(double now);
 
 	int debug_;
-	double trgTime_; /**< Time when the TCL command <i>setdest</i> is invoked. */
-	double lastUpdateTime_; /**< Time when last update of the coordinates was computed. */
+	double trgTime_; /**< Time when the TCL command <i>setdest</i> is invoked.
+					  */
+	double lastUpdateTime_; /**< Time when last update of the coordinates was
+							   computed. */
 	double Xdest_; /**< Position along x-axis of the destination point. */
 	double Ydest_; /**< Position along y-axis of the destination point. */
 	double Zdest_; /**< Position along z-axis of the destination point. */

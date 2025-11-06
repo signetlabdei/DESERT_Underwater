@@ -34,8 +34,8 @@
  * @brief Provides the initializazion of the uw-ofdm-aloha libraries
  */
 
-#include <tclcl.h>
 #include "uwofdmphy_hdr.h"
+#include <tclcl.h>
 
 extern EmbeddedTcl UWOFDMAlohaTclCode;
 
