@@ -168,7 +168,7 @@ Module/UW/CBR set drop_out_of_order_   0
 
 # UW/FLOODING
 Module/UW/FLOODING set ttl_                       6
-Module/UW/FLOODING set maximum_cache_time__time_  60
+Module/UW/FLOODING set maximum_cache_time_time_  60
 Module/UW/FLOODING set optimize_                  1
 
 # CSMA
