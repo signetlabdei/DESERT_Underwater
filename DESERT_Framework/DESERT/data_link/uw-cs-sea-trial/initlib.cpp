@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,11 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file   data_link/uw-csma-aloha/initlib.cc
- * @author Federico Guerra, Saiful Azad and Federico Favaro
+ * @file   data_link/uw-cs-sea-trial/initlib.cc
+ * @author Filippo Campagnaro
  * @version 1.0.0
  *
- * \brief Provides the initialization of uw-csma-aloha libraries
+ * \brief Provides the initialization of uw-cs-sea-trial library
  *
  */
 

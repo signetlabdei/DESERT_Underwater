@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,11 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Federico Guerra, Saiful Azad and Federico Favaro
+# Author: Filippo Campagnaro
 # Version: 1.0.0
 
 
 
-Module/UW/CSTRIAL set HDR_size_ 			0
-Module/UW/CSTRIAL set debug			0
 Module/UW/CSTRIAL set queue_size    		10
 Module/UW/CSTRIAL set max_packet_per_burst	10
 Module/UW/CSTRIAL set rv_sens_time	1.0

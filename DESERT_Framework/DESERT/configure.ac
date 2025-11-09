@@ -166,7 +166,7 @@ DESERT_UWMMAC_CLMSGS_LIBADD='$(top_builddir)/data_link/uwmmac_clmsgs/libuwmmac_c
 DESERT_UWTDMA_LIBADD='$(top_builddir)/data_link/uwtdma/libuwtdma.la'
 DESERT_UWEM_CHANNEL_LIBADD='$(top_builddir)/channel/uwem_channel/libuwem_channel.la'
 DESERT_UWTOKENBUS_LIBADD='$(top_builddir)/data_link/uwtokenbus/libuwtokenbus.la'
-DESERT_UWCSTRIAL_LIBADD='$(top_builddir)/data_link/uwtokenbus/libuwcstrial.la'
+DESERT_UWCSTRIAL_LIBADD='$(top_builddir)/data_link/uw-cs-sea-trial/libuwcstrial.la'
 DESERT_UWTAP_LIBADD='$(top_builddir)/ranging/uwtap/libuwtap.la'
 
 AC_SUBST(DESERT_UWINTERFERENCE_LIBADD)

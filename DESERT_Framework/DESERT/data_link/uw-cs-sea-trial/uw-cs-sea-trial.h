@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2017 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@
  *
  * @brief Provides the definition of the class <i>UwCsSeaTrial</i>.
  * This is simple CSMA with random deferring to be used when your modem
- * does not have real carrier-sensing abilities. 
+ * does not have real carrier-sensing abilities.
  * Once a packet is received from the apper layers, it starts a random timer.
  * If no packets are received from the PHY in such time, it starts transmitting,
  * otherwise it restarts the timer again.
@@ -45,20 +45,14 @@
 #ifndef UWCSTRIAL_H
 #define UWCSTRIAL_H
 
-#include <mmac.h>
 #include <deque>
-#include <iostream>
-#include <assert.h>
-#include <sstream>
-#include <fstream>
-#include <sys/time.h>
-
+#include <mmac.h>
 
 class UwCsSeaTrial;
 
 /**
- * UwSensingTimer class is used to handle the scheduling period of <i>UWCSTRIAL</i>
- * slots.
+ * UwSensingTimer class is used to handle the scheduling period of
+ * <i>UWCSTRIAL</i> slots.
  */
 
 class UwSensingTimer : public TimerHandler
@@ -73,8 +67,9 @@ public:
 		: TimerHandler()
 	{
 		assert(m != NULL);
-		module = m;
+		module_ = m;
 	}
+
 	~UwSensingTimer() = default;
 
 protected:
@@ -83,7 +78,8 @@ protected:
 	 * @param Event*  pointer to an object of type Event
 	 */
 	virtual void expire(Event *e);
-	UwCsSeaTrial *module;
+
+	UwCsSeaTrial *module_;
 };
 
 /**
@@ -110,51 +106,59 @@ protected:
 	 * Transmit a data packet if in my slot
 	 */
 	virtual void txData();
+
 	/**
 	 * Sensing timer expired
 	 */
 	virtual void sensingExpired();
+
 	/**
 	 * Start sensing the channel
 	 */
 	virtual void sensing();
-	
+
 	/**
 	 * Receive the packet from the upper layer (e.g. IP)
 	 * @param Packet* pointer to the packet received
 	 *
 	 */
-	virtual void recvFromUpperLayers(Packet *p);
+	virtual void recvFromUpperLayers(Packet *p) override;
+
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in reception
 	 */
-	virtual void Phy2MacEndRx(Packet *p);
+	virtual void Phy2MacEndRx(Packet *p) override;
+
 	/**
 	 * Method called when the Phy Layer start to receive a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in reception
 	 */
-	virtual void Phy2MacStartRx(const Packet *p);
+	virtual void Phy2MacStartRx(const Packet *p) override;
+
 	/**
 	 * Method called when the Mac Layer start to transmit a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in transmission
 	 */
 	virtual void Mac2PhyStartTx(Packet *p);
+
 	/**
 	 * Method called when the Mac Layer finish to transmit a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in transmission
 	 */
-	virtual void Phy2MacEndTx(const Packet *p);
+	virtual void Phy2MacEndTx(const Packet *p) override;
+
 	/**
 	 * Method called when the Packet received is determined to be not for me
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in reception
 	 */
 	virtual void rxPacketNotForMe(Packet *p);
+
 	/**
 	 * Method called to add the MAC header size
 	 * @param const Packet* Pointer to an Packet object that rapresent the
@@ -166,32 +170,29 @@ protected:
 	 * TCL command interpreter. It implements the following OTcl methods:
 	 *
 	 * @param argc Number of arguments in <i>argv</i>.
-	 * @param argv Array of strings which are the command parameters
-							 (Note that <i>argv[0]</i> is the name of the
-	 object).
+	 * @param argv Array of strings which are the command parameters (Note that
+	 <i>argv[0]</i> is the name of the object).
 	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
-															  successfully or
-	 not.
+	 successfully or not.
 	 */
-	virtual int command(int argc, const char *const *argv);
+	virtual int command(int argc, const char *const *argv) override;
+
 	/**
 	 * Enumeration class of CSTRIAL status.
 	 */
-	enum UWCS_STATUS {IDLE, SENSING, TRANSMITTING};
+	enum class UWCS_STATUS { IDLE, SENSING, TRANSMITTING };
 
-	UWCS_STATUS
-	tx_status; /**<Variable holding the status enum type*/
-	int debug_; /**<Debug variable: 0 for no info, > 0 for info*/	
-	unsigned int HDR_size; /**<Size of the HDR if any*/
-	double fix_sens_time; /**<Frame duration*/
-	double rv_sens_time; /**<Guard time between slots*/
-	UwSensingTimer sensing_timer; /**<carrier sensing timer handler*/
-	std::deque<Packet *> buffer; /**<Buffer of the MAC node*/
-	unsigned int max_queue_size; /**< Maximum dimension of Queue */
-	unsigned int max_packet_per_burst; /**<max numer of packet it can transmit in a tx burst */
-	unsigned int packet_sent_curr_burst; /**<counter of packet has been sent in the
-								current burst */
-	unsigned int n_rx_while_sensing; /*<number of rx packets while channel sensing*/
+	UWCS_STATUS tx_status_; /**< Variable holding the status enum type. */
+	double fix_sens_time_; /**< Frame duration. */
+	double rv_sens_time_; /**< Random guard time between slots. */
+	UwSensingTimer sensing_timer_; /**< Carrier sensing timer handler. */
+	std::deque<Packet *> buffer_; /**< Buffer of the MAC node. */
+	uint max_queue_size_; /**< Maximum dimension of queue. */
+	uint max_packet_per_burst_; /**< Max numer of packet it can transmit in a tx
+								   burst. */
+	uint packet_sent_curr_burst_; /**< Counter of packet has been sent in the
+									 current burst. */
+	uint n_rx_while_sensing_; /*< Number of rx packets while channel sensing. */
 };
 
 #endif
