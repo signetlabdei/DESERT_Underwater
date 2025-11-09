@@ -13,7 +13,7 @@ The folder structure is composed of two main folders:
 In this section we describe how to write a basic Tcl script, following the structure of the script found in `DES_CORE/samples/desert_samples/test_uwcbr.tcl`.
 
 It is a good practice to start your script with a brief description and a simple draw of the simulated network topology:
-```{tcl}
+```tcl
 # ----------------------------------------------------------------------------------
 # This script depicts a very simple but complete stack in which two nodes send data
 # to a common sink. The second node is used by the first one as a relay to send data to the sink.
@@ -46,7 +46,7 @@ It is a good practice to start your script with a brief description and a simple
 
 The first thing to do in order to have a working script, is to import the libraries. Note that the order matters and is often a cause of errors.
 You first need to import the ns-miracle libraries in the following order:
-```{tcl}
+```tcl
 load libMiracle.so
 load libMiracleBasicMovement.so
 load libmphy.so
@@ -54,7 +54,7 @@ load libmmac.so
 load libUwmStd.so
 ```
 Afterwards you can import DESERT libraries you need (in order).
-```{tcl}
+```tcl
 load libuwcsmaaloha.so
 load libuwip.so
 load libuwstaticrouting.so
@@ -65,7 +65,7 @@ load libuwcbr.so
 
 In order to configure your simulation, some options and variables may be needed.
 A common approach is to use an associative array called. These options may be hardcoded or given to the simulation as bash parameters.
-```{tcl}
+```tcl
 set opt(bash_parameters) 0; # Set to 1 to activate bash parameters
 if {$opt(bash_parameters)} {
 	if {$argc != 2} {
@@ -81,7 +81,7 @@ if {$opt(bash_parameters)} {
 ```
 
 Common simulation options are listed below
-```{tcl}
+```tcl
 set opt(nn) 2.0 ;# Number of Nodes
 set opt(starttime) 1
 set opt(stoptime) 1000
@@ -89,7 +89,7 @@ set opt(duration) [expr $opt(stoptime) - $opt(starttime)]
 ```
 
 Once you have all the needed libraries and options, you need to initialize the ns-miracle simulator and set the random number generator.
-```{tcl}
+```tcl
 set ns [new Simulator]
 $ns use-Miracle
 
@@ -101,7 +101,7 @@ for {set k 0} {$k < $opt(rngstream)} {incr k} {
 ```
 
 Next there are the binding of the modules. Here you can set globally the initialization values of the binded variables.
-```{tcl}
+```tcl
 Module/UW/CBR set packetSize_		$opt(pktsize)
 # ...
 ```
@@ -109,7 +109,7 @@ Module/UW/CBR set packetSize_		$opt(pktsize)
 Now you are ready to define a tcl procedure (function) that allows you to create as many different kind of nodes in the network.
 Inside this procedure, you need to create a ns-miracle node and add the modules you need (the whole protocol stack) and configure them.
 Optionally you can initialize and set the node position.
-```{tcl}
+```tcl
 proc createNode { id } {
 	# include global variables to use in the procedure
 	global <variables list>
@@ -152,7 +152,7 @@ proc createNode { id } {
 
 You can have as many procedures you want. Typically there is a specific procedure for the sink node (a node which only receives packets).
 Finally, to actually create the nodes you need to call the procedure. Suppose to have `$opt(nn)` nodes in the network, you can do:
-```{tcl}
+```tcl
 for {set id 0} {$id < $opt(nn)} {incr id}
 {
 	createNode $id
@@ -161,7 +161,7 @@ createSink; # Suppose to have a procedure to create the sink node
 ```
 
 Once you created the nodes you need to connect them, setup the routes and fill the arp tables.
-```{tcl}
+```tcl
 proc connectNodes {id1} {
     global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink
 
@@ -191,7 +191,7 @@ $ipr(1) addRoute [$ipif_sink addr] [$ipif_sink addr]
 ```
 
 Finally you need to start and stop the modules and the simulation.
-```{tcl}
+```tcl
 for {set id1 0} {$id1 < $opt(nn)} {incr id1} {
 	$ns at $opt(starttime) "$cbr($id1) start"
 	$ns at $opt(stoptime) "$cbr($id1) stop"
@@ -225,7 +225,7 @@ Inside `uwcoolphy.cpp`, you must always create a **static** class variable that 
 
 In our example, this is done with the following code:
 
-```{cpp} 
+```cpp 
 static class UwCoolPhyClass : public TclClass
 {
 public:
@@ -244,10 +244,10 @@ public:
 Then, we need to link the class parameters to Tcl variables. This is usually done in the `.cpp` constructor using the `bind()` function.
 This function takes as input a string representing a Tcl variable, which is bound to the second argument, a cpp class parameter.
 
-```{cpp}
+```cpp
 bind("debug", (int *) &debug_);			// inside uwcoolphy.cpp
 ```
-```{tcl}
+```tcl
 Module/UW/CoolPhy set debug 1			# inside a tcl script
 ```
 
@@ -259,7 +259,7 @@ This function must be named after the module, starting with an uppercase letter,
 
 Following our example, your `initlib.cc` should look like this:
 
-```{cpp}
+```cpp
 #include <tclcl.h>
 
 extern EmbeddedTcl UwCoolPhyTclCode;
@@ -276,7 +276,7 @@ All bound variables need to be initialized to a default value in the `uwcoolphy-
 
 For instance:
 
-```{tcl}
+```tcl
 Module/UW/CoolPhy set BitRate					32500
 Module/UW/CoolPhy set AcquisitionThreshold_dB_	10.0
 Module/UW/CoolPhy set debug						0
@@ -290,7 +290,7 @@ To compile your module, you need to fill the `Makefile.am` file:
 
 Your `Makefile.am` should look like this:
 
-```{am}
+```am
 AM_CXXFLAGS = -Wall -ggdb3
 
 lib_LTLIBRARIES = libuwcoolphy.la
@@ -320,7 +320,7 @@ Specifically, to add a new library, you need to modify the top-level `DES_CORE/M
 In our example:
 
 `DES_CORE/Makefile.am`
-```{am}
+```am
 
 [...]
 SUBDIRS = m4 \
@@ -331,7 +331,7 @@ SUBDIRS = m4 \
 ```
 
 `DES_CORE/configure.ac`
-```{ac}
+```ac
 [...]
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwcool_phy'
 [...]
@@ -344,13 +344,13 @@ physical/uwcool_phy
 
 Suppose now, that your module depends on anoter one called `UwCoolMac`.
 You also have to modify the `libuwcoolphy_la_LIBADD` flag of the module `Makefile.am` as follows.
-```{am}
+```am
 libuwcoolphy_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
                          @DESERT_UWCOOLMAC_LIBADD@
 ```
 
 Where the variable `@DESERT_UWCOOLMAC_LIBADD@` is defined inside the top-level `configure.ac` (if not, you need to manually define it):
-```{ac}
+```ac
 DESERT_UWCOOLMAC_LIBADD='$(top_builddir)/data_link/uwcoolmac/libuwcoolmac.la'
 [...]
 AC_SUBST(DESERT_UWCOOLMAC_LIBADD)
@@ -359,7 +359,7 @@ AC_SUBST(DESERT_UWCOOLMAC_LIBADD)
 Once everything is ready, we need to reinstall DESERT to properly add the new module.
 
 > Note: After the module is installed, we can recompile it without reinstalling everything. In our case, we would need to do the following:
-```{console}
+```console
 $ cd DESERT_buildCopy_LOCAL/.buildHost/DESERT/physical/uwcoolphy/
 $ make && make install
 ```
@@ -373,7 +373,7 @@ Finally, inside a tcl script we can use our module by:
 
 To set the parameters and instantiate the object we can write
 
-```{tcl}
+```tcl
 Module/UW/CoolPhy set BitRate_				   32500
 Module/UW/CoolPhy set AcquisitionThreshold_dB_ 10.0
 
@@ -383,12 +383,12 @@ set phy [new Module/UW/CoolPhy]
 To enable the communication between the cpp class and the tcl script we need to overwrite the command method, for example to get and set parameters of a module object.
 It must be declared in this way, in your module class (`uwcoolphy.h`)
 
-```{cpp}
+```cpp
 virtual int command(int argc, const char *const *argv);
 ```
 And then it should be defined in this way (inside `uwcoolphy.cpp`)
 
-```{cpp}
+```cpp
 UwCoolPhy::command(int argc, const char *const *argv) {
 	if (argc == 2) {
 		if (strcmp(argv[1], "Method1") == 0) {
@@ -429,7 +429,7 @@ DEBUG: details that allow to understand the execution flow plus both ERROR and I
 
 In particular, it gives you the method `printOnLog`, defined as follows:
 
-```{cpp}
+```cpp
 virtual void printOnLog(Logger::LogLevel level, const std::string &module, const std::string &message) const;
 ```
 
@@ -437,7 +437,7 @@ This method takes three parameter: (i) the log level of the message, (ii) the na
 
 As an example, suppose you have a method to handle packets reception that you would like to track, you can do it as follows:
 
-```{cpp}
+```cpp
 void
 UwCoolPhy::startRx(Packet *p)
 {
@@ -449,7 +449,7 @@ UwCoolPhy::startRx(Packet *p)
 
 To enable and configure the log messages in your simulation, you can use the following commands:
 
-```{tcl}
+```tcl
 	setLogLevel <log_level>				;# Set the logger level (1, 2 or 3)
 	setLogFile  <file_name>				;# Set the logger file name
 	setLog		<log_level> <file_name>	;# Set both the logger level and file name
@@ -460,7 +460,7 @@ To enable and configure the log messages in your simulation, you can use the fol
 Remember that all the modules in a given simulation, share the same instance of the logger, meaning, that the `log_level` and `log_file` can be set just once.
 For instance, suppose, you have a tcl file, with one transmitting node and one sink node, you can set the logger for the sink physical layer only as follows:
 
-```{tcl}
+```tcl
 proc createSink { } {
 	...
 	set phy_data_sink [new Module/UW/CoolPhy]
@@ -481,7 +481,7 @@ In the case your module needs its own **packet header**, a few things need to be
 
 Define a header *struct*, for example `hdr_uwmyprotocol` inside a file `myproto-hdr.h` with your parameters plus the offset field required by the *packet header manager*:
 
-```{cpp}
+```cpp
 typedef struct hdr_uwmyprotocol 
 {
 	uint8_t param;
@@ -500,19 +500,19 @@ typedef struct hdr_uwmyprotocol
 
 To simplify the access of your *header* from the *packet* class, at the beginning of the source file where your header is defined you can define the following macro
 
-```{cpp}
+```cpp
 #define HDR_UWMYPROTOCOL(p) (hdr_uwmyprotocol::access(p))
 ```
 
 Just after the macro, at the beginning of the file, you need to define a new *packet* type with
 
-```{cpp}
+```cpp
 extern packet_t PT_MYPACKET;
 ```
 
 Inside initlib.cpp you need to 
 - Include your header file and define the offset and the packet type
-```{cpp}
+```cpp
 #include<myproto-hdr.h>
 ...
 
@@ -522,7 +522,7 @@ packet_t PT_MYPACKET;
 
 - Add a static class
 
-```{cpp}
+```cpp
 static class MyProtoHeaderClass : public PacketHeaderClass
 {
 public:
@@ -537,13 +537,13 @@ public:
 
 - Add the packet inside the `init` function (before the `load` function call), using the same name of the extern
 
-```{cpp}
+```cpp
 PT_MYPACKET = p_info::addPacket("MYPROTO");
 ```
 
 Finally, inside the *-default.tcl you need to add the packet to the packet manager, with
 
-```{tcl}
+```tcl
 PacketHeaderManager set tab_(PacketHeader/MYPROTO) 1
 ```
 
@@ -562,7 +562,7 @@ Inside that folder, create the basic files for a properly cpp module, i.e., `coo
 
 Similarly to what you did for the adding a module, your `initlib.cpp` will look like
 
-```{cpp}
+```cpp
 #include <tclcl.h>
 
 extern EmbeddedTcl CoolAddonTclCode;
@@ -607,14 +607,14 @@ The actual path might be something like `/home/foo/DESERT_Underwater/DESERT_Fram
 
 First of all, enter the installation folder:
 
-```{console}
+```console
 $ cd .../DESERT_Underwater/DESERT_Framework/Installation/
 ```
 
 Now, create a new script.
 We suggest to copy an existing installation script (e.g. `installDESERT_LOCAL.sh`):
 
-```{console}
+```console
 $ cp installDESERT_LOCAL.sh installDESERT_<your-custom-installation-target>.sh
 ```
 
@@ -624,7 +624,7 @@ We remark that these steps are very easy but also very important, since the only
 
 Let us now have a deeper look at the script. We focus first on the main block:
 
-```{sh}
+```sh
 main() {
     #******************************************************************************
     # MAIN
@@ -662,7 +662,7 @@ Notice the `host` directive.
 This tells the installation script to compile the libraries for the current host.
 If you need to modify this script to cross-compile for a different target, substitute all lines with the following ones:
 
-```{sh}
+```sh
 main() {
     #******************************************************************************
     # MAIN
