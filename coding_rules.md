@@ -1,6 +1,6 @@
 # Coding rules
 
-This file shows the coding rules of the project.
+This page provides a set of rules to follow when contributing to the `DESERT_Underwater`.
 
 ## Indentation
 
@@ -166,3 +166,14 @@ Packet* curr_data_pkt_; /**< Pointer to the current DATA packet */
 int pkts_lost; /**< Total number of lost packets, including packets received
                     out of sequence. */
 ```
+
+## Clang-format
+
+Inside the tools directory there is a script to auto-format a module using clang-format.
+An example usage is the following:
+
+```console
+$ ./tools/format-code.sh <path-to-module>
+```
+
+If clang-format is already installed in your systems, it will format the module according to the coding rules, otherwise it will try to install clang-format.

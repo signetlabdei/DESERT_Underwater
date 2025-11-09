@@ -1,4 +1,6 @@
-Copyright (c) 2023 Regents of the SIGNET lab, University of Padova.
+# License terms
+
+Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
