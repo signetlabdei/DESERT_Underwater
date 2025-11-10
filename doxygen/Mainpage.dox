@@ -122,7 +122,7 @@ If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, et
 
 <small>
 
-    sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libtool gfortran bison flex
+    sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libtool gfortran bison flex libxml2-dev
 
 </small>
 

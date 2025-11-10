@@ -761,10 +761,10 @@ build_NETCDF() {
                 --host=${ARCH}          \
                 --build=${HOST}         \
                 --enable-shared         \
+                --enable-logging      \
                 --enable-netcdf-4      \
                 --disable-dap           \
                 --disable-byterange     \
-                --disable-libxml2       \
                 --prefix=${DEST_FOLDER} \
                 CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
                 LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib" \
@@ -927,7 +927,6 @@ build_WOSS() {
                 --with-ns-allinone=${currentBuildLog}                              \
                 --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}               \
                 --with-netcdf4=${DEST_FOLDER}                                      \
-                --with-pthread                                                     \
                 --prefix=${DEST_FOLDER}                                            \
                 >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
 
