@@ -12,6 +12,7 @@ Before installing the **DESERT framework**, please check that your host device h
 - libxmu-dev  
 - libxmu-headers  
 - libxt-dev  
+- libxml2-dev
 - libtool  
 - gfortran  
 - bison  
@@ -22,7 +23,7 @@ Before installing the **DESERT framework**, please check that your host device h
 If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, etc...), you can type the following command in a terminal, in order to install all dependencies above:
 
 ```console
-$ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libtool gfortran bison flex
+$ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libxml2-dev libtool gfortran bison flex
 ```
 
 ### Arch Linux
@@ -30,7 +31,7 @@ $ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev l
 If you are using an Arch Linux based distribution, you can type the following command in a terminal:
 
 ```console
-$ sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake libtool patch patchutils
+$ sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake libtool patch patchutils libxml2
 ```
 
 ### Fedora
@@ -52,7 +53,7 @@ $ dnf groupinstall "C Development Tools and Libraries"
 ```
 
 ```console
-$ dnf install gcc-gfortran libXmu-devel libX11-devel patch patchutils
+$ dnf install gcc-gfortran libXmu-devel libX11-devel patch patchutils libxml2
 ```
 
 ## Download and install
