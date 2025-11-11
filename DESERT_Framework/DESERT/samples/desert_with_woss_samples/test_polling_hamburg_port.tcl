@@ -202,17 +202,20 @@ set time_reference      [new "WOSS/Definitions/TimeReference/NS2"]
 set transducer_creator  [new "WOSS/Definitions/Transducer"]
 set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
 set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
+set location_creator    [new "WOSS/Position"]
+
 $rand_generator initialize
 
 set def_handler [new "WOSS/Definitions/Handler"]
-$def_handler setSSPCreator         $ssp_creator
-$def_handler setSedimentCreator    $sediment_creator
-$def_handler setPressureCreator    $pressure_creator
-$def_handler setTimeArrCreator     $time_arr_creator
-$def_handler setTransducerCreator  $transducer_creator
-$def_handler setTimeReference      $time_reference
-$def_handler setRandomGenerator    $rand_generator
-$def_handler setAltimetryCreator   $altimetry_creator
+$def_handler setSSPCreator                  $ssp_creator
+$def_handler setSedimentCreator             $sediment_creator
+$def_handler setPressureCreator             $pressure_creator
+$def_handler setTimeArrCreator              $time_arr_creator
+$def_handler setTransducerCreator           $transducer_creator
+$def_handler setTimeReferenceCreator        $time_reference
+$def_handler setRandomGeneratorCreator      $rand_generator
+$def_handler setAltimetryCreator            $altimetry_creator
+$def_handler setLocationCreator             $location_creator
 
 #WOSS RESULTS DB ASCII FILE
 WOSS/Creator/Database/Textual/Results/TimeArr set debug           0
@@ -308,8 +311,8 @@ $woss_creator setWorkDirPath        "./bellhop_out_hamburg_port/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
-$woss_creator setBathymetryType     0 0 "C" 
-$woss_creator setBathymetryMethod   0 0 "D" ;#CORRECT TYPE IS D
+$woss_creator setBathymetryType     0 0 "LL" 
+$woss_creator setBathymetryMethod   0 0 "D"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 1 2010 0 0 1 2 1 2010 0 0 1
 
@@ -321,9 +324,10 @@ $woss_creator setSimulationTimes    0 0 1 1 2010 0 0 1 2 1 2010 0 0 1
 
 WOSS/Manager/Simple/MultiThread set debug                     0
 WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
-WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 WOSS/Manager/Simple/MultiThread set space_sampling            20.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
+$woss_manager setConcurrentThreads 0
+#$woss_manager setThreadPoolUsage 1
 
 WOSS/Utilities set debug 0
 set woss_utilities [new "WOSS/Utilities"]
@@ -763,7 +767,8 @@ $ns at $opt(starttime) "$mac_auv run"
 proc finish { } {
     global ns opt cbr outfile
     global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
-	global cbr_auv mac_auv phy_data_auv udp_sink ipif_sink
+  	global cbr_auv mac_auv phy_data_auv udp_sink ipif_sink woss_manager
+
     if {$opt(verbose)} {
     	puts "CBR_PERIOD : $opt(cbr_period)"
     	puts "SEED: $opt(rep_num)"
@@ -941,6 +946,12 @@ proc finish { } {
 
     $ns flush-trace
     close $opt(tracefile)
+
+    puts "Delete Woss objects to force write"
+
+    $db_manager closeAllConnections
+    delete $db_manager
+    delete $woss_manager
 }
 
 
