@@ -210,17 +210,20 @@ set altimetry_creator   [new "WOSS/Definitions/Altimetry/Flat"]
 #set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
 set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
 #set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
+set location_creator    [new "WOSS/Position"]
+
 $rand_generator initialize
 
 set def_handler [new "WOSS/Definitions/Handler"]
-$def_handler setSSPCreator         $ssp_creator
-$def_handler setSedimentCreator    $sediment_creator
-$def_handler setPressureCreator    $pressure_creator
-$def_handler setTimeArrCreator     $time_arr_creator
-$def_handler setTransducerCreator  $transducer_creator
-$def_handler setTimeReference      $time_reference
-$def_handler setRandomGenerator    $rand_generator
-$def_handler setAltimetryCreator   $altimetry_creator
+$def_handler setSSPCreator                  $ssp_creator
+$def_handler setSedimentCreator             $sediment_creator
+$def_handler setPressureCreator             $pressure_creator
+$def_handler setTimeArrCreator              $time_arr_creator
+$def_handler setTransducerCreator           $transducer_creator
+$def_handler setTimeReferenceCreator        $time_reference
+$def_handler setRandomGeneratorCreator      $rand_generator
+$def_handler setAltimetryCreator            $altimetry_creator
+$def_handler setLocationCreator             $location_creator
 
 WOSS/Creator/Database/Textual/Results/TimeArr set debug           0
 WOSS/Creator/Database/Textual/Results/TimeArr set woss_db_debug   0
@@ -276,8 +279,6 @@ WOSS/Definitions/Altimetry/Flat set total_range_steps        -1
 WOSS/Definitions/Altimetry/Flat set depth                    0.0
 set cust_altimetry   [new "WOSS/Definitions/Altimetry/Flat"]
 
-
-
 $cust_altimetry setDebug 0
 
 
@@ -321,7 +322,7 @@ $woss_creator setWorkDirPath        "./bellhop_out_hamburg_port/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
-$woss_creator setBathymetryType     0 0 "C" 
+$woss_creator setBathymetryType     0 0 "LL" 
 $woss_creator setBathymetryMethod   0 0 "D"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 1 2010 0 0 1 2 1 2010 0 0 1
@@ -332,7 +333,7 @@ WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
 WOSS/Manager/Simple/MultiThread set space_sampling            0.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
 $woss_manager setConcurrentThreads 0
-
+#$woss_manager setThreadPoolUsage   1
 
 WOSS/Utilities set debug 0
 set woss_utilities [new "WOSS/Utilities"]
@@ -703,8 +704,10 @@ proc finish {} {
     close $opt(tracefile)
 
     puts "Delete Woss objects to force write"
-    delete $woss_manager
+
+    $db_manager closeAllConnections
     delete $db_manager
+    delete $woss_manager
 }
 
 ###################
