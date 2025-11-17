@@ -314,7 +314,7 @@ EXTRA_DIST = $(TCL_FILES)
 
 DESERT compilation and linking is based on autotools. 
 Specifically, to add a new library, you need to modify the top-level `DES_CORE/Makefile.am` and `DES_CORE/configure.ac` files as follows:
-- `Makefile.am`: add your folder to the list of subdirectories (SUBDIRS), using \ as a separator. The order of the list also determines the compilation order; if your module depends on another module (i.e., it inclludes headers from another modulle), it should be listed after that. 
+- `Makefile.am`: add your folder to the list of subdirectories (SUBDIRS), using \ as a separator. The order of the list also determines the compilation order; if your module depends on another module (i.e., it includes headers from another module), it should be listed after that. 
 - `configure.ac`: add your new folder to the CPPFLAGS, and tell autoconf (AC_CONFIG_FILES) where the new internal Makefile is.
 
 In our example:
