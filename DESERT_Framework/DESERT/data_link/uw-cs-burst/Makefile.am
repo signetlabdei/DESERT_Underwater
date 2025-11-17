@@ -25,13 +25,28 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# Author: Filippo Campagnaro
-# Version: 1.0.0
+
+AM_CXXFLAGS = -Wall -ggdb3
+
+lib_LTLIBRARIES = libuwcsburst.la
+
+libuwcsburst_la_SOURCES = initlib.cpp uw-cs-burst.cpp
 
 
+libuwcsburst_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
+libuwcsburst_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
+libuwcsburst_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
-Module/UW/CSTRIAL set queue_size    		10
-Module/UW/CSTRIAL set max_packet_per_burst	10
-Module/UW/CSTRIAL set rv_sens_time	1.0
-Module/UW/CSTRIAL set fix_sens_time	1.0
+
+nodist_libuwcsburst_la_SOURCES = embeddedtcl.cc
+BUILT_SOURCES = embeddedtcl.cc
+CLEANFILES = embeddedtcl.cc
+
+TCL_FILES =  uw-cs-burst-init.tcl
+
+embeddedtcl.cc: Makefile $(TCL_FILES)
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ csburstTclCode > embeddedtcl.cc
+
+EXTRA_DIST = $(TCL_FILES)
+
+

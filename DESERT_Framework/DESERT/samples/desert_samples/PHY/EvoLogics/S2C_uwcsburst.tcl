@@ -104,7 +104,7 @@ load libuwconnector.so
 load libuwmodem.so
 load libuwevologicss2c.so
 load libuwmmac_clmsgs.so
-load libuwcstrial.so
+load libuwcsburst.so
 
 #############################
 # NS-Miracle initialization #
@@ -128,7 +128,7 @@ set adrMAC $opt(node)
 set time_stop [expr "$opt(stop)+30"]
 
 #Trace file name
-set tf_name "S2C_Evologics_Uwcstrial.tr"
+set tf_name "S2C_Evologics_Uwcsburst.tr"
 
 #Open a file for writing the trace data
 set tf [open $tf_name w]
@@ -151,9 +151,9 @@ Module/UW/CBR set period_              $opt(traffic)
 Module/UW/CBR set PoissonTraffic_      0
 Module/UW/CBR set debug_               0
 
-Module/UW/CSTRIAL  set debug_          0
-Module/UW/CSTRIAL  set fix_sens_time   1.0
-Module/UW/CSTRIAL  set rv_sens_time    6.0
+Module/UW/CSBURST  set debug_          0
+Module/UW/CSBURST  set fix_sens_time   1.0
+Module/UW/CSBURST  set rv_sens_time    6.0
 
 
 # variables for the AL module
@@ -243,7 +243,7 @@ proc createNode { } {
     set mll_  [new Module/UW/MLL]
     
     # DATA LINK LAYER - MAC LAYER
-    set mac_  [new Module/UW/CSTRIAL]
+    set mac_  [new Module/UW/CSBURST]
     set uwal_ [new Module/UW/AL]
 
     $mac_ setMacAddr $opt(node)
@@ -258,7 +258,7 @@ proc createNode { } {
     $node_ addModule 6 $routing_ 1 "IPR"
     $node_ addModule 5 $ipif_ 1 "IPIF"
     $node_ addModule 4 $mll_ 1 "ARP"  
-    $node_ addModule 3 $mac_ 1 "CSTRIAL"
+    $node_ addModule 3 $mac_ 1 "CSBURST"
     $node_ addModule 2 $uwal_ 1 "UWAL"
     $node_ addModule 1 $modem_ 1 "S2C" 
 

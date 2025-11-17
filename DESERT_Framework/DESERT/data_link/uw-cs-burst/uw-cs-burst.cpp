@@ -28,36 +28,36 @@
 //
 
 /**
- * @file   UwCsSeaTrial.cpp
+ * @file   UwCsBurst.cpp
  * @author Filippo Campagnaro
  * @version 1.0.0
  *
- * @brief Provides the implementation of the class <i>UwCsSeaTrial</i>.
+ * @brief Provides the implementation of the class <i>UwCsBurst</i>.
  *
  */
 
-#include "uw-cs-sea-trial.h"
+#include "uw-cs-burst.h"
 #include <mac.h>
 #include <string>
 
 void
 UwSensingTimer::expire(Event *e)
 {
-	((UwCsSeaTrial *) module_)->sensingExpired();
+	((UwCsBurst *) module_)->sensingExpired();
 }
 
 /**
  * Class that represent the binding of the protocol with tcl
  */
-static class CSTrialModuleClass : public TclClass
+static class CSBurstModuleClass : public TclClass
 {
 
 public:
 	/**
-	 * Constructor of the TDMAGenericModule class
+	 * Constructor of the CSBurstModule class
 	 */
-	CSTrialModuleClass()
-		: TclClass("Module/UW/CSTRIAL")
+	CSBurstModuleClass()
+		: TclClass("Module/UW/CSBURST")
 	{
 	}
 	/**
@@ -67,12 +67,12 @@ public:
 	TclObject *
 	create(int, const char *const *)
 	{
-		return (new UwCsSeaTrial());
+		return (new UwCsBurst());
 	}
 
-} class_UwCsSeaTrial;
+} class_UwCsBurst;
 
-UwCsSeaTrial::UwCsSeaTrial()
+UwCsBurst::UwCsBurst()
 	: MMac()
 	, tx_status_(UWCS_STATUS::IDLE)
 	, fix_sens_time_(1)
@@ -91,26 +91,26 @@ UwCsSeaTrial::UwCsSeaTrial()
 
 	if (max_packet_per_burst_ < 0) {
 		printOnLog(Logger::LogLevel::ERROR,
-				"UWCSTRIAL",
+				"UWCSB",
 				"not valid max_packet_per_burst < 0!! set to 1 by default");
 		max_packet_per_burst_ = 1;
 	}
 	if (fix_sens_time_ < 0) {
 		printOnLog(Logger::LogLevel::ERROR,
-				"UWCSTRIAL",
+				"UWCSB",
 				"not valid fix_sens_time < 0!! set to 1 by default");
 		fix_sens_time_ = 1;
 	}
 	if (rv_sens_time_ < 0) {
 		printOnLog(Logger::LogLevel::ERROR,
-				"UWCSTRIAL",
+				"UWCSB",
 				"not valid rv_sens_time < 0!! set to 1 by default");
 		rv_sens_time_ = 1;
 	}
 }
 
 void
-UwCsSeaTrial::recvFromUpperLayers(Packet *p)
+UwCsBurst::recvFromUpperLayers(Packet *p)
 {
 	incrUpperDataRx();
 	if (buffer_.size() < max_queue_size_) {
@@ -118,25 +118,25 @@ UwCsSeaTrial::recvFromUpperLayers(Packet *p)
 		buffer_.push_back(p);
 	} else {
 		printOnLog(Logger::LogLevel::ERROR,
-				"UWCSTRIAL",
+				"UWCSB",
 				"recvFromUpperLayers()::dropping pkt due to buffer full");
 
 		Packet::free(p);
 	}
 
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"recvFromUpperLayers()::start sensing");
 
 	sensing();
 }
 
 void
-UwCsSeaTrial::sensing()
+UwCsBurst::sensing()
 {
 	if (tx_status_ != UWCS_STATUS::IDLE) { // already sensing or transmitting
 		printOnLog(Logger::LogLevel::DEBUG,
-				"UWCSTRIAL",
+				"UWCSB",
 				"sensing()::already sensing or transmitting");
 
 		return;
@@ -150,13 +150,13 @@ UwCsSeaTrial::sensing()
 	sensing_timer_.sched(sensing_time);
 
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"sensing()::sensing time = " + to_string(sensing_time) +
 					". Change status to SENSING.");
 }
 
 void
-UwCsSeaTrial::sensingExpired()
+UwCsBurst::sensingExpired()
 {
 
 	packet_sent_curr_burst_ = 0;
@@ -168,14 +168,14 @@ UwCsSeaTrial::sensingExpired()
 		sensing_timer_.resched(sensing_time);
 
 		printOnLog(Logger::LogLevel::DEBUG,
-				"UWCSTRIAL",
+				"UWCSB",
 				"sensingExpired()::received packet in the meanwhile, new "
 				"sensing time = " + to_string(sensing_time));
 		return;
 	}
 
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"sensingExpired()::change status to TRANSMITTING");
 
 	tx_status_ = UWCS_STATUS::TRANSMITTING;
@@ -183,13 +183,13 @@ UwCsSeaTrial::sensingExpired()
 }
 
 void
-UwCsSeaTrial::txData()
+UwCsBurst::txData()
 {
 	if (buffer_.size() <= 0) {
 		tx_status_ = UWCS_STATUS::IDLE;
 
 		printOnLog(Logger::LogLevel::DEBUG,
-				"UWCSTRIAL",
+				"UWCSB",
 				"txData()::no data to transmit. Change status to IDLE");
 
 		return;
@@ -204,7 +204,7 @@ UwCsSeaTrial::txData()
 		incrDataPktsTx();
 	} else {
 		printOnLog(Logger::LogLevel::DEBUG,
-				"UWCSTRIAL",
+				"UWCSB",
 				"txData()::already sent max packet = " +
 						to_string(max_packet_per_burst_) +
 						". Change status to IDLE.");
@@ -215,20 +215,20 @@ UwCsSeaTrial::txData()
 }
 
 void
-UwCsSeaTrial::Mac2PhyStartTx(Packet *p)
+UwCsBurst::Mac2PhyStartTx(Packet *p)
 {
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"Mac2PhyStartTx()::Start transmitting");
 
 	MMac::Mac2PhyStartTx(p);
 }
 
 void
-UwCsSeaTrial::Phy2MacEndTx(const Packet *p)
+UwCsBurst::Phy2MacEndTx(const Packet *p)
 {
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"Mac2PhyEndTx()::End transmitting");
 
 	packet_sent_curr_burst_++;
@@ -237,17 +237,17 @@ UwCsSeaTrial::Phy2MacEndTx(const Packet *p)
 }
 
 void
-UwCsSeaTrial::Phy2MacStartRx(const Packet *p)
+UwCsBurst::Phy2MacStartRx(const Packet *p)
 {
 	printOnLog(Logger::LogLevel::DEBUG,
-			"UWCSTRIAL",
+			"UWCSB",
 			"Mac2PhyStartRx()::Start receiving");
 
 	n_rx_while_sensing_++;
 }
 
 void
-UwCsSeaTrial::Phy2MacEndRx(Packet *p)
+UwCsBurst::Phy2MacEndRx(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_mac *mach = HDR_MAC(p);
@@ -256,7 +256,7 @@ UwCsSeaTrial::Phy2MacEndRx(Packet *p)
 
 	if (ch->error()) {
 		printOnLog(Logger::LogLevel::DEBUG,
-				"UWCSTRIAL",
+				"UWCSB",
 				"Phy2MacEndRx()::dropping corrupted packet from node " +
 						to_string(src_mac));
 
@@ -268,7 +268,7 @@ UwCsSeaTrial::Phy2MacEndRx(Packet *p)
 			rxPacketNotForMe(p);
 
 			printOnLog(Logger::LogLevel::DEBUG,
-					"UWCSTRIAL",
+					"UWCSB",
 					"Phy2MacEndRx()::dropping packet, it was for node " +
 							to_string(dest_mac));
 		} else {
@@ -276,7 +276,7 @@ UwCsSeaTrial::Phy2MacEndRx(Packet *p)
 			incrDataPktsRx();
 
 			printOnLog(Logger::LogLevel::DEBUG,
-					"UWCSTRIAL",
+					"UWCSB",
 					"Phy2MacEndRx()::Received packet from node " +
 							to_string(src_mac));
 		}
@@ -284,21 +284,21 @@ UwCsSeaTrial::Phy2MacEndRx(Packet *p)
 }
 
 void
-UwCsSeaTrial::initPkt(Packet *p)
+UwCsBurst::initPkt(Packet *p)
 {
 	hdr_mac *mach = HDR_MAC(p);
 	mach->macSA() = addr;
 }
 
 void
-UwCsSeaTrial::rxPacketNotForMe(Packet *p)
+UwCsBurst::rxPacketNotForMe(Packet *p)
 {
 	if (p != NULL)
 		Packet::free(p);
 }
 
 int
-UwCsSeaTrial::command(int argc, const char *const *argv)
+UwCsBurst::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
 
@@ -325,7 +325,7 @@ UwCsSeaTrial::command(int argc, const char *const *argv)
 			addr = atoi(argv[2]);
 
 			printOnLog(Logger::LogLevel::INFO,
-					"UWCSTRIAL",
+					"UWCSB",
 					"command()::MAC address of current node is " +
 							to_string(addr));
 

@@ -26,7 +26,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test UW-CSTRIAL protocol
+# This script is used to test UW-CSBURST protocol
 # with a CBR (Constant Bit Rate) Application Module
 # Here the complete stack used for each node in the simulation
 #
@@ -50,7 +50,7 @@
 #   +-------------------------+
 #   |  3. UW/MLL              |
 #   +-------------------------+
-#   |  2. UW/CSTRIAL          |
+#   |  2. UW/CSBURST          |
 #   +-------------------------+
 #   |  1. UW/PHYSICAL         |
 #   +-------------------------+
@@ -80,7 +80,7 @@ load libuwphy_clmsgs.so
 load libuwmll.so
 load libuwudp.so
 load libuwcbr.so
-load libuwcstrial.so
+load libuwcsburst.so
 load libuwinterference.so
 load libUwmStd.so
 load libuwphy_clmsgs.so
@@ -118,7 +118,7 @@ if {$opt(bash_parameters)} {
 		puts "- the first for the seed"
 		puts "- the second one is for the Poisson CBR period"
 		puts "- the third one is the cbr packet size (byte);"
-		puts "example: ns test_cstrial.tcl 1 60 125"
+		puts "example: ns test_csburst.tcl 1 60 125"
 		puts "If you want to leave the default values, please set to 0"
 		puts "the value opt(bash_parameters) in the tcl script"
 		puts "Please try again."
@@ -135,9 +135,9 @@ for {set k 0} {$k < $opt(rngstream)} {incr k} {
 	$defaultRNG next-substream
 }
 if {$opt(trace_files)} {
-	set opt(tracefilename) "./test_uwcstrial.tr"
+	set opt(tracefilename) "./test_uwcsburst.tr"
 	set opt(tracefile) [open $opt(tracefilename) w]
-	set opt(cltracefilename) "./test_uwcstrial.cltr"
+	set opt(cltracefilename) "./test_uwcsburst.cltr"
 	set opt(cltracefile) [open $opt(tracefilename) w]
 } else {
 	set opt(tracefilename) "/dev/null"
@@ -172,9 +172,9 @@ $data_mask setBandwidth         $opt(bw)
 $data_mask setPropagationSpeed  $opt(propagation_speed)
 
 
-Module/UW/CSTRIAL  set debug_                      0
-Module/UW/CSTRIAL  set fix_sens_time               0.5
-Module/UW/CSTRIAL  set rv_sens_time                2.5
+Module/UW/CSBURST  set debug_                      0
+Module/UW/CSBURST  set fix_sens_time               0.5
+Module/UW/CSBURST  set rv_sens_time                2.5
 
 ### PHY ###
 Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
@@ -207,7 +207,7 @@ proc createNode { id } {
     set ipr($id)  [new Module/UW/StaticRouting]
     set ipif($id) [new Module/UW/IP]
     set mll($id)  [new Module/UW/MLL] 
-    set mac($id)  [new Module/UW/CSTRIAL]
+    set mac($id)  [new Module/UW/CSBURST]
     set phy($id)  [new Module/UW/PHYSICAL]  
 	
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {

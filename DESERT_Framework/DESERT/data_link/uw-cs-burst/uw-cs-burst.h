@@ -28,11 +28,11 @@
 //
 
 /**
- * @file   uw-cs-sea-trial.h
+ * @file   uw-cs-burst.h
  * @author Filippo Campagnaro
  * @version 1.0.0
  *
- * @brief Provides the definition of the class <i>UwCsSeaTrial</i>.
+ * @brief Provides the definition of the class <i>UwCsBurst</i>.
  * This is simple CSMA with random deferring to be used when your modem
  * does not have real carrier-sensing abilities.
  * Once a packet is received from the apper layers, it starts a random timer.
@@ -42,17 +42,17 @@
  *
  */
 
-#ifndef UWCSTRIAL_H
-#define UWCSTRIAL_H
+#ifndef UWCSBURST_H
+#define UWCSBURST_H
 
 #include <deque>
 #include <mmac.h>
 
-class UwCsSeaTrial;
+class UwCsBurst;
 
 /**
  * UwSensingTimer class is used to handle the scheduling period of
- * <i>UWCSTRIAL</i> slots.
+ * <i>UWCSBURST</i> slots.
  */
 
 class UwSensingTimer : public TimerHandler
@@ -61,9 +61,9 @@ class UwSensingTimer : public TimerHandler
 public:
 	/**
 	 * Costructor of the class UwSensingTimer
-	 * @param Pointer of a UwCSTRIAL object
+	 * @param Pointer of a UwCSBURST object
 	 */
-	UwSensingTimer(UwCsSeaTrial *m)
+	UwSensingTimer(UwCsBurst *m)
 		: TimerHandler()
 	{
 		assert(m != NULL);
@@ -79,27 +79,27 @@ protected:
 	 */
 	virtual void expire(Event *e);
 
-	UwCsSeaTrial *module_;
+	UwCsBurst *module_;
 };
 
 /**
- * Class that represents a CSTRIAL Node
+ * Class that represents a CSBURST Node
  */
-class UwCsSeaTrial : public MMac
+class UwCsBurst : public MMac
 {
 
 	friend class UwSensingTimer;
 
 public:
 	/**
-	 * Constructor of the CSTRIAL class
+	 * Constructor of the CSBURST class
 	 */
-	UwCsSeaTrial();
+	UwCsBurst();
 
 	/**
-	 * Destructor of the CSTRIAL class
+	 * Destructor of the CSBURST class
 	 */
-	virtual ~UwCsSeaTrial() = default;
+	virtual ~UwCsBurst() = default;
 
 protected:
 	/**
@@ -178,7 +178,7 @@ protected:
 	virtual int command(int argc, const char *const *argv) override;
 
 	/**
-	 * Enumeration class of CSTRIAL status.
+	 * Enumeration class of CSBURST status.
 	 */
 	enum class UWCS_STATUS { IDLE, SENSING, TRANSMITTING };
 

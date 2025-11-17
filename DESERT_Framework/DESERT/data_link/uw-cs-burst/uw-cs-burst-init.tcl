@@ -25,28 +25,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-AM_CXXFLAGS = -Wall -ggdb3
-
-lib_LTLIBRARIES = libuwcstrial.la
-
-libuwcstrial_la_SOURCES = initlib.cpp uw-cs-sea-trial.cpp
+#
+# Author: Filippo Campagnaro
+# Version: 1.0.0
 
 
-libuwcstrial_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
-libuwcstrial_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwcstrial_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
 
-
-nodist_libuwcstrial_la_SOURCES = embeddedtcl.cc
-BUILT_SOURCES = embeddedtcl.cc
-CLEANFILES = embeddedtcl.cc
-
-TCL_FILES =  uw-cs-sea-trial-init.tcl
-
-embeddedtcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ CsTrialTclCode > embeddedtcl.cc
-
-EXTRA_DIST = $(TCL_FILES)
-
-
+Module/UW/CSBURST set queue_size    		10
+Module/UW/CSBURST set max_packet_per_burst	10
+Module/UW/CSBURST set rv_sens_time	1.0
+Module/UW/CSBURST set fix_sens_time	1.0

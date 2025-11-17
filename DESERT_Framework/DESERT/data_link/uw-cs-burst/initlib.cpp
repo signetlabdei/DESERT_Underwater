@@ -27,27 +27,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file   data_link/uw-cs-sea-trial/initlib.cc
+ * @file   data_link/uw-cs-burst/initlib.cc
  * @author Filippo Campagnaro
  * @version 1.0.0
  *
- * \brief Provides the initialization of uw-cs-sea-trial library
+ * \brief Provides the initialization of uw-cs-burst library
  *
  */
 
 #include <tclcl.h>
 
-extern EmbeddedTcl CsTrialTclCode;
+extern EmbeddedTcl csburstTclCode;
 
 extern "C" int
-Uwcstrial_Init()
+Uwcsburst_Init()
 {
-	CsTrialTclCode.load();
+	csburstTclCode.load();
 	return 0;
 }
 
 extern "C" int
-Cygcstrial_Init()
+Cygcsburst_Init()
 {
-	return Uwcstrial_Init();
+	return Uwcsburst_Init();
 }
