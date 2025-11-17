@@ -442,7 +442,7 @@ void
 UwCoolPhy::startRx(Packet *p)
 {
 	...
-	printOnLog(Logger:LogLevel:DEBUG, "UWCOOLPHY", "startRX(Packet *)::Received new packet");
+	printOnLog(Logger::LogLevel::DEBUG, "UWCOOLPHY", "startRX(Packet *)::Received new packet");
 	...
 }
 ```
