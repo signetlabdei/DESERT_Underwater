@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 # of the Hamburg port, sediments, as well as for the characteristics of               #"
 # electro-acoustic transducers.                                                       #"
 # You can download the databases at the following link:                               #"
-#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
 # After the download, please set opt(db_path) to the correct path.                    #"
 # (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 # Directory tree should be                                                            #"
@@ -78,8 +78,6 @@ load libmmac.so
 load libMiracleBasicMovement.so
 load libMiracleIp.so
 load libMiracleIpRouting.so
-load libmiracleport.so
-load libmll.so
 
 load libUwmStd.so
 load libWOSS.so
@@ -146,7 +144,7 @@ set opt(tracefile) [open $opt(tracefilename) w]
 set opt(cltracefilename) "/dev/null"
 set opt(cltracefile) [open $opt(cltracefilename) w]
 
-set opt(db_path) "/usr/share/woss/dbs"
+set opt(db_path) "./dbs"
 
 set opt(db_res_path)    "./bellhop_out_hamburg_port"
 
@@ -173,7 +171,7 @@ if { $exists_dbs == 0 } {
     puts "#######################################################################################"
     puts "Database files not found.                                                             #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
+    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #"
     puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
     puts "# Directory tree should be                                                            #"
@@ -210,17 +208,20 @@ set altimetry_creator   [new "WOSS/Definitions/Altimetry/Flat"]
 #set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
 set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
 #set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
+set location_creator    [new "WOSS/Position"]
+
 $rand_generator initialize
 
 set def_handler [new "WOSS/Definitions/Handler"]
-$def_handler setSSPCreator         $ssp_creator
-$def_handler setSedimentCreator    $sediment_creator
-$def_handler setPressureCreator    $pressure_creator
-$def_handler setTimeArrCreator     $time_arr_creator
-$def_handler setTransducerCreator  $transducer_creator
-$def_handler setTimeReference      $time_reference
-$def_handler setRandomGenerator    $rand_generator
-$def_handler setAltimetryCreator   $altimetry_creator
+$def_handler setSSPCreator                  $ssp_creator
+$def_handler setSedimentCreator             $sediment_creator
+$def_handler setPressureCreator             $pressure_creator
+$def_handler setTimeArrCreator              $time_arr_creator
+$def_handler setTransducerCreator           $transducer_creator
+$def_handler setTimeReferenceCreator        $time_reference
+$def_handler setRandomGeneratorCreator      $rand_generator
+$def_handler setAltimetryCreator            $altimetry_creator
+$def_handler setLocationCreator             $location_creator
 
 WOSS/Creator/Database/Textual/Results/TimeArr set debug           0
 WOSS/Creator/Database/Textual/Results/TimeArr set woss_db_debug   0
@@ -276,8 +277,6 @@ WOSS/Definitions/Altimetry/Flat set total_range_steps        -1
 WOSS/Definitions/Altimetry/Flat set depth                    0.0
 set cust_altimetry   [new "WOSS/Definitions/Altimetry/Flat"]
 
-
-
 $cust_altimetry setDebug 0
 
 
@@ -287,7 +286,7 @@ $time_evo_ssp_1 setTime 1 1 2011 9 0 1
 
 WOSS/Database/Manager set debug 0
 set db_manager [new "WOSS/Database/Manager"]
-$db_manager setCustomSSP        $time_evo_ssp_1 "./ssp-hamb-port.txt"
+$db_manager setCustomSSP        $time_evo_ssp_1 "./dbs/ssp-hamb-port.txt"
 $db_manager setCustomAltimetry  $cust_altimetry
 
 WOSS/Creator/Bellhop set debug                        0.0
@@ -321,7 +320,7 @@ $woss_creator setWorkDirPath        "./bellhop_out_hamburg_port/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
-$woss_creator setBathymetryType     0 0 "C" 
+$woss_creator setBathymetryType     0 0 "LL" 
 $woss_creator setBathymetryMethod   0 0 "D"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 1 2010 0 0 1 2 1 2010 0 0 1
@@ -332,7 +331,7 @@ WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
 WOSS/Manager/Simple/MultiThread set space_sampling            0.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
 $woss_manager setConcurrentThreads 0
-
+#$woss_manager setThreadPoolUsage   1
 
 WOSS/Utilities set debug 0
 set woss_utilities [new "WOSS/Utilities"]
@@ -703,8 +702,10 @@ proc finish {} {
     close $opt(tracefile)
 
     puts "Delete Woss objects to force write"
-    delete $woss_manager
+
+    $db_manager closeAllConnections
     delete $db_manager
+    delete $woss_manager
 }
 
 ###################

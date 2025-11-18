@@ -313,10 +313,10 @@ $data_mask_op setBandwidth  $opt(op_bw)
 # Procedure(s) to create node_leaders #
 ################################
 
-source "divers_mobile.tcl"
-source "rov_sink_mobile.tcl"
-source "leader_mobile.tcl"
-source "conf-multi-traffic-mobility.tcl"
+source "./uw_multi_traffic_waypoints/divers_mobile.tcl"
+source "./uw_multi_traffic_waypoints/rov_sink_mobile.tcl"
+source "./uw_multi_traffic_waypoints/leader_mobile.tcl"
+source "./uw_multi_traffic_waypoints/conf-multi-traffic-mobility.tcl"
 
 for {set id1 0} {$id1 < $opt(n_diver)} {incr id1}  {
   createDiver $id1

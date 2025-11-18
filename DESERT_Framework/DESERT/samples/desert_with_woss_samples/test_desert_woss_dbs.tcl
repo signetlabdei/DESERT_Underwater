@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,12 +39,12 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,     #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.      #"
 # You can download the sediment and SSP databases at the following link:              #"
-#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.0.tar.gz                     #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
 # After the download, please set opt(db_path) to the correct path.                    #"
 # (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 # Please note that we cannot redistribute the GEBCO bathymetry database.              #"
 # You can download the database by registering on the GEBCO web site at:              #"
-#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2023/zip/                 #"
+#     https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2025/ice_surface_elevation/netcdf/gebco_2025.zip?download=1                 #"
 # After the download you can place the GEBCO file in the bathymetry folder of         #"
 # WOSS databases.                                                                     #"
 # Directory tree should be                                                            #"
@@ -135,7 +135,7 @@ set opt(nn_in_row)      2       ;# Number of a nodes in m
 set opt(ack_mode)       "setNoAckMode"
 set opt(rngstream)      1
 set opt(cbr_period)     100
-set opt(db_path)        "./dbs/"
+set opt(db_path)        "./dbs"
 
 
 if {$opt(bash_parameters)} {
@@ -204,20 +204,20 @@ set opt(db_res_path) "./test_desert_woss_dbs"
 
 
 
-set exists_ssp [file exists "$opt(db_path)/ssp/WOA2018/WOA2018_SSP_April.nc"]
-set exists_gebco [file exists "$opt(db_path)/bathymetry/GEBCO_2023.nc"]
+set exists_ssp [file exists "$opt(db_path)/ssp/WOA2023/WOA2023_SSP_April.nc"]
+set exists_gebco [file exists "$opt(db_path)/bathymetry/GEBCO_2025.nc"]
 
 if { $exists_ssp == 0 || $exists_gebco == 0 } {
     puts "#######################################################################################"
     puts "# Database files not found.                                                           #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.0.tar.gz                     #"
+    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #"
     puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
     puts "# (i.e. /usr/share/dbs/ if you extracted WOSS databases in /usr/share/)               #"
     puts "# Please note that we cannot redistribute the GEBCO bathymetry database.              #"
     puts "# You can download GEBCO database at:                                                 #"
-    puts "#     https://www.bodc.ac.uk/data/open_download/gebco/gebco_2023/zip/                 #"
+    puts "#     https://dap.ceda.ac.uk/bodc/gebco/global/gebco_2025/ice_surface_elevation/netcdf/gebco_2025.zip                 #"
     puts "# After the download you can place the GEBCO file in the bathymetry folder of         #"
     puts "# WOSS databases .                                                                    #"
     puts "# Directory tree should be                                                            #"
@@ -251,17 +251,20 @@ set time_reference      [new "WOSS/Definitions/TimeReference/NS2"]
 set transducer_creator  [new "WOSS/Definitions/Transducer"]
 set altimetry_creator   [new "WOSS/Definitions/Altimetry/Bretschneider"]
 set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
+set location_creator    [new "WOSS/Position"]
+
 $rand_generator initialize
 
 set def_handler [new "WOSS/Definitions/Handler"]
-$def_handler setSSPCreator         $ssp_creator
-$def_handler setSedimentCreator    $sediment_creator
-$def_handler setPressureCreator    $pressure_creator
-$def_handler setTimeArrCreator     $time_arr_creator
-$def_handler setTransducerCreator  $transducer_creator
-$def_handler setTimeReference      $time_reference
-$def_handler setRandomGenerator    $rand_generator
-$def_handler setAltimetryCreator   $altimetry_creator
+$def_handler setSSPCreator                  $ssp_creator
+$def_handler setSedimentCreator             $sediment_creator
+$def_handler setPressureCreator             $pressure_creator
+$def_handler setTimeArrCreator              $time_arr_creator
+$def_handler setTransducerCreator           $transducer_creator
+$def_handler setTimeReferenceCreator        $time_reference
+$def_handler setRandomGeneratorCreator      $rand_generator
+$def_handler setAltimetryCreator            $altimetry_creator
+$def_handler setLocationCreator             $location_creator
 
 WOSS/Creator/Database/Binary/Results/TimeArr set debug           0
 WOSS/Creator/Database/Binary/Results/TimeArr set woss_db_debug   0
@@ -286,14 +289,14 @@ WOSS/Creator/Database/NetCDF/SSP/WOA2013/MonthlyAverage set debug          0
 WOSS/Creator/Database/NetCDF/SSP/WOA2013/MonthlyAverage set woss_db_debug  0
 
 set db_ssp [new "WOSS/Creator/Database/NetCDF/SSP/WOA2013/MonthlyAverage"]
-$db_ssp setDbPathName "${opt(db_path)}/ssp/WOA2018/WOA2018_SSP_June.nc"
+$db_ssp setDbPathName "${opt(db_path)}/ssp/WOA2023/WOA2023_SSP_April.nc"
 
 
 WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO set debug           0
 WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO set woss_db_debug   0
 
 set db_bathy [new "WOSS/Creator/Database/NetCDF/Bathymetry/GEBCO"]
-$db_bathy setDbPathName "${opt(db_path)}/bathymetry/GEBCO_2023.nc"
+$db_bathy setDbPathName "${opt(db_path)}/bathymetry/GEBCO_2025.nc"
 $db_bathy use2DFifteenSecondsPrecision
 
 
@@ -336,7 +339,7 @@ $woss_creator setWorkDirPath        "./test_desert_woss_dbs/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
-$woss_creator setBathymetryType     0 0 "L"
+$woss_creator setBathymetryType     0 0 "LL"
 $woss_creator setBathymetryMethod   0 0 "S"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 1 2013 0 0 1 2 1 2013 0 0 1
@@ -346,7 +349,7 @@ WOSS/Manager/Simple/MultiThread set is_time_evolution_active -1.0
 WOSS/Manager/Simple/MultiThread set space_sampling            0.0
 set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
 $woss_manager setConcurrentThreads 0
-
+#$woss_manager setThreadPoolUsage   1
 
 WOSS/Utilities set debug 0
 set woss_utilities [new "WOSS/Utilities"]
@@ -729,8 +732,9 @@ proc finish { } {
     close $opt(tracefile)
 
     puts "Delete WOSS objects to force file operations"
-    delete $woss_manager
+    $db_manager closeAllConnections
     delete $db_manager
+    delete $woss_manager
 }
 
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -186,6 +186,7 @@ set woss_utilities [new WOSS/Utilities]
 ### by uncomment/comment the followings lines
 
 set woss_utilities [new "WOSS/Utilities"]
+
 WOSS/Manager/Simple set debug                       0
 WOSS/Manager/Simple set is_time_evolution_active  -1.0
 WOSS/Manager/Simple set space_sampling              0.0
@@ -194,8 +195,9 @@ set woss_manager [new "WOSS/Manager/Simple"]
 #WOSS/Manager/Simple/MultiThread set debug                     0.0
 #WOSS/Manager/Simple/MultiThread set is_time_evolution_active  -1.0
 #WOSS/Manager/Simple/MultiThread set space_sampling            0.0
-#WOSS/Manager/Simple/MultiThread set concurrent_threads        0
 #set woss_manager [new "WOSS/Manager/Simple/MultiThread"]
+#$woss_manager setConcurrentThreads 0
+#$woss_manager setThreadPoolUsage 1
 
 
 WOSS/Definitions/RandomGenerator/NS2 set rep_number_ $opt(rngstream)
@@ -213,18 +215,21 @@ set time_reference      [new "WOSS/Definitions/TimeReference/NS2"]
 set transducer_creator  [new "WOSS/Definitions/Transducer"]
 set rand_generator      [new "WOSS/Definitions/RandomGenerator/NS2"]
 #set rand_generator      [new "WOSS/Definitions/RandomGenerator/C"]
+set location_creator    [new "WOSS/Position"]
+
 $rand_generator initialize
 
 #### we plug the chosen prototypes into the woss::DefinitionHandler
 set def_handler [new "WOSS/Definitions/Handler"]
-$def_handler setSSPCreator         $ssp_creator
-$def_handler setSedimentCreator    $sediment_creator
-$def_handler setPressureCreator    $pressure_creator
-$def_handler setTimeArrCreator     $time_arr_creator
-$def_handler setTransducerCreator  $transducer_creator
-$def_handler setTimeReference      $time_reference
-$def_handler setRandomGenerator    $rand_generator
-$def_handler setAltimetryCreator   $altimetry_creator
+$def_handler setSSPCreator                  $ssp_creator
+$def_handler setSedimentCreator             $sediment_creator
+$def_handler setPressureCreator             $pressure_creator
+$def_handler setTimeArrCreator              $time_arr_creator
+$def_handler setTransducerCreator           $transducer_creator
+$def_handler setTimeReferenceCreator        $time_reference
+$def_handler setRandomGeneratorCreator      $rand_generator
+$def_handler setAltimetryCreator            $altimetry_creator
+$def_handler setLocationCreator             $location_creator
 #######
 ######
 
@@ -296,7 +301,7 @@ $woss_creator setWorkDirPath        "./test_desert_woss_no_dbs/"
 $woss_creator setBellhopPath        ""
 $woss_creator setBellhopMode        0 0 "A"
 $woss_creator setBeamOptions        0 0 "B"
-$woss_creator setBathymetryType     0 0 "L"
+$woss_creator setBathymetryType     0 0 "LL"
 $woss_creator setBathymetryMethod   0 0 "S"
 $woss_creator setAltimetryType      0 0 "L"
 $woss_creator setSimulationTimes    0 0 1 12 2009 0 0 1 1 12 2009 0 0 1
@@ -680,8 +685,9 @@ proc finish { } {
     close $opt(tracefile)
     
     puts "Delete Woss objects to force write"
-    delete $woss_manager
+    $db_manager closeAllConnections
     delete $db_manager
+    delete $woss_manager
 }
 
 

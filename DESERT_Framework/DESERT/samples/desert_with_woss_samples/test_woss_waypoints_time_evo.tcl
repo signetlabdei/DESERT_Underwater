@@ -24,7 +24,7 @@
 # this tcl sample requires the use of enviromental databases for SSP, bathymetry,   #"
 # sediments, as well as for the characteristics of electro-acoustic transducers.    #"
 # You can download the sediment and SSP databases at the following link:            #"
-#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.0.tar.gz                   #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                   #"
 # After the download, please set opt(db_path) to the correct path.                  #" 
 #	Please note that we cannot redistribute the GEBCO bathymetry database. You can    #"
 # download the database by registering on the GEBCO web site at:                    #"
@@ -112,7 +112,7 @@ set opt(per_tgt)            0.01
 set opt(rx_snr_penalty_db)  -10.0
 set opt(tx_margin_db)       10.0
 
-set opt(db_path)     "/usr/share/woss/dbs/"
+set opt(db_path)     "./dbs"
 
 if {$opt(bash_parameters)} {
   if {$argc != 3} {
