@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 # of the Hamburg port, sediments, as well as for the characteristics of               #"
 # electro-acoustic transducers.                                                       #"
 # You can download the databases at the following link:                               #"
-#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
+#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
 # After the download, please set opt(db_path) to the correct path.                    #"
 # (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
 # Directory tree should be                                                            #"
@@ -78,8 +78,6 @@ load libmmac.so
 load libMiracleBasicMovement.so
 load libMiracleIp.so
 load libMiracleIpRouting.so
-load libmiracleport.so
-load libmll.so
 
 load libUwmStd.so
 load libWOSS.so
@@ -146,7 +144,7 @@ set opt(tracefile) [open $opt(tracefilename) w]
 set opt(cltracefilename) "/dev/null"
 set opt(cltracefile) [open $opt(cltracefilename) w]
 
-set opt(db_path) "/usr/share/woss/dbs"
+set opt(db_path) "./dbs"
 
 set opt(db_res_path)    "./bellhop_out_hamburg_port"
 
@@ -173,7 +171,7 @@ if { $exists_dbs == 0 } {
     puts "#######################################################################################"
     puts "Database files not found.                                                             #"
     puts "# You can download the sediment and SSP databases at the following link:              #"
-    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.6.0.tar.gz                     #"
+    puts "#     https://woss.dei.unipd.it/woss/files/WOSS-dbs-v1.7.1.tar.gz                     #"
     puts "# After the download, please set opt(db_path) to the correct path.                    #"
     puts "# (i.e. /usr/share/woss/dbs/ if you extracted WOSS databases in /usr/share/woss)      #"
     puts "# Directory tree should be                                                            #"
@@ -288,7 +286,7 @@ $time_evo_ssp_1 setTime 1 1 2011 9 0 1
 
 WOSS/Database/Manager set debug 0
 set db_manager [new "WOSS/Database/Manager"]
-$db_manager setCustomSSP        $time_evo_ssp_1 "./ssp-hamb-port.txt"
+$db_manager setCustomSSP        $time_evo_ssp_1 "./dbs/ssp-hamb-port.txt"
 $db_manager setCustomAltimetry  $cust_altimetry
 
 WOSS/Creator/Bellhop set debug                        0.0

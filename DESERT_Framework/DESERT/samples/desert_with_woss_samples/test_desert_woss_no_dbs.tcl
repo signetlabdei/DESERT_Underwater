@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
