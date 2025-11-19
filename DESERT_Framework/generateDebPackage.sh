@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo " This is an experimental feature --- DO NOT USE!!!"
+exit 0
+
+
 SCRIPT_DIR=$(pwd)
 BUILD_DIR=/tmp/desert
 
