@@ -26,7 +26,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Author: Federico Favaro, Filippo Campagnaro
+# Author: Filippo Campagnaro
 # Version: 1.0.0
 #
 ######################
@@ -104,7 +104,7 @@ load libuwconnector.so
 load libuwmodem.so
 load libuwevologicss2c.so
 load libuwmmac_clmsgs.so
-load libuwtdma.so
+load libuwcsburst.so
 
 #############################
 # NS-Miracle initialization #
@@ -125,10 +125,10 @@ set socket_port "${opt(ip)}:${opt(port)}"
 set adrMAC $opt(node)
 
 # time when actually to stop the simulation
-set time_stop [expr "$opt(stop)+15"]
+set time_stop [expr "$opt(stop)+30"]
 
 #Trace file name
-set tf_name "S2C_Evologics_Uwtdma.tr"
+set tf_name "S2C_Evologics_Uwcsburst.tr"
 
 #Open a file for writing the trace data
 set tf [open $tf_name w]
@@ -151,15 +151,10 @@ Module/UW/CBR set period_              $opt(traffic)
 Module/UW/CBR set PoissonTraffic_      0
 Module/UW/CBR set debug_               0
 
-Module/UW/TDMA set frame_duration   12
-Module/UW/TDMA set debug_           10
-Module/UW/TDMA set sea_trial_       1
-Module/UW/TDMA set fair_mode        1 
-Module/UW/TDMA set guard_time       0.3
-Module/UW/TDMA set tot_slots        4
+Module/UW/CSBURST  set debug_          0
+Module/UW/CSBURST  set fix_sens_time   1.0
+Module/UW/CSBURST  set rv_sens_time    6.0
 
-
-# # variables for the ALOHA-CSMA module
 
 # variables for the AL module
 Module/UW/AL set Dbit 0
@@ -245,13 +240,13 @@ proc createNode { } {
     set ipif_ [new Module/UW/IP]
 	
     # DATA LINK LAYER - MEDIA LINK LAYER
-    set mll_ [new Module/UW/MLL]
+    set mll_  [new Module/UW/MLL]
     
     # DATA LINK LAYER - MAC LAYER
-    set mac_ [new Module/UW/TDMA]
-    $mac_ setMacAddr     $opt(node)
-    $mac_ setSlotNumber [expr $opt(node) -1]
-    set uwal_             [new Module/UW/AL]
+    set mac_  [new Module/UW/CSBURST]
+    set uwal_ [new Module/UW/AL]
+
+    $mac_ setMacAddr $opt(node)
 
     # PHY LAYER
     set modem_ [new Module/UW/UwModem/EvoLogicsS2C]    
@@ -263,7 +258,7 @@ proc createNode { } {
     $node_ addModule 6 $routing_ 1 "IPR"
     $node_ addModule 5 $ipif_ 1 "IPIF"
     $node_ addModule 4 $mll_ 1 "ARP"  
-    $node_ addModule 3 $mac_ 1 "TDMA"
+    $node_ addModule 3 $mac_ 1 "CSBURST"
     $node_ addModule 2 $uwal_ 1 "UWAL"
     $node_ addModule 1 $modem_ 1 "S2C" 
 
@@ -282,7 +277,6 @@ proc createNode { } {
     # assign a port number to the application considered (CBR or VBR)
     set port_ [$transport_ assignPort $app_]
     $ipif_ addr $opt(node)
-    $mac_ setMacAddr $opt(node)
     $modem_ set ID_ $opt(node)
     $modem_ setModemAddress $socket_port
     $modem_ setLogLevel DBG
@@ -349,10 +343,8 @@ for {set cnt 0} {$cnt < $opt(n_node)} {incr cnt} {
 $ns at 0 "$modem_ start"
       
 $ns at $opt(start) "$app_ start"
-$ns at $opt(start) "$mac_ start"
 
 $ns at $opt(stop) "$app_ stop"
-$ns at $opt(stop) "$mac_ stop"
 
 $ns at $time_stop "$modem_ stop"
 
