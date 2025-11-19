@@ -265,8 +265,10 @@ protected:
 	 *
 	 * @param traffic application traffic id
 	 * @param tag: tag of the upper module
+	 *
+	 * @return 0 if there is a valid layer associated to tag, -1 otherwise.
 	 */
-	virtual void addUpLayerFromTag(int traffic_id, std::string tag);
+	virtual int addUpLayerFromTag(int traffic_id, std::string tag);
 
 	/**
 	 * add a lower layer from the tag name in the map
@@ -274,8 +276,10 @@ protected:
 	 * @param traffic application traffic id
 	 * @param tag: tag of the lower module
 	 * @param behavior: behavior of the layer
+	 *
+	 * @return 0 if there is a valid layer associated to tag, -1 otherwise.
 	 */
-	virtual void addLowLayerFromTag(
+	virtual int addLowLayerFromTag(
 			int traffic_id, std::string tag, int behavior);
 
 	/**

@@ -86,15 +86,18 @@ UwMultiTrafficControl::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addUpLayer") == 0) {
-			addUpLayerFromTag(atoi(argv[2]), argv[3]);
+			if (addUpLayerFromTag(atoi(argv[2]), argv[3]) < 0)
+				return TCL_ERROR;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "addLowLayer") == 0) {
-			addLowLayerFromTag(atoi(argv[2]), argv[3], DEFAULT);
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], DEFAULT) < 0)
+				return TCL_ERROR;
 			return TCL_OK;
 		}
 	} else if (argc == 5) {
 		if (strcasecmp(argv[1], "addLowLayer") == 0) {
-			addLowLayerFromTag(atoi(argv[2]), argv[3], atoi(argv[4]));
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], atoi(argv[4])) < 0)
+				return TCL_ERROR;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setBufferFeatures") == 0) {
 			setBufferFeature(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
@@ -111,7 +114,7 @@ UwMultiTrafficControl::command(int argc, const char *const *argv)
 	return Module::command(argc, argv);
 } /* UwMultiTrafficControl::command */
 
-void
+int
 UwMultiTrafficControl::addUpLayerFromTag(int traffic_id, std::string tag)
 {
 	ClMsgDiscovery m;
@@ -133,10 +136,14 @@ UwMultiTrafficControl::addUpLayerFromTag(int traffic_id, std::string tag)
 					  << traffic_id << "," << tag << ")"
 					  << (*up_layer_storage.begin()).first << std::endl;
 		insertTraffic2UpLayer(traffic_id, (*up_layer_storage.begin()).first);
+
+		return 0;
 	}
+
+	return -1;
 }
 
-void
+int
 UwMultiTrafficControl::addLowLayerFromTag(
 		int traffic_id, std::string tag, int behavior)
 {
@@ -149,12 +156,12 @@ UwMultiTrafficControl::addLowLayerFromTag(
 			getTag());
 	sendSyncClMsgDown(&m);
 	DiscoveryStorage low_layer_storage = m.findTag(tag.c_str());
-	DiscoveryData low_layer = (*low_layer_storage.begin()).second;
 	if (debug_)
 		std::cout << NOW << "UwMultiTrafficControl::addLowLayerFromTag("
 				  << traffic_id << "," << tag << ") disc size "
 				  << low_layer_storage.getSize() << endl;
 	if (low_layer_storage.getSize() == 1) {
+		DiscoveryData low_layer = (*low_layer_storage.begin()).second;
 		if (debug_)
 			std::cout << NOW << "UwMultiTrafficControl::addLowLayerFromTag("
 					  << traffic_id << "," << tag
@@ -166,7 +173,11 @@ UwMultiTrafficControl::addLowLayerFromTag(
 				low_layer.getStackId(),
 				low_layer.getId(),
 				behavior);
+
+		return 0;
 	}
+
+	return -1;
 }
 
 void

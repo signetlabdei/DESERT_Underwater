@@ -106,10 +106,12 @@ UwMultiTrafficRangeCtr::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addRobustLowLayer") == 0) {
-			addLowLayerFromTag(atoi(argv[2]), argv[3], ROBUST);
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], ROBUST) < 0)
+				return TCL_ERROR;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "addFastLowLayer") == 0) {
-			addLowLayerFromTag(atoi(argv[2]), argv[3], CHECK_RANGE);
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], CHECK_RANGE) < 0)
+				return TCL_ERROR;
 			return TCL_OK;
 		}
 	}
