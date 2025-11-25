@@ -58,7 +58,7 @@ RUN git clone -b master https://github.com/signetlabdei/DESERT_Underwater.git \
         && cd DESERT_Underwater/DESERT_Framework \
         && ./install.sh --target LOCAL --with-woss --inst_mode development --addons ALL --dest_folder /home/DESERT_Underwater/DESERT_buildCopy_LOCAL   
 
-WORKDIR /home/DESERT_Underwater/DESERT_buildCopy_LOCAL/DESERT-3.4.1-src/samples/desert_samples
+WORKDIR /home/DESERT_Underwater/DESERT_Framework/DESERT/samples/desert_samples
 
 RUN chmod +x /home/DESERT_Underwater/DESERT_buildCopy_LOCAL/environment
 
