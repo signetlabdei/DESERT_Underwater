@@ -472,6 +472,8 @@ UwFloodingSec::command(int argc, const char *const *argv)
 
 				return TCL_OK;
 			}
+
+			return TCL_ERROR;
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addTtlPerTraffic") == 0) {
