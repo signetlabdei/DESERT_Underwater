@@ -45,7 +45,9 @@ libuwposbasedrt_la_SOURCES = initlib.cpp\
 
 libuwposbasedrt_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@
 libuwposbasedrt_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
-libuwposbasedrt_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@
+libuwposbasedrt_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
+							@DESERT_UWSMPOSITION_LIBADD@ \
+							@DESERT_UWIP_LIBADD@
 
 nodist_libuwposbasedrt_la_SOURCES = InitTcl.cc
 
