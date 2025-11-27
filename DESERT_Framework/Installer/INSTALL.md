@@ -23,7 +23,7 @@ Before installing the **DESERT framework**, please check that your host device h
 If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, etc...), you can type the following command in a terminal, in order to install all dependencies above:
 
 ```console
-$ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-dev libxmu-headers libxt-dev libxml2-dev libtool gfortran bison flex
+$ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-headers libxt-dev libxml2-dev libtool gfortran bison flex
 ```
 
 ### Arch Linux
