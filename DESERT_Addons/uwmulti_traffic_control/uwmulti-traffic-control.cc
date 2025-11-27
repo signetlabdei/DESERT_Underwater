@@ -86,19 +86,19 @@ UwMultiTrafficControl::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addUpLayer") == 0) {
-			if (addUpLayerFromTag(atoi(argv[2]), argv[3]) < 0)
-				return TCL_ERROR;
-			return TCL_OK;
+			if (addUpLayerFromTag(atoi(argv[2]), argv[3]))
+				return TCL_OK;
+			return TCL_ERROR;
 		} else if (strcasecmp(argv[1], "addLowLayer") == 0) {
-			if (addLowLayerFromTag(atoi(argv[2]), argv[3], DEFAULT) < 0)
-				return TCL_ERROR;
-			return TCL_OK;
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], DEFAULT))
+				return TCL_OK;
+			return TCL_ERROR;
 		}
 	} else if (argc == 5) {
 		if (strcasecmp(argv[1], "addLowLayer") == 0) {
-			if (addLowLayerFromTag(atoi(argv[2]), argv[3], atoi(argv[4])) < 0)
-				return TCL_ERROR;
-			return TCL_OK;
+			if (addLowLayerFromTag(atoi(argv[2]), argv[3], atoi(argv[4])))
+				return TCL_OK;
+			return TCL_ERROR;
 		} else if (strcasecmp(argv[1], "setBufferFeatures") == 0) {
 			setBufferFeature(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
 			return TCL_OK;
@@ -114,8 +114,8 @@ UwMultiTrafficControl::command(int argc, const char *const *argv)
 	return Module::command(argc, argv);
 } /* UwMultiTrafficControl::command */
 
-int
-UwMultiTrafficControl::addUpLayerFromTag(int traffic_id, std::string tag)
+bool
+UwMultiTrafficControl::addUpLayerFromTag(int traffic_id, const std::string &tag)
 {
 	ClMsgDiscovery m;
 	m.addSenderData((const PlugIn *) this,
@@ -137,15 +137,15 @@ UwMultiTrafficControl::addUpLayerFromTag(int traffic_id, std::string tag)
 					  << (*up_layer_storage.begin()).first << std::endl;
 		insertTraffic2UpLayer(traffic_id, (*up_layer_storage.begin()).first);
 
-		return 0;
+		return true;
 	}
 
-	return -1;
+	return false;
 }
 
-int
+bool
 UwMultiTrafficControl::addLowLayerFromTag(
-		int traffic_id, std::string tag, int behavior)
+		int traffic_id, const std::string &tag, int behavior)
 {
 	ClMsgDiscovery m;
 	m.addSenderData((const PlugIn *) this,
@@ -174,10 +174,10 @@ UwMultiTrafficControl::addLowLayerFromTag(
 				low_layer.getId(),
 				behavior);
 
-		return 0;
+		return true;
 	}
 
-	return -1;
+	return false;
 }
 
 void

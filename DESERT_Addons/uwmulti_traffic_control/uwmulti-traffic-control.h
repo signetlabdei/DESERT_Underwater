@@ -266,9 +266,9 @@ protected:
 	 * @param traffic application traffic id
 	 * @param tag: tag of the upper module
 	 *
-	 * @return 0 if there is a valid layer associated to tag, -1 otherwise.
+	 * @return true if there is a valid layer associated to tag, false otherwise.
 	 */
-	virtual int addUpLayerFromTag(int traffic_id, std::string tag);
+	virtual bool addUpLayerFromTag(int traffic_id, const std::string &tag);
 
 	/**
 	 * add a lower layer from the tag name in the map
@@ -277,10 +277,10 @@ protected:
 	 * @param tag: tag of the lower module
 	 * @param behavior: behavior of the layer
 	 *
-	 * @return 0 if there is a valid layer associated to tag, -1 otherwise.
+	 * @return true if there is a valid layer associated to tag, false otherwise.
 	 */
-	virtual int addLowLayerFromTag(
-			int traffic_id, std::string tag, int behavior);
+	virtual bool addLowLayerFromTag(
+			int traffic_id, const std::string &tag, int behavior);
 
 	/**
 	 * set buffer features for the given traffic type
