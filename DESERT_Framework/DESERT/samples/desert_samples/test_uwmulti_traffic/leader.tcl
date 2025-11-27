@@ -191,15 +191,19 @@ proc createLeader { id } {
     $ctr_leader addRobustLowLayer 1  "MLL_LF"
     $ctr_leader addFastLowLayer 1     "MLL_OP"
     $ctr_leader addUpLayer 1         "IPF1"
+	$ctr_leader setBufferFeatures 1 10 1
 
 #   CONTROL TRAFFIC
     $ctr_leader addRobustLowLayer 2  "MLL_LF"
     $ctr_leader addUpLayer 2         "IPF1"
+	$ctr_leader setBufferFeatures 2 10 1
 
 #   IMAGE TRAFFIC
     $ctr_leader addFastLowLayer 3     "MLL_OP"
     $ctr_leader addUpLayer 3          "IPF1"
+	$ctr_leader setBufferFeatures 3 10 1
 
 #   SOS TRAFFIC: to all (no spec needed for lower)
     $ctr_leader addUpLayer 4          "IPF2"
+	$ctr_leader setBufferFeatures 4 10 1
 }

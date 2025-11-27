@@ -154,15 +154,19 @@ proc createDiver { id } {
     #HEALTH 
     $ctr_diver($id) addRobustLowLayer 1  "MLL_LF"
     $ctr_diver($id) addUpLayer 1         "IPF1"
+	$ctr_diver($id) setBufferFeatures 1 10 1
 
     #SENDING CONTROL IS NOT PERMITTED, cbr will not start
     $ctr_diver($id) addRobustLowLayer 2  "MLL_LF"
     $ctr_diver($id) addUpLayer 2         "IPF1"
+	$ctr_diver($id) setBufferFeatures 2 10 1
 
     #IMAGES WITH FAST ACOUSTIC
     $ctr_diver($id) addRobustLowLayer 3     "MLL_HF"
     $ctr_diver($id) addUpLayer 3          "IPF1"
+	$ctr_diver($id) setBufferFeatures 3 10 1
 
     #SOS
     $ctr_diver($id) addUpLayer 4          "IPF2"
+	$ctr_diver($id) setBufferFeatures 4 10 1
 }

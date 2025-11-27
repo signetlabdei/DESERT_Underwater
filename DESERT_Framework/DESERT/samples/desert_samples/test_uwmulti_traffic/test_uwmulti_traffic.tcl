@@ -96,7 +96,6 @@ load libuwtdma.so
 load libuwsmposition.so
 load libuwinterference.so
 load libUwmStd.so
-load libUwmStdPhyBpskTracer.so
 load libuwphy_clmsgs.so
 load libuwstats_utilities.so
 load libuwphysical.so
@@ -242,7 +241,7 @@ Module/UW/IP set debug_                      0
 Module/UW/UDP set debug_                     0
 
 #TRAFFIC_CTR
-Module/UW/MULTI_TRAFFIC_RANGE_CTR set debug_            0
+Module/UW/MULTI_TRAFFIC_CONTROL set debug_  0
 Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  50
 
 Module/UW/CSMA_ALOHA set wait_costant_ 0.01
