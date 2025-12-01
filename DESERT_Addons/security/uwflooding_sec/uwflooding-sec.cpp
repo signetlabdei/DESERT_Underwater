@@ -465,10 +465,15 @@ UwFloodingSec::command(int argc, const char *const *argv)
 					getTag());
 			sendSyncClMsg(&disc_m);
 			DiscoveryStorage phy_layer_storage = disc_m.findTag(argv[2]);
-			DiscoveryData phy_layer = (*phy_layer_storage.begin()).second;
-			stats_phy_id = phy_layer.getId();
-			valid_phy_id = true;
-			return TCL_OK;
+			if (phy_layer_storage.getSize() == 1) {
+				DiscoveryData phy_layer = (*phy_layer_storage.begin()).second;
+				stats_phy_id = phy_layer.getId();
+				valid_phy_id = true;
+
+				return TCL_OK;
+			}
+
+			return TCL_ERROR;
 		}
 	} else if (argc == 4) {
 		if (strcasecmp(argv[1], "addTtlPerTraffic") == 0) {

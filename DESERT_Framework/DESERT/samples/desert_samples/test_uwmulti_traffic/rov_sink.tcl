@@ -169,15 +169,19 @@ proc createROV { id } {
     $ctr_rov addRobustLowLayer 1  "MLL_LF"
     $ctr_rov addFastLowLayer 1     "MLL_OP"
     $ctr_rov addUpLayer 1         "IPF1"
+	$ctr_rov setBufferFeatures 1 10 1
 
 #   CONTROL TRAFFIC
     $ctr_rov addRobustLowLayer 2  "MLL_LF"
     $ctr_rov addUpLayer 2         "IPF1"
+	$ctr_rov setBufferFeatures 2 10 1
 
 #   IMAGE TRAFFIC
     $ctr_rov addFastLowLayer 3     "MLL_OP"
     $ctr_rov addUpLayer 3          "IPF1"
+	$ctr_rov setBufferFeatures 3 10 1
 #   SOS TRAFFIC: to all (no spec needed)
 
     $ctr_rov addUpLayer 4          "IPF2"
+	$ctr_rov setBufferFeatures 4 10 1
 }
