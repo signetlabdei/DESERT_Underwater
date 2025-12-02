@@ -92,7 +92,7 @@ UWMllModule::crLayCommand(ClMessage *m)
 int
 UWMllModule::recvAsyncClMsg(ClMessage *m)
 {
-	return Module::crLayCommand(m);
+	return Module::recvAsyncClMsg(m);
 }
 
 int
