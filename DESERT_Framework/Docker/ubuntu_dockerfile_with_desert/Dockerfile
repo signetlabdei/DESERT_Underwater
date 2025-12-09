@@ -55,7 +55,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 WORKDIR /home
 RUN git clone -b master https://github.com/signetlabdei/DESERT_Underwater.git \ 
         && cd DESERT_Underwater/DESERT_Framework \
-        && ./install.sh --target LOCAL --with-woss --inst_mode development --addons ALL --dest_folder /home/DESERT_Underwater/DESERT_buildCopy_LOCAL   
+        && ./install.sh --target LOCAL --with-woss --inst_mode release --addons ALL --dest_folder /home/DESERT_Underwater/DESERT_buildCopy_LOCAL   
 
 WORKDIR /home/DESERT_Underwater/DESERT_Framework/DESERT/samples/desert_samples
 
