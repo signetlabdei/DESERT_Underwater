@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,11 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file  ms2c_evologics/initlib.cc
- * @author Roberto Francescon
+ * @file  uwapplicon_sea_modem\initlib.cc
+ * @author Gianni Cario
  * @version 0.0.1
  * 
- * \brief file to initialize the libmstwoc_evologics.so library
+ * \brief file to initialize the libuwapplicon_sea_modem.so library
  */
 
 #include<tclcl.h>

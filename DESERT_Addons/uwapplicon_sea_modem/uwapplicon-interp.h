@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 /**
  * @file    uwapplicon-interp.h
- * @author  <YOUR NAME>
+ * @author  Gianni Cario
  * @version 0.0.1
  * @brief   Header of the interepreter class: this class is used ot translate
  *          form DESERT software to/from Applicon SeaModem syntax
@@ -37,9 +37,6 @@
 #ifndef UWINTERPRETERAPPL_H
 #define UWINTERPRETERAPPL_H
 
-#include <cstdarg>
-#include <iterator>
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -65,7 +62,7 @@ public:
 	/**
 	 * Class destructor
 	 */
-	virtual ~UwAppliconInterpr();
+	~UwAppliconInterpr()=default;
 
 	/**
 	 * Method that builds the command to send data through SEND command
@@ -111,7 +108,7 @@ public:
 private:
 	std::string sep; /**< Separator for paramters fo the commands: a comma */
 	std::string r_term; /**<Terminating sequence for commands read from device*/
-	std::string w_term; /**<Terminating sequence for commands wrtten to device*/
+
 
 	/**
 	 * Vector holding all possible commands for the S2C syntax and

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -42,13 +42,9 @@ std::vector<std::pair<std::string, UwAppliconInterpr::Response> >
 UwAppliconInterpr::UwAppliconInterpr()
 	: sep(",")
 	, r_term("\r\n")
-	, w_term("\n")
 {
 }
 
-UwAppliconInterpr::~UwAppliconInterpr()
-{
-}
 
 std::string
 UwAppliconInterpr::buildSend(std::string msg, int dest)
@@ -75,10 +71,6 @@ UwAppliconInterpr::buildSend(std::string msg, int dest)
 
     // Build the final JSON string
     std::string cmd = "{\"cmd\": \"send\", \"payload\": " + payload_stream.str() + "}";
-
-    // Note: The new command string is created exactly as required.
-    // The original line terminator (w_term) was removed because
-    // the b'...' format suggests a literal string.
 
     return cmd;
 }

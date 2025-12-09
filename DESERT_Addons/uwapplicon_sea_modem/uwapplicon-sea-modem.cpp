@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,7 @@
 #include <string>
 #include <iomanip>
 #include <chrono>
+#include <vector>
 
 
 const std::chrono::milliseconds UwAppliconSeaModem::MODEM_TIMEOUT =
@@ -62,7 +63,7 @@ public:
 		return (new UwAppliconSeaModem());
 	}
 
-} class_evologicss2c;
+} class_uwapplicon_sea_modem;
 
 UwAppliconSeaModem::UwAppliconSeaModem()
 	: UwModem()
@@ -320,11 +321,11 @@ UwAppliconSeaModem::receivingData()
 	data_buffer.resize(DATA_BUFFER_LEN);
 	std::fill(data_buffer.begin(), data_buffer.end(), '\0');
 	// iterators that keep track of read/write operations
-	std::vector<char>::iterator beg_it = data_buffer.begin();
-	std::vector<char>::iterator end_it = data_buffer.begin();
+	auto beg_it = data_buffer.begin();
+	auto end_it = data_buffer.begin();
 	// iterators that keep track of commands research
-	std::vector<char>::iterator cmd_b = data_buffer.begin();
-	std::vector<char>::iterator cmd_e = data_buffer.begin();
+	auto cmd_b = data_buffer.begin();
+	auto cmd_e = data_buffer.begin();
 	UwAppliconInterpr::Response cmd = UwAppliconInterpr::Response::NO_COMMAND;
 	int r_bytes = 0;
 	int offset = 0;
@@ -410,24 +411,6 @@ UwAppliconSeaModem::updateStatus(UwAppliconInterpr::Response cmd, bool integrity
 			printOnLog(LogLevel::INFO,
 				"APPLICONSEAMODEM",
 				"updateStatus::MSGS_RECEIVED PRE_: " + std::to_string(rx_payload.length()));
-
-			// std::stringstream ss_hex;
-			// // Set the hexadecimal format once
-			// ss_hex << std::hex << std::setfill('0');
-
-			// // 3. Iterate over each character of the input string
-			// for (char c : rx_payload)
-			// {
-			// 	// Set width to 2 for each character and add it to the stream
-			// 	ss_hex << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));
-			// }
-
-			// // 4. Extract the final string from the stringstream
-			// std::string hex_string = ss_hex.str();
-
-			// printOnLog(LogLevel::INFO,
-			// 	"APPLICONSEAMODEM",
-			// 	"updateStatus::MSGS_RECEIVED PRE HEX: " + hex_string);
 
 			Packet *p = Packet::alloc();
 			createRxPacket(p, integrity);

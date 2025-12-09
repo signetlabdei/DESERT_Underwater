@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2019 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file    uwapplicon-sea-moden.h
- * @author  <FILL IT WITH YOUR NAME>
+ * @file    uwapplicon-sea-modem.h
+ * @author  Gianni Cario
  * @version 0.1.0
  * @brief   Header of the main class that implements the drivers to manage the
  *          Applicon SeaModem
@@ -46,7 +46,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <vector>
+
 
 /**
  * Enum containing the possible statuses of the driver. In particular, a command
@@ -82,7 +82,7 @@ public:
 	 * @param p pointer to the packet that has been received from the simulator
 	 *        upper layers
 	 */
-	virtual void recv(Packet *p);
+	virtual void recv(Packet *p) override;
 
 	/**
 	 * Tcl command interpreter: Method that maps Tcl commands into C++ methods.
@@ -93,7 +93,7 @@ public:
 	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
 	 *		   successfully or not
 	 */
-	virtual int command(int argc, const char *const *argv);
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
 	 * Cross-Layer messages synchronous interpreter.
@@ -101,7 +101,7 @@ public:
 	 * message received
 	 * @return <i>0</i> if successful. NEEDED ONLY TO CONFIGURE FROM OTHER MODULES
 	 */
-	virtual int recvSyncClMsg(ClMessage *m) {return 0;}
+	virtual int recvSyncClMsg(ClMessage *m) override {return 0;}
 
 
 private:
@@ -110,7 +110,7 @@ private:
 	 * modem.
 	 * @param p Packet pointer to the packet to be sent
 	 */
-	virtual void startTx(Packet *p);
+	virtual void startTx(Packet *p) override;
 
 	/**
 	 * Method that starts a packet reception. This method is also in charge of
@@ -118,27 +118,27 @@ private:
 	 * the simulator about the start of the reception
 	 * @param p Packet pointer to the packet to be received
 	 */
-	virtual void startRx(Packet *p);
+	virtual void startRx(Packet *p) override;
 
 	/**
 	 * Method that ends a packet reception. This method is also in charge of
 	 * sending the received NS-MIRACLE packet to the upper layers
 	 * @param p Packet pointer to the packet being sent
 	 */
-	virtual void endRx(Packet *p);
+	virtual void endRx(Packet *p) override;
 
 	/**
 	 * Method that starts the driver operations. It performs all the needed
 	 * operations to correctly fire up the device's driver.
 	 */
-	virtual void start();
+	virtual void start() override;
 
 	/**
 	 * Method that stops the driver operations. It performs all the needed
 	 * operations to correctly stop the device's driver before closing the
 	 * simulation.
 	 */
-	virtual void stop();
+	virtual void stop() override;
 
 	/**
 	 * Method that detach a thread devoted to sending packets found in tx_queue.
