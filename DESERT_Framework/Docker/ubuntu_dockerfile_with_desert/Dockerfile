@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 SHELL ["/bin/bash", "-xo", "pipefail", "-c"]
 
@@ -25,17 +25,17 @@ RUN apt update \
 RUN DEBIAN_FRONTEND=noninteractive \
        apt-get install -qy \
          build-essential \
-         ccache \
-         cmake \
-         libad9361-0 \
-         libasound2 \
+         autoconf \
+         automake \
+         libxmu-dev \
+         libx11-dev \
+         libxmu-headers \
+         libxt-dev \
+         libxml2-dev \
+         libtool \
+         bison \
+         flex \
          --no-install-recommends
-RUN DEBIAN_FRONTEND=noninteractive \
-       apt-get install -qy \
-       automake \
-       autoconf \
-       libtool
-
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qy software-properties-common
 RUN DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:git-core/ppa
@@ -46,19 +46,18 @@ RUN DEBIAN_FRONTEND=noninteractive \
         apt-get install -qy gfortran
 
 RUN DEBIAN_FRONTEND=noninteractive \ 
-        apt-get install -qy netcat \
+        apt-get install -qy netcat-traditional \
         && apt-get install -qy net-tools \
         && apt-get install -qy iputils-ping \
         && apt-get install -qy wget \
-        && apt-get install -qy vim \
         && apt-get install -qy iproute2
 
 WORKDIR /home
 RUN git clone -b master https://github.com/signetlabdei/DESERT_Underwater.git \ 
         && cd DESERT_Underwater/DESERT_Framework \
-        && ./install.sh --target LOCAL --with-woss --inst_mode development --addons ALL --dest_folder /home/DESERT_Underwater/DESERT_buildCopy_LOCAL   
+        && ./install.sh --target LOCAL --with-woss --inst_mode release --addons ALL --dest_folder /home/DESERT_Underwater/DESERT_buildCopy_LOCAL   
 
-WORKDIR /home/DESERT_Underwater/DESERT_buildCopy_LOCAL/DESERT-3.4.1-src/samples/desert_samples
+WORKDIR /home/DESERT_Underwater/DESERT_Framework/DESERT/samples/desert_samples
 
 RUN chmod +x /home/DESERT_Underwater/DESERT_buildCopy_LOCAL/environment
 
