@@ -183,7 +183,6 @@ proc createNode { id } {
     
     # Set the MAC address
     $mac($id) setMacAddr [expr $id + 5]
-    # $mac($id) setSlotNumber $id
 
     set position($id) [new "Position/BM"]
     $node($id) addPosition $position($id)
@@ -214,23 +213,6 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
     createNode $id
     puts "Node $id created"
 }
-
-
-###############################
-# MAC settings: Generic mode  #
-###############################
-# Node 1
-$mac(0) setStartTime    0
-$mac(0) setSlotDuration 2
-$mac(0) setGuardTime    0.2
-# Node 2
-$mac(1) setStartTime    2
-$mac(1) setSlotDuration 1
-$mac(1) setGuardTime    0.2
-# Node 3
-$mac(2) setStartTime    3
-$mac(2) setSlotDuration 0.5
-$mac(2) setGuardTime    0.1
 
 
 ################################

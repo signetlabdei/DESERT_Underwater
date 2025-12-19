@@ -14,9 +14,11 @@ Module/UW/CBR:
         PoissonTraffic_: 1
         debug_: 0
 Module/UW/TDMA:
-        frame_duration: 3.5
+        frame_duration: 3
         debug_: 0
-        fair_mode: 0
+        fair_mode: 1
+        tot_slots: 3
+        guard_time: 0.3
 MPropagation/Underwater:
         practicalSpreading_: 1
         debug_: 0
