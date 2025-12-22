@@ -156,15 +156,13 @@ Module/UW/CBR set PoissonTraffic_      2
 Module/UW/CBR set debug_               0
 
 ### TDMA MAC ###
-Module/UW/TDMA set frame_duration   3.5
+Module/UW/TDMA set frame_duration   3
 Module/UW/TDMA set debug_           0
 Module/UW/TDMA set sea_trial_       1
-Module/UW/TDMA set fair_mode        0
-# FAIR Modality on
-# Remeber to put silent the SetSlotDuration, SetGuardTime and setStartTime call
-# down below
-# Module/UW/TDMA set guard_time       0.1
-# Module/UW/TDMA set tot_slots        3
+Module/UW/TDMA set fair_mode        1
+# FAIR Mode on settings:
+Module/UW/TDMA set guard_time       0.1
+Module/UW/TDMA set tot_slots        3
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_ 2
@@ -246,6 +244,7 @@ proc createNode { id } {
     
     # Set the MAC address
     $mac($id) setMacAddr [expr $id + 5]
+	# Uncomment if FAIR Mode off
     # $mac($id) setSlotNumber $id
 
     set position($id) [new "Position/BM"]
@@ -282,18 +281,20 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 ###############################
 # MAC settings: Generic mode  #
 ###############################
+# Uncomment if FAIR Mode off
+# Note: this works only for three nodes
 # Node 1
-$mac(0) setStartTime    0
-$mac(0) setSlotDuration 2
-$mac(0) setGuardTime    0.2
+# $mac(0) setStartTime    0
+# $mac(0) setSlotDuration 2
+# $mac(0) setGuardTime    0.2
 # Node 2
-$mac(1) setStartTime    2
-$mac(1) setSlotDuration 1
-$mac(1) setGuardTime    0.2
+# $mac(1) setStartTime    2
+# $mac(1) setSlotDuration 1
+# $mac(1) setGuardTime    0.2
 # Node 3
-$mac(2) setStartTime    3
-$mac(2) setSlotDuration 0.5
-$mac(2) setGuardTime    0.1
+# $mac(2) setStartTime    3
+# $mac(2) setSlotDuration 0.5
+# $mac(2) setGuardTime    0.1
 
 
 ################################
