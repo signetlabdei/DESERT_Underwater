@@ -753,21 +753,25 @@ build_NETCDF() {
     fi
 
     info_L2 "configure  [$*]"
+    LDFLAGS_LIB64=""
+    if [ -d "${DEST_FOLDER}/lib64" ]; then
+        LDFLAGS_LIB64="-L${DEST_FOLDER}/lib64"
+    fi
     CXXFLAGS="-Wno-write-strings"       \
     CFLAGS="-Wno-write-strings"       \
-#    CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
-#    LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/include/lib" \
+    # CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
+    # LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/include/lib" \
     ./configure --target=${ARCH}        \
                 --host=${ARCH}          \
                 --build=${HOST}         \
                 --enable-shared         \
-                --enable-logging      \
-                --enable-netcdf-4      \
+                --enable-logging        \
+                --enable-netcdf-4       \
                 --disable-dap           \
                 --disable-byterange     \
                 --prefix=${DEST_FOLDER} \
                 CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
-                LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib" \
+                LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib $LDFLAGS_LIB64" \
                 >> "${currentBuildLog}/netcdf-${NETCDF_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the configuration of netcdf-${NETCDF_VERSION}! Exiting ..."
@@ -808,15 +812,19 @@ build_NETCDFCXX() {
         make distclean > "${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log" 2>&1
     fi
     info_L2 "configure  [$*]"
+    LDFLAGS_LIB64=""
+    if [ -d "${DEST_FOLDER}/lib64" ]; then
+        LDFLAGS_LIB64="-L${DEST_FOLDER}/lib64"
+    fi
     CXXFLAGS="-Wno-write-strings"                           \
-    CFLAGS="-Wno-write-strings"                           \
+    CFLAGS="-Wno-write-strings"                             \
     ./configure --target=${ARCH}                            \
                 --host=${ARCH}                              \
                 --build=${HOST}                             \
                 --enable-shared                             \
                 --prefix=${DEST_FOLDER}                     \
                 CPPFLAGS="$CPPFLAGS -I${DEST_FOLDER}/include" \
-                LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib" \
+                LDFLAGS="$LDFLAGS -L${DEST_FOLDER}/lib $LDFLAGS_LIB64"     \
                 >> "${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the configuration of netcdf-cxx-${NETCDFCXX_VERSION}! Exiting ..."
@@ -916,11 +924,15 @@ build_WOSS() {
         exit 1
     fi
     info_L2 "configure  [$*]"
+    LDFLAGS_LIB64=""
+    if [ -d "${DEST_FOLDER}/lib64" ]; then
+        LDFLAGS_LIB64="-L${DEST_FOLDER}/lib64"
+    fi
     CXXFLAGS="-Wno-write-strings"                                                  \
     CXXFLAGS="$CXXFLAGS -Wno-overloaded-virtual"                                   \
       CFLAGS="-Wno-write-strings"                                                  \
     CPPFLAGS=-I${currentBuildLog}/netcdf-cxx-${NETCDFCXX_VERSION}/cxx              \
-     LDFLAGS=-L${DEST_FOLDER}/lib                                                  \
+    LDFLAGS=-L${DEST_FOLDER}/lib                                                   \
     ./configure --target=${ARCH}                                                   \
                 --host=${ARCH}                                                     \
                 --build=${HOST}                                                    \
@@ -928,6 +940,7 @@ build_WOSS() {
                 --with-nsmiracle=${currentBuildLog}/${NSMIRACLE_DIR}               \
                 --with-netcdf4=${DEST_FOLDER}                                      \
                 --prefix=${DEST_FOLDER}                                            \
+                LDFLAGS="$LDFLAGS $LDFLAGS_LIB64"                                 \
                 >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
 
     if [ $? -ne 0 ]; then
