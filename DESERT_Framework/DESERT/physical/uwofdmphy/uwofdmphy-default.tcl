@@ -47,3 +47,6 @@ Module/UW/OFDM/PHY  set BCH_T               1
 
 Module/UW/OFDM/PHY  set FRAME_BIT           9152
 
+Module/UW/OFDM/PHY set TxPower_             0.0
+Module/UW/OFDM/PHY set NoiseSPD_            0.001
+Module/UW/OFDM/PHY set ConsumedEnergy_      0.0

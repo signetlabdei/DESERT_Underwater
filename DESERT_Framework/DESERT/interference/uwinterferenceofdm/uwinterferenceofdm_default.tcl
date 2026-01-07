@@ -31,3 +31,4 @@
 Module/UW/INTERFERENCEOFDM set use_maxinterval_ 1 
 Module/UW/INTERFERENCEOFDM set maxinterval_ 50 
 Module/UW/INTERFERENCEOFDM set debug_ 0
+Module/UW/INTERFERENCEOFDM set inodeID_ 0

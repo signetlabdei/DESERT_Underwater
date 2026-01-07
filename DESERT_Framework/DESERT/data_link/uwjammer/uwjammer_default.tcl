@@ -32,3 +32,4 @@
 PacketHeaderManager set tab_(PacketHeader/UW/JAMMER) 1
 
 Module/UW/JAMMER set buffer_data_pkts_              50
+Module/UW/JAMMER set debug_                         0

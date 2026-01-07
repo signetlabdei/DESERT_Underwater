@@ -33,3 +33,5 @@
 PacketHeaderManager set tab_(PacketHeader/UWOPTICALBEAMPATTERN) 1
 
 Module/UW/UWOPTICALBEAMPATTERN set noise_threshold 0.001
+Module/UW/UWOPTICALBEAMPATTERN set NoiseSPD_       0.001
+Module/UW/UWOPTICALBEAMPATTERN set inclination_angle_ 0.0

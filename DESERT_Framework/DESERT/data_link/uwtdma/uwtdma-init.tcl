@@ -36,14 +36,14 @@ Module/UW/TDMA set HDR_size_ 		0
 Module/UW/TDMA set wait_constant_	0.1
 Module/UW/TDMA set MAC_addr_ 		0
 Module/UW/TDMA set sea_trial_ 		0
-Module/UW/TDMA set frame_duration   0
+Module/UW/TDMA set frame_duration       0
 Module/UW/TDMA set guard_time           0
 Module/UW/TDMA set tot_slots            0
 Module/UW/TDMA set fair_mode            0
 Module/UW/TDMA set max_packet_per_slot  1
 Module/UW/TDMA set queue_size_          10
 Module/UW/TDMA set drop_old_            0
-Module/UW/TDMA set checkPriority_		0
+Module/UW/TDMA set checkPriority_	0
 Module/UW/TDMA set mac2phy_delay_       [expr 1.0e-9]
 
 Module/UW/TDMA instproc init {args} {

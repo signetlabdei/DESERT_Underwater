@@ -30,8 +30,15 @@
 # Author: Roberto Francescon
 # version: 1.0.0
 
-Module/UW/TDMA_FRAME set debug_ 											0
-Module/UW/TDMA_FRAME set max_packet_per_slot                                1
+Module/UW/TDMA_FRAME set debug_			   0
+Module/UW/TDMA_FRAME set max_packet_per_slot       1
+Module/UW/TDMA_FRAME set queue_size_               10
+Module/UW/TDMA_FRAME set HDR_size_                 0
+Module/UW/TDMA_FRAME set drop_old_                 0
+Module/UW/TDMA_FRAME set checkPriority_            0
+Module/UW/TDMA_FRAME set mac2phy_delay_            [expr 1.0e-9]
+Module/UW/TDMA_FRAME set tot_slots                 0
+
 Module/UW/TDMA_FRAME instproc init {args} {
     $self next $args
     $self settag "UW/TDMA_FR"

@@ -31,5 +31,12 @@
 # @version 1.0.1
 
 Module/UW/PHYSICALNOISE set ship_stop			0
-Module/UW/PHYSICALNOISE set debug_noise_			0
+Module/UW/PHYSICALNOISE set debug_noise_		0
 Module/UW/PHYSICALNOISE set granularity			100
+Module/UW/PHYSICALNOISE set TxPower_                    5e9
+Module/UW/PHYSICALNOISE set NoiseSPD_                   [expr 1.28e-23 * 300]
+Module/UW/PHYSICALNOISE set BitRate_                    0
+Module/UW/PHYSICALNOISE set ConsumedEnergy_             0.0
+Module/UW/PHYSICALNOISE set rx_power_consumption_       0.0
+Module/UW/PHYSICALNOISE set tx_power_consumption_       0.0
+

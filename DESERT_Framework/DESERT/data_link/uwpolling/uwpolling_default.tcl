@@ -48,6 +48,8 @@ Module/UW/POLLING/NODE set modem_data_bit_rate_ 1000
 Module/UW/POLLING/NODE set n_run                0
 Module/UW/POLLING/NODE set intra_data_guard_time_ 0.001
 Module/UW/POLLING/NODE set useAdaptiveTpoll_    0
+Module/UW/POLLING/NODE set node_id_              0
+Module/UW/POLLING/NODE set n_run_                0
 
 Module/UW/POLLING/AUV set max_payload_          125
 Module/UW/POLLING/AUV set T_probe_guard_        2
@@ -64,6 +66,9 @@ Module/UW/POLLING/AUV set max_buffer_size_	 	30
 Module/UW/POLLING/AUV set max_tx_pkts_ 			20
 Module/UW/POLLING/AUV set full_knowledge_       0
 Module/UW/POLLING/AUV set use_woss_             0
+Module/UW/POLLING/AUV set T_ack_timer_          20
+Module/UW/POLLING/AUV set n_run_                0
+Module/UW/POLLING/AUV set ack_enabled_          1
 
 Module/UW/POLLING/SINK set T_data_gurad 		10
 Module/UW/POLLING/SINK set backoff_tuner_		1

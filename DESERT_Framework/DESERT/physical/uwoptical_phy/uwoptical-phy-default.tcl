@@ -38,4 +38,6 @@ Module/UW/OPTICAL/PHY set R_                                    [expr 1.49e9]
 Module/UW/OPTICAL/PHY set S_                                    0.26
 Module/UW/OPTICAL/PHY set T_                                    293.15
 Module/UW/OPTICAL/PHY set Ar_                                   0.0000011
+Module/UW/OPTICAL/PHY set NoiseSPD_                             0.01
 
+Module/UW/Optical/Channel set debug_                            0

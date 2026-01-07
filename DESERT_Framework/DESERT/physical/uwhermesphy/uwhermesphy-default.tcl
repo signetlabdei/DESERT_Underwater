@@ -30,10 +30,13 @@
 # @author Filippo Campagnaro
 # @version 1.0.0
 
-Module/UW/HERMES/PHY set tx_power_consumption_ 3.3
-Module/UW/HERMES/PHY set rx_power_consumption_ 0.620
-Module/UW/HERMES/PHY  set AcquisitionThreshold_dB_    15.0 
-Module/UW/HERMES/PHY  set MaxTxSPL_dB_               185.8
+Module/UW/HERMES/PHY set tx_power_consumption_        3.3
+Module/UW/HERMES/PHY set rx_power_consumption_        0.620
+Module/UW/HERMES/PHY set AcquisitionThreshold_dB_     15.0 
+Module/UW/HERMES/PHY set MaxTxSPL_dB_                 185.8
+Module/UW/HERMES/PHY set TxPower_                     5e9
+Module/UW/HERMES/PHY set NoiseSPD_                    [expr 1.28e-23 * 300]
+Module/UW/HERMES/PHY set ConsumedEnergy_              0
 
 Module/UW/HERMES/PHY  set BCH_N               15
 Module/UW/HERMES/PHY  set BCH_K               11

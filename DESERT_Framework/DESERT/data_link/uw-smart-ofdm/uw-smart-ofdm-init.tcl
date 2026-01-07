@@ -59,3 +59,4 @@ Module/UW/SMART_OFDM set max_car_reserved_  4
 Module/UW/SMART_OFDM set print_transitions_ 0
 Module/UW/SMART_OFDM set max_burst_size_    1
 Module/UW/SMART_OFDM set fullBand_          0
+Module/UW/SMART_OFDM set nodenum_           0

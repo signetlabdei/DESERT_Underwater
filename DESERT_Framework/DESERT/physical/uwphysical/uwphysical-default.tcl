@@ -30,5 +30,19 @@
 # @author Giovanni Toso
 # @version 1.0.1
 
-Module/UW/PHYSICAL set tx_power_consumption_ 3.3
-Module/UW/PHYSICAL set rx_power_consumption_ 0.620
+Module/UW/PHYSICAL set tx_power_consumption_    3.3
+Module/UW/PHYSICAL set rx_power_consumption_    0.620
+Module/UW/PHYSICAL set NoiseSPD_                [expr 1.28e-23 * 300]
+Module/UW/PHYSICAL set AcquisitionThreshold_dB_ 0 
+Module/UW/PHYSICAL set MinTxSPL_dB_             10
+Module/UW/PHYSICAL set PER_target_              0.01
+Module/UW/PHYSICAL set RxSnrPenalty_dB_         -10
+Module/UW/PHYSICAL set TxSPLMargin_dB_          10
+Module/UW/PHYSICAL set ConsumedEnergy_          0
+Module/UW/PHYSICAL set MaxTxRange_              10000
+Module/UW/PHYSICAL set SPLOptimization_         0
+Module/UW/PHYSICAL set CentralFreqOptimization_ 0
+Module/UW/PHYSICAL set BandwidthOptimization_   0
+Module/UW/PHYSICAL set debug_                   0
+Module/UW/PHYSICAL set TxPower_                 5e9 
+Module/UW/PHYSICAL set BitRate_                 0
