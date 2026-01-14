@@ -123,7 +123,7 @@ void UWTWR_PAUV::Phy2MacStartRx(const Packet *p)
 	if (ch->ptype() == PT_POLL) {
 		hdr_POLL *pollh = HDR_POLL(p);
 		if (debug_) {
-			std::cout << pollh->POLL_uid_ << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+			std::cout << pollh->POLL_uid_ << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 						<< ")::PHY2MACSTARTRX::RX_POLL::POLLED_NODE::"
 						<< pollh->id_ << "::LAST_TOF::" << pollh->tof_ 
 						<< "::AAUV_POS_X::" << NOW << "::AAUV_POS_Y::" << NOW <<std::endl; // post-processing using NOW to calculate AAUV position
@@ -132,7 +132,7 @@ void UWTWR_PAUV::Phy2MacStartRx(const Packet *p)
 		hdr_ACK_NODE *ackh = HDR_ACK_NODE(p);
 		ACK_uid = ackh->ACK_uid_;
 		if (debug_) {
-			std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+			std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 						<< ")::PHY2MACSTARTRX::RX_ACK::ACK_NODE::"
 						<< ackh->id_node() << "::NONE::" << 0
 						<< "::NONE::" << 0 << "::NONE::" << 0 << std::endl;
@@ -148,12 +148,12 @@ void UWTWR_PAUV::Phy2MacEndRx(Packet *p)
 	if (ch->error()) {
 		if (ch->ptype() == PT_POLL) {
 			if (debug_)
-				std::cout << getEpoch() << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+				std::cout << getEpoch() << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 						<< ")::PHY2MACENDRX_DROP_POLL" << std::endl;
 			incrPollDropped();
 		} else {
 			if (debug_)
-				std::cout << getEpoch() << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+				std::cout << getEpoch() << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 						<< ")::PHY2MACENDRX_DROP_ACK" << std::endl;
 			incrDroppedAckPkts();
 		}
@@ -161,7 +161,7 @@ void UWTWR_PAUV::Phy2MacEndRx(Packet *p)
 		if (ch->ptype() == PT_POLL) {
 			hdr_POLL *pollh = HDR_POLL(p);
 			// if (debug_) {
-			// 	std::cout << getEpoch() << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+			// 	std::cout << getEpoch() << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 			// 				<< ")::PHY2MACENDRX::RX_POLL::POLLED_NODE= "
 			// 				<< pollh->id_ << std::endl;
 			// }
@@ -170,7 +170,7 @@ void UWTWR_PAUV::Phy2MacEndRx(Packet *p)
 		} else {
 			hdr_ACK_NODE *ackh = HDR_ACK_NODE(p);
 			// if (debug_) {
-			// 	std::cout << getEpoch() << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr
+			// 	std::cout << getEpoch() << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr
 			// 				<< ")::PHY2MACENDRX::RX_ACK::ACK_NODE= "
 			// 				<< ackh->id_node() << std::endl;
 			// }
@@ -195,7 +195,7 @@ void UWTWR_PAUV::stateRxAck()
 void UWTWR_PAUV::stateIdle()
 {
 	// if (debug_)
-	// 	std::cout << getEpoch() << "::" << std::setprecision(10) << NOW << "::UWTWR_PAUV(" << addr << ")::IDLE_STATE"
+	// 	std::cout << getEpoch() << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_PAUV(" << addr << ")::IDLE_STATE"
 	// 			  << std::endl;
 	refreshState(UWTWR_PAUV_STATUS_IDLE);
 }

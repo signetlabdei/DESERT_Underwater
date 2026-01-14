@@ -157,7 +157,7 @@ void UWTWR_AAUV::Phy2MacStartRx(const Packet *p)
 	diff_time = received_time - gen_time;
 	if (cmh->ptype() == PT_ACK_NODE) {
 		if (debug_)
-			std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+			std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 					  << ")::RX_ACK_PACKET::TOF::" << diff_time << std::endl;
 	}
 }
@@ -175,12 +175,12 @@ void UWTWR_AAUV::Phy2MacEndRx(Packet *p)
 	if (cmh->error()) {
 		if (cmh->ptype_ == PT_ACK_NODE) {
 			if (debug_)
-				std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 						<< ")::PHY2MACENDRX_DROP_ACK" << std::endl;
 			incrDroppedAckPkts();
 		} else {
 			if (debug_)
-				std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 						<< ")::PHY2MACENDRX_DROP_POLL" << std::endl;
 			incrErrorPktsRx();
 		}
@@ -195,7 +195,7 @@ void UWTWR_AAUV::Phy2MacEndRx(Packet *p)
 			} 
 		} else {
 			if (debug_)
-				std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 						  << ")::PHY2MACENDRX::DROP_ACK_WRONG_DEST_"
 						  << mach->macDA() << std::endl;
 			incrXCtrlPktsRx();
@@ -218,7 +218,7 @@ void UWTWR_AAUV::Mac2PhyStartTx(Packet *p)
 void UWTWR_AAUV::Phy2MacEndTx(const Packet *p)
 {
 	// if (debug_)
-	// 	std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+	// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 	// 			  << ")::PHYEndTx" << std::endl;
 }
 
@@ -251,7 +251,7 @@ void UWTWR_AAUV::stateTxPoll()
 			pollh->tof_ = diff_time;
 
 			if (debug_)
-				std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 							<< ")::STATE_TX_POLL::NODE::" << pollh->id_
 							<< std::endl;
 			TxPoll();
@@ -259,14 +259,14 @@ void UWTWR_AAUV::stateTxPoll()
 			polling_index--; 
 		} else {
 			if (debug_)
-				std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 						  << ")::STATE_TX_POLL--->IDLE--->No node to POLL"
 						  << std::endl;
 			stateIdle();
 		}	
 	} else {
 		if (debug_)
-			std::cerr << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+			std::cerr << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 					  << ")---> going in stateTxPoll from WRONG STATE---> "
 						"current_state: "
 					  << status_info[curr_state] << std::endl;
@@ -276,7 +276,7 @@ void UWTWR_AAUV::stateTxPoll()
 void UWTWR_AAUV::TxPoll()
 {
 	// if(debug_)
-	// 	std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr << ")::TX_POLL"
+	// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr << ")::TX_POLL"
 	// 			  << std::endl;
 	incrCtrlPktsTx();
 	incrPollTx();
@@ -305,7 +305,7 @@ void UWTWR_AAUV::stateIdle()
 {
 	refreshState(UWTWR_AAUV_STATUS_IDLE);
 	// if (debug_)
-	// 	std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr << ")::IDLE STATE "
+	// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr << ")::IDLE STATE "
 	// 			  << std::endl;
 	TxEnabled = true;
 	stateTxPoll();
@@ -327,7 +327,7 @@ void UWTWR_AAUV::stateWaitAck()
 	TxEnabled = false;
 	RxAckEnabled = true;
 	// if (debug_)
-	// 	std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr
+	// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
 	// 			  << ")::scheduling_ACK_TIMER_T= " << T_ack_timer << std::endl;
 	ack_timer.schedule(T_ack_timer);
 }
@@ -336,7 +336,7 @@ void UWTWR_AAUV::stateRxAck()
 {
 	if(RxAckEnabled) {
 		// if (debug_)
-		// 	std::cout << POLL_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_AAUV(" << addr 
+		// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr 
 		// 			<< ")::stateRxAck()ACK received" << std::endl;
 		refreshState(UWTWR_AAUV_STATUS_RX_ACK);
 		RxAckEnabled = false;
