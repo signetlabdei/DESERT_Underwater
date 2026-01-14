@@ -147,7 +147,7 @@ void UWTWR_NODE::initInfo()
 void UWTWR_NODE::BackOffTimer::expire(Event *e)
 {
 	if (module->debug_)
-		std::cout << module->ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << module->addr
+		std::cout << module->ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << module->addr
 					<< ")::BACKOFF_TIMER::EXPIRED" << std::endl;
 	timer_status = UWTWR_NODE_EXPIRED;
 	if (module->polled) {
@@ -161,7 +161,7 @@ void UWTWR_NODE::BackOffTimerExpired()
 		stateTxAck();
 	} else {
 		if (debug_) {
-			std::cout << std::setprecision(10) << NOW << "UWTWR_NODE(" << addr
+			std::cout <<std::fixed<< std::setprecision(9) << NOW << "UWTWR_NODE(" << addr
 					<< ") Backoff timer expired but node not polled" 
 					<< std::endl;
 		}
@@ -171,7 +171,7 @@ void UWTWR_NODE::BackOffTimerExpired()
 void UWTWR_NODE::Mac2PhyStartTx(Packet *p)
 {
 	if (debug_)
-		std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+		std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 					<< ")::MAC2PHYSTARTTX::ACK_PACKET" << std::endl;
 	MMac::Mac2PhyStartTx(p);
 }
@@ -179,7 +179,7 @@ void UWTWR_NODE::Mac2PhyStartTx(Packet *p)
 void UWTWR_NODE::Phy2MacEndTx(const Packet *p)
 {
 	if (debug_)
-		std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+		std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 					<< ")::MAC2PHYENDTX::ACK_PACKET" << std::endl;
 	stateIdle();
 }
@@ -189,7 +189,7 @@ void UWTWR_NODE::Phy2MacStartRx(const Packet *p)
 	hdr_cmn *cmh = hdr_cmn::access(p);
 	if (cmh->ptype() == PT_POLL) {
 		if (debug_)
-			std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+			std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 					  << ")::PHY2MACSTARTRX::POLL_PACKET" << std::endl;
 	}
 }
@@ -203,7 +203,7 @@ void UWTWR_NODE::Phy2MacEndRx(Packet *p)
 	if (ch->error()) {
 		if (ch->ptype() == PT_POLL) {
 			if (debug_)
-			    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+			    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 						  << ")::PHY2MACENDRX::DROP_POLL" << std::endl;
 		incrPollDropped();
 		}
@@ -212,7 +212,7 @@ void UWTWR_NODE::Phy2MacEndRx(Packet *p)
 		if (ch->ptype() == PT_POLL) {
 			hdr_POLL *pollh = HDR_POLL(p);
 			if (debug_)
-			    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+			    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 						  << ")::PHY2MACENDRX::RX_POLL::POLLED_NODE= "
 						  << pollh->id_ << std::endl;
 			curr_poll_pkt = p->copy();
@@ -225,7 +225,7 @@ void UWTWR_NODE::Phy2MacEndRx(Packet *p)
 		incrXCtrlPktsRx();
 		if (ch->ptype() == PT_POLL) {
 			if (debug_)
-			    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+			    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 						  << ")::PHY2MACENDRX::WARNING!!POLL packet not in "
 							 "broadcast!!"
 						  << std::endl;
@@ -265,7 +265,7 @@ void UWTWR_NODE::stateTxAck()
 		// ACK_uid++;
 		// ackh->ACK_uid_ = ACK_uid;
 		if (debug_)
-			    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+			    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 						  << ")::STATE_TX_ACK_ID_" << ACK_uid
 						  << std::endl;
 		TxAck();
@@ -291,7 +291,7 @@ void UWTWR_NODE::stateRxPoll()
 		// Save the RX POLL id as the corresponding ACK id
 		ACK_uid = pollh->POLL_uid_;
 		if (debug_)
-		    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+		    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 					  << ")::STATE_RX_POLL::Node_POLLED = " << pollh->id_
 					  << " rx from MAC=" << AUV_mac_addr <<std::endl;
 		
@@ -304,7 +304,7 @@ void UWTWR_NODE::stateRxPoll()
 			incrTimesPolled();
 			// schedule backoff time
 			if (debug_)
-				std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr
+				std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr
 						  << ")::scheduling_BACKOFF_TIMER_T= " << T_backoff << std::endl;
 			backoff_timer.schedule(T_backoff);
 			RxPollEnabled = false;
@@ -314,7 +314,7 @@ void UWTWR_NODE::stateRxPoll()
 		}
 	} else {
 		if (debug_)
-		    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UTWR_NODE(" << addr
+		    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UTWR_NODE(" << addr
 					  << ")::STATE_RX_POLL::NODE_NOT_POLLED" << std::endl;
 		drop(curr_poll_pkt, 1, UWTWR_NODE_DROP_REASON_WRONG_STATE);
 	}
@@ -323,7 +323,7 @@ void UWTWR_NODE::stateRxPoll()
 void UWTWR_NODE::stateIdle()
 {
 	if (debug_)
-	    std::cout << ACK_uid << "::" << std::setprecision(10) << NOW << "::UWTWR_NODE(" << addr << ")::IDLE_STATE"
+	    std::cout << ACK_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_NODE(" << addr << ")::IDLE_STATE"
 				  << std::endl;
 	refreshState(UWTWR_NODE_STATUS_IDLE);
 	polled = false;
