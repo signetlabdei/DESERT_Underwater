@@ -486,7 +486,7 @@ UwCbrModule::GetPER() const
 			return (1 - (double) pkts_recv / (double) esn);
 	}
 
-	return 0;
+	return 1;
 }
 
 double
