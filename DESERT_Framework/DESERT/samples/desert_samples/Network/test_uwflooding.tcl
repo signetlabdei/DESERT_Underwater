@@ -377,6 +377,13 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 # Final Procedure #
 ###################
 # Define here the procedure to call at the end of the simulation
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
 proc finish {} {
     global ns opt outfile
     global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
@@ -397,7 +404,6 @@ proc finish {} {
     puts "---------------------------------------------------------------------"
 
     set sum_cbr_throughput     0
-    set sum_per                0
     set sum_cbr_sent_pkts      0.0
     set sum_cbr_rcv_pkts       0.0
     set total_energy           0.0
@@ -408,22 +414,13 @@ proc finish {} {
     set ipr_retx               0
     set first_check_ftt        1
     set first_check_ftt_std    1
-
-    for {set i 0} {$i < $opt(nn)} {incr i}  {
-        set cbr_throughput           [$cbr_sink($i) getthr]
-        set cbr_sent_pkts        [$cbr($i) getsentpkts]
-        set cbr_rcv_pkts           [$cbr_sink($i) getrecvpkts]
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
-        set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
-    }
     
     puts "Node Stats"
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 	set cbr_throughput      [$cbr_sink($i) getthr]
         set cbr_sent_pkts       [$cbr($i) getsentpkts]
         set cbr_rcv_pkts        [$cbr_sink($i) getrecvpkts]
-        set cbr_per             [$cbr_sink($i) getper]
+        set cbr_per             [get-app-per $cbr($i) $cbr_sink($i)]
         set cbr_ftt             [$cbr_sink($i) getftt]
         set cbr_fttstd          [$cbr_sink($i) getfttstd]
 
