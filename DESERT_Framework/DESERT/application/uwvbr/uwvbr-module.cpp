@@ -108,8 +108,6 @@ UwVbrModule::UwVbrModule()
 	, rftt(-1)
 	, srtt(0)
 	, sftt(0)
-	, lrtime(0)
-	, sthr(0)
 	, drop_out_of_order_(0)
 	, period_identifier_(1)
 	, timer_switch_1_(1000)
@@ -123,8 +121,7 @@ UwVbrModule::UwVbrModule()
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
-	, sumbytes(0)
-	, sumdt(0)
+	, recvd_bytes(0)
 	, esn(0)
 { // binding to TCL variables
 	bind("period1_", &period1_);
@@ -142,12 +139,6 @@ UwVbrModule::UwVbrModule()
 		sn_check[i] = false;
 	}
 }
-
-UwVbrModule::~UwVbrModule()
-{
-}
-
-// TCL command interpreter
 
 int
 UwVbrModule::command(int argc, const char *const *argv)
@@ -362,10 +353,7 @@ UwVbrModule::recv(Packet *p)
 		}
 	}
 
-	double dt = Scheduler::instance().clock() - lrtime;
-	updateThroughput(ch->size(), dt);
-
-	lrtime = Scheduler::instance().clock();
+	recvd_bytes += ch->size();
 
 	Packet::free(p);
 
@@ -441,7 +429,7 @@ UwVbrModule::GetPER() const
 double
 UwVbrModule::GetTHR() const
 {
-	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
+	return (NOW > 0) ? recvd_bytes * 8 / NOW : 0;
 }
 
 void
@@ -458,17 +446,6 @@ UwVbrModule::updateFTT(const double &ftt)
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-}
-
-void
-UwVbrModule::updateThroughput(const int &bytes, const double &dt)
-{
-	sumbytes += bytes;
-	sumdt += dt;
-
-	if (debug_ > 1) {
-		cerr << "bytes=" << bytes << "  dt=" << dt << endl;
-	}
 }
 
 void
@@ -504,7 +481,6 @@ UwVbrModule::resetStats()
 	pkts_lost = 0;
 	srtt = 0;
 	sftt = 0;
-	sthr = 0;
 	rftt = -1;
 	sumrtt = 0;
 	sumrtt2 = 0;
@@ -512,8 +488,7 @@ UwVbrModule::resetStats()
 	sumftt = 0;
 	sumftt2 = 0;
 	fttsamples = 0;
-	sumbytes = 0;
-	sumdt = 0;
+	recvd_bytes = 0;
 }
 
 double

@@ -97,13 +97,11 @@ uwApplicationModule::uwApplicationModule()
 	, rttsamples(0)
 	, fttsamples(0)
 	, period(10)
-	, lrtime(0)
 	, sumrtt(0)
 	, sumrtt2(0)
 	, sumftt(0)
 	, sumftt2(0)
-	, sumbytes(0)
-	, sumdt(0)
+	, recvd_bytes(0)
 	, servAddr()
 	, clnAddr()
 	, socket_thread()
@@ -322,10 +320,8 @@ uwApplicationModule::recv(Packet *p)
 		}
 	}
 
-	double dt = NOW - lrtime;
-	updateThroughput(uwApph->payload_size(), dt);
+	recvd_bytes += uwApph->payload_size();
 	incrPktRecv();
-	lrtime = NOW;
 
 	if (!withoutSocket())
 		printOnLog(Logger::LogLevel::DEBUG,
@@ -539,7 +535,7 @@ uwApplicationModule::GetPER() const
 double
 uwApplicationModule::GetTHR() const
 {
-	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
+	return (NOW > 0) ? recvd_bytes * 8 / NOW : 0;
 }
 
 void
@@ -548,13 +544,6 @@ uwApplicationModule::updateFTT(double ftt)
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-}
-
-void
-uwApplicationModule::updateThroughput(int bytes, double dt)
-{
-	sumbytes += bytes;
-	sumdt += dt;
 }
 
 void

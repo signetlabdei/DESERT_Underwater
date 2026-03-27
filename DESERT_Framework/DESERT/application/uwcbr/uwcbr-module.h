@@ -228,10 +228,10 @@ public:
 	 */
 	virtual double GetPER() const;
 
-	/**
-	 * Returns the mean Throughput.
+	 * Returns the throughput computed as the number of bits received
+	 * over the elapsed time from the start of the simulation.
 	 *
-	 * @return Throughput.
+	 * @return Throughput [bps].
 	 */
 	virtual double GetTHR() const;
 
@@ -302,8 +302,6 @@ protected:
 	double rftt; /**< Forward Trip Time seen for last received packet. */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP. */
 	double sftt; /**< Smoothed Forward Trip Time, calculated as srtt. */
-	double lrtime; /**< Time of last packet reception. */
-	double sthr; /**< Smoothed throughput calculation. */
 
 	double period_; /**< Period between two consecutive packet transmissions. */
 	int pktSize_; /**< <i>UWCBR</i> packets payload size. */
@@ -318,8 +316,7 @@ protected:
 	int fttsamples; /**< Number of FTT samples. */
 	double sumtxtimes = 0; /**< Sum of transmission times  */
 
-	double sumbytes; /**< Sum of bytes received. */
-	double sumdt; /**< Sum of the delays. */
+	double recvd_bytes; /**< Sum of received bytes. */
 
 	uint32_t esn; /**< Expected serial number. */
 
@@ -388,14 +385,6 @@ protected:
 	 * @param double& New Forward Trip Time entry.
 	 */
 	virtual void updateFTT(const double &);
-
-	/**
-	 * Updates the Throughput.
-	 *
-	 * @param int& Bytes of the payload of the last packet received.
-	 * @param double& Delay Time between the last two receipts.
-	 */
-	virtual void updateThroughput(const int &, const double &);
 
 	/**
 	 * Increases the number of packets lost.

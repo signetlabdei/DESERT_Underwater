@@ -134,9 +134,10 @@ public:
 	virtual double GetPER() const;
 
 	/**
-	 * Return the Throughput calculated [bps]
+	 * Returns the throughput computed as the number of bits received
+	 * over the elapsed time from the start of the simulation.
 	 *
-	 * @return Throughput [bps]
+	 * @return Throughput [bps].
 	 */
 	virtual double GetTHR() const;
 
@@ -445,25 +446,11 @@ protected:
 	virtual void updateRTT(double rtt);
 
 	/**
-	 * Returns the average Forward Trip Time
-	 *
-	 * @return the average Forward Trip Time
-	 *
-	 */
-
-	/**
 	 * Update the FTT after the reception of a new packet
 	 *
 	 * @param FTT of the current packet received
 	 */
 	virtual void updateFTT(double ftt);
-
-	/**
-	 * Update the Throughput after the reception of a new packet
-	 *
-	 * @param Throughput of the current packet received
-	 */
-	virtual void updateThroughput(int bytes, double dt);
 
 	bool socket_active; /** Flag set to true if packets are received from
 						   external application. */
@@ -504,13 +491,11 @@ protected:
 	int rttsamples; /**< Number of RTT samples. */
 	int fttsamples; /**< Number of FTT samples. */
 	double period; /**< Time between successive generation data packets. */
-	double lrtime; /**< Time of last packet reception. */
 	double sumrtt; /**< Sum of RTT samples. */
 	double sumrtt2; /**< Sum of (RTT^2). */
 	double sumftt; /**< Sum of FTT samples. */
 	double sumftt2; /**< Sum of (FTT^2). */
-	double sumbytes; /**< Sum of bytes received. */
-	double sumdt; /**< Sum of the delays. */
+	double recvd_bytes; /**< Sum of bytes received. */
 
 	struct sockaddr_in servAddr; /**< Server address. */
 	struct sockaddr_in clnAddr; /**< Client address. */
