@@ -157,9 +157,6 @@ UwCbrModule::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "gettxtime") == 0) {
 			tcl.resultf("%f", GetTxTime());
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getper") == 0) {
-			tcl.resultf("%f", GetPER());
-			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
 			return TCL_OK;
@@ -464,20 +461,6 @@ UwCbrModule::GetFTTstd() const
 		var = (sumftt2 - (sumftt * sumftt / fttsamples)) / (fttsamples - 1);
 		if (var > 0)
 			return (sqrt(var));
-	}
-
-	return 0;
-}
-
-double
-UwCbrModule::GetPER() const
-{
-	if (drop_out_of_order_) {
-		if ((pkts_recv + pkts_lost) > 0)
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-	} else {
-		if (esn > 0)
-			return (1 - (double) pkts_recv / (double) esn);
 	}
 
 	return 0;

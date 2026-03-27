@@ -160,9 +160,6 @@ UwVbrModule::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "getftt") == 0) {
 			tcl.resultf("%f", GetFTT());
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getper") == 0) {
-			tcl.resultf("%f", GetPER());
-			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
 			return TCL_OK;
@@ -406,23 +403,6 @@ UwVbrModule::GetFTTstd() const
 		}
 	} else {
 		return 0;
-	}
-}
-
-double
-UwVbrModule::GetPER() const
-{
-	if (drop_out_of_order_) {
-		if ((pkts_recv + pkts_lost) > 0) {
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-		} else {
-			return 0;
-		}
-	} else {
-		if (esn > 1)
-			return (1 - (double) pkts_recv / (double) (esn - 1));
-		else
-			return 0;
 	}
 }
 

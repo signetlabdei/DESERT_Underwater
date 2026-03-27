@@ -125,13 +125,6 @@ public:
 	 */
 
 	virtual double GetFTTstd() const;
-	/**
-	 * Rerturn the Packet Error Rate calculated
-	 *
-	 * @return the Packet Error Rate calculated
-	 */
-
-	virtual double GetPER() const;
 
 	/**
 	 * Returns the throughput computed as the number of bits received

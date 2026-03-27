@@ -217,11 +217,6 @@ public:
 	virtual double GetFTT() const;
 
 	/**
-	 * Returns the mean Packet Error Rate.
-	 * @return Packet Error Rate.
-	 */
-	virtual double GetPER() const;
-
 	 * Returns the throughput computed as the number of bits received
 	 * over the elapsed time from the start of the simulation.
 	 *
