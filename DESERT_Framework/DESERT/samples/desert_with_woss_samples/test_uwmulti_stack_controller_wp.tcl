@@ -718,7 +718,6 @@ proc finish { } {
 
 
   set sum_cbr_throughput 	0
-  set sum_per		0
   set sum_cbr_sent_pkts	0.0
   set sum_cbr_rcv_pkts	0.0
   set sum_mac_sent_pkts     0.0
@@ -727,7 +726,6 @@ proc finish { } {
 
   for {set id3 0} {$id3 < $opt(nn)} {incr id3}  {
 		set cbr_throughput	   [$cbr_sink($id3) getthr]
-		set cbr_per	           [$cbr_sink($id3) getper]
 		set cbr_pkts         	 [$cbr($id3) getsentpkts]
 		set mac_pkts         	 [$mac($id3) getDataPktsTx]
     set den_mac_pkts       $mac_pkts
@@ -742,7 +740,6 @@ proc finish { } {
     }
 
 		set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-		set sum_per [expr $sum_per + $cbr_per]
 		set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_pkts]
 		set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
 		set sum_mac_sent_pkts [expr $sum_mac_sent_pkts + $mac_pkts]
