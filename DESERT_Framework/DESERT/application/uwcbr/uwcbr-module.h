@@ -64,13 +64,13 @@ extern packet_t PT_UWCBR;
  * <i>hdr_uwcbr</i> describes <i>UWCBR</i> packets.
  */
 typedef struct hdr_uwcbr {
-	uint16_t sn_; /**< Serial number of the packet. */
 	float rftt_; /**< Forward Trip Time of the packet. */
+	uint16_t sn_; /**< Serial number of the packet. */
+	uint16_t traffic_type_; /**< Traffic type: (video, audio, image, etc..)
+							   meaning left to the user */
 	bool rftt_valid_; /**< Flag used to set the validity of the fft field. */
 	char priority_; /**< Priority flag: 1 means high priority, 0 normal
 					   priority. */
-	uint16_t traffic_type_; /**< Traffic type: (video, audio, image, etc..)
-							   meaning left to the user */
 	static int offset_; /**< Required by the PacketHeaderManager. */
 
 	/**
@@ -223,7 +223,7 @@ public:
 
 	/**
 	 * Returns the throughput computed as the number of bits received
-	 * over the elapsed time from the start of the simulation.
+	 * over the elapsed time from the first packet received.
 	 *
 	 * @return Throughput [bps].
 	 */
@@ -310,6 +310,7 @@ protected:
 	int fttsamples; /**< Number of FTT samples. */
 	double sumtxtimes = 0; /**< Sum of transmission times  */
 
+	double first_pkt_recvd_time; /**< Time when the first packet was correctly received. Used for throughput computation. */
 	double recvd_bytes; /**< Sum of received bytes. */
 
 	uint32_t esn; /**< Expected serial number. */

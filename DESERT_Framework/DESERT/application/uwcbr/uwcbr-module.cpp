@@ -118,6 +118,7 @@ UwCbrModule::UwCbrModule()
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
+	, first_pkt_recvd_time(0)
 	, recvd_bytes(0)
 	, esn(0)
 	, tracefile_enabler_(0)
@@ -400,12 +401,17 @@ UwCbrModule::recv(Packet *p)
 
 	incrPktRecv();
 
+	int last_hrsn = hrsn;
 	hrsn = uwcbrh->sn();
 	if (drop_out_of_order_) {
 		if (uwcbrh->sn() > esn) {
 			incrPktLost(uwcbrh->sn() - (esn));
 		}
 	}
+
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
 
 	recvd_bytes += ch->size();
 
@@ -469,7 +475,9 @@ UwCbrModule::GetFTTstd() const
 double
 UwCbrModule::GetTHR() const
 {
-	return (NOW > 0) ? recvd_bytes * 8 / NOW : 0;
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void

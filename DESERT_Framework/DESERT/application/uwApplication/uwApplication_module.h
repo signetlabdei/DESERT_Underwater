@@ -488,6 +488,7 @@ protected:
 	double sumrtt2; /**< Sum of (RTT^2). */
 	double sumftt; /**< Sum of FTT samples. */
 	double sumftt2; /**< Sum of (FTT^2). */
+	double first_pkt_recvd_time; /**< Time when the first packet was correctly received. Used for throughput computation. */
 	double recvd_bytes; /**< Sum of bytes received. */
 
 	struct sockaddr_in servAddr; /**< Server address. */

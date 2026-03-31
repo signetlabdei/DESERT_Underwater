@@ -295,6 +295,7 @@ protected:
 	double sumftt2; /**< Sum of (FTT^2). */
 	int fttsamples; /**< Number of FTT samples. */
 
+	double first_pkt_recvd_time; /**< Time when the first packet was correctly received. Used for throughput computation. */
 	double recvd_bytes; /**< Sum of bytes received. */
 
 	uint32_t esn; /**< Expected serial number. */

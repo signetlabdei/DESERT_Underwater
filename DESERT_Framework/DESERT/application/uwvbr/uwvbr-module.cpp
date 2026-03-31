@@ -121,6 +121,7 @@ UwVbrModule::UwVbrModule()
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
+	, first_pkt_recvd_time(0)
 	, recvd_bytes(0)
 	, esn(0)
 { // binding to TCL variables
@@ -343,12 +344,17 @@ UwVbrModule::recv(Packet *p)
 	/* a new packet has been received */
 	incrPktRecv();
 
+	int last_hrsn = hrsn;
 	hrsn = uwvbrh->sn();
 	if (drop_out_of_order_) {
 		if (uwvbrh->sn() > esn) { // packet losses are observed
 			incrPktLost(uwvbrh->sn() - (esn));
 		}
 	}
+
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
 
 	recvd_bytes += ch->size();
 
@@ -409,7 +415,9 @@ UwVbrModule::GetFTTstd() const
 double
 UwVbrModule::GetTHR() const
 {
-	return (NOW > 0) ? recvd_bytes * 8 / NOW : 0;
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void

@@ -101,6 +101,7 @@ uwApplicationModule::uwApplicationModule()
 	, sumrtt2(0)
 	, sumftt(0)
 	, sumftt2(0)
+	, first_pkt_recvd_time(0)
 	, recvd_bytes(0)
 	, servAddr()
 	, clnAddr()
@@ -301,6 +302,7 @@ uwApplicationModule::recv(Packet *p)
 	}
 	updateFTT(rftt);
 
+	int last_hrsn = hrsn;
 	hrsn = uwApph->sn_;
 
 	if (useDropOutOfOrder()) {
@@ -316,7 +318,12 @@ uwApplicationModule::recv(Packet *p)
 		}
 	}
 
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
+
 	recvd_bytes += uwApph->payload_size();
+
 	incrPktRecv();
 
 	if (!withoutSocket())
@@ -518,7 +525,9 @@ uwApplicationModule::GetFTTstd() const
 double
 uwApplicationModule::GetTHR() const
 {
-	return (NOW > 0) ? recvd_bytes * 8 / NOW : 0;
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void
