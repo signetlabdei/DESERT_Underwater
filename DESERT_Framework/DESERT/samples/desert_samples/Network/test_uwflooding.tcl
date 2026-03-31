@@ -376,7 +376,6 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###################
 # Final Procedure #
 ###################
-# Define here the procedure to call at the end of the simulation
 proc get-app-per { tx_app rx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
@@ -384,6 +383,7 @@ proc get-app-per { tx_app rx_app} {
 	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
 }
 
+# Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt outfile
     global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
@@ -458,7 +458,7 @@ proc finish {} {
     puts "Mean Throughput          : [expr (double($sum_cbr_throughput)/($opt(nn)))]"
     puts "Sent Packets             : $sum_cbr_sent_pkts"
     puts "Received Packets         : $sum_cbr_rcv_pkts"
-    puts "Packet Error Rate        : [expr ((1 - double($sum_cbr_rcv_pkts)/ $sum_cbr_sent_pkts) * 100)]"
+    puts "Packet Error Rate        : [expr (1 - 1.0 * $sum_cbr_rcv_pkts / $sum_cbr_sent_pkts) * 100]"
     
     $ns flush-trace
     close $opt(tracefile)
