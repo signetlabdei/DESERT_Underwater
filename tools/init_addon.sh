@@ -2,6 +2,24 @@
 # todo: read everything and fix
 # todo: add packet header and clmessages
 
+remove_from_list() {
+  local list="$1"
+  local to_remove="$2"
+  local new_list=""
+  
+  for item in $list; do
+    if [ "$item" != "$to_remove" ]; then
+      if [ -z "$new_list" ]; then
+        new_list="$item"
+      else
+        new_list="$new_list $item"
+      fi
+    fi
+  done
+  
+  echo "$new_list"
+}
+
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <addon_name> \"<author_name>\""
     exit 1
@@ -11,20 +29,42 @@ addon_name=$1
 author_name=$2
 
 # Create directory if it doesn't already exists
-rm -rf $addon_name; # TODO: remove, used for debug purposes
-cd ../DESERT_Addons/
-mkdir "$addon_name" && cd "$addon_name" || exit 1
+if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
+    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+    cd ../DESERT_Addons/
+    mkdir "$addon_name" && cd "$addon_name" || exit 1
+else 
+    echo "Error, another addon with the same name alredy exists."; exit 1
+fi
 
 echo "--- Dependency Configuration ---"
+# TODO list available dependencies or something like that
 read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
+
+# TODO better formatting for the depencecies or remove
+# echo "$(ls ../../DESERT_Framework/DESERT/)"
+for dep in $module_deps; do    
+    if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
+        module_deps=$(remove_from_list "$module_deps" "$dep")
+        read -p "Dependecy $dep does not exist, it will not be installed. Press CTLR+C to EXIT or ENTER to continue." stop
+    fi
+done
+
 read -p "Enter other ADDON dependencies (e.g., uwrov uwtracker): " addon_deps
-read -p "Does this addon depend on WOSS? [y/N]: " woss_choice
+for add in $addon_deps; do    
+    if [ ! -d "../../DESERT_Addons/$add" ]; then
+        addon_deps=$(remove_from_list "$addon_deps" "$add")
+        read -p "Dependecy $add does not exist, it will not be installed. Press CTLR+C to EXIT or ENTER to continue." stop
+    fi
+done
 
 if [ -z "$addon_deps" ]; then
 	has_deps=false
 else
 	has_deps=true
 fi
+
+read -p "Does this addon depend on WOSS? [y/N]: " woss_choice
 
 has_woss=false
 if [ "$woss_choice" = "y" ] || [ "$woss_choice" = "Y" ]; then
@@ -366,7 +406,7 @@ EOF
 ### nsallinone.m4 ###
 
 ### nsmiracle.m4 ###
-m4_text_nsallinone=$(cat << EOF
+m4_text_nsmiracle=$(cat << EOF
 ${copyright_header_sh}
 
 AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
@@ -488,16 +528,21 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
     DESERT_LDFLAGS=''
     DESERT_LIBADD=''
 
-    AC_ARG_WITH([desert], [AS_HELP_STRING([--with-desert=<dir>], [use desert in <dir>])], [
+    AC_ARG_WITH([desert], 
+        [AS_HELP_STRING([--with-desert=<dir>],
+        [use desert in <dir>])],
+        [
         if test "x\$withval" != "xno" ; then
             DESERT_PATH="\${withval}"
-            for dir in ${module_deps} ; do
-                DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\$dir"
-                DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\$dir/.libs"
-            done
-            for lib in $(echo $module_deps | xargs -n1 basename) ; do
-                DESERT_LIBADD="\$DESERT_LIBADD -l\$lib"
-            done
+            $([ ! -z "$module_deps" ] && echo "
+                for dir in ${module_deps} ; do 
+                    DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\${dir}" 
+                    DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\${dir}/.libs"
+                done  
+
+                for lib in $(echo $module_deps | xargs -n1 basename | xargs) ; do 
+                    DESERT_LIBADD="\$DESERT_LIBADD -l\$lib" 
+                done")  
         fi
     ])
     AC_SUBST(DESERT_CPPFLAGS)
@@ -505,18 +550,51 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
     AC_SUBST(DESERT_LIBADD)
 ])
 
+AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
+
+    DESERT_PATH_BUILD=''
+    DESERT_LDFLAGS_BUILD=''
+
+    AC_ARG_WITH([desert-build],
+        [AS_HELP_STRING([--with-desert-build=<directory>],
+                [use desert installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    DESERT_PATH_BUILD="\${withval}"
+                    if test ! -d "\${DESERT_PATH_BUILD}" ; then
+                        AC_MSG_ERROR([could not find \${withval}, is --with-desert-build=\${withval} correct?])
+                    fi
+                $([ ! -z "$addon_deps" ] && echo "
+                    for dir in ${addon_deps} ; do
+                        echo \"considering dir "\$dir"\"
+                        DESERT_LDFLAGS_BUILD="$DESERT_LDFLAGS_BUILD -L${DESERT_PATH_BUILD}/${dir}"
+                    done"
+                )
+                else
+                    AC_MSG_ERROR([desert path \$withval is not a directory])
+                fi
+            fi
+        ])
+
+    #AC_SUBST(DESERT_CPPFLAGS)
+    AC_SUBST(DESERT_LDFLAGS_BUILD)
+])
+
 AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
     DESERT_ADDON_CPPFLAGS=''
     DESERT_ADDON_LDFLAGS=''
     DESERT_ADDON_LIBADD=''
     AC_ARG_WITH([desertAddon], [AS_HELP_STRING([--with-desertAddon=<dir>], [use addons in <dir>])], [
-        if test "x\$withval" != "xno" ; then
+        $([ ! -z "$addon_deps" ] && echo "
+        if test \"x\$withval\" != \"xno\" ; then
             for dir in ${addon_deps} ; do
-                DESERT_ADDON_CPPFLAGS="\$DESERT_ADDON_CPPFLAGS -I\${withval}/\$dir"
-                DESERT_ADDON_LDFLAGS="\$DESERT_ADDON_LDFLAGS -L\${withval}/\$dir/.libs"
-                DESERT_ADDON_LIBADD="\$DESERT_ADDON_LIBADD -l\$dir"
+                DESERT_ADDON_CPPFLAGS=\"\$DESERT_ADDON_CPPFLAGS -I\${withval}/\$dir\"
+                DESERT_ADDON_LDFLAGS=\"\$DESERT_ADDON_LDFLAGS -L\${withval}/\$dir/.libs\"
+                DESERT_ADDON_LIBADD=\"\$DESERT_ADDON_LIBADD -l\$dir\"
             done
         fi
+        ")
     ])
     AC_SUBST(DESERT_ADDON_CPPFLAGS)
     AC_SUBST(DESERT_ADDON_LDFLAGS)
