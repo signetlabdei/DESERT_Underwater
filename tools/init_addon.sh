@@ -29,13 +29,16 @@ addon_name=$1
 author_name=$2
 
 # Create directory if it doesn't already exists
-if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
-    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
-    cd ../DESERT_Addons/
-    mkdir "$addon_name" && cd "$addon_name" || exit 1
-else 
-    echo "Error, another addon with the same name alredy exists."; exit 1
-fi
+# if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
+#     rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+#     cd ../DESERT_Addons/
+#     mkdir "$addon_name" && cd "$addon_name" || exit 1
+# else 
+#     echo "Error, another addon with the same name alredy exists."; exit 1
+# fi
+## TODO remove the test path folder
+rm -rf ./$addon_name; # TODO: remove, used for debug purposes
+mkdir "$addon_name" && cd "$addon_name" || exit 1
 
 echo "--- Dependency Configuration ---"
 # TODO list available dependencies or something like that
@@ -43,6 +46,7 @@ read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): 
 
 # TODO better formatting for the depencecies or remove
 # echo "$(ls ../../DESERT_Framework/DESERT/)"
+
 for dep in $module_deps; do    
     if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
         module_deps=$(remove_from_list "$module_deps" "$dep")
@@ -54,6 +58,7 @@ read -p "Enter other ADDON dependencies (e.g., uwrov uwtracker): " addon_deps
 for add in $addon_deps; do    
     if [ ! -d "../../DESERT_Addons/$add" ]; then
         addon_deps=$(remove_from_list "$addon_deps" "$add")
+        # TODO better exit strategy removing the folder alredy created
         read -p "Dependecy $add does not exist, it will not be installed. Press CTLR+C to EXIT or ENTER to continue." stop
     fi
 done
@@ -251,7 +256,7 @@ mkdir m4
 m4_text_makefile_am=$(cat << EOF
 ${copyright_header_sh}
 
-EXTRA_DIST = nsallinone.m4 nsmiracle.m4 desert.m4 $( [ "$has_deps" = true ] && echo " desertAddon.m4" )$( [ "$has_woss" = true ] && echo " woss.m4" )
+EXTRA_DIST = nsallinone.m4 nsmiracle.m4 desert.m4 $( [ "$has_deps" = true ] && echo "desertAddon.m4" ) $( [ "$has_woss" = true ] && echo "woss.m4" )
 EOF
 )
 ### Makefile.am ###
@@ -529,22 +534,33 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
     DESERT_LIBADD=''
 
     AC_ARG_WITH([desert], 
-        [AS_HELP_STRING([--with-desert=<dir>],
-        [use desert in <dir>])],
+        [AS_HELP_STRING([--with-desert=<directory>],
+        [use desert in <directory>])],
         [
-        if test "x\$withval" != "xno" ; then
-            DESERT_PATH="\${withval}"
-            $([ ! -z "$module_deps" ] && echo "
-                for dir in ${module_deps} ; do 
-                    DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\${dir}" 
-                    DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\${dir}/.libs"
-                done  
+            if test "x\$withval" != "xno" ; then
 
-                for lib in $(echo $module_deps | xargs -n1 basename | xargs) ; do 
-                    DESERT_LIBADD="\$DESERT_LIBADD -l\$lib" 
-                done")  
-        fi
-    ])
+                if test -d \$withval ; then
+                    DESERT_PATH="\${withval}"
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desert=\${withval} correct?])
+                fi
+        
+                $([ ! -z "$module_deps" ] && echo "
+                    for dir in ${module_deps} ; do 
+                        DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\${dir}" 
+                        DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\${dir}/.libs"
+                    done  
+
+                    for lib in $(echo $module_deps | xargs -n1 basename | xargs) ; do 
+                        DESERT_LIBADD="\$DESERT_LIBADD -l\${lib}" 
+                    done"
+                )
+
+                DESERT_DISTCHECK_CONFIGURE_FLAGS="--with-desert=\$withval"
+                AC_SUBST(DESERT_DISTCHECK_CONFIGURE_FLAGS)
+
+            fi
+        ])
     AC_SUBST(DESERT_CPPFLAGS)
     AC_SUBST(DESERT_LDFLAGS)
     AC_SUBST(DESERT_LIBADD)
@@ -557,48 +573,26 @@ AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
 
     AC_ARG_WITH([desert-build],
         [AS_HELP_STRING([--with-desert-build=<directory>],
-                [use desert installation in <directory>])],
+        [use desert installation in <directory>])],
         [
             if test "x\$withval" != "xno" ; then
+
                 if test -d \$withval ; then
                     DESERT_PATH_BUILD="\${withval}"
-                    if test ! -d "\${DESERT_PATH_BUILD}" ; then
-                        AC_MSG_ERROR([could not find \${withval}, is --with-desert-build=\${withval} correct?])
-                    fi
-                $([ ! -z "$addon_deps" ] && echo "
-                    for dir in ${addon_deps} ; do
-                        echo \"considering dir "\$dir"\"
-                        DESERT_LDFLAGS_BUILD="$DESERT_LDFLAGS_BUILD -L${DESERT_PATH_BUILD}/${dir}"
-                    done"
-                )
-                else
-                    AC_MSG_ERROR([desert path \$withval is not a directory])
+
+                    $([ ! -z "$module_deps" ] && echo "
+                        for dir in ${module_deps} ; do 
+                            DESERT_LDFLAGS_BUILD=\"\$DESERT_LDFLAGS_BUILD -L\${DESERT_PATH_BUILD}/\${dir}\" 
+                        done"  
+                    )
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desert=\${withval} correct?])
                 fi
-            fi
+            fi    
         ])
 
     #AC_SUBST(DESERT_CPPFLAGS)
     AC_SUBST(DESERT_LDFLAGS_BUILD)
-])
-
-AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
-    DESERT_ADDON_CPPFLAGS=''
-    DESERT_ADDON_LDFLAGS=''
-    DESERT_ADDON_LIBADD=''
-    AC_ARG_WITH([desertAddon], [AS_HELP_STRING([--with-desertAddon=<dir>], [use addons in <dir>])], [
-        $([ ! -z "$addon_deps" ] && echo "
-        if test \"x\$withval\" != \"xno\" ; then
-            for dir in ${addon_deps} ; do
-                DESERT_ADDON_CPPFLAGS=\"\$DESERT_ADDON_CPPFLAGS -I\${withval}/\$dir\"
-                DESERT_ADDON_LDFLAGS=\"\$DESERT_ADDON_LDFLAGS -L\${withval}/\$dir/.libs\"
-                DESERT_ADDON_LIBADD=\"\$DESERT_ADDON_LIBADD -l\$dir\"
-            done
-        fi
-        ")
-    ])
-    AC_SUBST(DESERT_ADDON_CPPFLAGS)
-    AC_SUBST(DESERT_ADDON_LDFLAGS)
-    AC_SUBST(DESERT_ADDON_LIBADD)
 ])
 
 AC_DEFUN([AC_CHECK_DESERT],[
@@ -606,7 +600,10 @@ AC_DEFUN([AC_CHECK_DESERT],[
     CPPFLAGS="\$CPPFLAGS \$NS_CPPFLAGS \$NSMIRACLE_CPPFLAGS"
     AC_LANG_PUSH(C++)
     AC_MSG_CHECKING([for desert headers])
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[#include<cltracer.h>]],[[]])],
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[
+                #include<cltracer.h>
+                ClMessageTracer* t;
+                ]],[[]])],
         [AC_MSG_RESULT([yes]); found_desert=yes; [\$1]],
         [AC_MSG_RESULT([no]); found_desert=no; [\$2]])
     AM_CONDITIONAL([HAVE_DESERT], [test x\$found_desert = xyes])
@@ -617,6 +614,81 @@ EOF
 )
 ### desert.m4 ###
 
+### desertAddon.m4 ###
+if [ "$has_deps" = true ]; then
+
+m4_text_desertAddon=$(cat << EOF
+${copyright_header_sh}
+
+AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
+    DESERT_ADDON_PATH=''
+    DESERT_ADDON_CPPFLAGS=''
+    DESERT_ADDON_LDFLAGS=''
+    DESERT_ADDON_LIBADD=''
+    
+    AC_ARG_WITH([desertAddon], 
+        [AS_HELP_STRING([--with-desertAddon=<directory>],
+        [use addons in <directory>])], 
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    DESERT_ADDON_PATH="\${withval}"
+                    
+                    $([ ! -z "$addon_deps" ] && echo "
+                    for dir in ${addon_deps} ; do 
+                        DESERT_ADDON_CPPFLAGS=\"\$DESERT_ADDON_CPPFLAGS -I\${DESERT_ADDON_PATH}/\${dir}\" 
+                        DESERT_ADDON_LDFLAGS=\"\$DESERT_ADDON_LDFLAGS -L\${DESERT_ADDON_PATH}/\${dir}/.libs\" 
+                        DESERT_ADDON_LIBADD=\"\$DESERT_ADDON_LIBADD -l\${dir}\" 
+                    done
+                    ")
+
+                    DESERT_ADDON_DISTCHECK_CONFIGURE_FLAGS="--with-desertAddon=\$withval"
+                    AC_SUBST(DESERT_ADDON_DISTCHECK_CONFIGURE_FLAGS)
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desertAddon=\${withval} correct?])
+                fi
+            fi
+        ])
+
+    AC_SUBST(DESERT_ADDON_CPPFLAGS)
+    AC_SUBST(DESERT_ADDON_LDFLAGS)
+    AC_SUBST(DESERT_ADDON_LIBADD)
+])
+
+AC_DEFUN([AC_ARG_WITH_DESERT_ADDON_BUILD],[
+
+    DESERT_ADDON_PATH_BUILD=''
+    DESERT_ADDON_LDFLAGS_BUILD=''
+
+    AC_ARG_WITH([desertAddon-build],
+        [AS_HELP_STRING([--with-desertAddon-build=<directory>],
+        [use desert_addon_build installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    DESERT_ADDON_PATH_BUILD="\${withval}"
+
+                    $([ ! -z "$addon_deps" ] && echo "
+                        for dir in ${addon_deps} ; do      
+                            echo \"considering dir \$dir\"
+                            DESERT_ADDON_LDFLAGS_BUILD=\"\$DESERT_ADDON_LDFLAGS_BUILD -L\${DESERT_ADDON_PATH_BUILD}/\${dir}\"
+                        done
+                     ")
+                else   
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desertAddon-build=\${withval} correct?])
+                fi
+            fi
+        ])
+
+    AC_SUBST(DESERT_ADDON_LDFLAGS_BUILD)
+])
+EOF
+)
+fi
+### desertAddon.m4 ###
+
+
+
 #### --------------------------- M4 write files --------------------------- ####
 printf "%s" "$m4_text_makefile_am" > m4/Makefile.am
 
@@ -625,6 +697,10 @@ printf "%s" "$m4_text_nsallinone" > m4/nsallinone.m4
 printf "%s" "$m4_text_nsmiracle" > m4/nsmiracle.m4
 
 printf "%s" "$m4_text_desert" > m4/desert.m4
+
+if [ "$has_deps" = true ]; then
+    printf "%s" "$m4_text_desertAddon" > m4/desertAddon.m4
+fi
 
 
 #### ------------------------------- Summary ------------------------------- ####
