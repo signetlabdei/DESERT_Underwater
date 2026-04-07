@@ -28,17 +28,13 @@ fi
 addon_name=$1
 author_name=$2
 
-# Create directory if it doesn't already exists
-# if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
-#     rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
-#     cd ../DESERT_Addons/
-#     mkdir "$addon_name" && cd "$addon_name" || exit 1
-# else 
-#     echo "Error, another addon with the same name alredy exists."; exit 1
-# fi
-## TODO remove the test path folder
-rm -rf ./$addon_name; # TODO: remove, used for debug purposes
-mkdir "$addon_name" && cd "$addon_name" || exit 1
+if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
+    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+    cd ../DESERT_Addons/
+    mkdir "$addon_name" && cd "$addon_name" || exit 1
+else 
+    echo "Error, another addon with the same name alredy exists."; exit 1
+fi
 
 echo "--- Dependency Configuration ---"
 # TODO list available dependencies or something like that
@@ -186,11 +182,11 @@ lib_LTLIBRARIES = lib${addon_name}.la
 
 lib${addon_name}_la_SOURCES = initlib.cpp ${addon_name}.cpp
 
-lib${addon_name}_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_CPPFLAGS" )$( [ "$has_woss" = true ] && echo " @WOSS_CPPFLAGS@" )
-lib${addon_name}_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD" )$( [ "$has_woss" = true ] && echo " @WOSS_LDFLAGS@" )
+lib${addon_name}_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_CPPFLAGS@" )$( [ "$has_woss" = true ] && echo " @WOSS_CPPFLAGS@" )
+lib${addon_name}_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@" )$( [ "$has_woss" = true ] && echo " @WOSS_LDFLAGS@" )
 lib${addon_name}_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LIBADD@" )$( [ "$has_woss" = true ] && echo " @WOSS_LIBADD@" )
 
-nodist_lib${addon_name}_la_SOURCES = InitTcl.cc
+nodist_lib${addon_name}_la_SOURCES = initTcl.cc
 
 BUILT_SOURCES = initTcl.cc
 
@@ -283,10 +279,10 @@ AC_ARG_WITH([ns-allinone],
 
         NS_ALLINONE_PATH=\$withval
 
-        NS_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d ns-* | head -n 1`
-        TCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d * | grep -e 'tcl[0-9].*' | head -n 1`
-        TCLCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d tclcl-* | head -n 1`
-        OTCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d otcl-* | head -n 1`
+        NS_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d ns-* | head -n 1\`
+        TCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d * | grep -e 'tcl[0-9].*' | head -n 1\`
+        TCLCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d tclcl-* | head -n 1\`
+        OTCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d otcl-* | head -n 1\`
 
         NS_CPPFLAGS="-isystem \$NS_ALLINONE_PATH/include -isystem \$NS_PATH -isystem \$TCLCL_PATH -isystem \$OTCL_PATH"
 
@@ -327,7 +323,7 @@ AC_ARG_WITH([ns-allinone],
     AC_SUBST(NS_CPPFLAGS)
     AC_MSG_CHECKING([for NS_LDFLAGS and NS_LIBADD type])
 
-    system=`uname -s`
+    system=\`uname -s\`
     case \$system in
         CYGWIN*)
             AC_MSG_RESULT([cygwin])
@@ -522,7 +518,6 @@ EOF
 )
 ### nsmiracle.m4 ###
 
-# TODO: fix case with no deps
 ### desert.m4 ###
 m4_text_desert=$(cat << EOF
 ${copyright_header_sh}
@@ -547,12 +542,12 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
         
                 $([ ! -z "$module_deps" ] && echo "
                     for dir in ${module_deps} ; do 
-                        DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\${dir}" 
-                        DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\${dir}/.libs"
+                        DESERT_CPPFLAGS=\$DESERT_CPPFLAGS\\ -I\${DESERT_PATH}/\${dir} 
+                        DESERT_LDFLAGS=\$DESERT_LDFLAGS\\ -L\${DESERT_PATH}/\${dir}
                     done  
 
-                    for lib in $(echo $module_deps | xargs -n1 basename | xargs) ; do 
-                        DESERT_LIBADD="\$DESERT_LIBADD -l\${lib}" 
+                    for lib in $(echo $module_deps | xargs -n1 basename | sed 's/-//g' | xargs) ; do 
+                        DESERT_LIBADD=\$DESERT_LIBADD\\ -l\${lib} 
                     done"
                 )
 
