@@ -1,5 +1,4 @@
 #!/bin/sh
-# todo: read everything and fix
 # todo: add packet header and clmessages
 
 remove_from_list() {
@@ -29,33 +28,49 @@ addon_name=$1
 author_name=$2
 
 if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
-    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
     cd ../DESERT_Addons/
     mkdir "$addon_name" && cd "$addon_name" || exit 1
 else 
+    # rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
     echo "Error, another addon with the same name alredy exists."; exit 1
 fi
 
 echo "--- Dependency Configuration ---"
-# TODO list available dependencies or something like that
-read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
 
-# TODO better formatting for the depencecies or remove
-# echo "$(ls ../../DESERT_Framework/DESERT/)"
+echo "Reading from /DESERT_Framework/DESERT/ directory."
+echo "$(find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | column)"
+
+read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
 
 for dep in $module_deps; do    
     if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
         module_deps=$(remove_from_list "$module_deps" "$dep")
-        read -p "Dependecy $dep does not exist, it will not be installed. Press CTLR+C to EXIT or ENTER to continue." stop
+        read -p "Dependecy $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        if [ $stop = "q" ] || [ $stop = "Q" ]; then
+            cd .. && rm -rf "$addon_name" || exit 1
+            exit 1
+        fi
     fi
 done
 
-read -p "Enter other ADDON dependencies (e.g., uwrov uwtracker): " addon_deps
+echo "--- Addons Configuration ---"
+
+echo "Reading from /DESERT_Framework/.addon.list. If you don't see your dependency, add it to this file."
+echo "$(cat ../../DESERT_Framework/.addon.list)"
+read -p "Enter ADDON dependencies you want to install (e.g., uwrov uwtracker): " addon_deps
+
+if [ "$addon_deps" = "a" ] || [ "$addon_deps" = "A" ] || [ "$addon_deps" = "ALL" ] || [ "$addon_deps" = "all" ]; then
+    addon_deps="$(sed '/ALL/d; s/[[:space:]].*$//' ../../DESERT_Framework/.addon.list | tr '\n' ' ')"
+fi
+
 for add in $addon_deps; do    
     if [ ! -d "../../DESERT_Addons/$add" ]; then
         addon_deps=$(remove_from_list "$addon_deps" "$add")
-        # TODO better exit strategy removing the folder alredy created
-        read -p "Dependecy $add does not exist, it will not be installed. Press CTLR+C to EXIT or ENTER to continue." stop
+        read -p "Addon $add does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        if [ $stop = "q" ] || [ $stop = "Q" ]; then
+            cd .. && rm -rf "$addon_name" || exit 1
+            exit 1
+        fi
     fi
 done
 
@@ -683,6 +698,134 @@ fi
 ### desertAddon.m4 ###
 
 
+### woss.m4 ###
+if [ "$has_woss" = true ]; then
+
+m4_text_woss=$(cat << EOF
+${copyright_header_sh}
+
+AC_DEFUN([AC_ARG_WITH_WOSS],[
+
+    WOSS_PATH=''
+    WOSS_CPPLAGS=''
+    WOSS_LDFLAGS=''
+    WOSS_LIBADD=''
+
+    AC_ARG_WITH([woss],
+        [AS_HELP_STRING([--with-woss=<directory>],[use woss installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    WOSS_PATH="\${withval}"
+                    relevantheaderfile="\${WOSS_PATH}/woss/woss.h"
+        
+                    if test ! -f "\${relevantheaderfile}"; then
+                        AC_MSG_ERROR([could not find \${relevantheaderfile}, is --with-woss=\${withval} correct?])
+                    fi      
+
+                    for dir in  \
+                        uwm \
+                        woss \
+                        woss/woss_def \
+                        woss/woss_db \
+                        woss_phy 
+                    do
+                        WOSS_CPPFLAGS="\$WOSS_CPPFLAGS -I\${WOSS_PATH}/\${dir}"
+                        WOSS_LDFLAGS="\$WOSS_LDFLAGS -L\${WOSS_PATH}/\${dir}"
+                    done
+
+                    for lib in \
+                        UwmStd \
+                        WOSS \
+                        WOSSPhy
+                    do
+                        WOSS_LIBADD="\$WOSS_LIBADD -l\${lib}"
+                    done    
+
+                    WOSS_DISTCHECK_CONFIGURE_FLAGS="--with-woss=\$withval"
+                    AC_SUBST(WOSS_DISTCHECK_CONFIGURE_FLAGS)
+
+                    AC_MSG_WARN([---------------------------------------------------------------------])
+                    AC_MSG_WARN([--with-woss parameter has been set when you ran configure file])
+                    AC_MSG_WARN([the Makefile.in file has been modified deleding:])
+                    AC_MSG_WARN([  - uwm])
+                    AC_MSG_WARN([---------------------------------------------------------------------])
+                    sed -i -e '/uwm/d' ./Makefile.in
+
+                else   
+                    AC_MSG_ERROR([woss path \$withval is not a directory])
+                fi
+            fi
+
+        ],
+        [
+            AC_MSG_WARN([---------------------------------------------------------------------])
+            AC_MSG_WARN([--with-woss parameter has been omitted when you ran configure file])
+            AC_MSG_WARN([the Makefile.in file has been modified deleding:])
+            AC_MSG_WARN([  - uw-t-lohi])
+#            AC_MSG_WARN([  - bpsk_db])
+#            AC_MSG_WARN([  - uwphysical])
+#            AC_MSG_WARN([  - uwgainfromdb])
+#            AC_MSG_WARN([  - uwphysicalracun])
+            AC_MSG_WARN([  - wossgmmob3D])
+            AC_MSG_WARN([  - wossgroupmob3D])
+            AC_MSG_WARN([---------------------------------------------------------------------])
+            sed -i -e '/uw-t-lohi/d' ./Makefile.in
+#            sed -i -e '/bpsk_db/d' ./Makefile.in
+#            sed -i -e '/uwphysical/d' ./Makefile.in
+#            sed -i -e '/uwgainfromdb/d' ./Makefile.in
+#            sed -i -e '/uwphysicalracun/d' ./Makefile.in
+            sed -i -e '/wossgmmob3D/d' ./Makefile.in
+            sed -i -e '/wossgroupmob3D/d' ./Makefile.in
+        ])
+    AC_SUBST(WOSS_CPPFLAGS)
+    AC_SUBST(WOSS_LDFLAGS)
+    AC_SUBST(WOSS_LIBADD)
+])
+
+
+AC_DEFUN([AC_CHECK_WOSS],
+    [
+    # temporarily add NS_CPPFLAGS and WOSS_CPPFLAGS to CPPFLAGS
+    BACKUP_CPPFLAGS="\$CPPFLAGS"
+    CPPFLAGS="\$CPPFLAGS \$NS_CPPFLAGS \$WOSS_CPPFLAGS"
+
+    AC_LANG_PUSH(C++)
+
+    AC_MSG_CHECKING([for woss headers])
+
+    AC_PREPROC_IFELSE(
+        [AC_LANG_PROGRAM([[
+            #include<res-reader.h>
+            ResReader* r; 
+            ]],[[
+            ]]  )],
+            [
+                AC_MSG_RESULT([yes])
+                found_woss=yes
+                [\$1]
+            ],
+            [
+                AC_MSG_RESULT([no])
+                found_woss=no
+            [\$2]
+            #AC_MSG_ERROR([could not find woss])
+            ])
+
+    AM_CONDITIONAL([HAVE_WOSS], [test x\$found_woss = xyes])
+
+    # Restoring to the initial value
+    CPPFLAGS="\$BACKUP_CPPFLAGS"
+
+    AC_LANG_POP(C++)
+
+    ])
+
+EOF
+)
+fi
+
+
 
 #### --------------------------- M4 write files --------------------------- ####
 printf "%s" "$m4_text_makefile_am" > m4/Makefile.am
@@ -692,6 +835,10 @@ printf "%s" "$m4_text_nsallinone" > m4/nsallinone.m4
 printf "%s" "$m4_text_nsmiracle" > m4/nsmiracle.m4
 
 printf "%s" "$m4_text_desert" > m4/desert.m4
+
+if [ "$has_woss" = true ]; then
+    printf "%s" "$m4_text_woss" > m4/woss.m4
+fi
 
 if [ "$has_deps" = true ]; then
     printf "%s" "$m4_text_desertAddon" > m4/desertAddon.m4
