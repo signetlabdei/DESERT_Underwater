@@ -1,6 +1,23 @@
 #!/bin/sh
-# todo: read everything and fix
 # todo: add packet header and clmessages
+
+remove_from_list() {
+  local list="$1"
+  local to_remove="$2"
+  local new_list=""
+  
+  for item in $list; do
+    if [ "$item" != "$to_remove" ]; then
+      if [ -z "$new_list" ]; then
+        new_list="$item"
+      else
+        new_list="$new_list $item"
+      fi
+    fi
+  done
+  
+  echo "$new_list"
+}
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <addon_name> \"<author_name>\""
@@ -10,21 +27,60 @@ fi
 addon_name=$1
 author_name=$2
 
-# Create directory if it doesn't already exists
-rm -rf $addon_name; # TODO: remove, used for debug purposes
-cd ../DESERT_Addons/
-mkdir "$addon_name" && cd "$addon_name" || exit 1
+if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
+    cd ../DESERT_Addons/
+    mkdir "$addon_name" && cd "$addon_name" || exit 1
+else 
+    # rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+    echo "Error, another addon with the same name alredy exists."; exit 1
+fi
 
 echo "--- Dependency Configuration ---"
+
+echo "Reading from /DESERT_Framework/DESERT/ directory."
+echo "$(find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | column)"
+
 read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
-read -p "Enter other ADDON dependencies (e.g., uwrov uwtracker): " addon_deps
-read -p "Does this addon depend on WOSS? [y/N]: " woss_choice
+
+for dep in $module_deps; do    
+    if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
+        module_deps=$(remove_from_list "$module_deps" "$dep")
+        read -p "Dependecy $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        if [ $stop = "q" ] || [ $stop = "Q" ]; then
+            cd .. && rm -rf "$addon_name" || exit 1
+            exit 1
+        fi
+    fi
+done
+
+echo "--- Addons Configuration ---"
+
+echo "Reading from /DESERT_Framework/.addon.list. If you don't see your dependency, add it to this file."
+echo "$(cat ../../DESERT_Framework/.addon.list)"
+read -p "Enter ADDON dependencies you want to install (e.g., uwrov uwtracker): " addon_deps
+
+if [ "$addon_deps" = "a" ] || [ "$addon_deps" = "A" ] || [ "$addon_deps" = "ALL" ] || [ "$addon_deps" = "all" ]; then
+    addon_deps="$(sed '/ALL/d; s/[[:space:]].*$//' ../../DESERT_Framework/.addon.list | tr '\n' ' ')"
+fi
+
+for add in $addon_deps; do    
+    if [ ! -d "../../DESERT_Addons/$add" ]; then
+        addon_deps=$(remove_from_list "$addon_deps" "$add")
+        read -p "Addon $add does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        if [ $stop = "q" ] || [ $stop = "Q" ]; then
+            cd .. && rm -rf "$addon_name" || exit 1
+            exit 1
+        fi
+    fi
+done
 
 if [ -z "$addon_deps" ]; then
 	has_deps=false
 else
 	has_deps=true
 fi
+
+read -p "Does this addon depend on WOSS? [y/N]: " woss_choice
 
 has_woss=false
 if [ "$woss_choice" = "y" ] || [ "$woss_choice" = "Y" ]; then
@@ -141,11 +197,11 @@ lib_LTLIBRARIES = lib${addon_name}.la
 
 lib${addon_name}_la_SOURCES = initlib.cpp ${addon_name}.cpp
 
-lib${addon_name}_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_CPPFLAGS" )$( [ "$has_woss" = true ] && echo " @WOSS_CPPFLAGS@" )
-lib${addon_name}_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD" )$( [ "$has_woss" = true ] && echo " @WOSS_LDFLAGS@" )
+lib${addon_name}_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_CPPFLAGS@" )$( [ "$has_woss" = true ] && echo " @WOSS_CPPFLAGS@" )
+lib${addon_name}_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@" )$( [ "$has_woss" = true ] && echo " @WOSS_LDFLAGS@" )
 lib${addon_name}_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@$( [ "$has_deps" = true ] && echo " @DESERT_ADDON_LIBADD@" )$( [ "$has_woss" = true ] && echo " @WOSS_LIBADD@" )
 
-nodist_lib${addon_name}_la_SOURCES = InitTcl.cc
+nodist_lib${addon_name}_la_SOURCES = initTcl.cc
 
 BUILT_SOURCES = initTcl.cc
 
@@ -211,7 +267,7 @@ mkdir m4
 m4_text_makefile_am=$(cat << EOF
 ${copyright_header_sh}
 
-EXTRA_DIST = nsallinone.m4 nsmiracle.m4 desert.m4 $( [ "$has_deps" = true ] && echo " desertAddon.m4" )$( [ "$has_woss" = true ] && echo " woss.m4" )
+EXTRA_DIST = nsallinone.m4 nsmiracle.m4 desert.m4 $( [ "$has_deps" = true ] && echo "desertAddon.m4" ) $( [ "$has_woss" = true ] && echo "woss.m4" )
 EOF
 )
 ### Makefile.am ###
@@ -238,10 +294,10 @@ AC_ARG_WITH([ns-allinone],
 
         NS_ALLINONE_PATH=\$withval
 
-        NS_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d ns-* | head -n 1`
-        TCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d * | grep -e 'tcl[0-9].*' | head -n 1`
-        TCLCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d tclcl-* | head -n 1`
-        OTCL_PATH=\$NS_ALLINONE_PATH/`cd \$NS_ALLINONE_PATH; ls -d otcl-* | head -n 1`
+        NS_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d ns-* | head -n 1\`
+        TCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d * | grep -e 'tcl[0-9].*' | head -n 1\`
+        TCLCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d tclcl-* | head -n 1\`
+        OTCL_PATH=\$NS_ALLINONE_PATH/\`cd \$NS_ALLINONE_PATH; ls -d otcl-* | head -n 1\`
 
         NS_CPPFLAGS="-isystem \$NS_ALLINONE_PATH/include -isystem \$NS_PATH -isystem \$TCLCL_PATH -isystem \$OTCL_PATH"
 
@@ -282,7 +338,7 @@ AC_ARG_WITH([ns-allinone],
     AC_SUBST(NS_CPPFLAGS)
     AC_MSG_CHECKING([for NS_LDFLAGS and NS_LIBADD type])
 
-    system=`uname -s`
+    system=\`uname -s\`
     case \$system in
         CYGWIN*)
             AC_MSG_RESULT([cygwin])
@@ -366,7 +422,7 @@ EOF
 ### nsallinone.m4 ###
 
 ### nsmiracle.m4 ###
-m4_text_nsallinone=$(cat << EOF
+m4_text_nsmiracle=$(cat << EOF
 ${copyright_header_sh}
 
 AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
@@ -477,7 +533,6 @@ EOF
 )
 ### nsmiracle.m4 ###
 
-# TODO: fix case with no deps
 ### desert.m4 ###
 m4_text_desert=$(cat << EOF
 ${copyright_header_sh}
@@ -488,39 +543,66 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
     DESERT_LDFLAGS=''
     DESERT_LIBADD=''
 
-    AC_ARG_WITH([desert], [AS_HELP_STRING([--with-desert=<dir>], [use desert in <dir>])], [
-        if test "x\$withval" != "xno" ; then
-            DESERT_PATH="\${withval}"
-            for dir in ${module_deps} ; do
-                DESERT_CPPFLAGS="\$DESERT_CPPFLAGS -I\${DESERT_PATH}/src/\$dir"
-                DESERT_LDFLAGS="\$DESERT_LDFLAGS -L\${DESERT_PATH}/src/\$dir/.libs"
-            done
-            for lib in $(echo $module_deps | xargs -n1 basename) ; do
-                DESERT_LIBADD="\$DESERT_LIBADD -l\$lib"
-            done
-        fi
-    ])
+    AC_ARG_WITH([desert], 
+        [AS_HELP_STRING([--with-desert=<directory>],
+        [use desert in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+
+                if test -d \$withval ; then
+                    DESERT_PATH="\${withval}"
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desert=\${withval} correct?])
+                fi
+        
+                $([ ! -z "$module_deps" ] && echo "
+                    for dir in ${module_deps} ; do 
+                        DESERT_CPPFLAGS=\$DESERT_CPPFLAGS\\ -I\${DESERT_PATH}/\${dir} 
+                        DESERT_LDFLAGS=\$DESERT_LDFLAGS\\ -L\${DESERT_PATH}/\${dir}
+                    done  
+
+                    for lib in $(echo $module_deps | xargs -n1 basename | sed 's/-//g' | xargs) ; do 
+                        DESERT_LIBADD=\$DESERT_LIBADD\\ -l\${lib} 
+                    done"
+                )
+
+                DESERT_DISTCHECK_CONFIGURE_FLAGS="--with-desert=\$withval"
+                AC_SUBST(DESERT_DISTCHECK_CONFIGURE_FLAGS)
+
+            fi
+        ])
     AC_SUBST(DESERT_CPPFLAGS)
     AC_SUBST(DESERT_LDFLAGS)
     AC_SUBST(DESERT_LIBADD)
 ])
 
-AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
-    DESERT_ADDON_CPPFLAGS=''
-    DESERT_ADDON_LDFLAGS=''
-    DESERT_ADDON_LIBADD=''
-    AC_ARG_WITH([desertAddon], [AS_HELP_STRING([--with-desertAddon=<dir>], [use addons in <dir>])], [
-        if test "x\$withval" != "xno" ; then
-            for dir in ${addon_deps} ; do
-                DESERT_ADDON_CPPFLAGS="\$DESERT_ADDON_CPPFLAGS -I\${withval}/\$dir"
-                DESERT_ADDON_LDFLAGS="\$DESERT_ADDON_LDFLAGS -L\${withval}/\$dir/.libs"
-                DESERT_ADDON_LIBADD="\$DESERT_ADDON_LIBADD -l\$dir"
-            done
-        fi
-    ])
-    AC_SUBST(DESERT_ADDON_CPPFLAGS)
-    AC_SUBST(DESERT_ADDON_LDFLAGS)
-    AC_SUBST(DESERT_ADDON_LIBADD)
+AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
+
+    DESERT_PATH_BUILD=''
+    DESERT_LDFLAGS_BUILD=''
+
+    AC_ARG_WITH([desert-build],
+        [AS_HELP_STRING([--with-desert-build=<directory>],
+        [use desert installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+
+                if test -d \$withval ; then
+                    DESERT_PATH_BUILD="\${withval}"
+
+                    $([ ! -z "$module_deps" ] && echo "
+                        for dir in ${module_deps} ; do 
+                            DESERT_LDFLAGS_BUILD=\"\$DESERT_LDFLAGS_BUILD -L\${DESERT_PATH_BUILD}/\${dir}\" 
+                        done"  
+                    )
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desert=\${withval} correct?])
+                fi
+            fi    
+        ])
+
+    #AC_SUBST(DESERT_CPPFLAGS)
+    AC_SUBST(DESERT_LDFLAGS_BUILD)
 ])
 
 AC_DEFUN([AC_CHECK_DESERT],[
@@ -528,7 +610,10 @@ AC_DEFUN([AC_CHECK_DESERT],[
     CPPFLAGS="\$CPPFLAGS \$NS_CPPFLAGS \$NSMIRACLE_CPPFLAGS"
     AC_LANG_PUSH(C++)
     AC_MSG_CHECKING([for desert headers])
-    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[#include<cltracer.h>]],[[]])],
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[
+                #include<cltracer.h>
+                ClMessageTracer* t;
+                ]],[[]])],
         [AC_MSG_RESULT([yes]); found_desert=yes; [\$1]],
         [AC_MSG_RESULT([no]); found_desert=no; [\$2]])
     AM_CONDITIONAL([HAVE_DESERT], [test x\$found_desert = xyes])
@@ -539,6 +624,209 @@ EOF
 )
 ### desert.m4 ###
 
+### desertAddon.m4 ###
+if [ "$has_deps" = true ]; then
+
+m4_text_desertAddon=$(cat << EOF
+${copyright_header_sh}
+
+AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
+    DESERT_ADDON_PATH=''
+    DESERT_ADDON_CPPFLAGS=''
+    DESERT_ADDON_LDFLAGS=''
+    DESERT_ADDON_LIBADD=''
+    
+    AC_ARG_WITH([desertAddon], 
+        [AS_HELP_STRING([--with-desertAddon=<directory>],
+        [use addons in <directory>])], 
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    DESERT_ADDON_PATH="\${withval}"
+                    
+                    $([ ! -z "$addon_deps" ] && echo "
+                    for dir in ${addon_deps} ; do 
+                        DESERT_ADDON_CPPFLAGS=\"\$DESERT_ADDON_CPPFLAGS -I\${DESERT_ADDON_PATH}/\${dir}\" 
+                        DESERT_ADDON_LDFLAGS=\"\$DESERT_ADDON_LDFLAGS -L\${DESERT_ADDON_PATH}/\${dir}/.libs\" 
+                        DESERT_ADDON_LIBADD=\"\$DESERT_ADDON_LIBADD -l\${dir}\" 
+                    done
+                    ")
+
+                    DESERT_ADDON_DISTCHECK_CONFIGURE_FLAGS="--with-desertAddon=\$withval"
+                    AC_SUBST(DESERT_ADDON_DISTCHECK_CONFIGURE_FLAGS)
+                else 
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desertAddon=\${withval} correct?])
+                fi
+            fi
+        ])
+
+    AC_SUBST(DESERT_ADDON_CPPFLAGS)
+    AC_SUBST(DESERT_ADDON_LDFLAGS)
+    AC_SUBST(DESERT_ADDON_LIBADD)
+])
+
+AC_DEFUN([AC_ARG_WITH_DESERT_ADDON_BUILD],[
+
+    DESERT_ADDON_PATH_BUILD=''
+    DESERT_ADDON_LDFLAGS_BUILD=''
+
+    AC_ARG_WITH([desertAddon-build],
+        [AS_HELP_STRING([--with-desertAddon-build=<directory>],
+        [use desert_addon_build installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    DESERT_ADDON_PATH_BUILD="\${withval}"
+
+                    $([ ! -z "$addon_deps" ] && echo "
+                        for dir in ${addon_deps} ; do      
+                            echo \"considering dir \$dir\"
+                            DESERT_ADDON_LDFLAGS_BUILD=\"\$DESERT_ADDON_LDFLAGS_BUILD -L\${DESERT_ADDON_PATH_BUILD}/\${dir}\"
+                        done
+                     ")
+                else   
+                    AC_MSG_ERROR([could not find \${withval}, is --with-desertAddon-build=\${withval} correct?])
+                fi
+            fi
+        ])
+
+    AC_SUBST(DESERT_ADDON_LDFLAGS_BUILD)
+])
+EOF
+)
+fi
+### desertAddon.m4 ###
+
+
+### woss.m4 ###
+if [ "$has_woss" = true ]; then
+
+m4_text_woss=$(cat << EOF
+${copyright_header_sh}
+
+AC_DEFUN([AC_ARG_WITH_WOSS],[
+
+    WOSS_PATH=''
+    WOSS_CPPLAGS=''
+    WOSS_LDFLAGS=''
+    WOSS_LIBADD=''
+
+    AC_ARG_WITH([woss],
+        [AS_HELP_STRING([--with-woss=<directory>],[use woss installation in <directory>])],
+        [
+            if test "x\$withval" != "xno" ; then
+                if test -d \$withval ; then
+                    WOSS_PATH="\${withval}"
+                    relevantheaderfile="\${WOSS_PATH}/woss/woss.h"
+        
+                    if test ! -f "\${relevantheaderfile}"; then
+                        AC_MSG_ERROR([could not find \${relevantheaderfile}, is --with-woss=\${withval} correct?])
+                    fi      
+
+                    for dir in  \
+                        uwm \
+                        woss \
+                        woss/woss_def \
+                        woss/woss_db \
+                        woss_phy 
+                    do
+                        WOSS_CPPFLAGS="\$WOSS_CPPFLAGS -I\${WOSS_PATH}/\${dir}"
+                        WOSS_LDFLAGS="\$WOSS_LDFLAGS -L\${WOSS_PATH}/\${dir}"
+                    done
+
+                    for lib in \
+                        UwmStd \
+                        WOSS \
+                        WOSSPhy
+                    do
+                        WOSS_LIBADD="\$WOSS_LIBADD -l\${lib}"
+                    done    
+
+                    WOSS_DISTCHECK_CONFIGURE_FLAGS="--with-woss=\$withval"
+                    AC_SUBST(WOSS_DISTCHECK_CONFIGURE_FLAGS)
+
+                    AC_MSG_WARN([---------------------------------------------------------------------])
+                    AC_MSG_WARN([--with-woss parameter has been set when you ran configure file])
+                    AC_MSG_WARN([the Makefile.in file has been modified deleding:])
+                    AC_MSG_WARN([  - uwm])
+                    AC_MSG_WARN([---------------------------------------------------------------------])
+                    sed -i -e '/uwm/d' ./Makefile.in
+
+                else   
+                    AC_MSG_ERROR([woss path \$withval is not a directory])
+                fi
+            fi
+
+        ],
+        [
+            AC_MSG_WARN([---------------------------------------------------------------------])
+            AC_MSG_WARN([--with-woss parameter has been omitted when you ran configure file])
+            AC_MSG_WARN([the Makefile.in file has been modified deleding:])
+            AC_MSG_WARN([  - uw-t-lohi])
+#            AC_MSG_WARN([  - bpsk_db])
+#            AC_MSG_WARN([  - uwphysical])
+#            AC_MSG_WARN([  - uwgainfromdb])
+#            AC_MSG_WARN([  - uwphysicalracun])
+            AC_MSG_WARN([  - wossgmmob3D])
+            AC_MSG_WARN([  - wossgroupmob3D])
+            AC_MSG_WARN([---------------------------------------------------------------------])
+            sed -i -e '/uw-t-lohi/d' ./Makefile.in
+#            sed -i -e '/bpsk_db/d' ./Makefile.in
+#            sed -i -e '/uwphysical/d' ./Makefile.in
+#            sed -i -e '/uwgainfromdb/d' ./Makefile.in
+#            sed -i -e '/uwphysicalracun/d' ./Makefile.in
+            sed -i -e '/wossgmmob3D/d' ./Makefile.in
+            sed -i -e '/wossgroupmob3D/d' ./Makefile.in
+        ])
+    AC_SUBST(WOSS_CPPFLAGS)
+    AC_SUBST(WOSS_LDFLAGS)
+    AC_SUBST(WOSS_LIBADD)
+])
+
+
+AC_DEFUN([AC_CHECK_WOSS],
+    [
+    # temporarily add NS_CPPFLAGS and WOSS_CPPFLAGS to CPPFLAGS
+    BACKUP_CPPFLAGS="\$CPPFLAGS"
+    CPPFLAGS="\$CPPFLAGS \$NS_CPPFLAGS \$WOSS_CPPFLAGS"
+
+    AC_LANG_PUSH(C++)
+
+    AC_MSG_CHECKING([for woss headers])
+
+    AC_PREPROC_IFELSE(
+        [AC_LANG_PROGRAM([[
+            #include<res-reader.h>
+            ResReader* r; 
+            ]],[[
+            ]]  )],
+            [
+                AC_MSG_RESULT([yes])
+                found_woss=yes
+                [\$1]
+            ],
+            [
+                AC_MSG_RESULT([no])
+                found_woss=no
+            [\$2]
+            #AC_MSG_ERROR([could not find woss])
+            ])
+
+    AM_CONDITIONAL([HAVE_WOSS], [test x\$found_woss = xyes])
+
+    # Restoring to the initial value
+    CPPFLAGS="\$BACKUP_CPPFLAGS"
+
+    AC_LANG_POP(C++)
+
+    ])
+
+EOF
+)
+fi
+
+
+
 #### --------------------------- M4 write files --------------------------- ####
 printf "%s" "$m4_text_makefile_am" > m4/Makefile.am
 
@@ -547,6 +835,14 @@ printf "%s" "$m4_text_nsallinone" > m4/nsallinone.m4
 printf "%s" "$m4_text_nsmiracle" > m4/nsmiracle.m4
 
 printf "%s" "$m4_text_desert" > m4/desert.m4
+
+if [ "$has_woss" = true ]; then
+    printf "%s" "$m4_text_woss" > m4/woss.m4
+fi
+
+if [ "$has_deps" = true ]; then
+    printf "%s" "$m4_text_desertAddon" > m4/desertAddon.m4
+fi
 
 
 #### ------------------------------- Summary ------------------------------- ####
