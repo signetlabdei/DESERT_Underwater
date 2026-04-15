@@ -372,6 +372,13 @@ $ns at $opt(stoptime)	    		"$ipr_sink  stop"
 ###################
 # Final Procedure #
 ###################
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt outfile
@@ -404,22 +411,13 @@ proc finish {} {
     set ipr_retx               0
     set first_check_ftt        1
     set first_check_ftt_std    1
-
-    for {set i 0} {$i < $opt(nn)} {incr i}  {
-        set cbr_throughput           [$cbr_sink($i) getthr]
-        set cbr_sent_pkts        [$cbr($i) getsentpkts]
-        set cbr_rcv_pkts           [$cbr_sink($i) getrecvpkts]
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
-        set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
-    }
     
     puts "Node Stats"
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 	set cbr_throughput      [$cbr_sink($i) getthr]
         set cbr_sent_pkts       [$cbr($i) getsentpkts]
         set cbr_rcv_pkts        [$cbr_sink($i) getrecvpkts]
-        set cbr_per             [$cbr_sink($i) getper]
+        set cbr_per				[get-app-per $cbr($i) $cbr_sink($i)]
         set cbr_ftt             [$cbr_sink($i) getftt]
         set cbr_fttstd          [$cbr_sink($i) getfttstd]
         set ipr_retx            [$ipr($i) getmeanretx]

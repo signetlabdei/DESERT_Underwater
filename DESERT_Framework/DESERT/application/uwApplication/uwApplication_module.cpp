@@ -97,13 +97,12 @@ uwApplicationModule::uwApplicationModule()
 	, rttsamples(0)
 	, fttsamples(0)
 	, period(10)
-	, lrtime(0)
 	, sumrtt(0)
 	, sumrtt2(0)
 	, sumftt(0)
 	, sumftt2(0)
-	, sumbytes(0)
-	, sumdt(0)
+	, first_pkt_recvd_time(0)
+	, recvd_bytes(0)
 	, servAddr()
 	, clnAddr()
 	, socket_thread()
@@ -214,10 +213,6 @@ uwApplicationModule::command(int argc, const char *const *argv)
 			tcl.resultf("%f", GetFTTstd());
 
 			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getper") == 0) {
-			tcl.resultf("%f", GetPER());
-
-			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
 
@@ -307,6 +302,7 @@ uwApplicationModule::recv(Packet *p)
 	}
 	updateFTT(rftt);
 
+	int last_hrsn = hrsn;
 	hrsn = uwApph->sn_;
 
 	if (useDropOutOfOrder()) {
@@ -322,10 +318,13 @@ uwApplicationModule::recv(Packet *p)
 		}
 	}
 
-	double dt = NOW - lrtime;
-	updateThroughput(uwApph->payload_size(), dt);
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
+
+	recvd_bytes += uwApph->payload_size();
+
 	incrPktRecv();
-	lrtime = NOW;
 
 	if (!withoutSocket())
 		printOnLog(Logger::LogLevel::DEBUG,
@@ -524,22 +523,11 @@ uwApplicationModule::GetFTTstd() const
 }
 
 double
-uwApplicationModule::GetPER() const
-{
-	if (drop_out_of_order) {
-		if ((pkts_recv + pkts_lost) > 0)
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-	} else {
-		if (esn > 0)
-			return (1 - (double) pkts_recv / (double) esn);
-	}
-	return 0;
-}
-
-double
 uwApplicationModule::GetTHR() const
 {
-	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void
@@ -548,13 +536,6 @@ uwApplicationModule::updateFTT(double ftt)
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-}
-
-void
-uwApplicationModule::updateThroughput(int bytes, double dt)
-{
-	sumbytes += bytes;
-	sumdt += dt;
 }
 
 void

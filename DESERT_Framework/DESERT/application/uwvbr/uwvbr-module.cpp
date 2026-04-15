@@ -108,8 +108,6 @@ UwVbrModule::UwVbrModule()
 	, rftt(-1)
 	, srtt(0)
 	, sftt(0)
-	, lrtime(0)
-	, sthr(0)
 	, drop_out_of_order_(0)
 	, period_identifier_(1)
 	, timer_switch_1_(1000)
@@ -123,8 +121,8 @@ UwVbrModule::UwVbrModule()
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
-	, sumbytes(0)
-	, sumdt(0)
+	, first_pkt_recvd_time(0)
+	, recvd_bytes(0)
 	, esn(0)
 { // binding to TCL variables
 	bind("period1_", &period1_);
@@ -142,12 +140,6 @@ UwVbrModule::UwVbrModule()
 		sn_check[i] = false;
 	}
 }
-
-UwVbrModule::~UwVbrModule()
-{
-}
-
-// TCL command interpreter
 
 int
 UwVbrModule::command(int argc, const char *const *argv)
@@ -168,9 +160,6 @@ UwVbrModule::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getftt") == 0) {
 			tcl.resultf("%f", GetFTT());
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getper") == 0) {
-			tcl.resultf("%f", GetPER());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
@@ -355,6 +344,7 @@ UwVbrModule::recv(Packet *p)
 	/* a new packet has been received */
 	incrPktRecv();
 
+	int last_hrsn = hrsn;
 	hrsn = uwvbrh->sn();
 	if (drop_out_of_order_) {
 		if (uwvbrh->sn() > esn) { // packet losses are observed
@@ -362,10 +352,11 @@ UwVbrModule::recv(Packet *p)
 		}
 	}
 
-	double dt = Scheduler::instance().clock() - lrtime;
-	updateThroughput(ch->size(), dt);
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
 
-	lrtime = Scheduler::instance().clock();
+	recvd_bytes += ch->size();
 
 	Packet::free(p);
 
@@ -422,26 +413,11 @@ UwVbrModule::GetFTTstd() const
 }
 
 double
-UwVbrModule::GetPER() const
-{
-	if (drop_out_of_order_) {
-		if ((pkts_recv + pkts_lost) > 0) {
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-		} else {
-			return 0;
-		}
-	} else {
-		if (esn > 1)
-			return (1 - (double) pkts_recv / (double) (esn - 1));
-		else
-			return 0;
-	}
-}
-
-double
 UwVbrModule::GetTHR() const
 {
-	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void
@@ -458,17 +434,6 @@ UwVbrModule::updateFTT(const double &ftt)
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-}
-
-void
-UwVbrModule::updateThroughput(const int &bytes, const double &dt)
-{
-	sumbytes += bytes;
-	sumdt += dt;
-
-	if (debug_ > 1) {
-		cerr << "bytes=" << bytes << "  dt=" << dt << endl;
-	}
 }
 
 void
@@ -504,7 +469,6 @@ UwVbrModule::resetStats()
 	pkts_lost = 0;
 	srtt = 0;
 	sftt = 0;
-	sthr = 0;
 	rftt = -1;
 	sumrtt = 0;
 	sumrtt2 = 0;
@@ -512,8 +476,7 @@ UwVbrModule::resetStats()
 	sumftt = 0;
 	sumftt2 = 0;
 	fttsamples = 0;
-	sumbytes = 0;
-	sumdt = 0;
+	recvd_bytes = 0;
 }
 
 double

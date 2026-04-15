@@ -342,6 +342,13 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###################
 # Final Procedure #
 ###################
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt outfile
@@ -369,7 +376,6 @@ proc finish {} {
         puts "---------------------------------------------------------------------"
     }
     set sum_cbr_throughput     0
-    set sum_per                0
     set sum_cbr_sent_pkts      0.0
     set sum_cbr_rcv_pkts       0.0
     set sum_rtx                0.0    
@@ -379,9 +385,13 @@ proc finish {} {
 		for {set j 0} {$j < $opt(nn)} {incr j} {
 			if {$i != $j} {
                 set cbr_throughput              [$cbr($i,$j) getthr]
-                set cbr_per                     [$cbr($i,$j) getper]
+				set cbr_per						[get-app-per $cbr($j,$i) $cbr($i,$j)]
 				set cbr_sent_pkts               [$cbr($i,$j) getsentpkts]
 				set cbr_rcv_pkts                [$cbr($i,$j) getrecvpkts]
+
+				set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
+        		set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
+        		set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
 			}
 			if ($opt(verbose)) {
                 if {$i != $j} {
@@ -397,9 +407,6 @@ proc finish {} {
             set rtx                         [expr (($DataPktsTx/$cbr_rcv_pkts) - 1)]
         }
 
-        set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-        set sum_cbr_sent_pkts [expr $sum_cbr_sent_pkts + $cbr_sent_pkts]
-        set sum_cbr_rcv_pkts  [expr $sum_cbr_rcv_pkts + $cbr_rcv_pkts]
         if {$opt(ack_mode) == "setAckMode"} {
             set sum_rtx           [expr $sum_rtx + $rtx]
         }
