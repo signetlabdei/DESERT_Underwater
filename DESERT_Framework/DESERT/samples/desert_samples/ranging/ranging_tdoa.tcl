@@ -645,6 +645,13 @@ for {set t $opt(step)} { $t < $opt(stoptime) } { incr t $opt(step)} {
 ###################
 # Final Procedure #
 ###################
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt position csvraw
@@ -677,7 +684,7 @@ proc finish {} {
         for {set i 0} {$i < $opt(nn)} {incr i}  {
             for {set j 0} {$j < $opt(nn)} {incr j} {		
                 if {$i != $j} {
-                    puts "cbr link $j -> $i     pkts sent: [$cbr($j,$i) getsentpkts]    pkts recv: [$cbr($i,$j) getrecvpkts]   PER: [$cbr($i,$j) getPER]  THR: [$cbr($i,$j) getthr]"          
+                    puts "cbr link $j -> $i     pkts sent: [$cbr($j,$i) getsentpkts]    pkts recv: [$cbr($i,$j) getrecvpkts]   PER: [get-app-per $cbr($j,$i) $cbr($i,$j)]  THR: [$cbr($i,$j) getthr]"          
                 }			
             }
         }

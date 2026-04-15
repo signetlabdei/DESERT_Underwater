@@ -699,6 +699,12 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###############################
 # finish 
 ###############################
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
 
 proc finish {} {
   global ns opt cbr mac propagation cbr_auv mac_auv phy_data phy_data_auv channel db_manager woss_manager
@@ -714,7 +720,6 @@ proc finish {} {
     set cbr_pkts        [$cbr_auv($id3) getsentpkts]
     set cbr_throughput  [$cbr($id3) getthr]
     set cbr_delay       [$cbr($id3) getftt]
-    set cbr_per         [$cbr($id3) getper]
     set cbr_rx          [$cbr($id3) getrecvpkts]
 
     set nodeenergy  [ $phy_data($id3) set ConsumedEnergy_]
@@ -725,7 +730,7 @@ proc finish {} {
     puts "cbr_rx($id3) app data pkts rx           : $cbr_rx"
     puts "cbr_rx($id3) throughput                 : $cbr_throughput"
     puts "cbr_rx($id3) delay                      : $cbr_delay"
-    puts "cbr_rx($id3) packet error rate          : $cbr_per"
+    puts "cbr_rx($id3) packet error rate          : [get-app-per $cbr_auv($id3) $cbr($id3)]"
     puts "\n"
   }
 

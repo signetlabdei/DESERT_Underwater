@@ -485,7 +485,12 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 }
 
 
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
 
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
 
 proc finish { } {
     global ns opt cbr mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
@@ -511,8 +516,8 @@ proc finish { } {
 	
     for {set id3 0} {$id3 < $opt(nn)} {incr id3}  {
 	set cbr_throughput	   [$cbr_sink($id3) getthr]
-	set cbr_per	           [$cbr_sink($id3) getper]
-	set cbr_pkts         [$cbr($id3) getsentpkts]
+	set cbr_per	           [get-app-per $cbr($id3) $cbr_sink($id3)]
+	set cbr_pkts           [$cbr($id3) getsentpkts]
 	set cbr_rcv_pkts       [$cbr_sink($id3) getrecvpkts]
 	################################################
 	set ftt					[$cbr_sink($id3) getftt]

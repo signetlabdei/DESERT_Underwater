@@ -554,15 +554,6 @@ proc finish {} {
     puts ""
 
     if ($opt(verbose)) {
-    
-        # for {set i 0} {$i < $opt(nn)} {incr i}  {
-        #     for {set j 0} {$j < $opt(nn)} {incr j} {		
-        #         if {$i != $j} {
-        #             puts "cbr link $j -> $i     pkts sent: [$cbr($j,$i) getsentpkts]    pkts recv: [$cbr($i,$j) getrecvpkts]   PER: [$cbr($i,$j) getPER]  THR: [$cbr($i,$j) getthr]"          
-        #         }			
-        #     }
-        # }
-        # puts ""
 
         for {set i 0} {$i < $opt(nn)} {incr i}  {
             puts "---------------------------------------------------------------------"
