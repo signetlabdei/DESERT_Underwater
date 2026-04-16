@@ -3,6 +3,7 @@
 // limited-API macros or undefine symbols later, so we protect ourselves by
 // defining the missing bits both before and after including them.
 #include <iostream>
+#include <iostream>
 #include <Python.h>
 #ifndef Py_REFCNT
 // direct field access if the standard macro is absent
@@ -48,10 +49,6 @@ PyMac::PyMac() : MMac()
 {
     // nothing to initialize
 	static py::scoped_interpreter guard{};
-	py::module_ sys = py::module_::import("sys");
-	std::string lib_path = "/home/federico/work/uwsignet/DESERT_Underwater/DESERT_buildCopy_LOCAL/lib";
-	sys.attr("path").attr("append")(lib_path);
-    cout << "PyMac constructor called, Python interpreter initialized" << endl;
 }
 
 PyMac::~PyMac()
@@ -69,7 +66,7 @@ int PyMac::command(int argc, const char*const* argv)
 // {
 //     // Pass packet to upper layer
 //     sendUp(p);
-//     std::cout << "dioboia: Packet received" << std::endl;
+//     std::cout << "Packet received" << std::endl;
 // }
 
 void PyMac::recvFromUpperLayers(Packet* p)
