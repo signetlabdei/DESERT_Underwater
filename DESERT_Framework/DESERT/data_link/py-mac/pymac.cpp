@@ -2,6 +2,7 @@
 // third-party headers (mmac, Tcl, etc.) may themselves include Python.h with
 // limited-API macros or undefine symbols later, so we protect ourselves by
 // defining the missing bits both before and after including them.
+#include <iostream>
 #include <Python.h>
 #ifndef Py_REFCNT
 // direct field access if the standard macro is absent
@@ -47,6 +48,10 @@ PyMac::PyMac() : MMac()
 {
     // nothing to initialize
 	static py::scoped_interpreter guard{};
+	py::module_ sys = py::module_::import("sys");
+	std::string lib_path = "/home/federico/work/uwsignet/DESERT_Underwater/DESERT_buildCopy_LOCAL/lib";
+	sys.attr("path").attr("append")(lib_path);
+    cout << "PyMac constructor called, Python interpreter initialized" << endl;
 }
 
 PyMac::~PyMac()
@@ -60,9 +65,32 @@ int PyMac::command(int argc, const char*const* argv)
     return MMac::command(argc, argv);
 }
 
-void PyMac::recv(Packet* p)
+// void PyMac::recv(Packet* p)
+// {
+//     // Pass packet to upper layer
+//     sendUp(p);
+//     std::cout << "dioboia: Packet received" << std::endl;
+// }
+
+void PyMac::recvFromUpperLayers(Packet* p)
 {
-    // drop every packet that arrives, marking it with a generic reason
-	py::module_ calc = py::module_::import("mac_logic");
-    drop(p, 1, 0); // 1=receive drop, reason 0=unspecified
+    // Queue the packet
+    packet_queue_.push(p);
+    std::cout << "Packet received from upper layers, queue size is now " << packet_queue_.size() << std::endl;
+    // Check if we should transmit
+    bool is_busy = false; // For POC, assume not busy
+    int queue_size = packet_queue_.size();
+    
+    py::module_ mac_logic = py::module_::import("mac_logic");
+    py::function should_transmit = mac_logic.attr("should_transmit");
+    std::cout << "Packet received from upper layers, calling should_transmit with is_busy=" << is_busy << " and queue_size=" << queue_size << std::endl;
+    int transmit = should_transmit(is_busy, queue_size).cast<int>();
+    std::cout << "Packet received from upper layers, should_transmit returned " << transmit << std::endl;
+    
+    if (transmit) {
+        // Transmit the packet
+        Packet* pkt = packet_queue_.front();
+        packet_queue_.pop();
+        Mac2PhyStartTx(pkt);
+    }
 }

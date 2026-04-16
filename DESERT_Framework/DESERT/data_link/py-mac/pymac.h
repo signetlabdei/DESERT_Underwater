@@ -2,6 +2,7 @@
 #define PYMAC_H
 
 #include <mmac.h>
+#include <queue>
 
 /**
  * @brief A minimal MAC protocol that does nothing.
@@ -26,7 +27,15 @@ public:
      * Called when a packet arrives from the lower layer (phy).  This
      * implementation simply drops every packet.
      */
-    virtual void recv(Packet* p) override;
+    // virtual void recv(Packet* p) override;
+
+    /**
+     * Called when a packet arrives from the upper layer.
+     */
+    virtual void recvFromUpperLayers(Packet* p) override;
+
+private:
+    std::queue<Packet*> packet_queue_;
 };
 
 #endif // PYMAC_H

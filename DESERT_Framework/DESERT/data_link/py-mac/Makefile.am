@@ -38,7 +38,8 @@ libpymac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ -I/u
 libpymac_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libpymac_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
                           @DESERT_UWMMAC_CLMSGS_LIBADD@ \
-                          @DESERT_UWCBR_LIBADD@
+                          @DESERT_UWCBR_LIBADD@ \
+                          -lpython3.10
 
 
 nodist_libpymac_la_SOURCES = initTcl.cc

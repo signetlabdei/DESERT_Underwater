@@ -40,7 +40,7 @@
 extern EmbeddedTcl PyMacTclCode;
 
 extern "C" int
-PyMac_Init()
+Pymac_Init()
 {
 	PyMacTclCode.load();
 	return 0;
@@ -49,5 +49,5 @@ PyMac_Init()
 extern "C" int 
 Cygpymac_Init() 
 {
-     return PyMac_Init();
+     return Pymac_Init();
 }
