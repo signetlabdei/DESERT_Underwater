@@ -31,21 +31,25 @@ if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
     cd ../DESERT_Addons/
     mkdir "$addon_name" && cd "$addon_name" || exit 1
 else 
-    # rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
     echo "Error, another addon with the same name alredy exists."; exit 1
 fi
 
 echo "--- Dependency Configuration ---"
 
 echo "Reading from /DESERT_Framework/DESERT/ directory."
-echo "$(find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | column)"
+
+deps_list=$(find "../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../DESERT_Framework/DESERT/||" | sort | tr '\n' ' ')
+
+find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | nl -w 3 -s "  " | column
 
 read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
+
 
 for dep in $module_deps; do    
     if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
         module_deps=$(remove_from_list "$module_deps" "$dep")
-        read -p "Dependecy $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        read -p "Dependency $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
         if [ $stop = "q" ] || [ $stop = "Q" ]; then
             cd .. && rm -rf "$addon_name" || exit 1
             exit 1
@@ -56,12 +60,8 @@ done
 echo "--- Addons Configuration ---"
 
 echo "Reading from /DESERT_Framework/.addon.list. If you don't see your dependency, add it to this file."
-echo "$(cat ../../DESERT_Framework/.addon.list)"
+echo "$(cat ../../DESERT_Framework/.addon.list | sed '$d')"
 read -p "Enter ADDON dependencies you want to install (e.g., uwrov uwtracker): " addon_deps
-
-if [ "$addon_deps" = "a" ] || [ "$addon_deps" = "A" ] || [ "$addon_deps" = "ALL" ] || [ "$addon_deps" = "all" ]; then
-    addon_deps="$(sed '/ALL/d; s/[[:space:]].*$//' ../../DESERT_Framework/.addon.list | tr '\n' ' ')"
-fi
 
 for add in $addon_deps; do    
     if [ ! -d "../../DESERT_Addons/$add" ]; then
@@ -443,13 +443,13 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
                         AC_MSG_WARN([could not find \${withval}/nsmiracle/module.h, is --with-nsmiracle=\${withval} correct?])
                     fi
 
-                    for dir in \
-                        nsmiracle \
-                        cbr \
-                        ip \
-                        mobility \
-                        mphy \
-                        mmac \
+                    for dir in      \\
+                        nsmiracle   \\
+                        cbr         \\
+                        ip          \\
+                        mobility    \\
+                        mphy        \\
+                        mmac        \\
                         uwm
                     do
                         #echo "considering dir \"\$dir\""
@@ -458,14 +458,14 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
 
                     done
 
-                    for lib in               \
-                        MiracleBasicMovement \
-                        Miracle              \
-                        miraclecbr           \
-                        MiracleIp            \
-                        mphy                 \
-                        mmac                 \
-                        UwmStd               \
+                    for lib in               \\
+                        MiracleBasicMovement \\
+                        Miracle              \\
+                        miraclecbr           \\
+                        MiracleIp            \\
+                        mphy                 \\
+                        mmac                 \\
+                        UwmStd               \\
                         UwmStdPhyBpskTracer
                     do
                         NSMIRACLE_LIBADD="\$NSMIRACLE_LIBADD -l\${lib}"
@@ -723,20 +723,20 @@ AC_DEFUN([AC_ARG_WITH_WOSS],[
                         AC_MSG_ERROR([could not find \${relevantheaderfile}, is --with-woss=\${withval} correct?])
                     fi      
 
-                    for dir in  \
-                        uwm \
-                        woss \
-                        woss/woss_def \
-                        woss/woss_db \
+                    for dir in          \\
+                        uwm             \\
+                        woss            \\
+                        woss/woss_def   \\
+                        woss/woss_db    \\
                         woss_phy 
                     do
                         WOSS_CPPFLAGS="\$WOSS_CPPFLAGS -I\${WOSS_PATH}/\${dir}"
                         WOSS_LDFLAGS="\$WOSS_LDFLAGS -L\${WOSS_PATH}/\${dir}"
                     done
 
-                    for lib in \
-                        UwmStd \
-                        WOSS \
+                    for lib in  \\
+                        UwmStd  \\
+                        WOSS    \\
                         WOSSPhy
                     do
                         WOSS_LIBADD="\$WOSS_LIBADD -l\${lib}"
@@ -798,7 +798,7 @@ AC_DEFUN([AC_CHECK_WOSS],
         [AC_LANG_PROGRAM([[
             #include<res-reader.h>
             ResReader* r; 
-            ]],[[
+            ]],[[ 
             ]]  )],
             [
                 AC_MSG_RESULT([yes])
