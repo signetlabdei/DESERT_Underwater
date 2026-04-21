@@ -1,5 +1,4 @@
 #!/bin/sh
-# todo: add packet header and clmessages
 
 remove_from_list() {
   local list="$1"
@@ -31,7 +30,6 @@ if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
     cd ../DESERT_Addons/
     mkdir "$addon_name" && cd "$addon_name" || exit 1
 else 
-    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
     echo "Error, another addon with the same name alredy exists."; exit 1
 fi
 
