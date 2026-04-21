@@ -31,21 +31,51 @@ if [ ! -d "../DESERT_Addons/$addon_name/" ]; then
     cd ../DESERT_Addons/
     mkdir "$addon_name" && cd "$addon_name" || exit 1
 else 
-    # rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
+    rm -rf ../DESERT_Addons/$addon_name; # TODO: remove, used for debug purposes
     echo "Error, another addon with the same name alredy exists."; exit 1
 fi
 
 echo "--- Dependency Configuration ---"
 
 echo "Reading from /DESERT_Framework/DESERT/ directory."
-echo "$(find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | column)"
+module_list=$(find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | tr '\n' ' ')
+find "../../DESERT_Framework/DESERT/" -mindepth 2 -maxdepth 2 -type d | sed "s|^../../DESERT_Framework/DESERT/||" | sort | nl -w 3 -s "  " | column
 
-read -p "Enter DESERT module dependencies (e.g., network/uwip transport/uwudp): " module_deps
+read -p "Enter the DESERT MODULE indexes you want to install, separated by spaces (e.g., 34 71): " selected_indexes
+
+set -- $module_list
+
+module_deps=""
+for sel in $selected_indexes; do
+    case "$sel" in
+        ''|*[!0-9]*)
+        echo "Error: '$sel' is not a valid index, select modules with their corresponding indexes. Exiting initialization."
+        rm -rf ../DESERT_Addons/$addon_name
+        exit 1
+            continue
+            ;;
+    esac
+
+    if [ "$sel" -lt 1 ] || [ "$sel" -gt "$#" ]; then
+        echo "Error: '$sel' is out of range of possible values. Exiting initialization."
+        rm -rf ../DESERT_Addons/$addon_name
+        exit 1
+    fi 
+
+    pos=1
+    for dep in $module_list; do
+        if [ "$pos" -eq "$sel" ]; then
+            module_deps="${module_deps:+$module_deps }$dep"
+            break
+        fi
+        pos=$((pos + 1))
+    done
+done
 
 for dep in $module_deps; do    
     if [ ! -d "../../DESERT_Framework/DESERT/$dep" ]; then
         module_deps=$(remove_from_list "$module_deps" "$dep")
-        read -p "Dependecy $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
+        read -p "Dependency $dep does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
         if [ $stop = "q" ] || [ $stop = "Q" ]; then
             cd .. && rm -rf "$addon_name" || exit 1
             exit 1
@@ -56,14 +86,41 @@ done
 echo "--- Addons Configuration ---"
 
 echo "Reading from /DESERT_Framework/.addon.list. If you don't see your dependency, add it to this file."
-echo "$(cat ../../DESERT_Framework/.addon.list)"
-read -p "Enter ADDON dependencies you want to install (e.g., uwrov uwtracker): " addon_deps
 
-if [ "$addon_deps" = "a" ] || [ "$addon_deps" = "A" ] || [ "$addon_deps" = "ALL" ] || [ "$addon_deps" = "all" ]; then
-    addon_deps="$(sed '/ALL/d; s/[[:space:]].*$//' ../../DESERT_Framework/.addon.list | tr '\n' ' ')"
-fi
+echo "$(cat ../../DESERT_Framework/.addon.list | sed '$d' | nl -w 3 -s "  ")"
+addon_list=$(cut -d' ' -f1 ../../DESERT_Framework/.addon.list | sed '$d' | tr '\n' ' ')
+read -p "Enter the ADDONS indexes you want to install, separated by spaces (e.g., 10 11): " selected_indexes
 
-for add in $addon_deps; do    
+set -- $addon_list
+
+addon_deps=""
+for sel in $selected_indexes; do
+    case "$sel" in
+        ''|*[!0-9]*)
+        echo "Error: '$sel' is not a valid index, select addons with their corresponding indexes. Exiting initialization."
+        rm -rf ../DESERT_Addons/$addon_name
+        exit 1
+            continue
+            ;;
+    esac
+
+    if [ "$sel" -lt 1 ] || [ "$sel" -gt "$#" ]; then 
+        echo "Error: '$sel' is out of range of possible values. Exiting initialization."
+        rm -rf ../DESERT_Addons/$addon_name
+        exit 1
+    fi 
+
+    pos=1
+    for dep in $addon_list; do
+        if [ "$pos" -eq "$sel" ]; then
+            addon_deps="${addon_deps:+$addon_deps }$dep"
+            break
+        fi
+        pos=$((pos + 1))
+    done
+done
+
+for add in $addon_deps; do
     if [ ! -d "../../DESERT_Addons/$add" ]; then
         addon_deps=$(remove_from_list "$addon_deps" "$add")
         read -p "Addon $add does not exist, it will not be installed. Type 'q' to EXIT or press ENTER to continue: " stop
@@ -443,13 +500,13 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
                         AC_MSG_WARN([could not find \${withval}/nsmiracle/module.h, is --with-nsmiracle=\${withval} correct?])
                     fi
 
-                    for dir in \
-                        nsmiracle \
-                        cbr \
-                        ip \
-                        mobility \
-                        mphy \
-                        mmac \
+                    for dir in      \\
+                        nsmiracle   \\
+                        cbr         \\
+                        ip          \\
+                        mobility    \\
+                        mphy        \\
+                        mmac        \\
                         uwm
                     do
                         #echo "considering dir \"\$dir\""
@@ -458,14 +515,14 @@ AC_DEFUN([AC_ARG_WITH_NSMIRACLE],[
 
                     done
 
-                    for lib in               \
-                        MiracleBasicMovement \
-                        Miracle              \
-                        miraclecbr           \
-                        MiracleIp            \
-                        mphy                 \
-                        mmac                 \
-                        UwmStd               \
+                    for lib in               \\
+                        MiracleBasicMovement \\
+                        Miracle              \\
+                        miraclecbr           \\
+                        MiracleIp            \\
+                        mphy                 \\
+                        mmac                 \\
+                        UwmStd               \\
                         UwmStdPhyBpskTracer
                     do
                         NSMIRACLE_LIBADD="\$NSMIRACLE_LIBADD -l\${lib}"
@@ -723,20 +780,20 @@ AC_DEFUN([AC_ARG_WITH_WOSS],[
                         AC_MSG_ERROR([could not find \${relevantheaderfile}, is --with-woss=\${withval} correct?])
                     fi      
 
-                    for dir in  \
-                        uwm \
-                        woss \
-                        woss/woss_def \
-                        woss/woss_db \
+                    for dir in          \\
+                        uwm             \\
+                        woss            \\
+                        woss/woss_def   \\
+                        woss/woss_db    \\
                         woss_phy 
                     do
                         WOSS_CPPFLAGS="\$WOSS_CPPFLAGS -I\${WOSS_PATH}/\${dir}"
                         WOSS_LDFLAGS="\$WOSS_LDFLAGS -L\${WOSS_PATH}/\${dir}"
                     done
 
-                    for lib in \
-                        UwmStd \
-                        WOSS \
+                    for lib in  \\
+                        UwmStd  \\
+                        WOSS    \\
                         WOSSPhy
                     do
                         WOSS_LIBADD="\$WOSS_LIBADD -l\${lib}"
@@ -798,7 +855,7 @@ AC_DEFUN([AC_CHECK_WOSS],
         [AC_LANG_PROGRAM([[
             #include<res-reader.h>
             ResReader* r; 
-            ]],[[
+            ]],[[ 
             ]]  )],
             [
                 AC_MSG_RESULT([yes])
@@ -848,5 +905,5 @@ fi
 #### ------------------------------- Summary ------------------------------- ####
 echo "------------------------------------------------"
 echo "Addon '$addon_name' generated by $author_name."
-echo "Dependencies: Modules ($module_deps) Addons ($addon_deps) WOSS ($has_woss)"
+echo "Dependencies: Modules ($module_deps) Addons: ($addon_deps) WOSS ($has_woss)"
 echo "------------------------------------------------"
