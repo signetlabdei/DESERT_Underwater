@@ -673,6 +673,12 @@ $mll_sink addentry [$ipif_sink addr] [$mac_sink addr]
 ###############################
 # finish 
 ###############################
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
 
 proc finish {} {
     global ns opt cbr mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
@@ -683,14 +689,13 @@ proc finish {} {
     for {set id3 0} {$id3 < $opt(nn)} {incr id3}  {
 
       set cbr_throughput   [$cbr_sink($id3) getthr]
-      set cbr_per          [$cbr_sink($id3) getper]
-      set cbr_pkts 			   [$cbr($id3) getsentpkts]
+      set cbr_pkts 		   [$cbr($id3) getsentpkts]
       set cbr_rxpkts       [$cbr_sink($id3) getrecvpkts]
 
       puts "cbr($id3)      app data pkts created       : $cbr_pkts"
       puts "cbr_sink($id3) app data pkts received      : $cbr_rxpkts"
       puts "cbr_sink($id3) throughput                  : $cbr_throughput"
-      puts "cbr_sink($id3) packet error rate           : $cbr_per"
+      puts "cbr_sink($id3) packet error rate           : [get-app-per $cbr($id3) $cbr_sink($id3)]"
       puts ""
     }
 

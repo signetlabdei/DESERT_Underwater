@@ -110,8 +110,6 @@ UwCbrModule::UwCbrModule()
 	, rftt(-1)
 	, srtt(0)
 	, sftt(0)
-	, lrtime(0)
-	, sthr(0)
 	, period_(0)
 	, pktSize_(0)
 	, sumrtt(0)
@@ -120,8 +118,8 @@ UwCbrModule::UwCbrModule()
 	, sumftt(0)
 	, sumftt2(0)
 	, fttsamples(0)
-	, sumbytes(0)
-	, sumdt(0)
+	, first_pkt_recvd_time(0)
+	, recvd_bytes(0)
 	, esn(0)
 	, tracefile_enabler_(0)
 { // binding to TCL variables
@@ -159,9 +157,6 @@ UwCbrModule::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "gettxtime") == 0) {
 			tcl.resultf("%f", GetTxTime());
-			return TCL_OK;
-		} else if (strcasecmp(argv[1], "getper") == 0) {
-			tcl.resultf("%f", GetPER());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getthr") == 0) {
 			tcl.resultf("%f", GetTHR());
@@ -406,6 +401,7 @@ UwCbrModule::recv(Packet *p)
 
 	incrPktRecv();
 
+	int last_hrsn = hrsn;
 	hrsn = uwcbrh->sn();
 	if (drop_out_of_order_) {
 		if (uwcbrh->sn() > esn) {
@@ -413,10 +409,11 @@ UwCbrModule::recv(Packet *p)
 		}
 	}
 
-	double dt = NOW - lrtime;
-	updateThroughput(ch->size(), dt);
+	// First valid packet received
+	if (last_hrsn == 0 && esn > 0)
+		first_pkt_recvd_time = NOW;
 
-	lrtime = NOW;
+	recvd_bytes += ch->size();
 
 	Packet::free(p);
 
@@ -476,23 +473,11 @@ UwCbrModule::GetFTTstd() const
 }
 
 double
-UwCbrModule::GetPER() const
-{
-	if (drop_out_of_order_) {
-		if ((pkts_recv + pkts_lost) > 0)
-			return ((double) pkts_lost / (double) (pkts_recv + pkts_lost));
-	} else {
-		if (esn > 0)
-			return (1 - (double) pkts_recv / (double) esn);
-	}
-
-	return 0;
-}
-
-double
 UwCbrModule::GetTHR() const
 {
-	return ((sumdt != 0) ? sumbytes * 8 / sumdt : 0);
+	double thr_time = NOW - first_pkt_recvd_time;
+
+	return ((thr_time > 0) ? recvd_bytes * 8 / thr_time : 0);
 }
 
 void
@@ -509,13 +494,6 @@ UwCbrModule::updateFTT(const double &ftt)
 	sumftt += ftt;
 	sumftt2 += ftt * ftt;
 	fttsamples++;
-}
-
-void
-UwCbrModule::updateThroughput(const int &bytes, const double &dt)
-{
-	sumbytes += bytes;
-	sumdt += dt;
 }
 
 void
@@ -551,7 +529,6 @@ UwCbrModule::resetStats()
 	pkts_lost = 0;
 	srtt = 0;
 	sftt = 0;
-	sthr = 0;
 	rftt = -1;
 	sumrtt = 0;
 	sumrtt2 = 0;
@@ -559,8 +536,7 @@ UwCbrModule::resetStats()
 	sumftt = 0;
 	sumftt2 = 0;
 	fttsamples = 0;
-	sumbytes = 0;
-	sumdt = 0;
+	recvd_bytes = 0;
 }
 
 double

@@ -347,8 +347,14 @@ proc update_and_check {} {
 ###################
 # Final Procedure #
 ###################
-# Define here the procedure to call at the end of the simulation
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
 
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
+# Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt outfile
     global mac propagation ROV_sink mac_sink phy phy_data_sink channel db_manager propagation
@@ -378,12 +384,12 @@ proc finish {} {
         puts "---------------------------------------------------------------------"
     } 
     set ROV_throughput              [$applicationROV getthr]
-    set ROV_per                     [$applicationROV getper]
+    set ROV_per                     [get-app-per $applicationCTR $applicationROV]
 	set ROV_sent_pkts               [$applicationROV getsentpkts]
 	set ROV_rcv_pkts                [$applicationROV getrecvpkts]
 
     set CTR_throughput              [$applicationCTR getthr]
-    set CTR_per                     [$applicationCTR getper]
+    set CTR_per                     [get-app-per $applicationROV $applicationCTR]
     set CTR_sent_pkts               [$applicationCTR getsentpkts]
     set CTR_rcv_pkts                [$applicationCTR getrecvpkts]
 	if ($opt(verbose)) {

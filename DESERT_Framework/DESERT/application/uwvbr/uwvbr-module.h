@@ -173,7 +173,7 @@ public:
 	/**
 	 * Destructor of UwVbrModule class.
 	 */
-	virtual ~UwVbrModule();
+	virtual ~UwVbrModule() = default;
 
 	/**
 	 * Performs the reception of packets from upper and lower layers.
@@ -217,14 +217,10 @@ public:
 	virtual double GetFTT() const;
 
 	/**
-	 * Returns the mean Packet Error Rate.
-	 * @return Packet Error Rate.
-	 */
-	virtual double GetPER() const;
-
-	/**
-	 * Returns the mean Throughput.
-	 * @return Throughput.
+	 * Returns the throughput computed as the number of bits received
+	 * over the elapsed time from the start of the simulation.
+	 *
+	 * @return Throughput [bps].
 	 */
 	virtual double GetTHR() const;
 
@@ -273,8 +269,6 @@ protected:
 	double rftt; /**< Forward Trip Time seen for last received packet. */
 	double srtt; /**< Smoothed Round Trip Time, calculated as for TCP. */
 	double sftt; /**< Smoothed Forward Trip Time, calculated as srtt. */
-	double lrtime; /**< Time of last packet reception. */
-	double sthr; /**< Smoothed throughput calculation. */
 
 	int period_identifier_; /**< Flag used to identify in which one of the
 							   period the vbr module is. */
@@ -301,8 +295,8 @@ protected:
 	double sumftt2; /**< Sum of (FTT^2). */
 	int fttsamples; /**< Number of FTT samples. */
 
-	double sumbytes; /**< Sum of bytes received. */
-	double sumdt; /**< Sum of the delays. */
+	double first_pkt_recvd_time; /**< Time when the first packet was correctly received. Used for throughput computation. */
+	double recvd_bytes; /**< Sum of bytes received. */
 
 	uint32_t esn; /**< Expected serial number. */
 

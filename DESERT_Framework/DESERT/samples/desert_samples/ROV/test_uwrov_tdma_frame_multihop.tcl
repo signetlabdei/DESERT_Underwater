@@ -542,8 +542,14 @@ proc update_and_check {t} {
 ###################
 # Final Procedure #
 ###################
-# Define here the procedure to call at the end of the simulation
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
 
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
+
+# Define here the procedure to call at the end of the simulation
 proc finish {} {
     global ns opt outfile
     global mac propagation ROV_sink mac_sink phy phy_data_sink channel db_manager propagation
@@ -568,17 +574,16 @@ proc finish {} {
         puts "---------------------------------------------------------------------"
     } 
     set ROV_throughput              [$applicationROV getthr]
-    set ROV_per                     [$applicationROV getper]
+    set ROV_per                     [get-app-per $applicationCTR $applicationROV]
     set ROV_sent_pkts               [$mac(1) get_sent_pkts]
     set ROV_rcv_pkts                [$mac(1) get_recv_pkts]
 
     set CTR_throughput              [$applicationCTR getthr]
-    set CTR_per                     [$applicationCTR getper]
+    set CTR_per                     [get-app-per $applicationROV $applicationCTR]
     set CTR_sent_pkts               [$mac(0) get_sent_pkts]
     set CTR_rcv_pkts                [$mac(0) get_recv_pkts]
 
     set cbr_throughput              [$application_relay(0) getthr]
-    set cbr_per                     [$application_relay(0) getper]
     set cbr_sent_pkts               [$application_relay(0) getsentpkts]
     set cbr_rcv_pkts                [$application_relay(0) getrecvpkts]
 

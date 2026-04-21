@@ -598,7 +598,6 @@ proc finish { } {
 	for {set id3 0} {$id3 < $opt(nn)} {incr id3}  {
 		set cbr_sink_rcv_pkts($id3)       [$cbr_auv($id3) getrecvpkts]
 		set cbr_sink_thr($id3)			[$cbr_auv($id3) getthr]
-		set cbr_per	           [$cbr_auv($id3) getper]
 		set cbr_sink_rcv [expr $cbr_sink_rcv + $cbr_sink_rcv_pkts($id3)]
 	}
 
