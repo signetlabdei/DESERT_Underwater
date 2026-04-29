@@ -3,14 +3,29 @@
 
 #include <mmac.h>
 #include <queue>
+#include <pybind11/embed.h>
+
+namespace py = pybind11;
+
+class PyMac;
 
 /**
- * @brief A minimal MAC protocol that does nothing.
+ * Timer handler for periodically invoking Python MAC logic.
+ */
+class PyMacTimer : public TimerHandler {
+public:
+    PyMacTimer(PyMac* mac) : TimerHandler(), mac_(mac) {}
+    void expire(Event* e) override;
+    
+private:
+    PyMac* mac_;
+};
+
+/**
+ * @brief MAC protocol with logic driven by Python.
  *
- * This class exists only to provide the bare minimum implementation of an
- * MMac-derived module so that it can be compiled and instantiated by the
- * simulator.  All packets received are dropped and no timers or state are
- * managed.
+ * Most of the protocol logic is in Python (mac_logic.py), with C++ providing
+ * the NS-2 interface, packet handling, and scheduler access.
  */
 class PyMac : public MMac
 {
@@ -24,18 +39,20 @@ public:
     virtual int command(int argc, const char*const* argv) override;
 
     /**
-     * Called when a packet arrives from the lower layer (phy).  This
-     * implementation simply drops every packet.
-     */
-    // virtual void recv(Packet* p) override;
-
-    /**
      * Called when a packet arrives from the upper layer.
      */
     virtual void recvFromUpperLayers(Packet* p) override;
+    
+    /**
+     * Called by the timer to invoke Python MAC logic.
+     */
+    void on_timer();
 
 private:
     std::queue<Packet*> packet_queue_;
+    PyMacTimer timer_;
+    py::object py_mac_state_;  // Python object holding MAC state
+    bool timer_scheduled_;
 };
 
 #endif // PYMAC_H

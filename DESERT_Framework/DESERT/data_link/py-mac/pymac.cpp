@@ -33,8 +33,52 @@ extern "C" int PyObject_RichCompareBool(PyObject *a, PyObject *b, int op);
 #endif
 
 #include <tclcl.h>
+#include <scheduler.h>
 #include <pybind11/embed.h> // Everything needed for embedding
+#include <pybind11/functional.h>
 namespace py = pybind11;
+
+/**
+ * Pybind11 module exposing NS-2 scheduler and Packet to Python.
+ * Allows Python code to schedule events, read simulation time, and access packet fields.
+ */
+PYBIND11_EMBEDDED_MODULE(ns2_scheduler, m) {
+    m.def("current_time", []() {
+        return Scheduler::instance().clock();
+    }, "Get current simulation time");
+}
+
+/**
+ * Pybind11 module exposing Packet interface to Python.
+ */
+PYBIND11_EMBEDDED_MODULE(ns2_packet, m) {
+    py::class_<Packet, std::shared_ptr<Packet>>(m, "Packet")
+        .def("uid", [](Packet* p) {
+            return HDR_CMN(p)->uid_;
+        }, "Get packet unique ID")
+        .def("size", [](Packet* p) {
+            return HDR_CMN(p)->size_;
+        }, "Get packet size in bytes")
+        .def("ptype", [](Packet* p) {
+            return HDR_CMN(p)->ptype_;
+        }, "Get packet type")
+        .def("src", [](Packet* p) {
+            return HDR_CMN(p)->src();
+        }, "Get source address")
+        .def("dst", [](Packet* p) {
+            return HDR_CMN(p)->dst();
+        }, "Get destination address")
+        .def("timestamp", [](Packet* p) {
+            return HDR_CMN(p)->timestamp_;
+        }, "Get packet timestamp")
+        .def("__repr__", [](Packet* p) {
+            char buf[256];
+            sprintf(buf, "<Packet uid=%d size=%d ptype=%d src=%d dst=%d>",
+                    HDR_CMN(p)->uid_, HDR_CMN(p)->size_, HDR_CMN(p)->ptype_,
+                    HDR_CMN(p)->src(), HDR_CMN(p)->dst());
+            return std::string(buf);
+        });
+}
 
 // Tcl registration so ns-2 can create the object from OTcl scripts.
 static class PyMacClass : public TclClass {
@@ -45,49 +89,95 @@ public:
     }
 } class_pymac;
 
-PyMac::PyMac() : MMac()
+PyMac::PyMac() : MMac(), timer_(this), timer_scheduled_(false)
 {
-    // nothing to initialize
-	static py::scoped_interpreter guard{};
+    static py::scoped_interpreter guard{};
+    
+    // Add the lib directory to Python's search path so mac_logic.py can be imported
+    py::module_ sys = py::module_::import("sys");
+    py::list path = sys.attr("path");
+    path.append(std::string(INSTALL_LIB_DIR));
+    
+    // Import mac_logic module and create state
+    py::module_ mac_logic = py::module_::import("mac_logic");
+    py_mac_state_ = mac_logic.attr("MacState")();
 }
 
 PyMac::~PyMac()
 {
-    // no dynamic resources
+    // Clean up
 }
 
 int PyMac::command(int argc, const char*const* argv)
 {
-    // forward unknown commands to the base class
     return MMac::command(argc, argv);
 }
 
-// void PyMac::recv(Packet* p)
-// {
-//     // Pass packet to upper layer
-//     sendUp(p);
-//     std::cout << "Packet received" << std::endl;
-// }
+void PyMacTimer::expire(Event* e)
+{
+    mac_->on_timer();
+}
+
+void PyMac::on_timer()
+{
+    // Invoke Python logic
+    try {
+        py::module_ mac_logic = py::module_::import("mac_logic");
+        
+        // Get current simulation time
+        double now = Scheduler::instance().clock();
+        int queue_size = packet_queue_.size();
+        
+        // Convert packet queue to Python list (for now, just pass queue size)
+        // In future, could pass actual packet objects if needed
+        py::list packets;
+        std::queue<Packet*> temp_queue = packet_queue_;
+        while (!temp_queue.empty()) {
+            packets.append(temp_queue.front());
+            temp_queue.pop();
+        }
+        
+        // Call Python function
+        py::dict result = mac_logic.attr("on_event")(
+            py_mac_state_,
+            now,
+            queue_size,
+            packets  // Pass actual packet objects to Python
+        ).cast<py::dict>();
+        
+        // Parse result
+        std::string action = py::cast<std::string>(result["action"]);
+        double next_event_delay = py::cast<double>(result["next_event_delay"]);
+        
+        if (action == "transmit" && !packet_queue_.empty()) {
+            Packet* pkt = packet_queue_.front();
+            packet_queue_.pop();
+            Mac2PhyStartTx(pkt);
+        }
+        
+        // Reschedule if needed
+        if (next_event_delay > 0) {
+            timer_scheduled_ = true;
+            timer_.resched(next_event_delay);
+        } else {
+            // Timer has fired and we're not rescheduling
+            cout << "No further events scheduled by Python logic." << endl;
+            timer_scheduled_ = false;
+            // Don't call cancel() here—the timer just fired, it's not scheduled anymore
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error in on_timer: " << e.what() << std::endl;
+    }
+}
 
 void PyMac::recvFromUpperLayers(Packet* p)
 {
-    // Queue the packet
     packet_queue_.push(p);
-    std::cout << "Packet received from upper layers, queue size is now " << packet_queue_.size() << std::endl;
-    // Check if we should transmit
-    bool is_busy = false; // For POC, assume not busy
-    int queue_size = packet_queue_.size();
     
-    py::module_ mac_logic = py::module_::import("mac_logic");
-    py::function should_transmit = mac_logic.attr("should_transmit");
-    std::cout << "Packet received from upper layers, calling should_transmit with is_busy=" << is_busy << " and queue_size=" << queue_size << std::endl;
-    int transmit = should_transmit(is_busy, queue_size).cast<int>();
-    std::cout << "Packet received from upper layers, should_transmit returned " << transmit << std::endl;
-    
-    if (transmit) {
-        // Transmit the packet
-        Packet* pkt = packet_queue_.front();
-        packet_queue_.pop();
-        Mac2PhyStartTx(pkt);
+    // Schedule timer if not already scheduled
+    if (!timer_scheduled_) {
+        timer_scheduled_ = true;
+        // Schedule for immediate processing (sched is for first-time scheduling)
+        timer_.sched(0);
     }
 }

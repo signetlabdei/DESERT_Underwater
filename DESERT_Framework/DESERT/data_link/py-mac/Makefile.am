@@ -34,7 +34,8 @@ libpymac_la_SOURCES = initlib.cpp \
 				pymac.cpp
 
 
-libpymac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ -I/usr/include/python3.10 -I/home/federico/.local/lib/python3.10/site-packages/pybind11/include
+libpymac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ -I/usr/include/python3.10 -I/home/federico/.local/lib/python3.10/site-packages/pybind11/include \
+	-DINSTALL_LIB_DIR=\"$(libdir)\"
 libpymac_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libpymac_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
                           @DESERT_UWMMAC_CLMSGS_LIBADD@ \
@@ -48,9 +49,18 @@ CLEANFILES = initTcl.cc
 
 TCL_FILES =  pymac-init.tcl
 
+PY_FILES = mac_logic.py
+
 initTcl.cc : Makefile $(TCL_FILES)
 		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ PyMacTclCode > initTcl.cc
 
-EXTRA_DIST = $(TCL_FILES)
+EXTRA_DIST = $(TCL_FILES) $(PY_FILES)
+
+# Install Python files to lib directory so they can be imported at runtime
+install-exec-hook:
+	$(mkdir_p) $(libdir)
+	@for file in $(PY_FILES); do \
+		$(INSTALL_DATA) $(srcdir)/$$file $(libdir)/$$file; \
+	done
 
 
