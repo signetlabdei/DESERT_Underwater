@@ -47,6 +47,9 @@ def on_event(mac_state, current_time, queue_size, packets):
     if packets:
         pkt = packets[0]
         print(f"  First packet: {pkt}")  # Uses __repr__ to show packet info
+        # Access fields from common header:
+        # pkt.uid(), pkt.size(), pkt.ptype(), pkt.timestamp()
+        # pkt.next_hop(), pkt.prev_hop(), pkt.error(), pkt.direction()
     
     if mac_state.state == "IDLE":
         if queue_size > 0:

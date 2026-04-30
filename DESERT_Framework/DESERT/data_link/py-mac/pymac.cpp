@@ -62,20 +62,26 @@ PYBIND11_EMBEDDED_MODULE(ns2_packet, m) {
         .def("ptype", [](Packet* p) {
             return HDR_CMN(p)->ptype_;
         }, "Get packet type")
-        .def("src", [](Packet* p) {
-            return HDR_CMN(p)->src();
-        }, "Get source address")
-        .def("dst", [](Packet* p) {
-            return HDR_CMN(p)->dst();
-        }, "Get destination address")
         .def("timestamp", [](Packet* p) {
-            return HDR_CMN(p)->timestamp_;
+            return HDR_CMN(p)->ts_;
         }, "Get packet timestamp")
+        .def("next_hop", [](Packet* p) {
+            return HDR_CMN(p)->next_hop_;
+        }, "Get next hop address")
+        .def("prev_hop", [](Packet* p) {
+            return HDR_CMN(p)->prev_hop_;
+        }, "Get previous hop address")
+        .def("error", [](Packet* p) {
+            return HDR_CMN(p)->error_;
+        }, "Get error flag")
+        .def("direction", [](Packet* p) {
+            return static_cast<int>(HDR_CMN(p)->direction_);
+        }, "Get direction (-1=down, 0=none, 1=up)")
         .def("__repr__", [](Packet* p) {
             char buf[256];
-            sprintf(buf, "<Packet uid=%d size=%d ptype=%d src=%d dst=%d>",
+            sprintf(buf, "<Packet uid=%d size=%d ptype=%d next_hop=%d prev_hop=%d ts=%.6f>",
                     HDR_CMN(p)->uid_, HDR_CMN(p)->size_, HDR_CMN(p)->ptype_,
-                    HDR_CMN(p)->src(), HDR_CMN(p)->dst());
+                    HDR_CMN(p)->next_hop_, HDR_CMN(p)->prev_hop_, HDR_CMN(p)->ts_);
             return std::string(buf);
         });
 }
