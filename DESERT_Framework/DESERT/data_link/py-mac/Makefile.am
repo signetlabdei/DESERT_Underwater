@@ -34,13 +34,15 @@ libpymac_la_SOURCES = initlib.cpp \
 				pymac.cpp
 
 
-libpymac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ -I/usr/include/python3.10 -I/home/federico/.local/lib/python3.10/site-packages/pybind11/include \
+libpymac_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ \
+	$(shell python3-config --includes) \
+	$(shell python3 -m pybind11 --includes) \
 	-DINSTALL_LIB_DIR=\"$(libdir)\"
 libpymac_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@
 libpymac_la_LIBADD =   @NS_LIBADD@  @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ \
                           @DESERT_UWMMAC_CLMSGS_LIBADD@ \
                           @DESERT_UWCBR_LIBADD@ \
-                          -lpython3.10
+                          $(shell python3-config --libs)
 
 
 nodist_libpymac_la_SOURCES = initTcl.cc

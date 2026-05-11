@@ -107,6 +107,7 @@ PyMac::PyMac() : MMac(), timer_(this), timer_scheduled_(false)
     // Import mac_logic module and create state
     py::module_ mac_logic = py::module_::import("mac_logic");
     py_mac_state_ = mac_logic.attr("MacState")();
+    std::cout << "PyMac: Python initialization successful" << std::endl;
 }
 
 PyMac::~PyMac()
@@ -126,6 +127,7 @@ void PyMacTimer::expire(Event* e)
 
 void PyMac::on_timer()
 {
+    cout << "PyMac timer expired at time " << Scheduler::instance().clock() << endl;
     // Invoke Python logic
     try {
         py::module_ mac_logic = py::module_::import("mac_logic");
@@ -134,12 +136,17 @@ void PyMac::on_timer()
         double now = Scheduler::instance().clock();
         int queue_size = packet_queue_.size();
         
-        // Convert packet queue to Python list (for now, just pass queue size)
-        // In future, could pass actual packet objects if needed
-        py::list packets;
+        // Pass packet metadata instead of raw objects
+        py::list packet_info;
         std::queue<Packet*> temp_queue = packet_queue_;
         while (!temp_queue.empty()) {
-            packets.append(temp_queue.front());
+            Packet* p = temp_queue.front();
+            py::dict info;
+            info["uid"] = HDR_CMN(p)->uid_;
+            info["size"] = HDR_CMN(p)->size_;
+            info["ptype"] = HDR_CMN(p)->ptype_;
+            info["timestamp"] = HDR_CMN(p)->ts_;
+            packet_info.append(info);
             temp_queue.pop();
         }
         
@@ -148,7 +155,7 @@ void PyMac::on_timer()
             py_mac_state_,
             now,
             queue_size,
-            packets  // Pass actual packet objects to Python
+            packet_info  // Pass packet metadata as dicts
         ).cast<py::dict>();
         
         // Parse result
@@ -178,6 +185,7 @@ void PyMac::on_timer()
 
 void PyMac::recvFromUpperLayers(Packet* p)
 {
+    cout << "Received packet from upper layers at time " << Scheduler::instance().clock() << endl;
     packet_queue_.push(p);
     
     // Schedule timer if not already scheduled

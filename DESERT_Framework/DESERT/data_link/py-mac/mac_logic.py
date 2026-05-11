@@ -25,7 +25,7 @@ class MacState:
                 f"last_event_time={self.last_event_time})")
 
 
-def on_event(mac_state, current_time, queue_size, packets):
+def on_event(mac_state, current_time, queue_size, packet_info):
     """
     Called periodically by C++ to run MAC protocol logic.
     
@@ -33,7 +33,7 @@ def on_event(mac_state, current_time, queue_size, packets):
         mac_state: MacState object (mutable)
         current_time: Current simulation time (float)
         queue_size: Number of packets in the queue (int)
-        packets: List of Packet objects from the queue
+        packet_info: List of dicts with packet metadata (uid, size, ptype, timestamp)
     
     Returns:
         dict with:
@@ -44,12 +44,10 @@ def on_event(mac_state, current_time, queue_size, packets):
     print(f"[{current_time:.4f}] on_event: queue_size={queue_size}, state={mac_state}")
     
     # Example: inspect first packet if available
-    if packets:
-        pkt = packets[0]
-        print(f"  First packet: {pkt}")  # Uses __repr__ to show packet info
-        # Access fields from common header:
-        # pkt.uid(), pkt.size(), pkt.ptype(), pkt.timestamp()
-        # pkt.next_hop(), pkt.prev_hop(), pkt.error(), pkt.direction()
+    if packet_info:
+        pkt = packet_info[0]
+        print(f"  First packet: uid={pkt['uid']}, size={pkt['size']}, ptype={pkt['ptype']}")
+
     
     if mac_state.state == "IDLE":
         if queue_size > 0:
