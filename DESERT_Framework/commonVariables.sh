@@ -135,6 +135,23 @@ export _WITHOUTWOSS=-1
 #*
 
 #***
+# _PYTHON_INSTALL: -1(no variable setted)
+#                   1(the python install setting is done)
+export _PYTHON_INSTALL=-1
+#*
+
+#***
+# WITH_PYTHON_INSTALL:   0(--without-python options is passed to installer procedure)
+#                        1(--with-python options is passed to installer procedure)
+export WITH_PYTHON_INSTALL=0
+#*
+
+#***
+# PYTHON_VENV_PATH: path to create python virtual environment
+export PYTHON_VENV_PATH=""
+#*
+
+#***
 # _TARGET: -1(no variable setted)
 #           1(the target setting is done)
 export _TARGET=-1

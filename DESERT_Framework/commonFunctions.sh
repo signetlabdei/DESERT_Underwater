@@ -382,6 +382,45 @@ wizard_function_wossRequire() {
     log_L2 "WITHWOSS=${WITHWOSS}" install.log
 }
 
+wizard_function_pythonRequire() {
+    sleep ${SLEEP05}
+    printf "\n"
+    wizard__print_L2 "Setting of the Python dependencies installation (OPTIONAL)"
+    wizard__print_L3 "If you need to use Python bindings with the MAC layer,"
+    wizard__print_L3 "you can install Python dependencies in a virtual environment."
+    wizard__print_L3 "This includes pip, pybind11, and other required packages."
+    printf "Do you need Python dependencies installed (N, by default)? [y/N]"
+    python_require=""
+    read_input "python_require"
+    case "${python_require}" in
+        [Yy]|[Yy]es)
+            WITH_PYTHON_INSTALL=1
+            printf '%s\n' "--with-python " >> ${INSTALL_CONF}
+            printf "Enter the path for Python virtual environment"
+            PYTHON_VENV_PATH=""
+            read_input "PYTHON_VENV_PATH"
+            if [ -z "${PYTHON_VENV_PATH}" ]; then
+                PYTHON_VENV_PATH="${DEST_FOLDER}/.python_venv"
+            fi
+            log_L2 "PYTHON_VENV_PATH=${PYTHON_VENV_PATH}" install.log
+            ;;
+        [Nn]|[Nn]o)
+            WITH_PYTHON_INSTALL=0
+            ;;
+        "")
+            WITH_PYTHON_INSTALL=0
+            ;;
+        *)
+            err_L1 "Input ${python_require} not valid. Please write yes (y) or no (n)"
+            wizard_function_pythonRequire
+            ;;
+    esac
+    _PYTHON_INSTALL=1
+    log_L1 "_PYTHON_INSTALL=${_PYTHON_INSTALL}" install.log
+    log_L2 "python_require=${python_require}" install.log
+    log_L2 "WITH_PYTHON_INSTALL=${WITH_PYTHON_INSTALL}" install.log
+}
+
 wizard_function_customPar() {
     sleep ${SLEEP05}
     printf "\n"
@@ -476,6 +515,7 @@ wizard_function() {
     wizard_function_instMode
     wizard_function_destFolder
     wizard_function_wossRequire
+    wizard_function_pythonRequire
     wizard_function_customPar
     wizard_function_addons
 }
@@ -503,6 +543,12 @@ install__print_help() {
     printf "\n"
     printf '%s\n'  "       \033[1m--without-woss\033[0m"
     printf '%s\n'  "              install the Desert Framework without the WOSS framework"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--with-python\033[0m"
+    printf '%s\n'  "              install Python dependencies in a virtual environment"
+    printf "\n"
+    printf '%s\n'  "       \033[1m--without-python\033[0m"
+    printf '%s\n'  "              install the Desert Framework without Python dependencies"
     printf "\n"
     printf '%s\n'  "       \033[1m--target <YOUR_TARGET>\033[0m"
     printf '%s\n'  "              install Desert for YOUR_TARGET"

@@ -71,6 +71,8 @@ shortOpt="abcd:e:f:g:hi:lm"
 longOpt="wizard,\
          with-woss,\
          without-woss,\
+         with-python,\
+         without-python,\
          target:,\
          inst_mode:,\
          dest_folder:,\
@@ -171,6 +173,33 @@ while true; do
                 if [ "${_DEBUG}" = "1" ]; then
                     debug__print_screen_L1 "_WITHOUTWOSS=${_WITHOUTWOSS}"
                     debug__print_screen_L1 "no parameter for --without-woss option"
+                fi
+                #shift
+            fi
+            ;;
+        --with-python)
+            shift;
+            _PYTHON_INSTALL=1
+            WITH_PYTHON_INSTALL=1
+            log_L1 "_PYTHON_INSTALL=${_PYTHON_INSTALL}" ${INSTALL_LOG}
+            printf '%s' "--with-python " >> ${INSTALL_CONF}
+            if [ -n "$1" ]; then
+                if [ "${_DEBUG}" = "1" ]; then
+                    debug__print_screen_L1 "_PYTHON_INSTALL=${_PYTHON_INSTALL}"
+                    debug__print_screen_L1 "no parameter for --with-python option"
+                fi
+                #shift
+            fi
+            ;;
+        --without-python)
+            shift;
+            _PYTHON_INSTALL=1
+            WITH_PYTHON_INSTALL=0
+            log_L1 "_PYTHON_INSTALL=${_PYTHON_INSTALL}" ${INSTALL_LOG}
+            if [ -n "$1" ]; then
+                if [ "${_DEBUG}" = "1" ]; then
+                    debug__print_screen_L1 "_PYTHON_INSTALL=${_PYTHON_INSTALL}"
+                    debug__print_screen_L1 "no parameter for --without-python option"
                 fi
                 #shift
             fi
