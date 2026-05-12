@@ -281,17 +281,6 @@ for {set ii 0} {$ii < $opt(nn)} {incr ii} {
 ###################
 # Final Procedure #
 ###################
-# TODO:
-# 1) Caricare load-output-config
-# 2) Leggere il dizionario per ogni modulo
-# 3) Per ogni modulo tirare fuori le metriche specificate nella lista per ogni nodo
-# 4) Scrivere su yaml
-# Struttura yaml-output:
-# - Modulo:
-#	- Metrica:
-#		- nodo0:
-#		- nodo1:
-#		- nodo(n-1):
 # Define here the procedure to call at the end of the simulation
 source "get-output-config.tcl"
 
@@ -343,14 +332,12 @@ proc finish {} {
 	                set tx $curr_mod($j)
 	            }
 	
-	            # 2. Get the tag and build the dictionary key
-	            # Note: We use the actual type name in the key to prevent collisions
+	            # Get the tag and build the dictionary key
 	            set module_tag [$rx gettag]
 	            set module_name "Module/UW/$module_tag"
 	            set key [list $module_name $i $j]
 	            
-	            # 3. Store the objects
-	            dict set input_modules $key [list $tx $rx]
+	            dict set input_modules $key [list $rx $tx]
 	        }
 	    }
 	}
@@ -361,52 +348,42 @@ proc finish {} {
 		puts "----------------------------"
 	}
 
- #    for {set i 0} {$i < $opt(nn)} {incr i}  {
-	# 	puts "sent by $i: [$mac($i) get_sent_pkts]"
-	# 	puts "recvd by $i: [$mac($i) get_recv_pkts]"
-	# }
-	#
- #    for {set i 0} {$i < $opt(nn)} {incr i}  {
-	# 	for {set j 0} {$j < $opt(nn)} {incr j} {
-	# 		if {$i != $j} {
-	# 			puts [$cbr($i,$j) getsentpkts]
- #    			puts [$cbr($i,$j) getrecvpkts]
-	# 		}
-	# 	}
-	# }
+    for {set i 0} {$i < $opt(nn)} {incr i}  {
 
-    # for {set i 0} {$i < $opt(nn)} {incr i}  {
-    #
-    # 	set mac_sent_pkts        [$mac($i) get_sent_pkts]
-    # 	set mac_recv_pkts        [$mac($i) get_recv_pkts]
-    #
-    # 	for {set j 0} {$j < $opt(nn)} {incr j} {
-    # 	    if {$i != $j} {
-    #             set cbr_throughput   [$cbr($i,$j) getthr]
-    #             set sent_pkts        [$cbr($i,$j) getsentpkts]
-    #             set recv_pkts        [$cbr($i,$j) getrecvpkts]
-    #             set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-    #             set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
-    #             set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
-    #         }
-    # 	}
-    #     set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
-    #     set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
-    #     set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
-    #     set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
-    #    	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
-    # }
-    #
-    # if ($opt(verbose)) {
-    #     puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
-    #     puts "MAC sent Packets         : $sum_mac_sent_pkts"
-    #     puts "MAC received Packets     : $sum_mac_recv_pkts"
-    #     puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
-    #     puts "CBR sent Packets         : $sum_sent_pkts"
-    #     puts "CBR received Packets     : $sum_recv_pkts"
-    #     puts "Packets in buffer        : $sum_pcks_in_buffer"
-    #     puts "Packet Delivery Ratio    : [format %.4f [expr $sum_recv_pkts / $sum_sent_pkts * 100]]"
-    # }
+    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
+    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
+		# puts "mac sent $i: $mac_sent_pkts"
+		# puts "mac recv $i: $mac_recv_pkts"
+
+    	for {set j 0} {$j < $opt(nn)} {incr j} {
+    	    if {$i != $j} {
+                set cbr_throughput   [$cbr($i,$j) getthr]
+                set sent_pkts        [$cbr($i,$j) getsentpkts]
+                set recv_pkts        [$cbr($i,$j) getrecvpkts]
+				puts "cbr sent $i,$j: $sent_pkts"
+				puts "cbr recv $i,$j: $recv_pkts"
+                set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
+                set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
+                set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
+            }
+    	}
+        set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
+        set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
+        set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
+        set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
+       	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
+    }
+
+    if ($opt(verbose)) {
+        puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
+        puts "MAC sent Packets         : $sum_mac_sent_pkts"
+        puts "MAC received Packets     : $sum_mac_recv_pkts"
+        puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
+        puts "CBR sent Packets         : $sum_sent_pkts"
+        puts "CBR received Packets     : $sum_recv_pkts"
+        puts "Packets in buffer        : $sum_pcks_in_buffer"
+        puts "Packet Error Rate    : [format %.4f [expr (1 - 1.0 * ($sum_recv_pkts / $sum_sent_pkts)) * 100]]"
+    }
     
     $ns flush-trace
     close $opt(tracefile)

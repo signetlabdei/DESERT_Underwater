@@ -36,7 +36,7 @@
 
 package require yaml
 
-proc get-app-per { tx_app rx_app} {
+proc get-app-per { rx_app tx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
 
@@ -84,13 +84,13 @@ proc print-output-metrics { id input_modules } {
     set results [dict create]
 
     dict for {key objects} $input_modules {
-        lassign $key module_name tx_id rx_id
+        lassign $key module_name rx_id tx_id
         
         # Only process data intended for this receiver
         if {$rx_id != $id} continue
         if {![dict exists $output_config $module_name]} continue
 
-        lassign $objects tx rx
+        lassign $objects rx tx
         set requested_metrics [dict get $output_config $module_name]
 
         foreach item $requested_metrics {
@@ -99,7 +99,7 @@ proc print-output-metrics { id input_modules } {
             switch $module_name {
                 "Module/UW/CBR" {
                     switch $item {
-                        "PER"              { set val [get-app-per $tx $rx] }
+                        "PER"              { set val [get-app-per $rx $tx] }
                         "throughput"       { set val [$rx getthr] }
                         "sent_packets"     { set val [$rx getsentpkts] }
                         "received_packets" { set val [$rx getrecvpkts] }
