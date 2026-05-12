@@ -95,12 +95,12 @@ global positions
 ########################
 # Configure simulation #
 ########################
-source "get-config.tcl"
+source "../yaml_input_interface/get-config.tcl"
 
-set config_filename "uwtdma_config.yaml"
+set config_filename "../yaml_input_interface/uwtdma_config.yaml"
 load-config $config_filename
 
-set positions_filename "uwtdma_positions.yaml"
+set positions_filename "../yaml_input_interface/uwtdma_positions.yaml"
 load-positions $positions_filename
 
 
@@ -139,7 +139,7 @@ $data_mask setPropagationSpeed  $opt(propagation_speed)
 proc createNode { id } {
 
     global channel ns cbr position node udp portnum ipr ipif
-    global opt mll mac propagation data_mask interf_data positions
+    global opt mll mac propagation data_mask interf_data positions phy
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -162,8 +162,8 @@ proc createNode { id } {
     $node($id) addModule 5 $ipr($id)   1  "IPR"
     $node($id) addModule 4 $ipif($id)  1  "IPF"   
     $node($id) addModule 3 $mll($id)   1  "MLL"
-    $node($id) addModule 2 $mac($id)   1  "MAC"
-    $node($id) addModule 1 $phy($id)   1  "PHY"
+    $node($id) addModule 2 $mac($id)   1  "TDMA"
+    $node($id) addModule 1 $phy($id)   1  "PHYSICAL"
 
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
         if { $id == $cnt} { continue }
@@ -219,7 +219,7 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 # Inter-node module connection #
 ################################
 proc connectNodes {id1 des1} {
-    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt 
+    global ipif ipr portnum cbr opt 
     $cbr($id1,$des1) set destAddr_ [$ipif($des1) addr]
     $cbr($id1,$des1) set destPort_ $portnum($des1,$id1)
 }
@@ -266,10 +266,10 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 # e.g., 
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2} {
-	if {$id1 != $id2} {
-	    $ns at $opt(starttime)    "$cbr($id1,$id2) start"
-	    $ns at $opt(stoptime)     "$cbr($id1,$id2) stop"
-	}
+		if {$id1 != $id2} {
+		    $ns at $opt(starttime)    "$cbr($id1,$id2) start"
+		    $ns at $opt(stoptime)     "$cbr($id1,$id2) stop"
+		}
     }
 }
 
@@ -293,12 +293,14 @@ for {set ii 0} {$ii < $opt(nn)} {incr ii} {
 #		- nodo1:
 #		- nodo(n-1):
 # Define here the procedure to call at the end of the simulation
+source "get-output-config.tcl"
+
 proc finish {} {
-    global ns opt outfile
-    global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
+    global ns opt outfile node
+    global mac propagation phy channel db_manager propagation
     global node_coordinates
-    global ipr_sink ipr ipif udp cbr phy phy_data_sink
-    global node_stats tmp_node_stats sink_stats tmp_sink_stats
+    global ipr ipif udp cbr phy
+    global node_stats tmp_node_stats
     if ($opt(verbose)) {
        puts "-----------------------------------------------------------------"
        puts "Simulation summary"
@@ -320,38 +322,91 @@ proc finish {} {
     set sent_pkts 0
     set recv_pkts 0
 
-    for {set i 0} {$i < $opt(nn)} {incr i}  {
+	set input_modules [dict create]
+	
+	foreach type {cbr phy mac} {
+	    for {set i 0} {$i < $opt(nn)} {incr i} {
+	        for {set j 0} {$j < $opt(nn)} {incr j} {
+	            if {$i == $j} continue
+	            
+	            # Determine if this module type is per link or per node
+	            if {$type eq "cbr"} {
+	                if {![info exists cbr($i,$j)] || ![info exists cbr($j,$i)]} continue
+	                set rx $cbr($i,$j)
+	                set tx $cbr($j,$i)
+	            } else {
+					# Access the array from string
+	                upvar 1 $type curr_mod
+	                
+	                if {![info exists curr_mod($i)] || ![info exists curr_mod($j)]} continue
+	                set rx $curr_mod($i)
+	                set tx $curr_mod($j)
+	            }
+	
+	            # 2. Get the tag and build the dictionary key
+	            # Note: We use the actual type name in the key to prevent collisions
+	            set module_tag [$rx gettag]
+	            set module_name "Module/UW/$module_tag"
+	            set key [list $module_name $i $j]
+	            
+	            # 3. Store the objects
+	            dict set input_modules $key [list $tx $rx]
+	        }
+	    }
+	}
+	
+	for {set id 0} {$id < $opt(nn)} {incr id} {
+		puts "csv $id"
+		print-output-metrics $id $input_modules
+		puts "----------------------------"
+	}
 
-    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
-    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
+ #    for {set i 0} {$i < $opt(nn)} {incr i}  {
+	# 	puts "sent by $i: [$mac($i) get_sent_pkts]"
+	# 	puts "recvd by $i: [$mac($i) get_recv_pkts]"
+	# }
+	#
+ #    for {set i 0} {$i < $opt(nn)} {incr i}  {
+	# 	for {set j 0} {$j < $opt(nn)} {incr j} {
+	# 		if {$i != $j} {
+	# 			puts [$cbr($i,$j) getsentpkts]
+ #    			puts [$cbr($i,$j) getrecvpkts]
+	# 		}
+	# 	}
+	# }
 
-    	for {set j 0} {$j < $opt(nn)} {incr j} {
-    	    if {$i != $j} {
-                set cbr_throughput   [$cbr($i,$j) getthr]
-                set sent_pkts        [$cbr($i,$j) getsentpkts]
-                set recv_pkts        [$cbr($i,$j) getrecvpkts]
-                set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-                set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
-                set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
-            }
-    	}
-        set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
-        set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
-        set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
-        set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
-       	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
-    }
-
-    if ($opt(verbose)) {
-        puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
-        puts "MAC sent Packets         : $sum_mac_sent_pkts"
-        puts "MAC received Packets     : $sum_mac_recv_pkts"
-        puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
-        puts "CBR sent Packets         : $sum_sent_pkts"
-        puts "CBR received Packets     : $sum_recv_pkts"
-        puts "Packets in buffer        : $sum_pcks_in_buffer"
-        puts "Packet Delivery Ratio    : [format %.4f [expr $sum_recv_pkts / $sum_sent_pkts * 100]]"
-    }
+    # for {set i 0} {$i < $opt(nn)} {incr i}  {
+    #
+    # 	set mac_sent_pkts        [$mac($i) get_sent_pkts]
+    # 	set mac_recv_pkts        [$mac($i) get_recv_pkts]
+    #
+    # 	for {set j 0} {$j < $opt(nn)} {incr j} {
+    # 	    if {$i != $j} {
+    #             set cbr_throughput   [$cbr($i,$j) getthr]
+    #             set sent_pkts        [$cbr($i,$j) getsentpkts]
+    #             set recv_pkts        [$cbr($i,$j) getrecvpkts]
+    #             set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
+    #             set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
+    #             set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
+    #         }
+    # 	}
+    #     set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
+    #     set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
+    #     set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
+    #     set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
+    #    	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
+    # }
+    #
+    # if ($opt(verbose)) {
+    #     puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
+    #     puts "MAC sent Packets         : $sum_mac_sent_pkts"
+    #     puts "MAC received Packets     : $sum_mac_recv_pkts"
+    #     puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
+    #     puts "CBR sent Packets         : $sum_sent_pkts"
+    #     puts "CBR received Packets     : $sum_recv_pkts"
+    #     puts "Packets in buffer        : $sum_pcks_in_buffer"
+    #     puts "Packet Delivery Ratio    : [format %.4f [expr $sum_recv_pkts / $sum_sent_pkts * 100]]"
+    # }
     
     $ns flush-trace
     close $opt(tracefile)

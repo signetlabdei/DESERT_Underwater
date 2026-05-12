@@ -1,11 +1,12 @@
 ---
 Module/UW/CBR:
         PER: 1
-        throughput: 1
-Module/UW/TDMA:
-        PER: 0
+        throughput: 0
         sent_packets: 1
         received_packets: 1
+Module/UW/TDMA:
+        sent_packets: 1
+        pippo: 1
+        received_packets: 1
 Module/UW/PHYSICAL:
-        PER: 0
-        throughput: 1
+        getTotPktsLost: 0
