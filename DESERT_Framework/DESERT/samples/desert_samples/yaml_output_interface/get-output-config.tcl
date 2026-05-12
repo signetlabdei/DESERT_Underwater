@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,18 @@
 # This file implements the reading functions for parsing
 # the YAML configuration files.
 #
-# Authors: Roberto francescon <frances1@dei.unipd.it>
+# Authors:
 # Version: 1.0.0
 #
 
 package require yaml
+
+proc get-app-per { tx_app rx_app} {
+	set sent_packets [$tx_app getsentpkts]
+	set received_packets [$rx_app getrecvpkts]
+
+	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+}
 
 proc load-output-config { filename } {
 
@@ -67,7 +74,60 @@ proc load-output-config { filename } {
 		dict append module_metrics $module $temp_list
     }
 
-	puts $module_metrics
+	return $module_metrics
 }
 
-load-output-config "./uwtdma_output_config.yaml"
+proc print-output-metrics { id input_modules } {
+    set output_config [load-output-config "./uwtdma_output_config.yaml"]
+    
+    # Dictionary: tx_id -> {list of all metrics}
+    set results [dict create]
+
+    dict for {key objects} $input_modules {
+        lassign $key module_name tx_id rx_id
+        
+        # Only process data intended for this receiver
+        if {$rx_id != $id} continue
+        if {![dict exists $output_config $module_name]} continue
+
+        lassign $objects tx rx
+        set requested_metrics [dict get $output_config $module_name]
+
+        foreach item $requested_metrics {
+            set val ""
+            
+            switch $module_name {
+                "Module/UW/CBR" {
+                    switch $item {
+                        "PER"              { set val [get-app-per $tx $rx] }
+                        "throughput"       { set val [$rx getthr] }
+                        "sent_packets"     { set val [$rx getsentpkts] }
+                        "received_packets" { set val [$rx getrecvpkts] }
+                    }
+                }
+                "Module/UW/TDMA" {
+                    switch $item {
+                        "sent_packets"     { set val [$rx get_sent_pkts] }
+                        "received_packets" { set val [$rx get_recv_pkts] }
+                    }
+                }
+                "Module/UW/PHYSICAL" {
+                    switch $item {
+                        "getTotPktsLost" { set val [$rx getTotPktsLost] }
+                    }
+                }
+            }
+
+            if {$val ne ""} {
+                dict lappend results $tx_id $val
+            } else {
+                dict lappend results $tx_id "nan"
+			}
+        }
+    }
+
+    foreach tx_id [lsort -integer [dict keys $results]] {
+        set metrics_list [dict get $results $tx_id]
+        puts "$tx_id,[join $metrics_list ","]"
+    }
+}
