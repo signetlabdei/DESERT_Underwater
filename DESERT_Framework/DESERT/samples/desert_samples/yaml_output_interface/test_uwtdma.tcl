@@ -240,7 +240,7 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###################
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
-	$mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
+		$mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
     }
 }
 
@@ -313,40 +313,37 @@ proc finish {} {
 
 	set input_modules [dict create]
 	
-	foreach type {cbr phy mac} {
+	# Node-based modules
+	foreach type {phy mac} {
+	    upvar 1 $type curr_mod
+
 	    for {set i 0} {$i < $opt(nn)} {incr i} {
-	        for {set j 0} {$j < $opt(nn)} {incr j} {
-	            if {$i == $j} continue
-	            
-	            # Determine if this module type is per link or per node
-	            if {$type eq "cbr"} {
-	                if {![info exists cbr($i,$j)] || ![info exists cbr($j,$i)]} continue
-	                set rx $cbr($i,$j)
-	                set tx $cbr($j,$i)
-	            } else {
-					# Access the array from string
-	                upvar 1 $type curr_mod
-	                
-	                if {![info exists curr_mod($i)] || ![info exists curr_mod($j)]} continue
-	                set rx $curr_mod($i)
-	                set tx $curr_mod($j)
-	            }
-	
-	            # Get the tag and build the dictionary key
-	            set module_tag [$rx gettag]
-	            set module_name "Module/UW/$module_tag"
-	            set key [list $module_name $i $j]
-	            
-	            dict set input_modules $key [list $rx $tx]
-	        }
+	        if {![info exists curr_mod($i)]} continue
+	        
+	        set rx $curr_mod($i)
+	        set module_name "Module/UW/[$rx gettag]"
+	        
+	        # Use node id as key
+	        dict set input_modules $module_name $i [list $rx ""]
 	    }
 	}
-	
-	for {set id 0} {$id < $opt(nn)} {incr id} {
-		puts "csv $id"
-		print-output-metrics $id $input_modules
-		puts "----------------------------"
+
+	# Link-based modules
+	foreach link [lsort -dictionary [array names cbr]] {
+	    scan $link "%d,%d" i j
+	    
+	    if {$i == $j || ![info exists cbr($i,$j)] || ![info exists cbr($j,$i)]} continue 
+	    
+	    set rx $cbr($i,$j)
+	    set tx $cbr($j,$i)
+	    set module_name "Module/UW/[$rx gettag]"
+	    
+	    # Use "rx,tx" as a key
+	    dict set input_modules $module_name "$i,$j" [list $rx $tx]
 	}
+	
+	# Print metrics to csv according to yaml output config
+	print-metrics-csv $input_modules "./uwtdma_output_config.yaml"
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 
@@ -382,7 +379,7 @@ proc finish {} {
         puts "CBR sent Packets         : $sum_sent_pkts"
         puts "CBR received Packets     : $sum_recv_pkts"
         puts "Packets in buffer        : $sum_pcks_in_buffer"
-        puts "Packet Error Rate    : [format %.4f [expr (1 - 1.0 * ($sum_recv_pkts / $sum_sent_pkts)) * 100]]"
+        puts "Packet Delivery Ratio    : [format %.4f [expr ($sum_recv_pkts / $sum_sent_pkts) * 100]]"
     }
     
     $ns flush-trace
