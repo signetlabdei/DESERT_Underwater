@@ -30,104 +30,140 @@
 # This file implements the reading functions for parsing
 # the YAML configuration files.
 #
-# Authors:
+# Authors: Vincenz Cimino, Filippo Donegà
 # Version: 1.0.0
 #
 
 package require yaml
 
-proc get-app-per { rx_app tx_app} {
+set MOD_CBR "Module/UW/CBR" 
+set MOD_TDMA "Module/UW/TDMA"
+set MOD_PHY "Module/UW/PHYSICAL"
+
+
+# Compute application layer packet delivery ratio.
+# Inputs
+# - rx_app: application object receiving packets
+# - tx_app: application object transmitting packets
+proc get-app-pdr { rx_app tx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
 
-	return [expr 1 - (1.0 * $received_packets / $sent_packets)]
+	return [expr 1.0 * $received_packets / $sent_packets]
 }
 
-proc load-output-config { filename } {
-
+# load-output-config reads output metrics from yaml config file and store them in a dictionary.
+# Keys are module names and values list of metrics.
+# Inputs
+# - config_file: name of the yaml config file
+proc load-output-config { config_file } {
     global opt
 
-    set fileId [open $filename r]
+    set fileId [open $config_file r]
     set data [read $fileId]
     close $fileId
     set loaded_data [::yaml::yaml2dict $data]
 
-    set modules [dict keys $loaded_data]
+    set module_names [dict keys $loaded_data]
 	set module_metrics [dict create]
 
-    foreach module $modules {
-		set temp_list [list]
+	# Iterate over each module
+    foreach module $module_names {
+		set metrics [list]
+
+		# Iterate over metric
         foreach param [dict keys [dict get $loaded_data $module]] {
             set value [dict get $loaded_data $module $param]
 
+			# Store only active metrics
 			switch $value {
-				1 {
-					lappend temp_list $param
-				}
+				1 { lappend metrics $param }
 				0 { }
 				default {
-					puts "Invalid value for $param, exiting..."
-					exit
+					puts "Invalid value for $param, ignoring."
 				}
 			}
         }
-		dict append module_metrics $module $temp_list
+
+		dict append module_metrics $module $metrics
     }
 
 	return $module_metrics
 }
 
-proc print-output-metrics { id input_modules } {
-    set output_config [load-output-config "./uwtdma_output_config.yaml"]
-    
-    # Dictionary: tx_id -> {list of all metrics}
-    set results [dict create]
+# print-metrics-csv retrieves metrics from a list of modules and store them
+# in csv files. A different file is created for each module.
+# Modules are distinguished in:
+# - Node-based: metrics are computed over all links
+# - Link-based: metrics are computed over single links
+# Inputs
+# - input_modules: list of modules used in the simulation
+# - config_file: name of the yaml config file
+proc print-metrics-csv { input_modules config_file } {
+	global MOD_CBR MOD_TDMA MOD_PHY
 
-    dict for {key objects} $input_modules {
-        lassign $key module_name rx_id tx_id
+    set output_config [load-output-config $config_file]
+
+    dict for {module_name requested_metrics} $output_config {
+        if {[llength $requested_metrics] == 0 || ![dict exists $input_modules $module_name]} continue
+
+        # Sanitize filename
+        set safe_name [string map {"/" "_"} $module_name]
+        set filename "${safe_name}.csv"
         
-        # Only process data intended for this receiver
-        if {$rx_id != $id} continue
-        if {![dict exists $output_config $module_name]} continue
+        set fp [open $filename w]
+        
+		# Write csv header
+        set is_linkbased [expr {$module_name eq $MOD_CBR}]
+        if {$is_linkbased} {
+            puts $fp "rx_id,tx_id,[join $requested_metrics ","]"
+        } else {
+            puts $fp "node_id,[join $requested_metrics ","]"
+        }
 
-        lassign $objects rx tx
-        set requested_metrics [dict get $output_config $module_name]
+        set module_data [dict get $input_modules $module_name]
+        set sorted_keys [lsort -dictionary [dict keys $module_data]]
 
-        foreach item $requested_metrics {
-            set val ""
-            
-            switch $module_name {
-                "Module/UW/CBR" {
-                    switch $item {
-                        "PER"              { set val [get-app-per $rx $tx] }
-                        "throughput"       { set val [$rx getthr] }
-                        "sent_packets"     { set val [$rx getsentpkts] }
-                        "received_packets" { set val [$rx getrecvpkts] }
+		# Iterate over each module
+		# Key: (module_name, rx_id, tx_id)
+		# Value: (rx_object, tx_object)
+        foreach id_key $sorted_keys {
+            set objects [dict get $module_data $id_key]
+            lassign $objects rx tx
+            set row_metrics [list]
+
+			# Iterate over each metric
+            foreach item $requested_metrics {
+                set val "nan"
+                switch -exact -- $module_name \
+                    $MOD_CBR  {
+                        switch -exact -- $item {
+                            "PDR"              { set val [get-app-pdr $rx $tx] }
+                            "throughput"       { set val [$rx getthr] }
+                            "sent_packets"     { set val [$rx getsentpkts] }
+                            "received_packets" { set val [$rx getrecvpkts] }
+                        }
+                    } \
+                    $MOD_TDMA {
+                        switch -exact -- $item {
+                            "sent_packets"     { set val [$rx get_sent_pkts] }
+                            "received_packets" { set val [$rx get_recv_pkts] }
+                        }
+                    } \
+                    $MOD_PHY {
+                        switch -exact -- $item {
+                            "getTotPktsLost"   { set val [$rx getTotPktsLost] }
+                        }
                     }
-                }
-                "Module/UW/TDMA" {
-                    switch $item {
-                        "sent_packets"     { set val [$rx get_sent_pkts] }
-                        "received_packets" { set val [$rx get_recv_pkts] }
-                    }
-                }
-                "Module/UW/PHYSICAL" {
-                    switch $item {
-                        "getTotPktsLost" { set val [$rx getTotPktsLost] }
-                    }
-                }
+
+                lappend row_metrics $val
             }
 
-            if {$val ne ""} {
-                dict lappend results $tx_id $val
-            } else {
-                dict lappend results $tx_id "nan"
-			}
+            # Write the row
+            puts $fp "$id_key,[join $row_metrics ","]"
         }
-    }
-
-    foreach tx_id [lsort -integer [dict keys $results]] {
-        set metrics_list [dict get $results $tx_id]
-        puts "$tx_id,[join $metrics_list ","]"
+        
+        close $fp
+        puts "Saved metrics in $filename"
     }
 }
