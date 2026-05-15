@@ -91,79 +91,100 @@ proc load-output-config { config_file } {
 	return $module_metrics
 }
 
+proc get_metrics { metrics_names module_name rx tx} {
+	global MOD_CBR MOD_TDMA MOD_PHY
+    set row_metrics [list]
+
+	# Iterate over each metric
+	foreach item $metrics_names {
+		set val "nan"
+		switch -exact -- $module_name \
+			$MOD_CBR  {
+			switch -exact -- $item {
+				"PDR"              { set val [get-app-pdr $rx $tx] }
+				"throughput"       { set val [$rx getthr] }
+				"sent_packets"     { set val [$rx getsentpkts] }
+				"received_packets" { set val [$rx getrecvpkts] }
+			}
+		} \
+			$MOD_TDMA {
+			switch -exact -- $item {
+				"sent_packets"     { set val [$rx get_sent_pkts] }
+				"received_packets" { set val [$rx get_recv_pkts] }
+			}
+		} \
+			$MOD_PHY {
+			switch -exact -- $item {
+				"getTotPktsLost"   { set val [$rx getTotPktsLost] }
+			}
+		}
+
+		lappend row_metrics $val
+	}
+
+	return $row_metrics
+}
+
 # print-metrics-csv retrieves metrics from a list of modules and store them
 # in csv files. A different file is created for each module.
 # Modules are distinguished in:
 # - Node-based: metrics are computed over all links
 # - Link-based: metrics are computed over single links
 # Inputs
+# - rngstream: random seed / run identifier
 # - input_modules: list of modules used in the simulation
 # - config_file: name of the yaml config file
-proc print-metrics-csv { input_modules config_file } {
-	global MOD_CBR MOD_TDMA MOD_PHY
+proc print-metrics-csv { rngstream input_modules config_file } {
 
     set output_config [load-output-config $config_file]
 
+	# Iterate over each module in the yaml config file
     dict for {module_name requested_metrics} $output_config {
-        if {[llength $requested_metrics] == 0 || ![dict exists $input_modules $module_name]} continue
+        if { [llength $requested_metrics] == 0 
+				|| ![dict exists $input_modules $module_name] } continue
 
         # Sanitize filename
         set safe_name [string map {"/" "_"} $module_name]
         set filename "${safe_name}.csv"
         
-        set fp [open $filename w]
-        
-		# Write csv header
-        set is_linkbased [expr {$module_name eq $MOD_CBR}]
-        if {$is_linkbased} {
-            puts $fp "rx_id,tx_id,[join $requested_metrics ","]"
-        } else {
-            puts $fp "node_id,[join $requested_metrics ","]"
+		# Check if file already exists
+        set file_exists 0
+        if { [file exists $filename] } {
+            set file_exists 1
         }
 
+		# Open file in append mode
+        set fp [open $filename a]
+
+		# Retrieve lists of nodes and keys per current module
         set module_data [dict get $input_modules $module_name]
         set sorted_keys [lsort -dictionary [dict keys $module_data]]
 
-		# Iterate over each module
-		# Key: (module_name, rx_id, tx_id)
+		# Write csv header
+        if { !$file_exists } {
+			# Link-based modules use "rx_id,tx_id" as dict keys
+            set is_linkbased [expr {[string length [lindex $sorted_keys 0]] > 1}]
+
+            if {$is_linkbased} {
+                puts $fp "rngstream,rx_id,tx_id,[join $requested_metrics ","]"
+            } else {
+                puts $fp "rngstream,node_id,[join $requested_metrics ","]"
+            }
+        }
+
+		# Iterate over each link/node
+		# Key: (module_name, "rx_id,tx_id") or (module_name, rx_id)
 		# Value: (rx_object, tx_object)
         foreach id_key $sorted_keys {
             set objects [dict get $module_data $id_key]
             lassign $objects rx tx
-            set row_metrics [list]
 
-			# Iterate over each metric
-            foreach item $requested_metrics {
-                set val "nan"
-                switch -exact -- $module_name \
-                    $MOD_CBR  {
-                        switch -exact -- $item {
-                            "PDR"              { set val [get-app-pdr $rx $tx] }
-                            "throughput"       { set val [$rx getthr] }
-                            "sent_packets"     { set val [$rx getsentpkts] }
-                            "received_packets" { set val [$rx getrecvpkts] }
-                        }
-                    } \
-                    $MOD_TDMA {
-                        switch -exact -- $item {
-                            "sent_packets"     { set val [$rx get_sent_pkts] }
-                            "received_packets" { set val [$rx get_recv_pkts] }
-                        }
-                    } \
-                    $MOD_PHY {
-                        switch -exact -- $item {
-                            "getTotPktsLost"   { set val [$rx getTotPktsLost] }
-                        }
-                    }
+			set row_metrics [get_metrics $requested_metrics $module_name $rx $tx]
 
-                lappend row_metrics $val
-            }
-
-            # Write the row
-            puts $fp "$id_key,[join $row_metrics ","]"
+            puts $fp "$rngstream,$id_key,[join $row_metrics ","]"
         }
         
         close $fp
-        puts "Saved metrics in $filename"
+        puts "Saved $module_name metrics in $filename"
     }
 }

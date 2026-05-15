@@ -343,22 +343,18 @@ proc finish {} {
 	}
 	
 	# Print metrics to csv according to yaml output config
-	print-metrics-csv $input_modules "./uwtdma_output_config.yaml"
+	print-metrics-csv $opt(rngstream) $input_modules "./uwtdma_output_config.yaml"
 
     for {set i 0} {$i < $opt(nn)} {incr i}  {
 
     	set mac_sent_pkts        [$mac($i) get_sent_pkts]
     	set mac_recv_pkts        [$mac($i) get_recv_pkts]
-		# puts "mac sent $i: $mac_sent_pkts"
-		# puts "mac recv $i: $mac_recv_pkts"
 
     	for {set j 0} {$j < $opt(nn)} {incr j} {
     	    if {$i != $j} {
                 set cbr_throughput   [$cbr($i,$j) getthr]
                 set sent_pkts        [$cbr($i,$j) getsentpkts]
                 set recv_pkts        [$cbr($i,$j) getrecvpkts]
-				puts "cbr sent $i,$j: $sent_pkts"
-				puts "cbr recv $i,$j: $recv_pkts"
                 set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
                 set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
                 set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
