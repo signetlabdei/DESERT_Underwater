@@ -2,11 +2,10 @@
 Module/UW/CBR:
         PDR: 1
         throughput: 1
-        sent_packets: 1
-        received_packets: 1
+        sent_packets: 0
+        received_packets: 0
 Module/UW/TDMA:
         sent_packets: 1
         received_packets: 1
 Module/UW/PHYSICAL:
         getTotPktsLost: 0
-        pippo: 1
