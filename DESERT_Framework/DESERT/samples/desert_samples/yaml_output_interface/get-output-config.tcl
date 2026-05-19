@@ -30,12 +30,13 @@
 # This file implements the reading functions for parsing
 # the YAML configuration files.
 #
-# Authors: Vincenz Cimino, Filippo Donegà
+# Authors: Vincenzo Cimino, Filippo Donegà
 # Version: 1.0.0
 #
 
 package require yaml
 
+#TODO: finish documentation
 set MOD_CBR "Module/UW/CBR" 
 set MOD_TDMA "Module/UW/TDMA"
 set MOD_PHY "Module/UW/PHYSICAL"
@@ -49,7 +50,9 @@ proc get-app-pdr { rx_app tx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
 
-	return [expr 1.0 * $received_packets / $sent_packets]
+	set pdr [format %.6f [expr 1.0 * $received_packets / $sent_packets]]
+
+	return $pdr
 }
 
 # load-output-config reads output metrics from yaml config file and store them in a dictionary.
@@ -91,7 +94,60 @@ proc load-output-config { config_file } {
 	return $module_metrics
 }
 
-proc get_metrics { metrics_names module_name rx tx} {
+proc write-input-node-based-modules {dict_modules args} {
+    global opt
+    upvar 1 $dict_modules input_modules
+    
+    foreach type $args {
+        upvar 1 $type curr_mod
+
+        for {set i 0} {$i < $opt(nn)} {incr i} {
+            if {![info exists curr_mod($i)]} continue
+            
+            set rx $curr_mod($i)
+            set module_name [$rx info class] 
+            
+            # Use node id as key
+            dict set input_modules $module_name $i [list $rx ""]
+        }
+    }
+}
+
+proc write-input-link-based-modules {dict_var_name args} {
+    upvar 1 $dict_var_name input_modules
+    
+    foreach type $args {
+        upvar 1 $type curr_array
+
+        # If the array doesn't exist in the caller's scope, skip it
+        if {![array exists curr_array]} continue
+
+        foreach link [lsort -dictionary [array names curr_array]] {
+            scan $link "%d,%d" i j
+            
+            if {$i == $j || ![info exists curr_array($i,$j)] || ![info exists curr_array($j,$i)]} continue 
+            
+            set rx $curr_array($i,$j)
+            set tx $curr_array($j,$i)
+            set module_name [$rx info class] 
+            
+            # Use "i,j" as a key
+            dict set input_modules $module_name "$i,$j" [list $rx $tx]
+        }
+    }
+}
+
+##
+# get-metrics retrieves specified metric values for a given module.
+#
+# @param metrics_names List of the names of the metrics to be collected.
+# @param module_name   Name of the module containing the metrics.
+# @param rx            The receiving module object reference.
+# @param tx            The transmitting module object reference (used in link-based modules only).
+#
+# @return List containing the requested metric values.
+##
+proc get-metrics { metrics_names module_name rx tx} {
 	global MOD_CBR MOD_TDMA MOD_PHY
     set row_metrics [list]
 
@@ -160,17 +216,35 @@ proc print-metrics-csv { rngstream input_modules config_file } {
         set module_data [dict get $input_modules $module_name]
         set sorted_keys [lsort -dictionary [dict keys $module_data]]
 
+		# Link-based modules use "rx_id,tx_id" as dict keys
+        set is_linkbased [expr {[string length [lindex $sorted_keys 0]] > 1}]
+
 		# Write csv header
         if { !$file_exists } {
-			# Link-based modules use "rx_id,tx_id" as dict keys
-            set is_linkbased [expr {[string length [lindex $sorted_keys 0]] > 1}]
-
             if {$is_linkbased} {
                 puts $fp "rngstream,rx_id,tx_id,[join $requested_metrics ","]"
             } else {
                 puts $fp "rngstream,node_id,[join $requested_metrics ","]"
             }
-        }
+        } else {
+			# If file already exists check header consistency
+			set string_metrics [join $requested_metrics ,]
+
+			set fh [open $filename r]
+			gets $fh line
+			close $fh
+
+            if {$is_linkbased} {
+				set string_header [join [lrange [split $line ","] 3 end] ","]
+            } else {
+				set string_header [join [lrange [split $line ","] 2 end] ","]
+            }
+
+			# TODO: what to do if not consistent?
+			if {$string_header != $string_metrics} {
+				puts "uh-oh"
+			}
+		}
 
 		# Iterate over each link/node
 		# Key: (module_name, "rx_id,tx_id") or (module_name, rx_id)
@@ -179,7 +253,7 @@ proc print-metrics-csv { rngstream input_modules config_file } {
             set objects [dict get $module_data $id_key]
             lassign $objects rx tx
 
-			set row_metrics [get_metrics $requested_metrics $module_name $rx $tx]
+			set row_metrics [get-metrics $requested_metrics $module_name $rx $tx]
 
             puts $fp "$rngstream,$id_key,[join $row_metrics ","]"
         }
