@@ -26,9 +26,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test the YAML input interface.
+# This script contains the API to use the YAML output interface.
 # This file implements the reading functions for parsing
-# the YAML configuration files.
+# the YAML configuration files and writing the CSV outputs.
 #
 # Authors: Vincenzo Cimino, Filippo Donegà
 # Version: 1.0.0
@@ -37,15 +37,17 @@
 package require yaml
 
 # List of modules
-set MOD_CBR "Module/UW/CBR" 
-set MOD_TDMA "Module/UW/TDMA"
-set MOD_PHY "Module/UW/PHYSICAL"
+set MOD_CBR         "Module/UW/CBR" 
+set MOD_TDMA        "Module/UW/TDMA"
+set MOD_CSMA_ALOHA  "Module/UW/CSMA_ALOHA"
+set MOD_PHY         "Module/UW/PHYSICAL"
 
-
+##
 # get-app-pdr computes Module/UW/CBR packet delivery ratio.
 #
 # @paramm rx_app Application object receiving packets.
 # @paramm tx_app application object transmitting packets
+##
 proc get-app-pdr { rx_app tx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
@@ -158,6 +160,63 @@ proc write-input-link-based-modules {dict_var_name args} {
 }
 
 ##
+# write-sink-modules creates a dictionary in the caller's scope
+# with receiving (rx) and transmitting (tx) module pairs.
+# It automatically handles both array-based receivers (e.g., cbr_sink) 
+# and scalar-based receivers (e.g., mac_sink).
+#
+# @param dict_var_name Dictionary in the caller's scope.
+# @param args          One or more array couples containing module object references indexed by node pairs.
+##
+proc write-sink-modules {dict_var_name args} {
+    upvar 1 $dict_var_name input_modules
+    
+    if { [expr [llength $args] % 2] != 0 } {
+        puts "Invalid number of arguments. Please provide pairs (e.g., rx_var tx_array)."
+        return
+    }
+
+    foreach {rx_name tx_array_name} $args {
+        upvar 1 $rx_name rx_var
+        upvar 1 $tx_array_name tx_array
+
+        # The transmitter must be an array of nodes
+        if {![array exists tx_array]} {
+            puts "Warning: Transmitter $tx_array_name is not an array. Skipping."
+            continue
+        }
+
+        # Check if the receiver is an array or a single scalar variable
+        set rx_is_array [array exists rx_var]
+        set rx_is_scalar [info exists rx_var]
+
+        if {!$rx_is_array && !$rx_is_scalar} {
+            puts "Warning: Receiver $rx_name does not exist. Skipping."
+            continue
+        }
+
+        # Iterate through the transmitting nodes
+        foreach tx_id [lsort -dictionary [array names tx_array]] {
+            set tx $tx_array($tx_id)
+            
+            # Assign the correct receiver object
+            if {$rx_is_array} {
+                if {![info exists rx_var($tx_id)]} continue 
+                set rx $rx_var($tx_id)
+            } else {
+                # If it's a scalar, all tx nodes report to the same single rx module
+                set rx $rx_var
+            }
+            
+            set module_name [$rx info class] 
+            
+            # Use "sink,tx_id" as a key to differentiate from node/link keys safely
+            dict set input_modules $module_name "sink,$tx_id" [list $rx $tx]
+        }
+    }
+}
+
+##
 # get-metrics retrieves specified metric values for a given module.
 #
 # @param metrics_names List of the names of the metrics to be collected.
@@ -168,7 +227,7 @@ proc write-input-link-based-modules {dict_var_name args} {
 # @return List containing the requested metric values.
 ##
 proc get-metrics { metrics_names module_name rx tx} {
-	global MOD_CBR MOD_TDMA MOD_PHY
+	global MOD_CBR MOD_TDMA MOD_CSMA_ALOHA MOD_PHY
     set row_metrics [list]
 
 	# Iterate over each metric
@@ -189,9 +248,15 @@ proc get-metrics { metrics_names module_name rx tx} {
 				"received_packets" { set val [$rx get_recv_pkts] }
 			}
 		} \
+			$MOD_CSMA_ALOHA {
+			switch -exact -- $item {
+				"sent_packets"     { set val [$rx getDataPktsTx] }
+				"received_packets" { set val [$rx getDataPktsRx] }
+			}
+		} \
 			$MOD_PHY {
 			switch -exact -- $item {
-				"getTotPktsLost"   { set val [$rx getTotPktsLost] }
+				"packets_lost"   { set val [$rx getTotPktsLost] }
 			}
 		}
 
@@ -207,80 +272,87 @@ proc get-metrics { metrics_names module_name rx tx} {
 # Modules are distinguished in:
 # - Node-based: metrics are computed over all links.
 # - Link-based: metrics are computed over single links.
+# - Sink-based: metrics are compute over links to sink.
 #
 # @param rngstream     Random seed used as run identifier.
 # @param input_modules List of modules used in the simulation.
 # @param config_file   Name of the yaml output config file.
 proc print-metrics-csv { rngstream input_modules config_file } {
-
     set output_config [load-output-config $config_file]
 
-	# Iterate over each module in the yaml config file
     dict for {module_name requested_metrics} $output_config {
-        if { [llength $requested_metrics] == 0 
-				|| ![dict exists $input_modules $module_name] } continue
+        if { [llength $requested_metrics] == 0 || ![dict exists $input_modules $module_name] } continue
 
-        # Sanitize filename
         set safe_name [string map {"/" "_"} $module_name]
-        set filename "${safe_name}.csv"
-        
-		# Check if file already exists
-        set file_exists 0
-        if { [file exists $filename] } {
-            set file_exists 1
-        }
-
-		# Open file in append mode
-        set fp [open $filename a]
-
-		# Retrieve lists of nodes and keys per current module
         set module_data [dict get $input_modules $module_name]
-        set sorted_keys [lsort -dictionary [dict keys $module_data]]
-
-		# Link-based modules use "rx_id,tx_id" as dict keys
-        set is_linkbased [expr {[string length [lindex $sorted_keys 0]] > 1}]
-
-		# Write csv header
-        if { !$file_exists } {
-            if {$is_linkbased} {
-                puts $fp "rngstream,rx_id,tx_id,[join $requested_metrics ","]"
+        
+        # Separate keys by configuration type
+        set node_keys [list]
+        set link_keys [list]
+        set sink_keys [list]
+        
+        foreach k [dict keys $module_data] {
+            if {[string match "sink,*" $k]} {
+                lappend sink_keys $k
+            } elseif {[string match "*,*" $k]} {
+                lappend link_keys $k
             } else {
-                puts $fp "rngstream,node_id,[join $requested_metrics ","]"
+                lappend node_keys $k
             }
-        } else {
-			# If file already exists check header consistency
-			set string_metrics [join $requested_metrics ,]
+        }
 
-			set fh [open $filename r]
-			gets $fh line
-			close $fh
+        if {[llength $node_keys] > 0} {
+            write-group-csv $rngstream "${safe_name}.csv" "node_id" $requested_metrics $module_data $node_keys $module_name
+        }
+        if {[llength $link_keys] > 0} {
+            write-group-csv $rngstream "${safe_name}.csv" "rx_id,tx_id" $requested_metrics $module_data $link_keys $module_name
+        }
+        if {[llength $sink_keys] > 0} {
+            write-group-csv $rngstream "${safe_name}_sink.csv" "tx_id" $requested_metrics $module_data $sink_keys $module_name
+        }
+    }
+}
 
-            if {$is_linkbased} {
-				set string_header [join [lrange [split $line ","] 3 end] ","]
-            } else {
-				set string_header [join [lrange [split $line ","] 2 end] ","]
-            }
-
-			if {$string_header != $string_metrics} {
-				puts "File already exists with different header, exiting..."
-				close $fp
-				break
-			}
-		}
-
-		# Iterate over each link/node
-		# Key: (module_name, "rx_id,tx_id") or (module_name, rx_id)
-		# Value: (rx_object, tx_object)
-        foreach id_key $sorted_keys {
-            set objects [dict get $module_data $id_key]
-            lassign $objects rx tx
-
-			set row_metrics [get-metrics $requested_metrics $module_name $rx $tx]
-
-            puts $fp "$rngstream,$id_key,[join $row_metrics ","]"
+##
+# Helper procedure to manage the file writing and header logic for grouped layout types.
+##
+proc write-group-csv { rngstream filename header_prefix requested_metrics module_data keys_list module_name } {
+    set file_exists [file exists $filename]
+    set fp [open $filename a]
+    
+    if { !$file_exists } {
+        puts $fp "rngstream,${header_prefix},[join $requested_metrics ","]"
+    } else {
+        set string_metrics [join $requested_metrics ,]
+        set fh [open $filename r]
+        gets $fh line
+        close $fh
+        
+        # Calculate dynamic offset to skip prefix columns (e.g., skip 'rngstream,tx_id')
+        set prefix_cols [llength [split $header_prefix ","]]
+        set string_header [join [lrange [split $line ","] [expr {$prefix_cols + 1}] end] ","]
+        
+        if {$string_header != $string_metrics} {
+            puts "File $filename already exists with different header, exiting..."
+            close $fp
+            return
+        }
+    }
+    
+    foreach id_key [lsort -dictionary $keys_list] {
+        set objects [dict get $module_data $id_key]
+        lassign $objects rx tx
+        set row_metrics [get-metrics $requested_metrics $module_name $rx $tx]
+        
+        # Strip the "sink," tag for the final CSV print
+        set print_id $id_key
+        if {[string match "sink,*" $id_key]} {
+            set print_id [string range $id_key 5 end]
         }
         
-        close $fp
-        puts "Saved $module_name metrics in $filename"
+        puts $fp "$rngstream,$print_id,[join $row_metrics ","]"
     }
+
+    close $fp
+    puts "Saved $module_name metrics in $filename"
 }
