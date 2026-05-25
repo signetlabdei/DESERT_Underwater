@@ -240,9 +240,10 @@ proc print-metrics-csv { rngstream input_modules config_file } {
 				set string_header [join [lrange [split $line ","] 2 end] ","]
             }
 
-			# TODO: what to do if not consistent?
 			if {$string_header != $string_metrics} {
-				puts "uh-oh"
+				puts "File already exists with different header, exiting..."
+				close $fp
+				break
 			}
 		}
 
