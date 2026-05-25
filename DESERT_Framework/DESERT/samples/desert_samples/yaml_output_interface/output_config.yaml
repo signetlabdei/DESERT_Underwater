@@ -1,11 +1,14 @@
 ---
 Module/UW/CBR:
-        PDR: 0
+        PDR: 1
         throughput: 1
         sent_packets: 1
         received_packets: 1
 Module/UW/TDMA:
+        sent_packets: 0
+        received_packets: 0
+Module/UW/CSMA_ALOHA:
         sent_packets: 1
         received_packets: 1
 Module/UW/PHYSICAL:
-        getTotPktsLost: 0
+        packets_lost: 1

@@ -136,7 +136,6 @@ $data_mask setPropagationSpeed  $opt(propagation_speed)
 ################################
 # Procedure(s) to create nodes #
 ################################
-set module_tags [dict create]
 proc createNode { id } {
     global opt ns node portnum
     global channel propagation data_mask interf_data positions position 
@@ -288,7 +287,7 @@ proc finish {} {
     global ns opt output_config_filename
     global cbr udp ipr ipf mac phy channel propagation
 
-	# Create dictionary with simulation modules
+	# Create dictionary containing simulation modules
 	set input_modules [dict create]
 	write-input-node-based-modules input_modules phy mac
 	write-input-link-based-modules input_modules cbr
