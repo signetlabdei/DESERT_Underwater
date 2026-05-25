@@ -36,16 +36,16 @@
 
 package require yaml
 
-#TODO: finish documentation
+# List of modules
 set MOD_CBR "Module/UW/CBR" 
 set MOD_TDMA "Module/UW/TDMA"
 set MOD_PHY "Module/UW/PHYSICAL"
 
 
-# Compute application layer packet delivery ratio.
-# Inputs
-# - rx_app: application object receiving packets
-# - tx_app: application object transmitting packets
+# get-app-pdr computes Module/UW/CBR packet delivery ratio.
+#
+# @paramm rx_app Application object receiving packets.
+# @paramm tx_app application object transmitting packets
 proc get-app-pdr { rx_app tx_app} {
 	set sent_packets [$tx_app getsentpkts]
 	set received_packets [$rx_app getrecvpkts]
@@ -55,10 +55,14 @@ proc get-app-pdr { rx_app tx_app} {
 	return $pdr
 }
 
+##
 # load-output-config reads output metrics from yaml config file and store them in a dictionary.
 # Keys are module names and values list of metrics.
-# Inputs
-# - config_file: name of the yaml config file
+#
+# @param config_file Name of the yaml config file.
+#
+# @return Dictionary containing the modules metrics.
+#
 proc load-output-config { config_file } {
     global opt
 
@@ -94,6 +98,14 @@ proc load-output-config { config_file } {
 	return $module_metrics
 }
 
+##
+# write-input-node-based-modules creates a dictionary in the caller's scope
+# with receiving (rx) modules, grouped by the module's class,for the specified node arrays.
+# It iterates through node IDs up to the global limit opt(nn).
+#
+# @param dict_modules Dictionary in the caller's scope to be populated.
+# @param args         One or more arrays containing module references indexed by node IDs (e.g., $i).
+##
 proc write-input-node-based-modules {dict_modules args} {
     global opt
     upvar 1 $dict_modules input_modules
@@ -113,6 +125,14 @@ proc write-input-node-based-modules {dict_modules args} {
     }
 }
 
+##
+# write-input-link-based-modules creates a dictionary in the caller's scope
+# with receiving (rx) and transmitting (tx) module pairs, grouped by 
+# the receiving module's class, for the specified link arrays.
+#
+# @param dict_var_name Dictionary in the caller's scope.
+# @param args          One or more array containing module object references indexed by node pairs.
+##
 proc write-input-link-based-modules {dict_var_name args} {
     upvar 1 $dict_var_name input_modules
     
@@ -181,15 +201,16 @@ proc get-metrics { metrics_names module_name rx tx} {
 	return $row_metrics
 }
 
+##
 # print-metrics-csv retrieves metrics from a list of modules and store them
 # in csv files. A different file is created for each module.
 # Modules are distinguished in:
-# - Node-based: metrics are computed over all links
-# - Link-based: metrics are computed over single links
-# Inputs
-# - rngstream: random seed / run identifier
-# - input_modules: list of modules used in the simulation
-# - config_file: name of the yaml config file
+# - Node-based: metrics are computed over all links.
+# - Link-based: metrics are computed over single links.
+#
+# @param rngstream     Random seed used as run identifier.
+# @param input_modules List of modules used in the simulation.
+# @param config_file   Name of the yaml output config file.
 proc print-metrics-csv { rngstream input_modules config_file } {
 
     set output_config [load-output-config $config_file]
