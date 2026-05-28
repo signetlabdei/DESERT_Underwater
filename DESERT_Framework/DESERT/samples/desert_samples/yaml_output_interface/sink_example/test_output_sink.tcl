@@ -1,6 +1,5 @@
-
 #
-# Copyright (c) 2025 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -93,49 +92,12 @@ $ns use-Miracle
 ########################
 # Configure simulation #
 ########################
+source "../../yaml_input_interface/get-config.tcl"
+set input_config_filename "./input_config.yaml"
+load-config $input_config_filename
+
 source "../get-output-config.tcl"
-set output_config_filename "../output_config.yaml"
-
-##################
-# Tcl variables  #
-##################
-set opt(nn)                 2.0;# Number of Nodes
-set opt(starttime)          1
-set opt(stoptime)           100000
-set opt(txduration)         [expr $opt(stoptime) - $opt(starttime)]
-set opt(log_file)			"test_log"
-
-set opt(maxinterval_)       20.0
-set opt(freq)               25000.0
-set opt(bw)                 5000.0
-set opt(bitrate)            4800.0
-set opt(ack_mode)           "setNoAckMode"
-set opt(propagation_speed)  1500;# m/s
-
-set opt(txpower)            135.0 
-set opt(rngstream)	        1
-set opt(pktsize)            125
-set opt(cbr_period)         60
-
-if {$opt(bash_parameters)} {
-    if {$argc != 5} {
-        puts "The script requires three inputs:"
-        puts "- the first one is the cbr packet size (byte);"
-        puts "- the second one is the cbr poisson period (seconds);"
-        puts "- the third one is the random generator substream;"
-        puts "- the fourth one is the number of nodes;"
-        puts "- the fifth one is the name of the log file;"
-        puts "example: ns uwcbr.tcl 125 60 13 2 test_log"
-        puts "Please try again."
-        return
-    } else {
-        set opt(pktsize)       [lindex $argv 0]
-        set opt(cbr_period)    [lindex $argv 1]
-        set opt(rngstream)     [lindex $argv 2]
-        set opt(nn)            [lindex $argv 3]
-        set opt(log_file)      [lindex $argv 4]
-    }
-}
+set output_config_filename "./output_config.yaml"
 
 global defaultRNG
 for {set k 0} {$k < $opt(rngstream)} {incr k} {
@@ -160,34 +122,6 @@ set data_mask [new MSpectralMask/Rect]
 $data_mask setFreq              $opt(freq)
 $data_mask setBandwidth         $opt(bw)
 $data_mask setPropagationSpeed  $opt(propagation_speed)
-
-#########################
-# Module Configuration  #
-#########################
-### CBR ###
-Module/UW/CBR set packetSize_          $opt(pktsize)
-Module/UW/CBR set period_              $opt(cbr_period)
-Module/UW/CBR set PoissonTraffic_      1
-
-### PHY ###
-Module/UW/PHYSICAL  set BitRate_                    $opt(bitrate)
-Module/UW/PHYSICAL  set AcquisitionThreshold_dB_    15.0 
-Module/UW/PHYSICAL  set RxSnrPenalty_dB_            0
-Module/UW/PHYSICAL  set TxSPLMargin_dB_             0
-Module/UW/PHYSICAL  set MaxTxSPL_dB_                $opt(txpower)
-Module/UW/PHYSICAL  set MinTxSPL_dB_                10
-Module/UW/PHYSICAL  set MaxTxRange_                 200
-Module/UW/PHYSICAL  set PER_target_                 0    
-Module/UW/PHYSICAL  set CentralFreqOptimization_    0
-Module/UW/PHYSICAL  set BandwidthOptimization_      0
-Module/UW/PHYSICAL  set SPLOptimization_            0
-Module/UW/PHYSICAL  set debug_                      0
-
-### Channel ###
-MPropagation/Underwater set practicalSpreading_ 2
-MPropagation/Underwater set debug_              0
-MPropagation/Underwater set windspeed_          10
-MPropagation/Underwater set shipping_           1
 
 ################################
 # Procedure(s) to create nodes #
