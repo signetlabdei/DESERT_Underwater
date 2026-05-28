@@ -1,39 +1,38 @@
----
-opt:
-        starttime: 1
-        stoptime: 1001
-        nn: 3
-        propagation_speed: 1500
-        maxinterval_: 200
-        freq: 40000.0
-        bw: 5000.0
-        rngstream: 1
-Module/UW/CBR:
-        packetSize_: 128
-        period_: 60
-        PoissonTraffic_: 1
-        debug_: 0
-Module/UW/TDMA:
-        frame_duration: 3
-        debug_: 0
-        fair_mode: 1
-        tot_slots: 3
-        guard_time: 0.1
 MPropagation/Underwater:
-        practicalSpreading_: 1
-        debug_: 0
-        windspeed_: 5
-        shipping_: 0.2
+  debug_: 0
+  practicalSpreading_: 1
+  shipping_: 0.2
+  windspeed_: 2
+Module/UW/CBR:
+  PoissonTraffic_: 1
+  debug_: 0
+  packetSize_: 1250
+  period_: 10
 Module/UW/PHYSICAL:
-        BitRate_: 4000.0
-        AcquisitionThreshold_dB_: 15.0
-        RxSnrPenalty_dB_: 0
-        TxSPLMargin_dB_: 0
-        MaxTxSPL_dB_: 150
-        MinTxSPL_dB_: 10
-        MaxTxRange_: 200
-        PER_target_: 0
-        CentralFreqOptimization_: 0
-        BandwidthOptimization_: 0
-        SPLOptimization_: 0
-        debug_: 0
+  AcquisitionThreshold_dB_: 15.0
+  BandwidthOptimization_: 0
+  BitRate_: 20768.0
+  CentralFreqOptimization_: 0
+  MaxTxRange_: 200
+  MaxTxSPL_dB_: 150
+  MinTxSPL_dB_: 10
+  PER_target_: 0
+  RxSnrPenalty_dB_: 0
+  SPLOptimization_: 0
+  TxSPLMargin_dB_: 0
+  debug_: 0
+Module/UW/TDMA:
+  debug_: 0
+  fair_mode: 1
+  frame_duration: 3
+  guard_time: 0.3
+  tot_slots: 3
+opt:
+  bw: 26000.0
+  freq: 50000.0
+  maxinterval_: 200
+  nn: 3
+  propagation_speed: 1500
+  rngstream: 46
+  starttime: 1
+  stoptime: 1001
