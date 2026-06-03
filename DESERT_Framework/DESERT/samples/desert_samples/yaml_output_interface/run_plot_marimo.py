@@ -28,13 +28,13 @@ def _():
 
 @app.cell(hide_code=True)
 def _(os):
-    input_config = 'input_config.yaml'
+    input_config = "input_config.yaml"
     if not os.access(input_config, os.F_OK):
         raise ValueError("Input config file doesn't exists")
 
-    tcl_file = 'test_io_tdma_yaml.tcl'
+    tcl_file = "test_io_tdma_yaml.tcl"
     if not os.access(tcl_file, os.F_OK):
-            raise ValueError("Simulation file doesn't exists")
+        raise ValueError("Simulation file doesn't exists")
     return input_config, tcl_file
 
 
@@ -75,45 +75,53 @@ def _(input_config, simulation_form, subprocess, tcl_file, yaml):
 
         for current_rng in rng_values:
             # Update yaml file with current rng
-            with open(input_config, 'r') as file:
+            with open(input_config, "r") as file:
                 data = yaml.safe_load(file) or {}
 
-            data['opt']['rngstream'] = current_rng
+            data["opt"]["rngstream"] = current_rng
 
-            with open(input_config, 'w') as file:
+            with open(input_config, "w") as file:
                 yaml.dump(data, file, default_flow_style=False)
 
             # Run simulation
             print(f"Running simulation with rngstream = {current_rng}...")
-            result = subprocess.run(
-                ["ns", tcl_file], 
-                capture_output=True, 
-                text=True
-            )
+            result = subprocess.run(["ns", tcl_file], capture_output=True, text=True)
     return
 
 
 @app.cell(hide_code=True)
-def _(pl, plt, simulation_form):
+def _(mo, pl, plt, simulation_form):
     if simulation_form.value is not None:
         df = pl.read_csv("Module_UW_CBR.csv")
         fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 
-        # PDR
-        ax[0].boxplot(df['PDR'])
-        ax[0].set_ylabel('PDR')
+        # pdr
+        ax[0].boxplot(df["PDR"])
+        ax[0].set_ylabel("PDR")
         ax[0].set_xticks([1])
 
-        # Throughput
-        ax[1].boxplot(df['throughput'])
-        ax[1].set_ylabel('Throughput [bps]')
+        # throughput
+        ax[1].boxplot(df["throughput"])
+        ax[1].set_ylabel("Throughput [bps]")
         ax[1].set_xticks([1])
 
-        # Title and Layout
-        plt.suptitle('Application layer performance')
+        # title and layout
+        plt.suptitle("application layer performance")
         plt.tight_layout()
-        plt.show()
-    return
+
+        # Embed the plot inside a markdown component using mo.as_html()
+        plot_markdown = mo.md(
+            f"""
+            ### 📊 Simulation Results
+
+            {mo.as_html(fig)}
+            """
+        )
+    else:
+        plot_markdown = None
+
+    plot_markdown
+    return (plot_markdown,)
 
 
 if __name__ == "__main__":
