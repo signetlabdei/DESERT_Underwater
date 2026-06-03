@@ -235,30 +235,30 @@ proc get-metrics { metrics_names module_name rx tx} {
 		set val "nan"
 		switch -exact -- $module_name \
 			$MOD_CBR  {
-			switch -exact -- $item {
-				"PDR"              { set val [get-app-pdr $rx $tx] }
-				"throughput"       { set val [$rx getthr] }
-				"sent_packets"     { set val [$rx getsentpkts] }
-				"received_packets" { set val [$rx getrecvpkts] }
-			}
-		} \
+				switch -exact -- $item {
+					"PDR"              { set val [get-app-pdr $rx $tx] }
+					"throughput"       { set val [$rx getthr] }
+					"sent_packets"     { set val [$rx getsentpkts] }
+					"received_packets" { set val [$rx getrecvpkts] }
+				}
+			} \
 			$MOD_TDMA {
-			switch -exact -- $item {
-				"sent_packets"     { set val [$rx get_sent_pkts] }
-				"received_packets" { set val [$rx get_recv_pkts] }
-			}
-		} \
+				switch -exact -- $item {
+					"sent_packets"     { set val [$rx get_sent_pkts] }
+					"received_packets" { set val [$rx get_recv_pkts] }
+				}
+			} \
 			$MOD_CSMA_ALOHA {
-			switch -exact -- $item {
-				"sent_packets"     { set val [$rx getDataPktsTx] }
-				"received_packets" { set val [$rx getDataPktsRx] }
-			}
-		} \
+				switch -exact -- $item {
+					"sent_packets"     { set val [$rx getDataPktsTx] }
+					"received_packets" { set val [$rx getDataPktsRx] }
+				}
+			} \
 			$MOD_PHY {
-			switch -exact -- $item {
-				"packets_lost"   { set val [$rx getTotPktsLost] }
+				switch -exact -- $item {
+					"packets_lost"   { set val [$rx getTotPktsLost] }
+				}
 			}
-		}
 
 		lappend row_metrics $val
 	}
