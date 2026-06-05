@@ -10,7 +10,7 @@
 
 import marimo
 
-__generated_with = "0.23.4"
+__generated_with = "0.23.9"
 app = marimo.App(width="medium")
 
 
@@ -121,7 +121,56 @@ def _(mo, pl, plt, simulation_form):
         plot_markdown = None
 
     plot_markdown
-    return (plot_markdown,)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo, pl, plt, simulation_form):
+    if simulation_form.value is not None:
+        df_link = pl.read_csv("Module_UW_CBR.csv")
+        fig_link, ax_link = plt.subplots(1, 2, figsize=(12, 5))
+
+        # 1. Create a link identifier string combining tx_id and rx_id
+        df_link = df_link.with_columns(
+            (pl.col("tx_id").cast(pl.Utf8) + " -> " + pl.col("rx_id").cast(pl.Utf8)).alias("link")
+        )
+
+        # 2. Extract a unique, sorted list of all directional links
+        unique_links = sorted(df_link["link"].unique().to_list())
+
+        # 3. Separate PDR and throughput values into distinct lists for each link
+        pdr_data = [df_link.filter(pl.col("link") == l)["PDR"].to_list() for l in unique_links]
+        throughput_data = [df_link.filter(pl.col("link") == l)["throughput"].to_list() for l in unique_links]
+
+        # 4. PDR boxplot per link
+        ax_link[0].boxplot(pdr_data, tick_labels=unique_links)
+        ax_link[0].set_ylabel("PDR")
+        ax_link[0].set_xlabel("Link (tx -> rx)")
+        ax_link[0].tick_params(axis='x', rotation=45)
+
+        # 5. Throughput boxplot per link
+        ax_link[1].boxplot(throughput_data, tick_labels=unique_links)
+        ax_link[1].set_ylabel("Throughput [bps]")
+        ax_link[1].set_xlabel("Link (tx -> rx)")
+        ax_link[1].tick_params(axis='x', rotation=45)
+
+        # title and layout
+        plt.suptitle("application layer performance")
+        plt.tight_layout()
+
+        # Embed the plot inside a markdown component using mo.as_html()
+        plot_markdown_link = mo.md(
+            f"""
+            ### 📊 Simulation Results
+
+            {mo.as_html(fig_link)}
+            """
+        )
+    else:
+        plot_markdown_link = None
+
+    plot_markdown_link
+    return
 
 
 if __name__ == "__main__":

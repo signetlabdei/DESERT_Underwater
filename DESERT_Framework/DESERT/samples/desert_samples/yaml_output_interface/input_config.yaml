@@ -1,17 +1,17 @@
 MPropagation/Underwater:
   debug_: 0
-  practicalSpreading_: 1
-  shipping_: 0.2
-  windspeed_: 2
+  practicalSpreading_: 2
+  shipping_: 1
+  windspeed_: 10
 Module/UW/CBR:
   PoissonTraffic_: 1
   debug_: 0
-  packetSize_: 1250
+  packetSize_: 128
   period_: 10
 Module/UW/PHYSICAL:
   AcquisitionThreshold_dB_: 15.0
   BandwidthOptimization_: 0
-  BitRate_: 20768.0
+  BitRate_: 4000.0
   CentralFreqOptimization_: 0
   MaxTxRange_: 200
   MaxTxSPL_dB_: 150
@@ -24,15 +24,15 @@ Module/UW/PHYSICAL:
 Module/UW/TDMA:
   debug_: 0
   fair_mode: 1
-  frame_duration: 3
-  guard_time: 0.3
+  frame_duration: 0.1
+  guard_time: 1e-9
   tot_slots: 3
 opt:
-  bw: 26000.0
-  freq: 50000.0
+  bw: 5000.0
+  freq: 25000.0
   maxinterval_: 200
   nn: 3
   propagation_speed: 1500
-  rngstream: 46
+  rngstream: 246
   starttime: 1
-  stoptime: 1001
+  stoptime: 10000

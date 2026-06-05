@@ -89,6 +89,10 @@ $ns use-Miracle
 
 global positions
 
+set channel [new Module/UnderwaterChannel]
+set propagation [new MPropagation/Underwater]
+set data_mask [new MSpectralMask/Rect]
+
 ########################
 # Configure simulation #
 ########################
@@ -103,6 +107,12 @@ load-positions $positions_filename
 source "get-output-config.tcl"
 set output_config_filename "./output_config.yaml"
 
+####################################
+# Set the physical characteristics #
+####################################
+$data_mask setFreq              $opt(freq)
+$data_mask setBandwidth         $opt(bw)
+$data_mask setPropagationSpeed  $opt(propagation_speed)
 
 ##################################
 # Set random seed and tracefiles #
@@ -122,16 +132,6 @@ if {$opt(trace_files)} {
 	set opt(cltracefilename) "/dev/null"
 	set opt(cltracefile) [open $opt(cltracefilename) w]
 }
-
-####################################
-# Set the physical characteristics #
-####################################
-set channel [new Module/UnderwaterChannel]
-set propagation [new MPropagation/Underwater]
-set data_mask [new MSpectralMask/Rect]
-$data_mask setFreq              $opt(freq)
-$data_mask setBandwidth         $opt(bw)
-$data_mask setPropagationSpeed  $opt(propagation_speed)
 
 ################################
 # Procedure(s) to create nodes #
@@ -294,6 +294,20 @@ proc finish {} {
 
 	# Print metrics to csv according to yaml output config
 	print-metrics-csv $opt(rngstream) $input_modules $output_config_filename
+    for {set i 0} {$i < $opt(nn)} {incr i}  {
+
+    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
+    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
+
+    	for {set j 0} {$j < $opt(nn)} {incr j} {
+    	    if {$i != $j} {
+                set sent_pkts        [$cbr($i,$j) getsentpkts]
+                set recv_pkts        [$cbr($i,$j) getrecvpkts]
+				puts "sent: $sent_pkts"
+				puts "recv: $recv_pkts"
+		}
+		}
+	}
     
     $ns flush-trace
     close $opt(tracefile)
