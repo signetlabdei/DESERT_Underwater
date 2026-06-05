@@ -92,6 +92,10 @@ $ns use-Miracle
 
 global positions
 
+set channel [new Module/UnderwaterChannel]
+set propagation [new MPropagation/Underwater]
+set data_mask [new MSpectralMask/Rect]
+
 ########################
 # Configure simulation #
 ########################
@@ -126,9 +130,6 @@ if {$opt(trace_files)} {
 ####################################
 # Set the physical characteristics #
 ####################################
-set channel [new Module/UnderwaterChannel]
-set propagation [new MPropagation/Underwater]
-set data_mask [new MSpectralMask/Rect]
 $data_mask setFreq              $opt(freq)
 $data_mask setBandwidth         $opt(bw)
 $data_mask setPropagationSpeed  $opt(propagation_speed)
