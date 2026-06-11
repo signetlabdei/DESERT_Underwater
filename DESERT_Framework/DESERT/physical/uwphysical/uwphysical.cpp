@@ -43,6 +43,7 @@
 #include <phymac-clmsg.h>
 #include <sstream>
 #include <string>
+// #include <uwApplication_cmn_header.h>
 
 UwPhysicalStats::UwPhysicalStats()
 	: Stats()
@@ -182,7 +183,7 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "updateDropProbability") == 0) {
 			size_t pool_len = drop_pool.size();
-			if (pool_len <= 1)
+			if (pool_len <= 1 || drop_prob == 0)
 				return TCL_ERROR;
 
 			// Find the index of the current drop_prob
@@ -264,6 +265,7 @@ UnderwaterPhysical::recv(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_MPhy *ph = HDR_MPHY(p);
+	// hdr_DATA_APPLICATION *uwApph = HDR_DATA_APPLICATION(p);
 
 	if (ch->direction() == hdr_cmn::UP) {
 		ph->dstSpectralMask = getRxSpectralMask(p);
@@ -279,7 +281,10 @@ UnderwaterPhysical::recv(Packet *p)
 		p->txinfo_.CPThresh = 0;
 
 		if (ph->Pr > 0) {
-			if (RNG::defaultrng()->uniform_double() < drop_prob) {
+			if ( // uwApph->payload_msg[0] != 0x6 && uwApph->payload_msg[0] !=
+				 // 0x2
+				 // && // don't drop oack and wrq
+					RNG::defaultrng()->uniform_double() < drop_prob) {
 
 				printOnLog(Logger::LogLevel::DEBUG,
 						"UWPHY",
