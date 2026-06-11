@@ -43,6 +43,7 @@
 #include "underwater-bpsk.h"
 #include "uwinterference.h"
 
+#include <array>
 #include <cmath>
 #include <limits>
 
@@ -442,6 +443,9 @@ protected:
 										CHUNK model or MEANPOWER model */
 
 	uwinterference *interference_; /**< Pointer to the interference module. */
+
+	double drop_prob; /**< Fixed packet drop probability. */
+	static const std::array<double, 3> drop_pool; /**< Array of possible values for drop_prob. */
 };
 
 #endif /* UWPHYSICAL_H  */

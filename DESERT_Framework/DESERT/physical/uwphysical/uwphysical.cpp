@@ -108,6 +108,8 @@ public:
 	}
 } class_module_uwphysical;
 
+const std::array<double, 3> UnderwaterPhysical::drop_pool = {0.3, 0.5, 0.7};
+
 UnderwaterPhysical::UnderwaterPhysical()
 	: modulation_name_("BPSK")
 	, time_ready_to_end_rx_(0)
@@ -126,6 +128,7 @@ UnderwaterPhysical::UnderwaterPhysical()
 	, collisionDATA(0)
 	, Interference_Model("CHUNK")
 	, interference_(nullptr)
+	, drop_prob(0)
 {
 	bind("rx_power_consumption_", &rx_power_);
 	bind("tx_power_consumption_", &tx_power_);
@@ -177,6 +180,34 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 		} else if (strcasecmp(argv[1], "getErrorCtrlPktsInterf") == 0) {
 			tcl.resultf("%d", getError_CtrlPktsInterf());
 			return TCL_OK;
+		} else if (strcasecmp(argv[1], "updateDropProbability") == 0) {
+			size_t pool_len = drop_pool.size();
+			if (pool_len <= 1)
+				return TCL_ERROR;
+
+			// Find the index of the current drop_prob
+			size_t current_idx = 0;
+			for (size_t i = 0; i < pool_len; ++i) {
+				if (drop_pool[i] == drop_prob) {
+					current_idx = i;
+					break;
+				}
+			}
+
+			// Randomly pick a new drop probability and ensure it's different
+			// than the current one
+			size_t offset = 1 +
+					(RNG::defaultrng()->uniform_positive_int() % (pool_len - 1));
+			size_t new_idx = (current_idx + offset) % pool_len;
+
+			drop_prob = drop_pool[new_idx];
+
+			printOnLog(Logger::LogLevel::INFO,
+					"UWPHY",
+					"command(int, const char *const)::New drop probability = " +
+							std::to_string(drop_prob));
+
+			return TCL_OK;
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "modulation") == 0) {
@@ -210,6 +241,19 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			}
 
 			return TCL_OK;
+		} else if (strcasecmp(argv[1], "setDropProbability") == 0) {
+			double per = std::atof(argv[2]);
+			if (per < 0) {
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWPHY",
+						"command(int, const char *const)::Packet error "
+						"probability must be > 0!");
+
+				return TCL_ERROR;
+			}
+
+			drop_prob = per;
+			return TCL_OK;
 		}
 	}
 	return UnderwaterMPhyBpsk::command(argc, argv);
@@ -235,6 +279,18 @@ UnderwaterPhysical::recv(Packet *p)
 		p->txinfo_.CPThresh = 0;
 
 		if (ph->Pr > 0) {
+			if (RNG::defaultrng()->uniform_double() < drop_prob) {
+
+				printOnLog(Logger::LogLevel::DEBUG,
+						"UWPHY",
+						"recv(Packet *)::Dropping pkt. Drop probability = " +
+								std::to_string(drop_prob));
+
+				Packet::free(p);
+
+				return;
+			}
+
 			ph->Pn = getNoisePower(p);
 
 			if (interference_) {
