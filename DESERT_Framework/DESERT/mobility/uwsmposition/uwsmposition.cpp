@@ -194,12 +194,12 @@ UWSMPosition::update(double now)
 		theta = acos((Zdest_ - Zsorg_) / theta_den);
 
 		if (Xdest_ - Xsorg_ == 0)
-			gamma = pi / 2 * sgn(Ydest_ - Ysorg_);
+			gamma = pi_local / 2 * sgn(Ydest_ - Ysorg_);
 		else
 			gamma = atan((Ydest_ - Ysorg_) / (Xdest_ - Xsorg_));
 
 		if ((Xdest_ - Xsorg_) < 0.0)
-			gamma += (Ysorg_ - Ydest_) >= 0.0 ? pi : -pi;
+			gamma += (Ysorg_ - Ydest_) >= 0.0 ? pi_local : -pi_local;
 
 		x_ = Xsorg_ + (speed_ * (now - trgTime_)) * sin(theta) * cos(gamma);
 		y_ = Ysorg_ + (speed_ * (now - trgTime_)) * sin(theta) * sin(gamma);
