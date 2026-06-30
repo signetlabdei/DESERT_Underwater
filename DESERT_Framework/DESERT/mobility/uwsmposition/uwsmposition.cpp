@@ -40,6 +40,9 @@
 #include "uwsmposition.h"
 #include <iostream>
 
+#define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
+#define pi_local (4 * atan(1.0))
+
 static class UWSMPositionClass : public TclClass
 {
 public:
