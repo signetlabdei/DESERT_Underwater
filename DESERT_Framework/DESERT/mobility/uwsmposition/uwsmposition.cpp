@@ -40,8 +40,16 @@
 #include "uwsmposition.h"
 #include <iostream>
 
-#define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))
-#define pi_local (4 * atan(1.0))
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+
+#include <cmath>
+
+static constexpr double
+sgn(double val)
+{
+	return (val > 0.0) ? 1.0 : ((val < 0.0) ? -1.0 : 0.0);
+}
 
 static class UWSMPositionClass : public TclClass
 {
@@ -197,12 +205,12 @@ UWSMPosition::update(double now)
 		theta = acos((Zdest_ - Zsorg_) / theta_den);
 
 		if (Xdest_ - Xsorg_ == 0)
-			gamma = pi_local / 2 * sgn(Ydest_ - Ysorg_);
+			gamma = M_PI / 2 * sgn(Ydest_ - Ysorg_);
 		else
 			gamma = atan((Ydest_ - Ysorg_) / (Xdest_ - Xsorg_));
 
 		if ((Xdest_ - Xsorg_) < 0.0)
-			gamma += (Ysorg_ - Ydest_) >= 0.0 ? pi_local : -pi_local;
+			gamma += (Ysorg_ - Ydest_) >= 0.0 ? M_PI : -M_PI;
 
 		x_ = Xsorg_ + (speed_ * (now - trgTime_)) * sin(theta) * cos(gamma);
 		y_ = Ysorg_ + (speed_ * (now - trgTime_)) * sin(theta) * sin(gamma);
@@ -327,3 +335,4 @@ UWSMPosition::getSpeed() const
 {
 	return speed_;
 }
+#endif
