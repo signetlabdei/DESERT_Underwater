@@ -28,7 +28,7 @@
 
 Module/UW/UwModem/MODA set TxPower_      0.0
 Module/UW/UwModem/MODA set NoiseSPD_     0.0
-Module/UW/UwModem/MODA set period_       0.0
+Module/UW/UwModem/MODA set period_       0.01
 Module/UW/UwModem/MODA set buffer_size   4096
 Module/UW/UwModem/MODA set max_read_size 1024
 Module/UW/UwModem/MODA set ID_           0
