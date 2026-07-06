@@ -254,6 +254,10 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			}
 
 			drop_prob = per;
+			printOnLog(Logger::LogLevel::INFO,
+					"UWPHY",
+					"command(int, const char *const)::Set drop probability = " +
+							std::to_string(drop_prob));
 			return TCL_OK;
 		}
 	}
