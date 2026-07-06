@@ -88,6 +88,7 @@ UwCsBurst::UwCsBurst()
 	bind("max_packet_per_burst", (int *) &max_packet_per_burst_);
 	bind("fix_sens_time", (double *) &fix_sens_time_);
 	bind("rv_sens_time", (double *) &rv_sens_time_);
+	bind("mac2phy_delay_", (double *) &mac2phy_delay_);
 
 	if (max_packet_per_burst_ < 0) {
 		printOnLog(Logger::LogLevel::ERROR,
@@ -229,7 +230,7 @@ UwCsBurst::Phy2MacEndTx(const Packet *p)
 {
 	printOnLog(Logger::LogLevel::DEBUG,
 			"UWCSB",
-			"Mac2PhyEndTx()::End transmitting");
+			"Phy2MacEndTx()::End transmitting");
 
 	packet_sent_curr_burst_++;
 
@@ -241,7 +242,7 @@ UwCsBurst::Phy2MacStartRx(const Packet *p)
 {
 	printOnLog(Logger::LogLevel::DEBUG,
 			"UWCSB",
-			"Mac2PhyStartRx()::Start receiving");
+			"Phy2MacStartRx()::Start receiving");
 
 	n_rx_while_sensing_++;
 }

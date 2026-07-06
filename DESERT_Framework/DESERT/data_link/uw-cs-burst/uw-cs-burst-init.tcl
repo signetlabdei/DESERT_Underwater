@@ -35,3 +35,4 @@ Module/UW/CSBURST set queue_size    		10
 Module/UW/CSBURST set max_packet_per_burst	10
 Module/UW/CSBURST set rv_sens_time	1.0
 Module/UW/CSBURST set fix_sens_time	1.0
+Module/UW/CSBURST set mac2phy_delay_ [expr 1.0e-9]
