@@ -39,6 +39,7 @@
 #ifndef UW_ALOHA_Q_SYNC_SINK_H
 #define UW_ALOHA_Q_SYNC_SINK_H
 
+#include <timer-handler.h>
 #include <mmac.h>
 #include <iostream>
 #include <assert.h>

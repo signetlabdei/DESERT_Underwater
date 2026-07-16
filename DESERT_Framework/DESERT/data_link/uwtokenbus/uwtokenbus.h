@@ -42,6 +42,7 @@
 #include "uwtokenbus_hdr.h"
 #include <deque>
 #include <mmac.h>
+#include <timer-handler.h>
 
 extern packet_t PT_UWTOKENBUS;
 

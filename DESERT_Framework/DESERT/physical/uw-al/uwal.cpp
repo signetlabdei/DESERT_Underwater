@@ -36,6 +36,7 @@
  */
 
 #include "uwal.h"
+#include <rng.h>
 #include <phymac-clmsg.h>
 
 /**

@@ -39,6 +39,7 @@
 #ifndef UW_CSMA_UW_CS_ALOHA_TRIG_SINK_TRIGGER_SINK_H
 #define UW_CSMA_UW_CS_ALOHA_TRIG_SINK_TRIGGER_SINK_H
 
+#include <timer-handler.h>
 #include "mac.h"
 #include "mmac.h"
 #include "mphy.h"

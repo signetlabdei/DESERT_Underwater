@@ -46,6 +46,7 @@
 #include <iostream>
 #include <plugin.h>
 #include <string>
+#include <timer-handler.h>
 #include <uw-woss-position.h>
 
 #define sgn(x) (((x) == 0.0) ? 0.0 : ((x) / fabs(x)))

@@ -40,6 +40,7 @@
 #include "mac.h"
 #include <fstream>
 #include <phymac-clmsg.h>
+#include <rng.h>
 #include <sstream>
 
 /**

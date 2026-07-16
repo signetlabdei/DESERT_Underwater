@@ -37,6 +37,7 @@
 #ifndef UWUFETCH_AUV_H_
 #define UWUFETCH_AUV_H_
 
+#include <timer-handler.h>
 #include <cassert>
 #include <clmessage.h>
 #include <fstream>

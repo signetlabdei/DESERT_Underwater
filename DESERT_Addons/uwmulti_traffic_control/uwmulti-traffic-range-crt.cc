@@ -1,3 +1,4 @@
+#include <timer-handler.h>
 //
 // Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
@@ -197,7 +198,7 @@ UwMultiTrafficRangeCtr::manageCheckedLayer(
 	if (it_t == timers.end())
 		return;
 	UwCheckRangeTimer *to = it_t->second;
-	if (to->status() == TIMER_IDLE) {
+	if (to->status() == TimerHandler::TIMER_IDLE) {
 		return; // nothing to check is pending
 	} else {
 		StatusMap::iterator it_s = status.find(traffic);

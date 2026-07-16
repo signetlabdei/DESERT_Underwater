@@ -44,7 +44,7 @@
 	"TEZ" /**< Reason for a drop in a <i>UWFLOODING</i> module. */
 
 #include "uwflooding-hdr.h"
-
+#include <timer-handler.h>
 #include <uwcbr-module.h>
 #include <uwip-clmsg.h>
 #include <uwip-module.h>

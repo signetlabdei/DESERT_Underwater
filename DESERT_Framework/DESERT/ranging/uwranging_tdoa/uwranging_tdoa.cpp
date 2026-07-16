@@ -48,6 +48,7 @@
 #include <uwphysical.h>
 #include <uwsmposition.h>
 #include <uwstats-utilities.h>
+#include <rng.h>
 
 // define a macro to print debug messages
 // 0: NONE	-	1: ERR	-	2: DBG

@@ -36,6 +36,7 @@
  */
 
 #include "uw-csma-aloha-trigger-node.h"
+#include <rng.h>
 
 enum { NOT_SET = -1, SESSION_DISTANCE_NOT_SET = 0 };
 

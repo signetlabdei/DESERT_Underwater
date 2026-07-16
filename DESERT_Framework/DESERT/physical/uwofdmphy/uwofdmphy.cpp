@@ -41,6 +41,7 @@
 
 #include "mac.h"
 #include "uwphy-clmsg.h"
+#include <rng.h>
 
 static class UwOFDMPhyClass : public TclClass
 {

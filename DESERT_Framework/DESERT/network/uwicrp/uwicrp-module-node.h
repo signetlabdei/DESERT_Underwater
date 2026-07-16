@@ -46,6 +46,7 @@
 #include "uwicrp-hdr-status.h"
 #include <uwip-clmsg.h>
 #include <uwip-module.h>
+#include <timer-handler.h>
 
 #include "packet.h"
 #include <climits>

@@ -82,7 +82,6 @@ private:
 		iface_,
 		src_rt_valid,
 		ts_arr_,
-		aomdv_salvage_count_,
 		xmit_failure_,
 		xmit_failure_data_,
 		xmit_reason_,
@@ -160,9 +159,6 @@ private:
 								 put in the header stream of bits. */
 	size_t ts_arr_Bits; /** Bit length of the ts_arr_ field to be put in the
 						   header stream of bits. */
-	size_t aomdv_salvage_count_Bits; /** Bit length of the aomdv_salvage_count_
-										field to be put in the header stream of
-										bits. */
 	size_t xmit_failure_Bits; /** Bit length of the xmit_failure_ field to be
 								 put in the header stream of bits. */
 	size_t xmit_failure_data_Bits; /** Bit length of the xmit_failure_data_
