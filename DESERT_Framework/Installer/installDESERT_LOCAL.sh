@@ -425,6 +425,7 @@ build_NS() {
     fi
 
     mkdir -p ${DEST_FOLDER}/bin
+	info_L2 "make inst  [$*]"
     make install-ns >> "${currentBuildLog}/ns-${NS_VERSION}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of ns-${NS_VERSION}! Exiting ..."
@@ -495,6 +496,7 @@ build_NSMIRACLE() {
         exit 1
     fi
 
+    info_L2 "make inst  [$*]"
     make install-strip >> "${currentBuildLog}/${NSMIRACLE_DIR}-$*.log"  2>&1
     if [ $? -ne 0 ] ; then
         err_L1 "Error during the installation of ${NSMIRACLE_DIR}! Exiting ..."
@@ -955,6 +957,7 @@ build_WOSS() {
 	tail -n 50 ${currentBuildLog}/woss-${WOSS_VERSION}-$*.log
 	exit 1
     fi
+	info_L2 "make inst  [$*]"
     make install >>  "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log" 2>&1
     if [ $? -ne 0 ]; then
         err_L1 "Error during the installation of woss-${WOSS_VERSION}! Exiting ..."
