@@ -51,7 +51,6 @@ sgn(double val)
 	return (val > 0.0) ? 1.0 : ((val < 0.0) ? -1.0 : 0.0);
 }
 
-
 static class UWSMPositionClass : public TclClass
 {
 public:
