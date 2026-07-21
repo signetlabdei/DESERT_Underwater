@@ -899,6 +899,7 @@ build_WOSS() {
     fi
 
     patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/woss-remove-nsmiracle-extra-deps.patch >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"  2>&1
+    patch -p1 < ${UNPACKED_FOLDER}/${PATCHES_DIR}/woss-remove-nsallinone-extra-deps.patch >> "${currentBuildLog}/woss-${WOSS_VERSION}-$*.log"  2>&1
     # if [ $? -ne 0 ]
     # then
     #    print_error "woss-$WOSS_VERSION error during patching! Exiting ..."
