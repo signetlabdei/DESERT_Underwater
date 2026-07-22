@@ -51,6 +51,7 @@
 
 #include "uwofdmphy_hdr.h"
 #include <mphy.h>
+#include <timer-handler.h>
 
 #define UWOFDMALOHA_DROP_REASON_WRONG_STATE "WST"
 #define UWOFDMALOHA_DROP_REASON_WRONG_RECEIVER "WRCV"

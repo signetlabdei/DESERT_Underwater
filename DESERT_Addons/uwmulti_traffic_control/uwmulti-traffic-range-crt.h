@@ -39,6 +39,7 @@
 #define UWMULTI_TRAFFIC_CONTROL_H
 
 #include "uwmulti-traffic-control.h"
+#include <timer-handler.h>
 #include <set>
 #include <uwip-module.h>
 

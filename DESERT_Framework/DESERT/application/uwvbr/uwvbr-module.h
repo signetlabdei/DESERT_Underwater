@@ -44,6 +44,7 @@
 #ifndef UWVBR_MODULE_H
 #define UWVBR_MODULE_H
 
+#include <timer-handler.h>
 #include <uwip-module.h>
 #include <uwudp-module.h>
 

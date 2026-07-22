@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -120,16 +120,6 @@ AC_ARG_WITH([ns-allinone],
     #BACKUP_CFLAGS=$CFLAGS
     #CFLAGS=$NS_CPPFLAGS
 
-
-    dnl AC_CHECK_HEADERS([tcl.h],,AC_MSG_ERROR([could not find tcl.h]))
-    dnl AC_CHECK_HEADERS([otcl.h],,AC_MSG_ERROR([could not find otcl.h]))
-
-    dnl AC_CHECK_HEADERS([tclcl.h],,AC_MSG_ERROR([could not find tclcl.h])
-    dnl         [
-    dnl            #if HAVE_TCL_H
-    dnl            #include <tcl.h>
-    dnl            #endif
-    dnl         ])
 
     AC_LANG_PUSH(C++)
 

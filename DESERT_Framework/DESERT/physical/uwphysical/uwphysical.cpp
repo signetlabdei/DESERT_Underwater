@@ -39,6 +39,7 @@
 #include "uwphysical.h"
 #include "uwphy-clmsg.h"
 #include "uwstats-utilities.h"
+#include <rng.h>
 #include <mac.h>
 #include <phymac-clmsg.h>
 #include <sstream>

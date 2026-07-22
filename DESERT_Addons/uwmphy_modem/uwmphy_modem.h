@@ -44,6 +44,7 @@
 #include <mphy.h>
 #include <uwal.h>
 #include <uwip-module.h>
+#include <timer-handler.h>
 
 #include <cmath>
 #include <cstring>

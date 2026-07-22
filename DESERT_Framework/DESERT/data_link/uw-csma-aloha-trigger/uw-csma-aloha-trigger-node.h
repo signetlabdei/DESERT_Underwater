@@ -39,6 +39,7 @@
 #ifndef UW_CS_ALOHA_TRIG_NODE_H
 #define UW_CS_ALOHA_TRIG_NODE_H
 
+#include <timer-handler.h>
 #include <climits>
 #include <cmath>
 #include <fstream>

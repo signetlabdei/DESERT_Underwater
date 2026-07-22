@@ -78,7 +78,6 @@ packerCOMMON::packerCOMMON()
 	iface_Bits = 0;
 	src_rt_valid_Bits = 0;
 	ts_arr_Bits = 0;
-	aomdv_salvage_count_Bits = 0;
 	xmit_failure_Bits = 0;
 	xmit_failure_data_Bits = 0;
 	xmit_reason_Bits = 0;
@@ -102,7 +101,6 @@ packerCOMMON::packerCOMMON()
 	bind("iface_Bits", (int *) &iface_Bits);
 	bind("src_rt_valid_Bits", (int *) &src_rt_valid_Bits);
 	bind("ts_arr_Bits", (int *) &ts_arr_Bits);
-	bind("aomdv_salvage_count_Bits", (int *) &aomdv_salvage_count_Bits);
 	bind("xmit_failure_Bits", (int *) &xmit_failure_Bits);
 	bind("xmit_failure_data_Bits", (int *) &xmit_failure_data_Bits);
 	bind("xmit_reason_Bits", (int *) &xmit_reason_Bits);
@@ -134,7 +132,6 @@ packerCOMMON::packerCOMMON()
 	n_bits[iface_] = iface_Bits;
 	n_bits[src_rt_valid] = src_rt_valid_Bits;
 	n_bits[ts_arr_] = ts_arr_Bits;
-	n_bits[aomdv_salvage_count_] = aomdv_salvage_count_Bits;
 	n_bits[xmit_failure_] = xmit_failure_Bits;
 	n_bits[xmit_failure_data_] = xmit_failure_data_Bits;
 	n_bits[xmit_reason_] = xmit_reason_Bits;
@@ -173,7 +170,6 @@ packerCOMMON::init()
 	n_bits[iface_] = iface_Bits;
 	n_bits[src_rt_valid] = src_rt_valid_Bits;
 	n_bits[ts_arr_] = ts_arr_Bits;
-	n_bits[aomdv_salvage_count_] = aomdv_salvage_count_Bits;
 	n_bits[xmit_failure_] = xmit_failure_Bits;
 	n_bits[xmit_failure_data_] = xmit_failure_data_Bits;
 	n_bits[xmit_reason_] = xmit_reason_Bits;
@@ -221,11 +217,6 @@ packerCOMMON::packMyHdr(Packet *p, unsigned char *buf, size_t offset)
 	offset += put(buf, offset, &(ch->src_rt_valid), n_bits[src_rt_valid]);
 
 	offset += put(buf, offset, &(ch->ts_arr_), n_bits[ts_arr_]);
-
-	offset += put(buf,
-			offset,
-			&(ch->aomdv_salvage_count_),
-			n_bits[aomdv_salvage_count_]);
 
 	offset += put(buf, offset, &(ch->xmit_failure_), n_bits[xmit_failure_]);
 
@@ -336,14 +327,6 @@ packerCOMMON::unpackMyHdr(unsigned char *buf, size_t offset, Packet *p)
 	memset(&(ch->ts_arr_), 0, sizeof(ch->ts_arr_));
 	offset += get(buf, offset, &(ch->ts_arr_), n_bits[ts_arr_]);
 
-	memset(&(ch->aomdv_salvage_count_), 0, sizeof(ch->aomdv_salvage_count_));
-	offset += get(buf,
-			offset,
-			&(ch->aomdv_salvage_count_),
-			n_bits[aomdv_salvage_count_]);
-	ch->aomdv_salvage_count_ = restoreSignedValue(
-			ch->aomdv_salvage_count_, n_bits[aomdv_salvage_count_]);
-
 	memset(&(ch->xmit_failure_), 0, sizeof(ch->xmit_failure_));
 	offset += get(buf, offset, &(ch->xmit_failure_), n_bits[xmit_failure_]);
 
@@ -426,10 +409,6 @@ packerCOMMON::printMyHdrMap()
 	std::cout << "\033[0;43;30m 16st field "
 			  << "\033[0m"
 			  << " ts_arr_: " << ts_arr_Bits << " bits" << std::endl;
-	std::cout << "\033[0;43;30m 17st field "
-			  << "\033[0m"
-			  << " aomdv_salvage_count_: " << aomdv_salvage_count_Bits
-			  << " bits" << std::endl;
 	std::cout << "\033[0;43;30m 18st field "
 			  << "\033[0m"
 			  << " xmit_failure_: " << xmit_failure_Bits << " bits"
@@ -504,26 +483,22 @@ packerCOMMON::printMyHdrFields(Packet *p)
 	if (n_bits[15] != 0)
 		cout << "\033[0;43;30m ts_arr:\033[0m " << ch->ts_arr_ << " "
 			 << hex_bytes(ch->ts_arr_) << std::endl;
-	if (n_bits[16] != 0)
-		cout << "\033[0;43;30m aomdv_salvage_count:\033[0m "
-			 << ch->aomdv_salvage_count_ << " "
-			 << hex_bytes(ch->aomdv_salvage_count_, n_bits[16]) << std::endl;
-	// if (n_bits[17] != 0) cout << "\033[0;43;30m xmit_failure_:\033[0m " <<
-	// ch->xmit_failure_ << " " << hex_bytes(ch->xmit_failure_, n_bits[17]) <<
+	// if (n_bits[16] != 0) cout << "\033[0;43;30m xmit_failure_:\033[0m " <<
+	// ch->xmit_failure_ << " " << hex_bytes(ch->xmit_failure_, n_bits[16]) <<
 	// std::endl;
-	// if (n_bits[18] != 0) cout << "\033[0;43;30m xmit_failure_data_:\033[0m "
+	// if (n_bits[17] != 0) cout << "\033[0;43;30m xmit_failure_data_:\033[0m "
 	// << ch->xmit_failure_data_ << " " << hex_bytes(ch->xmit_failure_data_,
-	// n_bits[18]) << std::endl;
-	if (n_bits[19] != 0)
+	// n_bits[17]) << std::endl;
+	if (n_bits[18] != 0)
 		cout << "\033[0;43;30m xmit_reason_:\033[0m " << ch->xmit_reason_ << " "
-			 << hex_bytes(ch->xmit_reason_, n_bits[19]) << std::endl;
-	if (n_bits[20] != 0)
+			 << hex_bytes(ch->xmit_reason_, n_bits[18]) << std::endl;
+	if (n_bits[19] != 0)
 		cout << "\033[0;43;30m num_forwards_:\033[0m " << ch->num_forwards_
-			 << " " << hex_bytes(ch->num_forwards_, n_bits[20]) << std::endl;
-	if (n_bits[21] != 0)
+			 << " " << hex_bytes(ch->num_forwards_, n_bits[19]) << std::endl;
+	if (n_bits[20] != 0)
 		cout << "\033[0;43;30m opt_num_forwards_:\033[0m "
 			 << ch->opt_num_forwards_ << " "
-			 << hex_bytes(ch->opt_num_forwards_, n_bits[21]) << std::endl;
+			 << hex_bytes(ch->opt_num_forwards_, n_bits[20]) << std::endl;
 	// cout << "\033[0;41;30m packerMAC::printMyHdrField WARNING \033[0m, Field
 	// index " << field << " does not exist or its printing is not implemented."
 	// << std::endl;

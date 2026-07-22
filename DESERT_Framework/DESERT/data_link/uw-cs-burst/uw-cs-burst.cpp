@@ -37,6 +37,7 @@
  */
 
 #include "uw-cs-burst.h"
+#include <rng.h>
 #include <mac.h>
 #include <string>
 

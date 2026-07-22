@@ -40,6 +40,7 @@
 #define UWRANGINGTDOA_H
 
 #include "uwranging_tdoa_hdr.h"
+#include <timer-handler.h>
 #include <limits>
 #include <module.h>
 #include <vector>

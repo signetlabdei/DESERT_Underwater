@@ -39,6 +39,7 @@
 #include "uwem-phy.h"
 #include "uwem-mpropagation.h"
 #include <float.h>
+#include <rng.h>
 
 static class UwElectroMagneticPhyClass : public TclClass
 {

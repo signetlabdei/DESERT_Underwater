@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -65,27 +65,11 @@ AC_ARG_WITH([ns-allinone],
     fi
 
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/mac"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/propagation"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/mobile"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/pcap"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/tcp"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/sctp"
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/common"
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/link"
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/queue"
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/trace"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/adc"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/apps"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/routing"
     NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/tools"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/classifier"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/mcast"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/diffusion3/lib"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/diffusion3/lib/main"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/diffusion3/lib/nr"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/diffusion3/ns"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/diffusion3/filter_core"
-    NS_CPPFLAGS="$NS_CPPFLAGS -isystem $NS_PATH/asim"
 
     AC_SUBST(NS_CPPFLAGS)
     AC_MSG_CHECKING([for NS_LDFLAGS and NS_LIBADD type])

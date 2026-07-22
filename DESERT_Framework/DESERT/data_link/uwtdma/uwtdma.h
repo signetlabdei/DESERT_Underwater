@@ -48,6 +48,7 @@
 #include <queue>
 #include <sstream>
 #include <sys/time.h>
+#include <timer-handler.h>
 
 #define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active>*/
 #define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/

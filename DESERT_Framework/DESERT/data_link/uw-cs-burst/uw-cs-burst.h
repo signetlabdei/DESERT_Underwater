@@ -47,6 +47,7 @@
 
 #include <deque>
 #include <mmac.h>
+#include <timer-handler.h>
 
 class UwCsBurst;
 

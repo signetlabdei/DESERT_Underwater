@@ -40,6 +40,7 @@
 
 #include "uwpolling_cmn_hdr.h"
 
+#include <timer-handler.h>
 #include "uwsmposition.h"
 #include <chrono>
 #include <clmessage.h>

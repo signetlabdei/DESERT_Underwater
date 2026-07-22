@@ -44,6 +44,7 @@
 #ifndef UWCBR_MODULE_H
 #define UWCBR_MODULE_H
 
+#include <timer-handler.h>
 #include <climits>
 #include <module.h>
 #include <uwip-module.h>

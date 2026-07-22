@@ -41,6 +41,7 @@
 #ifndef UWAPPLICATION_MODULE_H
 #define UWAPPLICATION_MODULE_H
 
+#include <timer-handler.h>
 #include <module.h>
 #include <uwApplication_cmn_header.h>
 

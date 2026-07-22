@@ -40,6 +40,7 @@
 #ifndef UWOPTICAL_ACOUSTIC_CONTROLLER_MASTER_H
 #define UWOPTICAL_ACOUSTIC_CONTROLLER_MASTER_H
 
+#include <timer-handler.h>
 #include "uwmulti-stack-controller-phy.h"
 #include <mac.h>
 
