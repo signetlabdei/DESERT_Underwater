@@ -91,6 +91,11 @@ main() {
     export CROSS_ENV_FILE=""
     #*
 
+    # Setup Python virtual environment if requested
+    if [ ${WITH_PYTHON_INSTALL} -eq 1 ]; then
+        build_PYTHON_VENV
+    fi
+
     handle_package host ZLIB
     handle_package host TCL
     export PATH="${BUILD_HOST}/bin:$PATH"
@@ -111,6 +116,60 @@ main() {
         addon_installation_list host "${ADDONS}"
     fi
     #******************************************************************************
+}
+
+#***
+# << PYTHON VENV package >>
+# -------
+# This function creates and configures a Python virtual environment
+# with pip and pybind11 for C++ bindings
+#*
+build_PYTHON_VENV() {
+    info_L1 "Python virtual environment"
+    start="$(date +%s)"
+
+    # Initialize build log directory if not set
+    if [ -z "${currentBuildLog}" ]; then
+        currentBuildLog=${BUILD_HOST}
+    fi
+
+    if [ -z "${PYTHON_VENV_PATH}" ]; then
+        PYTHON_VENV_PATH="${DEST_FOLDER}/.python_venv"
+    fi
+
+    info_L2 "creating venv at ${PYTHON_VENV_PATH}"
+    python3 -m venv "${PYTHON_VENV_PATH}" >> "${currentBuildLog}/python-venv.log" 2>&1
+    if [ $? -ne 0 ]; then
+        err_L1 "Error creating Python virtual environment! Exiting ..."
+        tail -n 50 "${currentBuildLog}/python-venv.log"
+        exit 1
+    fi
+
+    # Source the activate script
+    . "${PYTHON_VENV_PATH}/bin/activate"
+    
+    info_L2 "upgrading pip"
+    pip install --upgrade pip >> "${currentBuildLog}/python-venv.log" 2>&1
+    if [ $? -ne 0 ]; then
+        err_L1 "Error upgrading pip! Exiting ..."
+        tail -n 50 "${currentBuildLog}/python-venv.log"
+        exit 1
+    fi
+
+    info_L2 "installing pybind11"
+    pip install pybind11 >> "${currentBuildLog}/python-venv.log" 2>&1
+    if [ $? -ne 0 ]; then
+        err_L1 "Error installing pybind11! Exiting ..."
+        tail -n 50 "${currentBuildLog}/python-venv.log"
+        exit 1
+    fi
+
+    # Export venv python to environment for build
+    export PYTHON_VENV_BIN="${PYTHON_VENV_PATH}/bin"
+    export PATH="${PYTHON_VENV_BIN}:$PATH"
+
+    elapsed=`expr $(date +%s) - $start`
+    ok_L1 "completed in ${elapsed}s"
 }
 
 #***
