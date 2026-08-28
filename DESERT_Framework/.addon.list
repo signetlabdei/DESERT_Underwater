@@ -15,6 +15,7 @@ uwmulti_traffic_control
 uwmulti_destination
 uwmphy_modem
 ms2c_evologics_lowlev (requires uwmphy_modem)
+uwapplicon_sea_modem
 wossgmmob3D    (requires WOSS)
 wossgroupmob3D (requires WOSS)
 ALL            (installs all addons)
