@@ -19,6 +19,6 @@ RUN apt update && \
         bison \
         autoconf-archive \
         gettext
-COPY make-rpi-toolchain.sh /
+COPY ../make-rpi-toolchain.sh /
 RUN /make-rpi-toolchain.sh
 WORKDIR /work

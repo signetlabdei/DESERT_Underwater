@@ -193,25 +193,3 @@ In order to make the environment update persistent even after you close the term
 ```console
 $ echo "source <destination-folder-path>/environment" >> $HOME/.bashrc
 ```
-
-## Use Docker
-Alternatively to the manual installation, DESERT provide an automatic installation using docker.
-
-You will need to cd to the dockerfile directory
-
-```console
-$ cd DESERT_Underwater/DESERT_Framework/Docker/ubuntu_dockerfile_with_desert/
-```
-
-And build it
-
-```console
-$ docker build -t docker_desert .
-```
-
-It will create a container with Ubuntu 22.04 LTS, download all the dependencies and install DESERT with WOSS and all the addons.
-Finally run the just created container
-
-```console
-$ docker run -it docker_desert
-```
