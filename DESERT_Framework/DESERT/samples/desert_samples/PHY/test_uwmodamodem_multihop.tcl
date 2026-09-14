@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ if {$opt(AppSocket) == 1} {
         puts "11 - Application socket port"
         puts "Please try again."
         puts "Example:"
-        puts "ns test_uwmdoamodem_multihop.tcl 1 1 4 2 2 3 1 10000 10 10.42.0.1 55555 44444"
+        puts "ns test_uwmdoamodem_multihop.tcl 1 1 3 1 2 1 10000 0.1 192.168.100.101 55555 44444"
         exit
     } else {
 		set opt(node)        [lindex $argv 0]
