@@ -32,7 +32,7 @@
 #
 # ----------------------------------------------------------------------------------
 # This script depicts a very simple but complete stack in which two nodes send data
-# to a common sink. The routes are dinamic and decided by UW/FLOODING protocol.
+# to a common sink. The routes are dynamic and decided by UW/FLOODING protocol.
 # The application used to generate data is UW/CBR.
 # ----------------------------------------------------------------------------------
 # Stack
@@ -50,7 +50,7 @@
 #   +--------------------------+   +--------------------------+   +--------------------------+
 #   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |
 #   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  1. WOSS/BPSK/Underwater |   |  1. WOSS/BPSK/Underwater |   |  1. WOSS/BPSK/Underwater |
+#   |  1. UW/PHYSICAL          |   |  1. UW/PHYSICAL          |   |  1. UW/PHYSICAL          |
 #   +--------------------------+   +--------------------------+   +--------------------------+
 #            |         |                    |         |                   |         |       
 #   +----------------------------------------------------------------------------------------+
@@ -107,7 +107,7 @@ set opt(bw)                 5000.0
 set opt(bitrate)            4800.0
 set opt(ack_mode)           "setAckMode"
 
-# Parameters used to configure the BPSK module of WOSS
+# Parameters used to configure the BPSK module
 set opt(txpower)	    136.0
 set opt(per_tgt)	    0.1
 set opt(rx_snr_penalty_db)  -10.0
@@ -195,7 +195,7 @@ Module/UW/PHYSICAL set SPLOptimization_           1
 proc createNode { id } {
 
     global channel propagation data_mask ns cbr position node udp portnum ipr ipif channel_estimator
-    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac woss_utilities woss_creator db_manager
+    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac db_manager
     global node_coordinates
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
