@@ -30,8 +30,6 @@
 # There are 4 nodes placed in line that can transmit each other 
 # packets with a CBR (Constant Bit Rate) Application Module
 #
-# N.B.: This Example require WOSS installed for the Underwater Channel
-#
 # Author: Federico Favaro <favarofe@dei.unipd.it>
 # Version: 1.0.0
 #
@@ -163,7 +161,7 @@ Module/MPhy/BPSK  set TxPower_               $opt(txpower)
 proc createNode { id } {
 
     global channel propagation data_mask ns cbr position node udp portnum ipr ipif channel_estimator
-    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac woss_utilities woss_creator db_manager
+    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac db_manager
     global node_coordinates
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
