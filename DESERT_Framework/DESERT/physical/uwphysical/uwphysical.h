@@ -45,6 +45,7 @@
 
 #include <cmath>
 #include <limits>
+#include <set>
 
 class UwPhysicalStats : public Stats
 {
@@ -442,6 +443,9 @@ protected:
 										CHUNK model or MEANPOWER model */
 
 	uwinterference *interference_; /**< Pointer to the interference module. */
+
+	double drop_prob; /**< Drop received packets with this probability. */
+	std::set<double> drop_set; /** Set of possible values for the packet drop probability. */
 };
 
 #endif /* UWPHYSICAL_H  */
