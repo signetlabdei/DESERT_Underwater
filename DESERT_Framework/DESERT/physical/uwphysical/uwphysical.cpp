@@ -183,7 +183,8 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			if (drop_set.empty()) {
 				printOnLog(Logger::LogLevel::ERROR,
 						"UWPHY",
-						"command(int, const char *const)::updateDropProbability: "
+						"command(int, const char "
+						"*const)::updateDropProbability: "
 						"Can't update drop probability, set is empty.");
 
 				return TCL_ERROR;
@@ -273,7 +274,8 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 			printOnLog(Logger::LogLevel::INFO,
 					"UWPHY",
 					"command(int, const char *const)::setDropProbability: "
-					"drop_prob = " + std::to_string(drop_prob));
+					"drop_prob = " +
+							std::to_string(drop_prob));
 
 			return TCL_OK;
 		}
@@ -397,8 +399,7 @@ UnderwaterPhysical::startRx(Packet *p)
 		std::stringstream log_sstr;
 		double snr_dB = 10 * log10(ph->Pr / ph->Pn);
 
-		log_sstr << "startRx(Packet *)::"
-				 << "snr_dB = " << snr_dB
+		log_sstr << "startRx(Packet *)::" << "snr_dB = " << snr_dB
 				 << "; AcquisitionThreshold_dB_ = " << getAcquisitionThreshold()
 				 << " pr " << 10 * log10(ph->Pr) << " pn " << 10 * log10(ph->Pn)
 				 << " end " << NOW + ph->duration << " src "

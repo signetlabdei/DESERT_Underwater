@@ -445,7 +445,8 @@ protected:
 	uwinterference *interference_; /**< Pointer to the interference module. */
 
 	double drop_prob; /**< Drop received packets with this probability. */
-	std::set<double> drop_set; /** Set of possible values for the packet drop probability. */
+	std::set<double> drop_set; /** Set of possible values for the packet drop
+								  probability. */
 };
 
 #endif /* UWPHYSICAL_H  */
