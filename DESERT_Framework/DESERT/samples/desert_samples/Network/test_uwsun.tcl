@@ -106,7 +106,7 @@ set opt(bitrate)            4800.0
 set opt(ack_mode)           "setNoAckMode"
 set opt(pktsize)       125
 set opt(cbr_period)    60
-# Parameters used to configure the BPSK module of WOSS
+# Parameters used to configure the BPSK module
 set opt(txpower)	    130.0 
 
 
@@ -182,7 +182,7 @@ Module/UW/PHYSICAL  set MaxTxSPL_dB_                  $opt(txpower)
 proc createNode { id } {
 
     global channel propagation data_mask ns cbr position node udp portnum ipr ipif channel_estimator
-    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac woss_utilities woss_creator db_manager
+    global phy posdb opt rvposx rvposy rvposz mhrouting mll mac db_manager
     global node_coordinates
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
