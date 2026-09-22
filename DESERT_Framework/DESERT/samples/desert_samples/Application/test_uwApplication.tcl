@@ -193,7 +193,7 @@ Module/UW/APPLICATION set EXP_ID_ 1
 
 
 # BPSK              
-Module/MPhy/BPSK/Underwater set BitRate_          $opt(bitrate)
+Module/MPhy/BPSK/Underwater set BitRate_              $opt(bitrate)
 Module/MPhy/BPSK/Underwater set MaxTxSPL_dB_          $opt(txpower)
 
 ################################
