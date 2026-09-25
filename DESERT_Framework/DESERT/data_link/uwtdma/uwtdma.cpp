@@ -41,6 +41,7 @@
 #include <iostream>
 #include <mac.h>
 #include <stdint.h>
+#include <string>
 #include <uwcbr-module.h>
 #include <uwmmac-clmsg.h>
 
@@ -111,42 +112,38 @@ UwTDMA::UwTDMA()
 	}
 
 	if (max_queue_size < 0) {
-		cerr << NOW
-			 << " UwTDMA() not valid max_queue_size < 0!! set to 1 by default "
-			 << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"UwTDMA()::invalid max_queue_size < 0. Set to 1 by default.");
 		max_queue_size = 1;
 	}
 	if (frame_duration < 0) {
-		cerr << NOW
-			 << " UwTDMA() not valid frame_duration < 0!! set to 1 by default "
-			 << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"UwTDMA()::invalid frame_duration < 0. Set to 1 by default.");
 		frame_duration = 1;
 	}
 	if (max_packet_per_slot < 0) {
-		cerr << NOW
-			 << " UwTDMA() not valid max_packet_per_slot < 0!! set to 1 by "
-				"default "
-			 << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"UwTDMA()::invalid max_packet_per_slot < 0. Set to 1 by "
+				"default.");
 		max_packet_per_slot = 1;
 	}
 	if (drop_old_ == 1 && checkPriority == 1) {
-		cerr << NOW
-			 << " UwTDMA() drop_old_ and checkPriority cannot be set both to "
-				"1!! "
-			 << "checkPriority set to 0 by default " << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"UwTDMA()::drop_old_ and checkPriority cannot be set both to 1"
+				"checkPriority set to 0 by default.");
 		checkPriority = 0;
 	}
 	if (mac2phy_delay_ <= 0) {
-		cerr << NOW
-			 << " UwTDMA() not valid mac2phy_delay_ < 0!! set to 1e-9 by "
-				"default "
-			 << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"UwTDMA()::invalid mac2phy_delay_ <= 0. Set to 1e-9 by "
+				"default.");
 		mac2phy_delay_ = 1e-9;
 	}
-}
-
-UwTDMA::~UwTDMA()
-{
 }
 
 void
@@ -161,26 +158,26 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 			hdr_uwcbr *uwcbrh = HDR_UWCBR(p);
 			if (uwcbrh->priority() == 0) {
 				buffer.push_back(p);
-				if (debug_)
-					std::cout << NOW << " TDMA(" << addr
-							  << ")::insert packet with standard priority in "
-								 "the queue"
-							  << std::endl;
+
+				printOnLog(Logger::LogLevel::INFO,
+						"UWTDMA",
+						"recvFromUpperLayers(Packet*)::inserted packet with "
+						"standard priority in the queue.");
 			} else {
 				buffer.push_front(p);
-				if (debug_)
-					std::cout << NOW << " TDMA(" << addr
-							  << ")::insert packet with high priority in the "
-								 "queue"
-							  << std::endl;
+
+				printOnLog(Logger::LogLevel::INFO,
+						"UWTDMA",
+						"recvFromUpperLayers(Packet*)::inserted packet with "
+						"high priority in the queue.");
 			}
 		}
-
 	} else {
-		if (debug_)
-			cout << NOW << " TDMA(" << addr
-				 << ")::recvFromUpperLayers() dropping pkt due to buffer full "
-				 << std::endl;
+		printOnLog(Logger::LogLevel::ERROR,
+				"UWTDMA",
+				"recvFromUpperLayers(Packet*)::dropping packet due to buffer "
+				"full");
+
 		if (drop_old_) {
 			Packet *p_old = buffer.front();
 			buffer.pop_front();
@@ -205,8 +202,6 @@ UwTDMA::recvFromUpperLayers(Packet *p)
 void
 UwTDMA::stateTxData()
 {
-	// if (transceiver_status == TRANSMITTING)
-	//	transceiver_status = IDLE;
 	txData();
 }
 
@@ -222,15 +217,18 @@ UwTDMA::txData()
 				Mac2PhyStartTx(p);
 				incrDataPktsTx();
 			}
-		} else if (debug_) {
+		} else {
 			if (slot_status != UW_TDMA_STATUS_MY_SLOT)
-				std::cout << NOW << " ID " << addr << ": Wait my slot to send"
-						  << std::endl;
+				printOnLog(Logger::LogLevel::INFO,
+						"UWTDMA",
+						"txData()::Addr " + std::to_string(addr) +
+								"::Wait my slot to send");
 			else
-				std::cout << NOW << " ID " << addr
-						  << ": Wait earlier packet expires to send the "
-							 "current one"
-						  << std::endl;
+				printOnLog(Logger::LogLevel::INFO,
+						"UWTDMA",
+						"txData()::Addr " + std::to_string(addr) +
+								"::Wait earlier packet expires to send the "
+								"current one");
 		}
 	} else {
 		if (sea_trial_)
@@ -238,10 +236,12 @@ UwTDMA::txData()
 						   << "::TDMA_node(" << addr
 						   << ")::already_tx max packet = "
 						   << max_packet_per_slot << std::endl;
-		if (debug_)
-			cout << NOW << " TDMA(" << addr
-				 << ")::already_tx max packet = " << max_packet_per_slot
-				 << std::endl;
+
+		printOnLog(Logger::LogLevel::INFO,
+				"UWTDMA",
+				"txData()::Addr " + std::to_string(addr) +
+						"::already tx max packet = " +
+						std::to_string(max_packet_per_slot));
 	}
 }
 
@@ -258,8 +258,11 @@ UwTDMA::Mac2PhyStartTx(Packet *p)
 		MMac::Mac2PhyStartTx(p);
 	}
 
-	if (debug_ < -5)
-		std::cout << NOW << " ID " << addr << ": Sending packet" << std::endl;
+	printOnLog(Logger::LogLevel::INFO,
+			"UWTDMA",
+			"Mac2PhyStartTx(Packet*)::Addr " + std::to_string(addr) +
+					"::sending packet");
+
 	if (sea_trial_)
 		out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 					   << "::TDMA_node(" << addr
@@ -302,10 +305,11 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 		int src_mac = mach->macSA();
 
 		if (ch->error()) {
-			if (debug_)
-				cout << NOW << " TDMA(" << addr
-					 << ")::Phy2MacEndRx() dropping corrupted pkt from node = "
-					 << src_mac << std::endl;
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWTDMA",
+					"Phy2MacEndRx(Packet*)::Addr " + std::to_string(addr) +
+							"::dropping corrupted packet from node with addr " +
+							std::to_string(src_mac));
 
 			incrErrorPktsRx();
 			Packet::free(p);
@@ -313,17 +317,21 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 			if (dest_mac != addr && dest_mac != MAC_BROADCAST) {
 				rxPacketNotForMe(p);
 
-				if (debug_ < -5)
-					std::cout << NOW << " ID " << addr << ": packet was for "
-							  << dest_mac << std::endl;
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWTDMA",
+						"Phy2MacEndRx(Packet*)::Addr " + std::to_string(addr) +
+								"::dropping packet was for node with addr " +
+								std::to_string(dest_mac));
 			} else {
 				sendUp(p);
 				incrDataPktsRx();
 
-				if (debug_ < -5)
-					std::cout << NOW << " ID " << addr
-							  << ": Received packet from " << src_mac
-							  << std::endl;
+				printOnLog(Logger::LogLevel::DEBUG,
+						"UWTDMA",
+						"Phy2MacEndRx(Packet*)::Addr " + std::to_string(addr) +
+								"::received packet from " +
+								std::to_string(src_mac));
+
 				if (sea_trial_)
 					out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 								   << "::TDMA_node(" << addr
@@ -337,9 +345,11 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 			txData();
 
 	} else {
-		if (debug_)
-			std::cout << NOW << " ID " << addr
-					  << ": Received packet while transmitting " << std::endl;
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWTDMA",
+				"Phy2MacEndRx(Packet*)::Addr " + std::to_string(addr) +
+						"::received packet while transmitting");
+
 		if (sea_trial_) {
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::RCVD_PCK_WHILE_TX"
@@ -356,8 +366,6 @@ void
 UwTDMA::initPkt(Packet *p)
 {
 	hdr_cmn *ch = hdr_cmn::access(p);
-	hdr_mac *mach = HDR_MAC(p);
-
 	int curr_size = ch->size();
 
 	ch->size() = curr_size + HDR_size;
@@ -376,22 +384,29 @@ UwTDMA::changeStatus()
 	packet_sent_curr_slot_ = 0;
 	if (slot_status == UW_TDMA_STATUS_MY_SLOT) {
 		slot_status = UW_TDMA_STATUS_NOT_MY_SLOT;
-		tdma_timer.resched(frame_duration - slot_duration + guard_time);
+		double off_time = frame_duration - slot_duration + guard_time;
+		tdma_timer.resched(off_time);
 
-		if (debug_ < -5)
-			std::cout << NOW << " Off ID " << addr << " "
-					  << frame_duration - slot_duration + guard_time << ""
-					  << std::endl;
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWTDMA",
+				"changeStatus(Packet*)::Addr " + std::to_string(addr) +
+						"::Not my slot for the next " +
+						std::to_string(off_time) + " seconds");
+
 		if (sea_trial_)
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::Off" << std::endl;
 	} else {
 		slot_status = UW_TDMA_STATUS_MY_SLOT;
-		tdma_timer.resched(slot_duration - guard_time);
+		double on_time = slot_duration - guard_time;
+		tdma_timer.resched(on_time);
 
-		if (debug_ < -5)
-			std::cout << NOW << " On ID " << addr << " "
-					  << slot_duration - guard_time << " " << std::endl;
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWTDMA",
+				"changeStatus(Packet*)::Addr " + std::to_string(addr) +
+						"::My slot for the next " + std::to_string(on_time) +
+						" seconds");
+
 		if (sea_trial_)
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::On" << std::endl;
@@ -418,9 +433,10 @@ UwTDMA::start(double delay)
 
 	tdma_timer.sched(delay);
 
-	if (debug_ < -5)
-		std::cout << NOW << " Status " << slot_status << " on ID " << addr
-				  << " " << std::endl;
+	printOnLog(Logger::LogLevel::DEBUG,
+			"UWTDMA",
+			"start(double)::Addr " + std::to_string(addr) +
+					"::current status " + std::to_string(slot_status));
 }
 
 void
@@ -428,6 +444,7 @@ UwTDMA::stop()
 {
 	enable = false;
 	tdma_timer.cancel();
+
 	if (sea_trial_)
 		out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 					   << "::TDMA_node(" << addr << ")::TDMA_stopped_"
@@ -442,14 +459,21 @@ UwTDMA::command(int argc, const char *const *argv)
 		if (strcasecmp(argv[1], "start") == 0) {
 			if (fair_mode == 1) {
 				if (tot_slots == 0) {
-					std::cout << "Error: number of slots set to 0" << std::endl;
+					printOnLog(Logger::LogLevel::ERROR,
+							"UWTDMA",
+							"command(int, const char *const)::start:: "
+							"Number of slots can't be set to 0");
+
 					return TCL_ERROR;
 				} else {
 					slot_duration = frame_duration / tot_slots;
 					if (slot_duration - guard_time < 0) {
-						std::cout
-								<< "Error: guard time or frame set incorrectly"
-								<< std::endl;
+						printOnLog(Logger::LogLevel::ERROR,
+								"UWTDMA",
+								"command(int, const char *const)::start:: "
+								"Slot duration can't be smaller than guard "
+								"time");
+
 						return TCL_ERROR;
 					} else {
 						start_time = slot_number * slot_duration;
@@ -482,8 +506,11 @@ UwTDMA::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setSlotDuration") == 0) {
 			if (fair_mode == 1) {
-				std::cout << "Fair mode is being used! Change to generic TDMA"
-						  << std::endl;
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWTDMA",
+						"command(int, const char *const)::setSlotDuration:: "
+						"Can't set slot duration in fair mode");
+
 				return TCL_ERROR;
 			} else {
 				slot_duration = atof(argv[2]);
@@ -491,8 +518,11 @@ UwTDMA::command(int argc, const char *const *argv)
 			}
 		} else if (strcasecmp(argv[1], "setGuardTime") == 0) {
 			if (fair_mode == 1) {
-				std::cout << "Fair mode is being used! Change to generic TDMA"
-						  << std::endl;
+				printOnLog(Logger::LogLevel::ERROR,
+						"UWTDMA",
+						"command(int, const char *const)::setGuardTime:: "
+						"Can't set guard timmme in fair mode");
+
 				return TCL_ERROR;
 			} else {
 				guard_time = atof(argv[2]);
@@ -503,14 +533,17 @@ UwTDMA::command(int argc, const char *const *argv)
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
 			addr = atoi(argv[2]);
-			if (debug_)
-				cout << "TDMA MAC address of current node is " << addr
-					 << std::endl;
+
+			printOnLog(Logger::LogLevel::ERROR,
+					"UWTDMA",
+					"command(int, const char *const)::setMacAddr:: "
+					"Address set to " +
+							std::to_string(addr));
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setLogLabel") == 0) {
 			name_label_ = argv[2];
-			if (debug_)
-				cout << "TDMA name_label_ " << name_label_ << std::endl;
+
 			return TCL_OK;
 		}
 	}
