@@ -190,16 +190,18 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 				return TCL_ERROR;
 			}
 
-			// Randomly pick a new drop probability (different from the current
-			// value, if more than one available)
-			std::vector<double> drop_vector;
-			for (double p : drop_set)
-				if (p != drop_prob)
-					drop_vector.push_back(p);
+			// Randomly pick a different drop probability (if more than one
+			// available)
+			if (drop_set.size() > 1) {
+				std::vector<double> drop_vector;
+				for (double p : drop_set)
+					if (p != drop_prob)
+						drop_vector.push_back(p);
 
-			size_t idx = RNG::defaultrng()->uniform_positive_int() %
-					(drop_vector.size() - 1);
-			drop_prob = drop_vector[idx];
+				size_t idx = RNG::defaultrng()->uniform_positive_int() %
+						drop_vector.size();
+				drop_prob = drop_vector[idx];
+			}
 
 			printOnLog(Logger::LogLevel::INFO,
 					"UWPHY",
@@ -252,7 +254,6 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 				return TCL_ERROR;
 			}
 
-			// Add drop probability to drop_set
 			drop_set.insert(pdp);
 
 			return TCL_OK;
@@ -267,7 +268,6 @@ UnderwaterPhysical::command(int argc, const char *const *argv)
 				return TCL_ERROR;
 			}
 
-			// Update current drop probability and add to drop set
 			drop_prob = pdp;
 			drop_set.insert(pdp);
 
@@ -303,16 +303,6 @@ UnderwaterPhysical::recv(Packet *p)
 		p->txinfo_.CPThresh = 0;
 
 		if (ph->Pr > 0) {
-			if (RNG::defaultrng()->uniform_double() < drop_prob) {
-				printOnLog(Logger::LogLevel::DEBUG,
-						"UWPHY",
-						"recv(Packet *)::Dropping packet. Drop probability = " +
-								std::to_string(drop_prob));
-
-				Packet::free(p);
-				return;
-			}
-
 			ph->Pn = getNoisePower(p);
 
 			if (interference_) {
@@ -655,6 +645,10 @@ UnderwaterPhysical::getPER(double _snr, int _nbits, Packet *_p)
 	if (_nbits == 1) {
 		return ber_;
 	}
+
+	if (drop_prob)
+		return drop_prob;
+
 	// PER calculation
 	return 1 - pow(1 - ber_, _nbits);
 } /* UnderwaterPhysical::getPER */
