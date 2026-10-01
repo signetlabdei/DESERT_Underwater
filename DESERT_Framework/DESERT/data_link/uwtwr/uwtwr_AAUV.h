@@ -510,8 +510,6 @@ protected:
 	// timers
 	// PollTimer poll_timer; /**< POLL Timer */
 	ACKTimer ack_timer; /**< ACK Timer */
-
-	int polling_index; /**< Index of the node that the AUV is polling */
 	
 	// pointer to packets
 	Packet *curr_poll_packet; /**< Pointer to the current POLL packet >*/
@@ -541,6 +539,8 @@ protected:
 
 	bool RxAckEnabled; /**< True if the ack reception is enabled */
 
+	bool is_running; /**< Control flag: true if polling is active, false if stopped */
+
 	uint curr_node_id; /**< ID of the node polled */
 	
 	// statistics
@@ -554,6 +554,10 @@ protected:
 
 	//Update Range(TOF) to the previous buoy and then send in next POLL
 	double diff_time;
+
+	int poll_size; /**<Number of nodes to poll in rotation (configurable from TCL)> */
+	int polling_rotation_index; /**< Current index in rotation (0 to poll_size-1) */
+	std::vector<int> poll_node_ids; /** <List of nodes IDs to poll in rotation> */
 };
 
 #endif
