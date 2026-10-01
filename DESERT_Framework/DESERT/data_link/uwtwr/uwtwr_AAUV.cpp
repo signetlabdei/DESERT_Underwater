@@ -68,10 +68,11 @@ std::map<UWTWR_AAUV::UWTWR_AAUV_STATUS, std::string>
 
 UWTWR_AAUV::UWTWR_AAUV()
 	: ack_timer(this)
-	, polling_index(2)
+	, poll_size(2) // Default to 2 nodes (configutable in TCL)
+	, polling_rotation_index(0) // Start from first node
 	, curr_poll_packet(0)
 	, curr_ack_packet(0)
-	, T_ack_timer(2) // send POLL every 2 seconds, need to be set in Tcl
+	, T_ack_timer(1) // send POLL every 1 second, need to be set in Tcl
 	, curr_state(UWTWR_AAUV_STATUS_IDLE)
 	, prev_state(UWTWR_AAUV_STATUS_IDLE) // not used
 	, TxEnabled(false)
@@ -81,10 +82,13 @@ UWTWR_AAUV::UWTWR_AAUV()
 	, RxAckEnabled(false)
 	, ack_enabled(1)
 	, n_dropped_ack_pkts(0)
+	, is_running(false)
 {
 	bind("T_ack_timer_", (double *) &T_ack_timer);
 	bind("ack_enabled_", (int *) &ack_enabled);
 	bind("POLL_size_", (int *) &POLL_size);
+	bind("ACK_size_", (int *) &ACK_size);
+	bind("poll_size_", (int *) &poll_size);
 }
 
 UWTWR_AAUV::~UWTWR_AAUV()
@@ -97,11 +101,25 @@ int UWTWR_AAUV::command(int argc, const char *const * argv)
 
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "initialize") == 0) {
+			// Initialize poll_node_ids with default sequence based on poll_size
+			poll_node_ids.clear();
+			for (int i = 0; i < poll_size; i++) {
+				poll_node_ids.push_back(i); // Poll nodes 0, 1, ..., poll_size-1
+			}
 			if (!initialized)
 				initInfo();
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "run") == 0) {
+			is_running = true;
 			stateIdle();
+			return TCL_OK;
+		} else if (strcasecmp(argv[1], "stop") == 0) {
+			is_running = false;
+			if (ack_timer.isActive()) {
+				ack_timer.stop();
+			}
+			RxAckEnabled = false;
+			TxEnabled = false;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "getAckRx") == 0) {
 			tcl.resultf("%d", getAckRx());
@@ -112,10 +130,20 @@ int UWTWR_AAUV::command(int argc, const char *const * argv)
 		} else if (strcasecmp(argv[1], "getPollSent") == 0) {
 			tcl.resultf("%d", getPollSent());
 			return TCL_OK;
-		} 
-	} else if (argc == 3) {
+		}
+	} 
+	if (argc >= 3) {
 		if (strcasecmp(argv[1], "setMacAddr") == 0) {
 			addr = atoi(argv[2]);
+			return TCL_OK;
+		}
+		// set custom polling sequence
+		if (strcasecmp(argv[1], "setPollSequence") == 0) {
+			poll_node_ids.clear();
+			for (int i = 2; i < argc; i++) {
+				poll_node_ids.push_back(atoi(argv[i]));
+			}
+			poll_size = poll_node_ids.size();
 			return TCL_OK;
 		}
 	}
@@ -139,8 +167,10 @@ void UWTWR_AAUV::ACKTimer::expire(Event *e)
 void UWTWR_AAUV::AckTOExpired()
 {
 	RxAckEnabled = false;
-	// go back to IDLE and poll the other node
-	stateIdle();
+	// go back to IDLE and poll the other node only if still running
+	if (is_running) {
+		stateIdle();
+	}
 }
 
 // Is it not needed if no data packets to send
@@ -226,44 +256,33 @@ void UWTWR_AAUV::stateTxPoll()
 {
 	if(TxEnabled) {
 		SetNodePoll();
-		// poll when the id of node to poll is correct
-		if(polling_index > 0) {
-			refreshState(UWTWR_AAUV_STATUS_TX_POLL);
-			Packet *p = Packet::alloc();
-			hdr_cmn *cmh = hdr_cmn::access(p);
-			hdr_mac *mach = HDR_MAC(p);
-			// hdr_POLL *pollh = HDR_POLL(p);
-			cmh->ptype() = PT_POLL;
+		refreshState(UWTWR_AAUV_STATUS_TX_POLL);
+		Packet *p = Packet::alloc();
+		hdr_cmn *cmh = hdr_cmn::access(p);
+		hdr_mac *mach = HDR_MAC(p);
+		// hdr_POLL *pollh = HDR_POLL(p);
+		cmh->ptype() = PT_POLL;
 
-			//Set the size to POLL_size with correct bytes number
-			cmh->size() = POLL_size;
-			mach->set(MF_CONTROL, addr, MAC_BROADCAST);
-			mach->macSA() = addr;
-			mach->macDA() = MAC_BROADCAST;
-			curr_poll_packet = p->copy();
-			Packet::free(p);
-			hdr_POLL *pollh = HDR_POLL(curr_poll_packet);
-			POLL_uid++;
-			pollh->POLL_uid_ = POLL_uid;
-			pollh->id_ = curr_node_id;
+		//Set the size to POLL_size with correct bytes number
+		cmh->size() = POLL_size;
+		mach->set(MF_CONTROL, addr, MAC_BROADCAST);
+		mach->macSA() = addr;
+		mach->macDA() = MAC_BROADCAST;
+		curr_poll_packet = p->copy();
+		Packet::free(p);
+		hdr_POLL *pollh = HDR_POLL(curr_poll_packet);
+		POLL_uid++;
+		pollh->POLL_uid_ = POLL_uid;
+		pollh->id_ = curr_node_id;
 
-			// Save info (tof) to be sent in POLL in header (easier for now)
-			pollh->tof_ = diff_time;
+		// Save info (tof) to be sent in POLL in header (easier for now)
+		pollh->tof_ = diff_time;
 
-			if (debug_)
-				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
-							<< ")::STATE_TX_POLL::NODE::" << pollh->id_
-							<< std::endl;
-			TxPoll();
-			// iteratively polling node 0, 1 by counting down
-			polling_index--; 
-		} else {
-			if (debug_)
-				std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
-						  << ")::STATE_TX_POLL--->IDLE--->No node to POLL"
-						  << std::endl;
-			stateIdle();
-		}	
+		if (debug_)
+			std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
+						<< ")::STATE_TX_POLL::NODE::" << pollh->id_
+						<< std::endl;
+		TxPoll();
 	} else {
 		if (debug_)
 			std::cerr << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr
@@ -285,19 +304,11 @@ void UWTWR_AAUV::TxPoll()
 
 void UWTWR_AAUV::SetNodePoll()
 {
-	if(polling_index >0)
-	{
-		if(polling_index == 2)
-		{
-			curr_node_id = 0;
-		} else if(polling_index == 1)
-		{
-			curr_node_id = 1;
-		}
-	} else {
-		polling_index += 2;
-		curr_node_id = 0;
-	}
+	// Get current node to poll from rotation list
+	curr_node_id = poll_node_ids[polling_rotation_index];
+
+	// Move to next node in rotation
+	polling_rotation_index = (polling_rotation_index + 1) % poll_size;
 }
 
 // when to set the state to idle? TCl run--idle, waitAck--idle, RxAck--idle
@@ -308,7 +319,10 @@ void UWTWR_AAUV::stateIdle()
 	// 	std::cout << POLL_uid << "::" <<std::fixed<< std::setprecision(9) << NOW << "::UWTWR_AAUV(" << addr << ")::IDLE STATE "
 	// 			  << std::endl;
 	TxEnabled = true;
-	stateTxPoll();
+	// Only continue polling if is_running flag is true
+	if (is_running) {
+		stateTxPoll();
+	}
 }
 
 void UWTWR_AAUV::initInfo()
