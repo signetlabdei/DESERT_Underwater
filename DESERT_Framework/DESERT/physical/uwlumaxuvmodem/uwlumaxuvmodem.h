@@ -176,9 +176,18 @@ private:
 	 * @param endpoint endpoint of the param
 	 * @param param_name parameter to configure
 	 * @param param_value value to assign
+	 * @return true, parameter configured correctly, false otherwise
 	 */
 	bool configure(std::string endpoint, std::string param_name,
-			std::string param_value); // TODO
+			std::string param_value);
+
+	/**
+	 * Get param_name value from the APIs
+	 * @param endpoint endpoint of the param
+	 * @param param_name parameter to get value of
+	 * @return value of param_name if found, empty string on error
+	 */
+	std::string getParameter(std::string endpoint, std::string param_name);
 
 	/** Mutex associated with the state machine of the modem */
 	std::mutex status_m;

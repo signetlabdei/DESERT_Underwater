@@ -275,20 +275,23 @@ double
 UwLumaXUVModem::getTxDuration(Packet *p)
 {
 	hdr_uwal *uwalh = HDR_UWAL(p);
-	double tx_duration = -1;
 
-	// With Flexframe modulation, the TX duration obtained
-	// dividing the number of samples written by the sampling frequency
-	// (192 kHz by default).
-	// It can be written as a linear function of the packet size:
-	// tx_duration = a + b * pkt_size
-	// The two constants a = 0.560833333 [s] and b = 0.013333333 [s]
-	// are obtained by interpolating the TX duration values obtained
-	// with the smallest and biggest packet size possible.
-	tx_duration = 0.560833333 + 0.013333333 * (uwalh->binPktLength());
+	std::string optical_speed_mbps = getParameter("status", "optical_speed");
 
-	if (premodulation)
-		tx_duration += 0.1;
+	// defaults the optical speed to 1Mbit/s on error
+	if (optical_speed_mbps == "") {
+		printOnLog(UwModem::LogLevel::ERROR,
+				"UWLUMAXUVMODEM",
+				"couldn'r retrieve param 'optical_speed', defaulting to "
+				"1Mbit/s.");
+		optical_speed_mbps = 1.0;
+	}
+
+	// Convert Mbit/s to bit/s
+	double data_rate_bps = std::stod(optical_speed_mbps) * 1000000.0;
+
+	// tx_duration = (Packet size in bits) / (Data rate in bits per second)
+	double tx_duration = (uwalh->binPktLength() * 8.0) / data_rate_bps;
 
 	return tx_duration;
 }
@@ -345,7 +348,7 @@ UwLumaXUVModem::configure(
 				"UWLUMAXUVMODEM",
 				"invalid value for parameter '" + param_name +
 						"': " + param_value);
-		return false; // Changed from -1 to false to match the bool return type
+		return false;
 	}
 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -450,6 +453,69 @@ UwLumaXUVModem::configure(
 	curl_global_cleanup();
 
 	return true;
+}
+
+std::string
+UwLumaXUVModem::getParameter(std::string endpoint, std::string param_name)
+{
+	curl_global_init(CURL_GLOBAL_ALL);
+	CURL *curl = curl_easy_init();
+
+	// Default return value indicating an error or unfound parameter
+	std::string result = "";
+
+	if (curl) {
+		// Construct the URL dynamically based on the requested endpoint (e.g.,
+		// "status", "general_info", "parameters")
+		std::string url = "http://" + std::string(modem_address) + "/api/" +
+				endpoint + ".json";
+		std::string get_response;
+
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &get_response);
+
+		CURLcode res = curl_easy_perform(curl);
+
+		if (res == CURLE_OK) {
+			// Regex to capture the value associated with the param_name.
+			// This pattern handles:
+			// 1. Optional spaces around the colon.
+			// 2. Both unquoted numbers (e.g., "temperature": 40.3125) and
+			// quoted strings (e.g., "sha_version": "d16db17").
+			// 3. Captures all characters up to the next comma, closing brace,
+			// or whitespace.
+			std::regex value_pattern(
+					"\"" + param_name + "\"\\s*:\\s*\"?([^\",}\\s]+)\"?");
+			std::smatch match;
+
+			if (std::regex_search(get_response, match, value_pattern)) {
+				if (match.size() > 1) {
+					result = match[1].str();
+					printOnLog(UwModem::LogLevel::DEBUG,
+							"UWLUMAXUVMODEM",
+							"Parameter '" + param_name + "' retrieved from " +
+									endpoint + ": " + result);
+				}
+			} else {
+				printOnLog(UwModem::LogLevel::ERROR,
+						"UWLUMAXUVMODEM",
+						"Parameter '" + param_name + "' not found in " +
+								endpoint + ".json response.");
+			}
+		} else {
+			printOnLog(UwModem::LogLevel::ERROR,
+					"UWLUMAXUVMODEM",
+					"GET request to " + endpoint + ".json failed: " +
+							std::string(curl_easy_strerror(res)));
+		}
+
+		curl_easy_cleanup(curl);
+	}
+
+	curl_global_cleanup();
+	return result;
 }
 
 void

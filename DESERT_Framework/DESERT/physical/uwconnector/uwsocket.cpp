@@ -265,7 +265,6 @@ UwSocket::openConnection(const std::string &path)
 							(char *) &local_interface,
 							sizeof(local_interface)) < 0) {
 					local_errno = errno;
-					// TODO remote debug maybe
 					char ip[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, &local_interface, ip, sizeof(ip));
 					std::cerr << "[ERROR]::UWSOCKET::openConnection()::UDP connection failed to "
