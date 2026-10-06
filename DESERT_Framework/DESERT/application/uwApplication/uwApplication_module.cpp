@@ -326,6 +326,9 @@ uwApplicationModule::recv(Packet *p)
 
 	incrPktRecv();
 
+	std::cerr << "[DEBUG_UWAPPLICATION] "
+			  << "value of withoutSocket(): " << withoutSocket() << std::endl;
+
 	if (!withoutSocket())
 		printOnLog(Logger::LogLevel::DEBUG,
 				"UWAPPLICATION",
@@ -446,7 +449,7 @@ uwApplicationModule::stop()
 
 		if (clnSockDescr >= 0) {
 			shutdown(clnSockDescr, SHUT_RDWR);
-			close(servSockDescr);
+			close(clnSockDescr);
 			clnSockDescr = -1;
 		}
 

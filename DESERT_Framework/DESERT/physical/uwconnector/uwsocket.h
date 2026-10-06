@@ -130,7 +130,7 @@ public:
 	setUDP()
 	{
 		proto = Transport::UDP;
-		std::cout << "UDP set" << std::endl;
+		std::cout << "[DEBUG]::UWSOCKET::setUDP()::" << "UDP set" << std::endl;
 	};
 	/**
 	 * Method that sets SERVER role
@@ -140,6 +140,24 @@ public:
 	{
 		isClient = false;
 	};
+
+	/**
+	 * Method that enables multicast, if protocol is TCP isMulticast will be set
+	 * to true but nothing will change
+	 */
+	virtual void
+	setMulticast()
+	{
+		isMulticast = true;
+	}
+
+	virtual bool
+	setMulticastAddress(const char *multicast_address)
+	{
+		// TODO check address validity
+		this->multicast_address = multicast_address;
+		return true;
+	}
 
 private:
 	/**
@@ -157,9 +175,19 @@ private:
 	bool isClient;
 
 	/**
-	 *
+	 * Bool value that enables or disables multicast functionality
+	 */
+	bool isMulticast;
+
+	/**
+	 * Socket address
 	 */
 	struct sockaddr_in cl_addr;
+
+	/**
+	 * Multicast address
+	 */
+	std::string multicast_address;
 };
 
 #endif

@@ -7,6 +7,8 @@ Before installing the **DESERT framework**, please check that your host device h
 - build-essential  
 - autoconf  
 - automake  
+- curl
+- libcurl4-gnutls-dev
 - libxmu-dev  
 - libx11-dev  
 - libxmu-dev  
@@ -23,7 +25,7 @@ Before installing the **DESERT framework**, please check that your host device h
 If you are using a Debian-based Linux distribution (e.g., Ubuntu, Linux Mint, etc...), you can type the following command in a terminal, in order to install all dependencies above:
 
 ```console
-$ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev libxmu-headers libxt-dev libxml2-dev libtool gfortran bison flex
+$ sudo apt-get install build-essential autoconf automake curl libcurl4-gnutls-dev libxmu-dev libx11-dev libxmu-headers libxt-dev libxml2-dev libtool gfortran bison flex
 ```
 
 ### Arch Linux
@@ -31,7 +33,7 @@ $ sudo apt-get install build-essential autoconf automake libxmu-dev libx11-dev l
 If you are using an Arch Linux based distribution, you can type the following command in a terminal:
 
 ```console
-$ sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake libtool patch patchutils libxml2
+$ sudo pacman -S base-devel make tk gcc-fortran bison flex autoconf automake curl libtool patch patchutils libxml2
 ```
 
 ### Fedora
@@ -40,6 +42,8 @@ Before installing the DESERT framework in Fedora, check that your host device ha
 
 - C Development Tools and Libraries  
 - gcc-gfortran  
+- curl
+- libcurl4-gnutls-dev
 - libXmu-devel  
 - libX11-devel  
 - patch  
@@ -49,11 +53,15 @@ Note that main C development tools are installed by installing the package group
 To install all the software requirements you can run the following commands in a terminal:
 
 ```console
+$ dnf install @c-development
+```
+or for older versions:
+```console
 $ dnf groupinstall "C Development Tools and Libraries"
 ```
-
+then:
 ```console
-$ dnf install gcc-gfortran libXmu-devel libX11-devel patch patchutils libxml2
+$ dnf install gcc-gfortran curl libcurl4-gnutls-dev libXmu-devel libX11-devel patch patchutils libxml2
 ```
 
 ## Download and install
