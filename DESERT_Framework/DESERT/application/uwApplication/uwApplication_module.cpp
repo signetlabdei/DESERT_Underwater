@@ -446,7 +446,7 @@ uwApplicationModule::stop()
 
 		if (clnSockDescr >= 0) {
 			shutdown(clnSockDescr, SHUT_RDWR);
-			close(servSockDescr);
+			close(clnSockDescr);
 			clnSockDescr = -1;
 		}
 
