@@ -107,9 +107,12 @@ set opt(maxinterval_)       200
 set opt(freq)               50000.0 ;#Frequency used in Hz
 set opt(bw)                 26000.0 ;#Bandwidth used in Hz
 set opt(bitrate)            20768.0 ;#150000;#bitrate in bps
-set opt(cbr_period)     10
-set opt(pktsize)	1250
+set opt(cbr_period) 10
+set opt(pktsize)	125
 set opt(rngstream)	1
+
+set opt(fair_mode) 1
+set opt(phy_drop)  0
 
 if {$opt(bash_parameters)} {
 	if {$argc != 3} {
@@ -152,17 +155,17 @@ if {$opt(trace_files)} {
 ### APP ###
 Module/UW/CBR set packetSize_          $opt(pktsize)
 Module/UW/CBR set period_              $opt(cbr_period)
-Module/UW/CBR set PoissonTraffic_      2
+Module/UW/CBR set PoissonTraffic_      1
 Module/UW/CBR set debug_               0
 
 ### TDMA MAC ###
-Module/UW/TDMA set frame_duration   3
+Module/UW/TDMA set frame_duration   [expr $opt(nn) * ($opt(pktsize)*8)/$opt(bitrate)]
 Module/UW/TDMA set debug_           0
 Module/UW/TDMA set sea_trial_       1
-Module/UW/TDMA set fair_mode        1
+Module/UW/TDMA set fair_mode        $opt(fair_mode)
 # FAIR Mode on settings:
-Module/UW/TDMA set guard_time       0.1
-Module/UW/TDMA set tot_slots        3
+Module/UW/TDMA set guard_time       1e-4
+Module/UW/TDMA set tot_slots        $opt(nn)
 
 ### Channel ###
 MPropagation/Underwater set practicalSpreading_ 2
@@ -199,7 +202,7 @@ Module/UW/PHYSICAL  set debug_                      0
 proc createNode { id } {
 
     global channel ns cbr position node udp portnum ipr ipif
-    global opt mll mac propagation data_mask interf_data
+    global opt mll mac phy propagation data_mask interf_data
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -278,30 +281,44 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 }
 
 
-###############################
-# MAC settings: Generic mode  #
-###############################
-# Uncomment if FAIR Mode off
-# Note: this works only for three nodes
-# Node 1
-# $mac(0) setStartTime    0
-# $mac(0) setSlotDuration 2
-# $mac(0) setGuardTime    0.2
-# Node 2
-# $mac(1) setStartTime    2
-# $mac(1) setSlotDuration 1
-# $mac(1) setGuardTime    0.2
-# Node 3
-# $mac(2) setStartTime    3
-# $mac(2) setSlotDuration 0.5
-# $mac(2) setGuardTime    0.1
+# FAIR Mode off
+if {$opt(fair_mode) == 0} {
+	# Note: this works only for three nodes
+	# Node 1
+	$mac(0) setStartTime    0
+	$mac(0) setSlotDuration 2
+	$mac(0) setGuardTime    0.2
+	# Node 2
+	$mac(1) setStartTime    2
+	$mac(1) setSlotDuration 1
+	$mac(1) setGuardTime    0.2
+	# Node 3
+	$mac(2) setStartTime    3
+	$mac(2) setSlotDuration 0.5
+	$mac(2) setGuardTime    0.1
+}
 
+# Drop received packets with a fixed probability at PHY layer
+if {$opt(phy_drop)} {
+	for {set id 0} {$id < $opt(nn)} {incr id}  {
+		# Manually set a drop probability
+		# $phy($id) setDropProbability 0.1
+
+		# Pick a drop probability randomly from a given set
+		# Note that the same probability is never pick twice in a row
+		$phy($id) addToDropSet 0.3
+		$phy($id) addToDropSet 0.5
+		$phy($id) addToDropSet 0.7
+	
+		$ns at 500 "$phy($id) updateDropProbability"
+	}
+}
 
 ################################
 # Inter-node module connection #
 ################################
 proc connectNodes {id1 des1} {
-    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt 
+    global ipif ipr portnum cbr opt 
     $cbr($id1,$des1) set destAddr_ [$ipif($des1) addr]
     $cbr($id1,$des1) set destPort_ $portnum($des1,$id1)
 }
@@ -367,11 +384,10 @@ for {set ii 0} {$ii < $opt(nn)} {incr ii} {
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-    global ns opt outfile
-    global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
-    global node_coordinates
-    global ipr_sink ipr ipif udp cbr phy phy_data_sink
-    global node_stats tmp_node_stats sink_stats tmp_sink_stats
+    global ns opt
+    global mac propagation channel db_manager propagation
+    global ipr ipif udp cbr phy
+
     if ($opt(verbose)) {
        puts "-----------------------------------------------------------------"
        puts "Simulation summary"
