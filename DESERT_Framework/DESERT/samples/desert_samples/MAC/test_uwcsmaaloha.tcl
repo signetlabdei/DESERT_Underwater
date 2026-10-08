@@ -153,7 +153,7 @@ Module/UW/CBR set period_              $opt(cbr_period)
 Module/UW/CBR set PoissonTraffic_      1
 Module/UW/CBR set debug_               0
 
-Module/MPhy/BPSK  set TxPower_               $opt(txpower)
+Module/MPhy/BPSK/Underwater  set MaxTxSPL_dB_               $opt(txpower)
 
 ################################
 # Procedure(s) to create nodes #
@@ -174,7 +174,7 @@ proc createNode { id } {
     set ipif($id) [new Module/UW/IP]
     set mll($id)  [new Module/UW/MLL] 
     set mac($id)  [new Module/UW/CSMA_ALOHA] 
-    set phy($id)  [new Module/MPhy/BPSK]  
+    set phy($id)  [new Module/MPhy/BPSK/Underwater]  
 	
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
         if { $id == $cnt} { continue }

@@ -32,13 +32,13 @@
 #
 #########################################################################################
 ##
-## NOTE: This script uses the PHY model "Module/MPhy/BPSK" of NS-Miracle in addPosition
+## NOTE: This script uses the PHY model "Module/MPhy/BPSK/Underwater" of NS-Miracle in addPosition
 ## with the module "MInterference/MIV" for the computation of interference. 
 ## These two modules is used in this script to demonstrate their compatibility with
 ## DESERT stack.
 ## If you decide to use Module/UW/PHYSICAL from DESERT, it is suggested to use also 
 ## Module/UW/INTERFERENCE (which is an extension of the one coming from NS-Miracle)
-## Anyways, it is possibile to use Module/UW/INTERFERENCE with Module/MPhy/BPSK whereas
+## Anyways, it is possibile to use Module/UW/INTERFERENCE with Module/MPhy/BPSK/Underwater whereas
 ## it is not possibile to use MInterference/MIV with Module/UW/INTERFERENCE for compatibility
 ## reasons
 ##
@@ -50,26 +50,26 @@
 # The application used to generate data is UW/CBR.
 # ----------------------------------------------------------------------------------
 # Stack
-#             Node 1                         Node 2                        Sink
-#   +--------------------------+   +--------------------------+   +-------------+------------+
-#   |  7. UW/APPLICATION       |   |  7. UW/APPLICATION       |   |  7. UW/APP  | UW/APP     |
-#   +--------------------------+   +--------------------------+   +-------------+------------+
-#   |  6. UW/UDP               |   |  6. UW/UDP               |   |  6. UW/UDP               |
-#   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |   |  5. UW/STATICROUTING     |
-#   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  4. UW/IP                |   |  4. UW/IP                |   |  4. UW/IP                |
-#   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  3. UW/MLL               |   |  3. UW/MLL               |   |  3. UW/MLL               |
-#   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |   |  2. UW/CSMA_ALOHA        |
-#   +--------------------------+   +--------------------------+   +--------------------------+
-#   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |   |  1. Module/MPhy/BPSK     |
-#   +--------------------------+   +--------------------------+   +--------------------------+
+#             Node 1                                   Node 2                        Sink
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  7. UW/APPLICATION             |   |  7. UW/APPLICATION             |   |  7. UW/APP  | UW/APP           |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  6. UW/UDP                     |   |  6. UW/UDP                     |   |  6. UW/UDP                     |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  5. UW/STATICROUTING           |   |  5. UW/STATICROUTING           |   |  5. UW/STATICROUTING           |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  4. UW/IP                      |   |  4. UW/IP                      |   |  4. UW/IP                      |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  3. UW/MLL                     |   |  3. UW/MLL                     |   |  3. UW/MLL                     |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  2. UW/CSMA_ALOHA              |   |  2. UW/CSMA_ALOHA              |   |  2. UW/CSMA_ALOHA              |
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
+#   |  1. Module/MPhy/BPSK/Underwater|   |  1. Module/MPhy/BPSK/Underwater|   |  1. Module/MPhy/BPSK/Underwater|
+#   +--------------------------------+   +--------------------------------+   +--------------------------------+
 #            |         |                    |         |                   |         |       
-#   +----------------------------------------------------------------------------------------+
-#   |                                     UnderwaterChannel                                  |
-#   +----------------------------------------------------------------------------------------+
+#   +----------------------------------------------------------------------------------------------------------+
+#   |                                     UnderwaterChannel                                                    |
+#   +----------------------------------------------------------------------------------------------------------+
 
 ######################################
 # Flags to enable or disable options #
@@ -193,8 +193,8 @@ Module/UW/APPLICATION set EXP_ID_ 1
 
 
 # BPSK              
-Module/MPhy/BPSK  set BitRate_          $opt(bitrate)
-Module/MPhy/BPSK  set TxPower_          $opt(txpower)
+Module/MPhy/BPSK/Underwater set BitRate_              $opt(bitrate)
+Module/MPhy/BPSK/Underwater set MaxTxSPL_dB_          $opt(txpower)
 
 ################################
 # Procedure(s) to create nodes #
@@ -213,7 +213,7 @@ proc createNode { id } {
     set ipif($id) [new Module/UW/IP]
     set mll($id)  [new Module/UW/MLL] 
     set mac($id)  [new Module/UW/CSMA_ALOHA] 
-    set phy($id)  [new Module/MPhy/BPSK]
+    set phy($id)  [new Module/MPhy/BPSK/Underwater]
 
     $node($id) addModule 7 $app($id)   0  "CBR"
     $node($id) addModule 6 $udp($id)   0  "UDP"
@@ -273,7 +273,7 @@ proc createSink { } {
     set ipif_sink      [new Module/UW/IP]
     set mll_sink       [new Module/UW/MLL] 
     set mac_sink       [new Module/UW/CSMA_ALOHA]
-    set phy_data_sink  [new Module/MPhy/BPSK] 
+    set phy_data_sink  [new Module/MPhy/BPSK/Underwater] 
 
     for { set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
         $node_sink addModule 7 $app_sink($cnt) 0 "CBR"
