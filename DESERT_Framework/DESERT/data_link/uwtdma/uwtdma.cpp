@@ -79,26 +79,29 @@ UwTDMATimer::expire(Event *e)
 
 UwTDMA::UwTDMA()
 	: MMac()
-	, tdma_timer(this)
-	, slot_status(UW_TDMA_STATUS_NOT_MY_SLOT)
+	, transceiver_status(IDLE)
+	, slot_status(SlotStatus::NOT_MY_SLOT)
+	, sea_trial_(0)
+	, fair_mode(0)
+	, tot_slots(0)
+	, slot_number(0)
+	, HDR_size(0)
+	, frame_duration(0)
+	, guard_time(0)
 	, slot_duration(0)
 	, start_time(0)
-	, transceiver_status(IDLE)
-	, out_file_stats(0)
-	, guard_time(0)
-	, tot_slots(0)
-	, HDR_size(0)
+	, tdma_timer(this)
+	, out_file_stats()
+	, enable(true)
+	, max_queue_size(10)
 	, max_packet_per_slot(1)
 	, packet_sent_curr_slot_(0)
-	, max_queue_size(10)
 	, drop_old_(0)
-	, enable(true)
 	, name_label_("")
 	, checkPriority(0)
 {
 	bind("queue_size_", (int *) &max_queue_size);
 	bind("frame_duration", (double *) &frame_duration);
-	bind("debug_", (int *) &debug_);
 	bind("sea_trial_", (int *) &sea_trial_);
 	bind("fair_mode", (int *) &fair_mode);
 	bind("HDR_size_", (int *) &HDR_size);
@@ -112,36 +115,35 @@ UwTDMA::UwTDMA()
 	}
 
 	if (max_queue_size < 0) {
-		printOnLog(Logger::LogLevel::ERROR,
-				"UWTDMA",
-				"UwTDMA()::invalid max_queue_size < 0. Set to 1 by default.");
+		std::cout << "UWTDMA::"
+				  << "UwTDMA()::invalid max_queue_size < 0. Set to 1 by "
+					 "default.\n";
 		max_queue_size = 1;
 	}
+
 	if (frame_duration < 0) {
-		printOnLog(Logger::LogLevel::ERROR,
-				"UWTDMA",
-				"UwTDMA()::invalid frame_duration < 0. Set to 1 by default.");
+		std::cout << "UWTDMA::"
+				  << "UwTDMA()::invalid frame_duration < 0. Set to 1 by "
+					 "default.\n";
 		frame_duration = 1;
 	}
 	if (max_packet_per_slot < 0) {
-		printOnLog(Logger::LogLevel::ERROR,
-				"UWTDMA",
-				"UwTDMA()::invalid max_packet_per_slot < 0. Set to 1 by "
-				"default.");
+		std::cout << "UWTDMA::"
+				  << "UwTDMA()::invalid max_packet_per_slot < 0. Set to 1 by "
+					 "default.\n";
 		max_packet_per_slot = 1;
 	}
 	if (drop_old_ == 1 && checkPriority == 1) {
-		printOnLog(Logger::LogLevel::ERROR,
-				"UWTDMA",
-				"UwTDMA()::drop_old_ and checkPriority cannot be set both to 1"
-				"checkPriority set to 0 by default.");
+		std::cout << "UWTDMA::"
+				  << "UwTDMA()::drop_old_ and checkPriority cannot be set both "
+					 "to 1"
+					 "checkPriority set to 0 by default.\n";
 		checkPriority = 0;
 	}
 	if (mac2phy_delay_ <= 0) {
-		printOnLog(Logger::LogLevel::ERROR,
-				"UWTDMA",
-				"UwTDMA()::invalid mac2phy_delay_ <= 0. Set to 1e-9 by "
-				"default.");
+		std::cout << "UWTDMA::"
+				  << "UwTDMA()::invalid mac2phy_delay_ <= 0. Set to 1e-9 by "
+					 "default.\n";
 		mac2phy_delay_ = 1e-9;
 	}
 }
@@ -209,8 +211,7 @@ void
 UwTDMA::txData()
 {
 	if (packet_sent_curr_slot_ < max_packet_per_slot) {
-		if (slot_status == UW_TDMA_STATUS_MY_SLOT &&
-				transceiver_status == IDLE) {
+		if (slot_status == SlotStatus::MY_SLOT && transceiver_status == IDLE) {
 			if (buffer.size() > 0) {
 				Packet *p = buffer.front();
 				buffer.pop_front();
@@ -218,7 +219,7 @@ UwTDMA::txData()
 				incrDataPktsTx();
 			}
 		} else {
-			if (slot_status != UW_TDMA_STATUS_MY_SLOT)
+			if (slot_status != SlotStatus::MY_SLOT)
 				printOnLog(Logger::LogLevel::INFO,
 						"UWTDMA",
 						"txData()::Addr " + std::to_string(addr) +
@@ -341,7 +342,7 @@ UwTDMA::Phy2MacEndRx(Packet *p)
 
 		transceiver_status = IDLE;
 
-		if (slot_status == UW_TDMA_STATUS_MY_SLOT)
+		if (slot_status == SlotStatus::MY_SLOT)
 			txData();
 
 	} else {
@@ -382,8 +383,8 @@ void
 UwTDMA::changeStatus()
 {
 	packet_sent_curr_slot_ = 0;
-	if (slot_status == UW_TDMA_STATUS_MY_SLOT) {
-		slot_status = UW_TDMA_STATUS_NOT_MY_SLOT;
+	if (slot_status == SlotStatus::MY_SLOT) {
+		slot_status = SlotStatus::NOT_MY_SLOT;
 		double off_time = frame_duration - slot_duration + guard_time;
 		tdma_timer.resched(off_time);
 
@@ -397,7 +398,7 @@ UwTDMA::changeStatus()
 			out_file_stats << left << "[" << getEpoch() << "]::" << NOW
 						   << "::TDMA_node(" << addr << ")::Off" << std::endl;
 	} else {
-		slot_status = UW_TDMA_STATUS_MY_SLOT;
+		slot_status = SlotStatus::MY_SLOT;
 		double on_time = slot_duration - guard_time;
 		tdma_timer.resched(on_time);
 
@@ -436,7 +437,8 @@ UwTDMA::start(double delay)
 	printOnLog(Logger::LogLevel::DEBUG,
 			"UWTDMA",
 			"start(double)::Addr " + std::to_string(addr) +
-					"::current status " + std::to_string(slot_status));
+					"::current status " +
+					std::to_string(static_cast<int>(slot_status)));
 }
 
 void
@@ -457,38 +459,44 @@ UwTDMA::command(int argc, const char *const *argv)
 	Tcl &tcl = Tcl::instance();
 	if (argc == 2) {
 		if (strcasecmp(argv[1], "start") == 0) {
+			if (guard_time < 0) {
+				tcl.resultf("guard_time must be non-negative");
+				return TCL_ERROR;
+			}
+
 			if (fair_mode == 1) {
-				if (tot_slots == 0) {
-					printOnLog(Logger::LogLevel::ERROR,
-							"UWTDMA",
-							"command(int, const char *const)::start:: "
-							"Number of slots can't be set to 0");
-
+				if (tot_slots <= 0 || slot_number < 0 ||
+						slot_number >= tot_slots) {
+					tcl.resultf(
+							"tot_slots must be positive and slot_number must "
+							"be in [0, tot_slots)");
 					return TCL_ERROR;
-				} else {
-					slot_duration = frame_duration / tot_slots;
-					if (slot_duration - guard_time < 0) {
-						printOnLog(Logger::LogLevel::ERROR,
-								"UWTDMA",
-								"command(int, const char *const)::start:: "
-								"Slot duration can't be smaller than guard "
-								"time");
-
-						return TCL_ERROR;
-					} else {
-						start_time = slot_number * slot_duration;
-						start(start_time);
-						return TCL_OK;
-					}
 				}
 			}
+
+			const double duration =
+					fair_mode == 1 ? frame_duration / tot_slots : slot_duration;
+			const double delay =
+					fair_mode == 1 ? slot_number * duration : start_time;
+			if (duration <= guard_time || duration > frame_duration ||
+					delay < 0) {
+				tcl.resultf(
+						"slot duration must exceed guard_time and not exceed "
+						"frame_duration");
+				return TCL_ERROR;
+			}
+
+			slot_duration = duration;
+			start_time = delay;
+
 			start(start_time);
+
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "stop") == 0) {
 			stop();
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "get_buffer_size") == 0) {
-			tcl.resultf("%d", buffer.size());
+			tcl.resultf("%zu", buffer.size());
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "get_upper_data_pkts_rx") == 0) {
 			tcl.resultf("%d", up_data_pkts_rx);
@@ -502,48 +510,80 @@ UwTDMA::command(int argc, const char *const *argv)
 		}
 	} else if (argc == 3) {
 		if (strcasecmp(argv[1], "setStartTime") == 0) {
-			start_time = atof(argv[2]);
+			double value;
+			if (Tcl_GetDouble(tcl.interp(), argv[2], &value) != TCL_OK)
+				return TCL_ERROR;
+
+			if (value < 0) {
+				tcl.resultf("%s requires a non-negative value", argv[1]);
+				return TCL_ERROR;
+			}
+
+			start_time = value;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setSlotDuration") == 0) {
 			if (fair_mode == 1) {
-				printOnLog(Logger::LogLevel::ERROR,
-						"UWTDMA",
-						"command(int, const char *const)::setSlotDuration:: "
-						"Can't set slot duration in fair mode");
+				tcl.resultf("Cannot set slot duration in fair mode");
 
 				return TCL_ERROR;
 			} else {
-				slot_duration = atof(argv[2]);
+				double value;
+				if (Tcl_GetDouble(tcl.interp(), argv[2], &value) != TCL_OK)
+					return TCL_ERROR;
+
+				if (value <= 0) {
+					tcl.resultf("%s requires a positive value", argv[1]);
+					return TCL_ERROR;
+				}
+
+				slot_duration = value;
 				return TCL_OK;
 			}
 		} else if (strcasecmp(argv[1], "setGuardTime") == 0) {
 			if (fair_mode == 1) {
-				printOnLog(Logger::LogLevel::ERROR,
-						"UWTDMA",
-						"command(int, const char *const)::setGuardTime:: "
-						"Can't set guard timmme in fair mode");
+				tcl.resultf("Cannot set guard time in fair mode");
 
 				return TCL_ERROR;
 			} else {
-				guard_time = atof(argv[2]);
+				double value;
+				if (Tcl_GetDouble(tcl.interp(), argv[2], &value) != TCL_OK)
+					return TCL_ERROR;
+
+				if (value < 0) {
+					tcl.resultf(
+							"%s requires a finite nonnegative value", argv[1]);
+					return TCL_ERROR;
+				}
+
+				guard_time = value;
 				return TCL_OK;
 			}
 		} else if (strcasecmp(argv[1], "setSlotNumber") == 0) {
-			slot_number = atoi(argv[2]);
+			int value;
+			if (Tcl_GetInt(tcl.interp(), argv[2], &value) != TCL_OK)
+				return TCL_ERROR;
+
+			if (value < 0) {
+				tcl.resultf("%s requires a nonnegative integer", argv[1]);
+				return TCL_ERROR;
+			}
+
+			slot_number = value;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setMacAddr") == 0) {
-			addr = atoi(argv[2]);
+			int value;
+			if (Tcl_GetInt(tcl.interp(), argv[2], &value) != TCL_OK)
+				return TCL_ERROR;
 
-			printOnLog(Logger::LogLevel::ERROR,
-					"UWTDMA",
-					"command(int, const char *const)::setMacAddr:: "
-					"Address set to " +
-							std::to_string(addr));
+			if (value < 0) {
+				tcl.resultf("%s requires a nonnegative integer", argv[1]);
+				return TCL_ERROR;
+			}
 
+			addr = value;
 			return TCL_OK;
 		} else if (strcasecmp(argv[1], "setLogLabel") == 0) {
 			name_label_ = argv[2];
-
 			return TCL_OK;
 		}
 	}

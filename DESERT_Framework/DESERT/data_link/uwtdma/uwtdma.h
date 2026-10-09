@@ -48,9 +48,6 @@
 #include <sys/time.h>
 #include <timer-handler.h>
 
-#define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active>*/
-#define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/
-
 class UwTDMA;
 
 /**
@@ -235,10 +232,9 @@ protected:
 	enum UWTDMA_STATUS { IDLE, TRANSMITTING, RECEIVING };
 
 	UWTDMA_STATUS
-	transceiver_status; /**<Variable holding the status enum type*/
-	int slot_status; /**<Is it my turn to transmit data?*/
-	int debug_; /**<Debug variable: 0 for no info,
-				>-5 for small info, <-5 for complete info*/
+			transceiver_status; /**<Variable holding the status enum type*/
+	enum class SlotStatus { MY_SLOT = 1, NOT_MY_SLOT = 2 };
+	SlotStatus slot_status; /**<Is it my turn to transmit data?*/
 	int sea_trial_; /**<Written log variable*/
 	int fair_mode; /**<Fair modality on if 1: then only set
 					   tot_slots and common guard_time*/
