@@ -100,14 +100,14 @@ void
 UwTDMA_frame::changeStatus()
 {
 	packet_sent_curr_slot_ = 0;
-	if (slot_status == UW_TDMA_STATUS_NOT_MY_SLOT) {
+	if (slot_status == SlotStatus::NOT_MY_SLOT) {
 		my_slots_counter++;
 		if (debug_)
 			std::cout << NOW << " ID:" << addr
 					  << ", my_slots_counter:" << my_slots_counter << std::endl;
 	}
-	if (slot_status == UW_TDMA_STATUS_MY_SLOT) {
-		slot_status = UW_TDMA_STATUS_NOT_MY_SLOT;
+	if (slot_status == SlotStatus::MY_SLOT) {
+		slot_status = SlotStatus::NOT_MY_SLOT;
 		int num_jumping_slots =
 				getNextMySlot()->first - getCurrentSlot()->first;
 		num_jumping_slots = num_jumping_slots > 0
