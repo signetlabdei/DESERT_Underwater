@@ -73,7 +73,7 @@ public:
 	 * @param p pointer to the packet that has been received from the simulator
 	 *        upper layers
 	 */
-	virtual void recv(Packet *p);
+	virtual void recv(Packet *p) override;
 
 	/**
 	 * Tcl command interpreter: Method that maps Tcl commands into C++ methods.
@@ -84,7 +84,7 @@ public:
 	 * @return TCL_OK or TCL_ERROR whether the command has been dispatched
 	 *		   successfully or not
 	 */
-	virtual int command(int argc, const char *const *argv);
+	virtual int command(int argc, const char *const *argv) override;
 
 	/**
 	 * Method that returns the modulation type used for the packet being
@@ -93,7 +93,7 @@ public:
 	 * @param p Packet pointer to the given packet being transmitted
 	 * @return modulation type represented by an integer
 	 */
-	virtual int getModulationType(Packet *p);
+	virtual int getModulationType(Packet *p) override;
 
 	/**
 	 * Method that returns the duration of a given transmitted packet.
@@ -103,7 +103,7 @@ public:
 	 * @param p Packet pointer to the given packet being transmitted
 	 * @return duration in seconds
 	 */
-	virtual double getTxDuration(Packet *p);
+	virtual double getTxDuration(Packet *p) override;
 
 	/**
 	 * Cross-Layer messages synchronous interpreter.
@@ -112,7 +112,7 @@ public:
 	 * message received
 	 * @return <i>0</i> if successful.
 	 */
-	virtual int recvSyncClMsg(ClMessage *m);
+	virtual int recvSyncClMsg(ClMessage *m) override;
 
 protected:
 	/**
@@ -120,7 +120,7 @@ protected:
 	 * modem.
 	 * @param p Packet pointer to the packet to be sent
 	 */
-	virtual void startTx(Packet *p);
+	virtual void startTx(Packet *p) override;
 
 	/**
 	 * Method that starts a packet reception. This method is also in charge of
@@ -128,14 +128,14 @@ protected:
 	 * the simulator about the start of the reception
 	 * @param p Packet pointer to the packet to be received
 	 */
-	virtual void startRx(Packet *p);
+	virtual void startRx(Packet *p) override;
 
 	/**
 	 * Method that ends a packet reception. This method is also in charge of
 	 * sending the received NS-MIRACLE packet to the upper layers
 	 * @param p Packet pointer to the packet being sent
 	 */
-	virtual void endRx(Packet *p);
+	virtual void endRx(Packet *p) override;
 
 	ModemState status;
 
@@ -144,14 +144,14 @@ private:
 	 * Method that starts the driver operations. It performs all the needed
 	 * operations to correctly fire up the device's driver.
 	 */
-	void start();
+	void start() override;
 
 	/**
 	 * Method that stops the driver operations. It performs all the needed
 	 * operations to correctly stop the device's driver before closing
 	 * operations.
 	 */
-	void stop();
+	void stop() override;
 
 	/**
 	 * Method that dispatches a thread dedicated to receiving data from the data
@@ -178,8 +178,8 @@ private:
 	 * @param param_value value to assign
 	 * @return true, parameter configured correctly, false otherwise
 	 */
-	bool configure(std::string endpoint, std::string param_name,
-			std::string param_value);
+	bool configure(const std::string &endpoint, const std::string &param_name,
+			const std::string &param_value);
 
 	/**
 	 * Get param_name value from the APIs
@@ -187,7 +187,7 @@ private:
 	 * @param param_name parameter to get value of
 	 * @return value of param_name if found, empty string on error
 	 */
-	std::string getParameter(std::string endpoint, std::string param_name);
+	std::string getParameter(const std::string& endpoint, const std::string& param_name);
 
 	/** Mutex associated with the state machine of the modem */
 	std::mutex status_m;
@@ -251,29 +251,7 @@ private:
 	 * Local interface address, used to transmit or receive data
 	 */
 	std::string data_address;
-
-	int premodulation; /**< True if premodulation is on, false otherwise */
 };
 
-/**
- * Class to create the Otcl shadow object for an object of the class
- * UwLumaXUVModem.
- */
-static class UwLumaXUVModem_TclClass : public TclClass
-{
-
-public:
-	UwLumaXUVModem_TclClass()
-		: TclClass("Module/UW/UwModem/LumaXUV")
-	{
-	}
-
-	TclObject *
-	create(int args, const char *const *argv)
-	{
-		return (new UwLumaXUVModem());
-	}
-
-} class_lumaxuvmodem;
 
 #endif

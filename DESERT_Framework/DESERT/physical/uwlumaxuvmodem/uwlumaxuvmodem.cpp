@@ -37,6 +37,27 @@
 const std::chrono::milliseconds UwLumaXUVModem::MODEM_TIMEOUT =
 		std::chrono::milliseconds(3000);
 
+/**
+ * Class to create the Otcl shadow object for an object of the class
+ * UwLumaXUVModem.
+ */
+static class UwLumaXUVModem_TclClass : public TclClass
+{
+
+public:
+	UwLumaXUVModem_TclClass()
+		: TclClass("Module/UW/UwModem/LumaXUV")
+	{
+	}
+
+	TclObject *
+	create(int args, const char *const *argv)
+	{
+		return (new UwLumaXUVModem());
+	}
+
+} class_lumaxuvmodem;
+
 UwLumaXUVModem::UwLumaXUVModem()
 	: UwModem()
 	, status_m()
@@ -55,7 +76,6 @@ UwLumaXUVModem::UwLumaXUVModem()
 	, data_address("")
 	, signal_buffer()
 	, signal_tag("DRIVER")
-	, premodulation(0)
 {
 	send_conn->setUDP();
 	send_conn->setMulticast();
@@ -121,6 +141,7 @@ int
 UwLumaXUVModem::command(int argc, const char *const *argv)
 {
 	if (argc == 3) {
+		// TODO add the check valid address method to the uwsocket class
 		if (!strcmp(argv[1], "setModemAddress")) {
 			modem_address = argv[2];
 			return TCL_OK;
@@ -142,9 +163,8 @@ UwLumaXUVModem::command(int argc, const char *const *argv)
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "start_state", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "optical_speed")) {
 			if (std::stoi(argv[2]) == 1 || std::stoi(argv[2]) == 4 ||
@@ -152,114 +172,100 @@ UwLumaXUVModem::command(int argc, const char *const *argv)
 					std::stoi(argv[2]) == 10) {
 				configure("parameters", "optical_speed", argv[2]);
 				return TCL_OK;
-			} else {
-
-				return TCL_ERROR;
 			}
+
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "nb_led")) {
 			if (std::stoi(argv[2]) >= 1 && std::stoi(argv[2]) <= 5) {
 				configure("parameters", "nb_led", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "encoding")) {
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "encoding", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "led_tx_pwr_normal")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 100) {
 				configure("parameters", "led_tx_pwr_normal", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "led_tx_pwr_cooldown")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 100) {
 				configure("parameters", "led_tx_pwr_cooldown", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "auto_gain_control")) {
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "auto_gain_control", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "manual_gain")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 4000) {
 				configure("parameters", "manual_gain", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "nb_receivers")) {
 			if (std::stoi(argv[2]) >= 1 && std::stoi(argv[2]) <= 4) {
 				configure("parameters", "nb_receivers", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "agc_amplitude_adjusti")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 4000) {
 				configure("parameters", "agc_amplitude_adjusti", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "keep_alive_pkt")) {
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "keep_alive_pkt", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "autogain_speed")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 2) {
 				configure("parameters", "autogain_speed", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "signal_filtering_type")) {
 			if (std::stoi(argv[2]) >= 0 && std::stoi(argv[2]) <= 3) {
 				configure("parameters", "signal_filtering_type", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "auto_power")) {
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "auto_power", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 		if (!strcmp(argv[1], "auto_speed")) {
 			if (std::stoi(argv[2]) == 0 || std::stoi(argv[2]) == 1) {
 				configure("parameters", "auto_speed", argv[2]);
 				return TCL_OK;
-			} else {
-				return TCL_ERROR;
 			}
+			return TCL_ERROR;
 		}
 	}
 	return UwModem::command(argc, argv);
@@ -336,8 +342,8 @@ WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 }
 
 bool
-UwLumaXUVModem::configure(
-		std::string endpoint, std::string param_name, std::string param_value)
+UwLumaXUVModem::configure(const std::string &endpoint,
+		const std::string &param_name, const std::string &param_value)
 {
 	int value = 0;
 
@@ -456,7 +462,8 @@ UwLumaXUVModem::configure(
 }
 
 std::string
-UwLumaXUVModem::getParameter(std::string endpoint, std::string param_name)
+UwLumaXUVModem::getParameter(
+		const std::string &endpoint, const std::string &param_name)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	CURL *curl = curl_easy_init();

@@ -12,9 +12,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
                 bison \
                 build-essential \
                 ca-certificates \
+                curl \
                 flex \
                 gfortran \
                 git \
+                libcurl4-gnutls-dev \
                 libtool \
                 libx11-dev \
                 libxml2-dev \

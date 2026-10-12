@@ -43,7 +43,7 @@ Before installing the DESERT framework in Fedora, check that your host device ha
 - C Development Tools and Libraries  
 - gcc-gfortran  
 - curl
-- libcurl4-gnutls-dev
+- libcurl-devel
 - libXmu-devel  
 - libX11-devel  
 - patch  
@@ -61,7 +61,7 @@ $ dnf groupinstall "C Development Tools and Libraries"
 ```
 then:
 ```console
-$ dnf install gcc-gfortran curl libcurl4-gnutls-dev libXmu-devel libX11-devel patch patchutils libxml2
+$ dnf install gcc-gfortran curl libcurl-devel libXmu-devel libX11-devel patch patchutils libxml2
 ```
 
 ## Download and install

@@ -34,7 +34,6 @@
  * @brief file to initialize the libuwlumaxuvmodem.so library
  */
 
-#include <tclcl.h>
 #include <uwphy-clmsg.h>
 
 extern EmbeddedTcl UwLumaXUVModemTclCode;
