@@ -26,12 +26,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
 #include <arpa/inet.h>
-#include <cctype>
-#include <climits>
 #include <cstddef>
-#include <iterator>
 #include <linux/limits.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <ostream>
 #include <stdexcept>
@@ -71,10 +70,6 @@ UwSocket::isConnected()
 bool
 UwSocket::openConnection(const std::string &path)
 {
-
-	std::string sep(":");
-	std::string DEFAULT_ADDRESS = "127.0.0.1";
-	int DEFAULT_PORT = 50420;
 	std::string address;
 	int port;
 	int sockfd;
@@ -82,49 +77,16 @@ UwSocket::openConnection(const std::string &path)
 	struct sockaddr_in s_address;
 	int sockoptval = 1;
 	struct sockaddr_in cl_address;
-	size_t sep_pos = path.find(sep);
+	std::string host_section;
+	std::string port_section;
 
-	std::string host_section =
-			(sep_pos != std::string::npos) ? path.substr(0, sep_pos) : path;
-	std::string port_section =
-			(sep_pos != std::string::npos) ? path.substr(sep_pos + 1) : "";
-
-	try {
-		if (host_section == "localhost") {
-			address = DEFAULT_ADDRESS;
-		} else if (host_section.find(".") == std::string::npos &&
-				port_section.empty()) {
-			address = DEFAULT_ADDRESS;
-			port_section = host_section;
-		} else {
-			address = host_section;
-		}
-
-		if (port_section.empty()) {
-			port = DEFAULT_PORT;
-		} else {
-			port = std::stoi(port_section);
-		}
-
-		if (port < 0 || port > 65535)
-			throw std::out_of_range("");
-	} catch (const std::invalid_argument &e) {
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Port must be a number. "
-					 "Invalid address: "
-				  << path << std::endl;
+	if (!resolveStringAddress(path, host_section, port_section)) {
 		return false;
-	} catch (const std::out_of_range &e) {
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Port number too "
-					 "large. Invalid address: "
-				  << path << std::endl;
-		return false;
-	} catch (...) {
-		local_errno = errno;
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Error parsing "
-					 "address: '"
-				  << path << "'. Error code: " << local_errno << std::endl;
 	}
 
+	address = host_section;
+	port = std::stoi(port_section);
+	
 	if (proto == Transport::TCP) {
 
 		if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -448,4 +410,72 @@ UwSocket::readFromDevice(void *wpos, int maxlen)
 	}
 
 	return -1;
+}
+
+const bool
+UwSocket::resolveStringAddress(
+		const std::string &address, std::string &host, std::string &port)
+{
+	const std::string LOCAL_ADDRESS = "127.0.0.1"; // localhost
+	const std::string DEFAULT_PORT = "50420";
+	std::string sep = ":";
+	size_t sep_pos = address.find(sep);
+
+	std::string host_section = (sep_pos != std::string::npos)
+			? address.substr(0, sep_pos)
+			: address;
+	std::string port_section =
+			(sep_pos != std::string::npos) ? address.substr(sep_pos + 1) : "";
+
+	try {
+		// host_section validation
+		if (host_section.find(".") == std::string::npos &&
+				host_section == "localhost") { // localhost
+			host = LOCAL_ADDRESS;
+		} else if (host_section.find(".") == std::string::npos ||
+				std::count(host_section.begin(), host_section.end(), '.') !=
+						3) {
+			std::cerr
+					<< "[ERROR]::UWSOCKET::openConnection()::Invalid address: "
+					<< address << std::endl;
+			return false;
+		} else {
+			host = host_section;
+		}
+
+		if (std::stoi(port) < 1 || std::stoi(port) > 65535)
+			throw std::out_of_range("");
+
+		// port section validation
+		if (port_section.empty()) {
+			port = DEFAULT_PORT;
+		} else {
+			port = port_section;
+		}
+
+		sockaddr_in sock_address;
+		if (inet_pton(AF_INET, host.c_str(), &(sock_address.sin_addr)) != 1) {
+			std::cerr
+					<< "[ERROR]::UWSOCKET::openConnection()::Invalid address: "
+					<< address << std::endl;
+		}
+
+	} catch (const std::invalid_argument &e) {
+		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Port must be a "
+					 "number. "
+					 "Invalid address: "
+				  << address << std::endl;
+		return false;
+	} catch (const std::out_of_range &e) {
+		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Invalid port "
+					 "number. Invalid address: "
+				  << address << std::endl;
+		return false;
+	} catch (...) {
+		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Error parsing "
+					 "address: '"
+				  << address << "'. Error code: " << local_errno << std::endl;
+	}
+
+	return true;
 }

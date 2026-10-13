@@ -85,6 +85,8 @@ UwLumaXUVModem::UwLumaXUVModem()
 	// sets recv_conn in reception mode (server receives data)
 	recv_conn->setServer();
 
+	curl_global_init(CURL_GLOBAL_ALL);
+
 	data_buffer.clear();
 }
 
@@ -357,7 +359,6 @@ UwLumaXUVModem::configure(const std::string &endpoint,
 		return false;
 	}
 
-	curl_global_init(CURL_GLOBAL_ALL);
 	CURL *curl = curl_easy_init();
 
 	if (curl) {
@@ -386,7 +387,6 @@ UwLumaXUVModem::configure(const std::string &endpoint,
 					"the address or the modem state. Error: " +
 							std::string(curl_easy_strerror(res)));
 			curl_easy_cleanup(curl);
-			curl_global_cleanup();
 			return false;
 		}
 
@@ -456,8 +456,6 @@ UwLumaXUVModem::configure(const std::string &endpoint,
 		curl_easy_cleanup(curl);
 	}
 
-	curl_global_cleanup();
-
 	return true;
 }
 
@@ -465,7 +463,6 @@ std::string
 UwLumaXUVModem::getParameter(
 		const std::string &endpoint, const std::string &param_name)
 {
-	curl_global_init(CURL_GLOBAL_ALL);
 	CURL *curl = curl_easy_init();
 
 	// Default return value indicating an error or unfound parameter
@@ -535,22 +532,21 @@ UwLumaXUVModem::start()
 				"SENDING_SOCKET_FAILED_TO_OPEN_WITH_ADDRESS:" + data_address;
 		printOnLog(LogLevel::ERROR, "LUMAXUVMODEM", err_msg);
 		return;
-	} else {
-		printOnLog(LogLevel::INFO,
-				"LUMAXUVMODEM",
-				"SENDING_SOCKET_CONNECTION_ESTABLISHED:" + data_address);
 	}
+	printOnLog(LogLevel::INFO,
+			"LUMAXUVMODEM",
+			"SENDING_SOCKET_CONNECTION_ESTABLISHED:" + data_address);
 
 	if (!recv_conn->openConnection(data_address)) {
 		std::string err_msg =
 				"RECEIVING_SOCKET_FAILED_TO_OPEN_WITH_ADDRESS:" + data_address;
 		printOnLog(LogLevel::ERROR, "LUMAXUVMODEM", err_msg);
 		return;
-	} else {
-		printOnLog(LogLevel::INFO,
-				"LUMAXUVMODEM",
-				"RECEIVING_SOCKET_CONNECTION_ESTABLISHED:" + data_address);
 	}
+	printOnLog(LogLevel::INFO,
+			"LUMAXUVMODEM",
+			"RECEIVING_SOCKET_CONNECTION_ESTABLISHED:" + data_address);
+
 	// set flags to true so loops can start
 	receiving.store(true);
 	transmitting.store(true);
@@ -584,6 +580,8 @@ UwLumaXUVModem::stop()
 		printOnLog(LogLevel::ERROR,
 				"LUMAXUVMODEM",
 				"RECEIVING_SOCKET_CONNECTION_UNABLE_TO_CLOSE");
+
+	curl_global_cleanup();
 
 	if (sig_thread.joinable())
 		sig_thread.join();
@@ -691,8 +689,7 @@ UwLumaXUVModem::startTx(Packet *p)
 		status = ModemState::TRANSMITTING;
 		state_lock.unlock();
 
-		int temp{0};
-		if ((temp = send_conn->writeToDevice(payload)) < 0) {
+		if ((send_conn->writeToDevice(payload)) < 0) {
 			printOnLog(LogLevel::ERROR,
 					"LUMAXUVMODEM",
 					"startTx::FAIL_TO_WRITE_DATA_TO_DEVICE");

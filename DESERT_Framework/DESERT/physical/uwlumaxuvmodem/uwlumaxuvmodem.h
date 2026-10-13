@@ -171,6 +171,7 @@ private:
 	 */
 	void transmittingData();
 
+
 	/**
 	 * Configure modem parameters
 	 * @param endpoint endpoint of the param
@@ -187,7 +188,8 @@ private:
 	 * @param param_name parameter to get value of
 	 * @return value of param_name if found, empty string on error
 	 */
-	std::string getParameter(const std::string& endpoint, const std::string& param_name);
+	std::string getParameter(
+			const std::string &endpoint, const std::string &param_name);
 
 	/** Mutex associated with the state machine of the modem */
 	std::mutex status_m;
@@ -252,6 +254,5 @@ private:
 	 */
 	std::string data_address;
 };
-
 
 #endif
