@@ -92,11 +92,11 @@ $ns use-Miracle
 ########################
 # Configure simulation #
 ########################
-source "../../yaml_input_interface/get-config.tcl"
+source "../get-config.tcl"
+
 set input_config_filename "./input_config.yaml"
 load-config $input_config_filename
 
-source "../get-output-config.tcl"
 set output_config_filename "./output_config.yaml"
 
 global defaultRNG

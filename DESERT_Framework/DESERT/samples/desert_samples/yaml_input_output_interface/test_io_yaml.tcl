@@ -96,22 +96,22 @@ set data_mask [new MSpectralMask/Rect]
 ########################
 # Configure simulation #
 ########################
-source "../yaml_input_interface/get-config.tcl"
+source "./get-config.tcl"
 
 set input_config_filename "./input_config.yaml"
-load-config $input_config_filename
+load-input-config $input_config_filename
 
 set positions_filename "./input_positions.yaml"
-load-positions $positions_filename
+load-input-positions $positions_filename
 
-source "get-output-config.tcl"
-set output_config_filename "./output_config.yaml"
+set output_config_filename "./output_config.yaml" 
+set output_config_filename $output_config_filename
 
 ####################################
 # Set the physical characteristics #
 ####################################
-$data_mask setFreq              $opt(freq)
-$data_mask setBandwidth         $opt(bw)
+$data_mask setFreq              $opt(frequency)
+$data_mask setBandwidth         $opt(bandwidth)
 $data_mask setPropagationSpeed  $opt(propagation_speed)
 
 ##################################
@@ -137,7 +137,7 @@ if {$opt(trace_files)} {
 # Procedure(s) to create nodes #
 ################################
 proc createNode { id } {
-    global opt ns node portnum
+    global opt input_config ns node portnum
     global channel propagation data_mask interf_data positions position 
 	global cbr udp ipr ipif mll mac phy
     
@@ -177,7 +177,6 @@ proc createNode { id } {
     $node($id) setConnection $mac($id)   $phy($id)   1
     $node($id) addToChannel  $channel    $phy($id)   1
 
-
     #Set the IP address of the node
     $ipif($id) addr [expr $id + 1]
     
@@ -211,7 +210,6 @@ proc createNode { id } {
 # Create here all the nodes you want to network together
 for {set id 0} {$id < $opt(nn)} {incr id}  {
     createNode $id
-    puts "Node $id created"
 }
 
 
@@ -294,20 +292,6 @@ proc finish {} {
 
 	# Print metrics to csv according to yaml output config
 	print-metrics-csv $opt(rngstream) $input_modules $output_config_filename
-    for {set i 0} {$i < $opt(nn)} {incr i}  {
-
-    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
-    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
-
-    	for {set j 0} {$j < $opt(nn)} {incr j} {
-    	    if {$i != $j} {
-                set sent_pkts        [$cbr($i,$j) getsentpkts]
-                set recv_pkts        [$cbr($i,$j) getrecvpkts]
-				puts "sent: $sent_pkts"
-				puts "recv: $recv_pkts"
-		}
-		}
-	}
     
     $ns flush-trace
     close $opt(tracefile)

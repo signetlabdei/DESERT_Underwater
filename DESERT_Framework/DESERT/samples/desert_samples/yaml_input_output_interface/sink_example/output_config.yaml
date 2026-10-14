@@ -1,0 +1,14 @@
+---
+APPLICATION:
+  tag: Module/UW/CBR
+  PDR: 1
+  throughput: 1
+  sent_packets: 1
+  received_packets: 1
+MAC:
+  tag: Module/UW/TDMA:
+  sent_packets: 0
+  received_packets: 0
+PHYSICAL:
+  tag: Module/UW/PHYSICAL:
+  packets_lost: 0

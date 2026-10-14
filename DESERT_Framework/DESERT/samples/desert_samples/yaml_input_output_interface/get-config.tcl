@@ -57,6 +57,100 @@ proc get-app-pdr { rx_app tx_app} {
 	return $pdr
 }
 
+# Resolve arithmetic expressions against values in the same YAML document.
+#
+# @param expression Numerical expression to evaluate
+# @config dictionary containing the yaml file content
+#
+proc resolve-input-expression {expression config} {
+    while {[set start [string first "\$\{" $expression]] >= 0} {
+        set end [string first "\}" $expression $start]
+        if {$end < 0} {
+            error "Unclosed configuration reference in expression: $expression"
+        }
+
+        set reference [string range $expression [expr {$start + 2}] [expr {$end - 1}]]
+        set path [split $reference .]
+        if {[llength $path] != 2 || ![dict exists $config {*}$path]} {
+            error "Unknown configuration reference: $reference" }
+
+        set number [dict get $config {*}$path]
+        if {![string is double -strict $number]} {
+            error "Configuration reference $reference is not numeric: $number"
+        }
+        set expression [string replace $expression $start $end "($number)"]
+    }
+
+    if {![regexp {^[0-9eE.+*/() \t-]+$} $expression]} {
+        error "Invalid arithmetic expression: $expression"
+    }
+    return [expr $expression]
+}
+
+##
+# load-input-config reads input parameters from yaml config file and set them.
+#
+# @param config_file Name of the yaml config file.
+#
+proc load-input-config { filename } {
+
+    global opt
+
+    set fileId [open $filename r]
+    set data [read $fileId]
+    close $fileId
+    set loaded_data [::yaml::yaml2dict $data]
+
+    dict for {section parameters} $loaded_data {
+        if {$section eq "opt"} {
+            dict for {param value} $parameters {
+                if {[string match "expr:*" $value]} {
+                    set value [resolve-input-expression [string range $value 5 end] $loaded_data]
+                }
+                set opt($param) $value
+            }
+            continue
+        }
+
+        if {![dict exists $parameters tag]} {
+            error "Missing tag for input section $section"
+        }
+        set module [dict get $parameters tag]
+        dict for {param value} $parameters {
+            if {$param in {tag}} continue
+            if {[string match "expr:*" $value]} {
+                set value [resolve-input-expression [string range $value 5 end] $loaded_data]
+            }
+            $module set $param $value
+        }
+    }
+
+}
+
+##
+# load-input-positions reads input positions for each node from yaml config file and set them.
+#
+# @param config_file Name of the yaml config file.
+#
+proc load-input-positions { filename } {
+
+    global positions
+
+    set fileId [open $filename r]
+    set data [read $fileId]
+    close $fileId
+    set loaded_data [::yaml::yaml2dict $data]
+
+    set nodes [dict keys $loaded_data]
+
+    foreach node $nodes {
+        foreach coordinate [dict keys [dict get $loaded_data $node]] {
+            set positions($node,$coordinate) [dict get $loaded_data $node $coordinate]
+        }
+    }
+    
+}
+
 ##
 # load-output-config reads output metrics from yaml config file and store them in a dictionary.
 # Keys are module names and values list of metrics.
@@ -66,23 +160,24 @@ proc get-app-pdr { rx_app tx_app} {
 # @return Dictionary containing the modules metrics.
 #
 proc load-output-config { config_file } {
-    global opt
-
     set fileId [open $config_file r]
     set data [read $fileId]
     close $fileId
     set loaded_data [::yaml::yaml2dict $data]
 
-    set module_names [dict keys $loaded_data]
 	set module_metrics [dict create]
 
-	# Iterate over each module
-    foreach module $module_names {
+	# Use each section's tag as the module name returned to the CSV writer.
+    dict for {section parameters} $loaded_data {
+        if {![dict exists $parameters tag]} {
+            error "Missing tag for output section $section"
+        }
+        set module [dict get $parameters tag]
 		set metrics [list]
 
 		# Iterate over metric
-        foreach param [dict keys [dict get $loaded_data $module]] {
-            set value [dict get $loaded_data $module $param]
+        dict for {param value} $parameters {
+            if {$param eq "tag"} continue
 
 			# Store only active metrics
 			switch $value {
@@ -94,7 +189,7 @@ proc load-output-config { config_file } {
 			}
         }
 
-		dict append module_metrics $module $metrics
+		dict set module_metrics $module $metrics
     }
 
 	return $module_metrics

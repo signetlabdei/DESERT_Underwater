@@ -4,6 +4,7 @@
 #     "matplotlib==3.10.9",
 #     "numpy==2.4.6",
 #     "polars==1.41.1",
+#     "pyyaml",
 # ]
 # requires-python = ">=3.14"
 # ///
@@ -32,7 +33,7 @@ def _(os):
     if not os.access(input_config, os.F_OK):
         raise ValueError("Input config file doesn't exists")
 
-    tcl_file = "test_io_tdma_yaml.tcl"
+    tcl_file = "test_io_yaml.tcl"
     if not os.access(tcl_file, os.F_OK):
         raise ValueError("Simulation file doesn't exists")
     return input_config, tcl_file
@@ -81,7 +82,7 @@ def _(input_config, simulation_form, subprocess, tcl_file, yaml):
             data["opt"]["rngstream"] = current_rng
 
             with open(input_config, "w") as file:
-                yaml.dump(data, file, default_flow_style=False)
+                yaml.safe_dump(data, file, default_flow_style=False, sort_keys=False)
 
             # Run simulation
             print(f"Running simulation with rngstream = {current_rng}...")
