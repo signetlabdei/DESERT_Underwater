@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,11 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# This script is used to test the YAML input interface.
+# This script is used to test the YAML input/output interface.
 # It make use of TDMA with a CBR (Constant Bit Rate) Application Module
-# Here the complete stack used for each node in the simulation
+# Here the complete stack used for each node in the simulation.
 #
-# N.B.: it is based on test_uwtdma.tcl
-#
-# Authors: Roberto francescon <frances1@dei.unipd.it>
+# Authors: Vincenzo Cimino, Filippo Donegà
 # Version: 1.0.0
 #
 # Stack of the nodes
@@ -59,8 +57,7 @@
 ######################################
 # Flags to enable or disable options #
 ######################################
-set opt(verbose) 		1
-set opt(trace_files)		1
+set opt(trace_files)	0
 
 #####################
 # Library Loading   #
@@ -92,17 +89,30 @@ $ns use-Miracle
 
 global positions
 
+set channel [new Module/UnderwaterChannel]
+set propagation [new MPropagation/Underwater]
+set data_mask [new MSpectralMask/Rect]
+
 ########################
 # Configure simulation #
 ########################
-source "get-config.tcl"
+source "./get-config.tcl"
 
-set config_filename "uwtdma_config.yaml"
-load-config $config_filename
+set input_config_filename "./input_config.yaml"
+load-input-config $input_config_filename
 
-set positions_filename "uwtdma_positions.yaml"
-load-positions $positions_filename
+set positions_filename "./input_positions.yaml"
+load-input-positions $positions_filename
 
+set output_config_filename "./output_config.yaml" 
+set output_config_filename $output_config_filename
+
+####################################
+# Set the physical characteristics #
+####################################
+$data_mask setFreq              $opt(frequency)
+$data_mask setBandwidth         $opt(bandwidth)
+$data_mask setPropagationSpeed  $opt(propagation_speed)
 
 ##################################
 # Set random seed and tracefiles #
@@ -123,23 +133,13 @@ if {$opt(trace_files)} {
 	set opt(cltracefile) [open $opt(cltracefilename) w]
 }
 
-####################################
-# Set the physical characteristics #
-####################################
-set channel [new Module/UnderwaterChannel]
-set propagation [new MPropagation/Underwater]
-set data_mask [new MSpectralMask/Rect]
-$data_mask setFreq              $opt(freq)
-$data_mask setBandwidth         $opt(bw)
-$data_mask setPropagationSpeed  $opt(propagation_speed)
-
 ################################
 # Procedure(s) to create nodes #
 ################################
 proc createNode { id } {
-
-    global channel ns cbr position node udp portnum ipr ipif
-    global opt mll mac propagation data_mask interf_data positions
+    global opt input_config ns node portnum
+    global channel propagation data_mask interf_data positions position 
+	global cbr udp ipr ipif mll mac phy
     
     set node($id) [$ns create-M_Node $opt(tracefile) $opt(cltracefile)] 
 	for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -162,7 +162,7 @@ proc createNode { id } {
     $node($id) addModule 5 $ipr($id)   1  "IPR"
     $node($id) addModule 4 $ipif($id)  1  "IPF"   
     $node($id) addModule 3 $mll($id)   1  "MLL"
-    $node($id) addModule 2 $mac($id)   1  "MAC"
+    $node($id) addModule 2 $mac($id)   1  "TDMA"
     $node($id) addModule 1 $phy($id)   1  "PHY"
 
     for {set cnt 0} {$cnt < $opt(nn)} {incr cnt} {
@@ -177,7 +177,6 @@ proc createNode { id } {
     $node($id) setConnection $mac($id)   $phy($id)   1
     $node($id) addToChannel  $channel    $phy($id)   1
 
-
     #Set the IP address of the node
     $ipif($id) addr [expr $id + 1]
     
@@ -188,9 +187,9 @@ proc createNode { id } {
     $node($id) addPosition $position($id)
     
     #Setup positions
-    $position($id) setX_ $positions($id,x);# [expr $id*20]
-    $position($id) setY_ $positions($id,y);# [expr $id*20]
-    $position($id) setZ_ $positions($id,z);# -100
+    $position($id) setX_ $positions($id,x);
+    $position($id) setY_ $positions($id,y);
+    $position($id) setZ_ $positions($id,z);
 
     #Interference model
     set interf_data($id)  [new "Module/UW/INTERFERENCE"]
@@ -211,7 +210,6 @@ proc createNode { id } {
 # Create here all the nodes you want to network together
 for {set id 0} {$id < $opt(nn)} {incr id}  {
     createNode $id
-    puts "Node $id created"
 }
 
 
@@ -219,7 +217,7 @@ for {set id 0} {$id < $opt(nn)} {incr id}  {
 # Inter-node module connection #
 ################################
 proc connectNodes {id1 des1} {
-    global ipif ipr portnum cbr cbr_sink ipif_sink portnum_sink ipr_sink opt 
+    global ipif ipr portnum cbr opt 
     $cbr($id1,$des1) set destAddr_ [$ipif($des1) addr]
     $cbr($id1,$des1) set destPort_ $portnum($des1,$id1)
 }
@@ -230,7 +228,7 @@ proc connectNodes {id1 des1} {
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
         if {$id1 != $id2} {
-	    connectNodes $id1 $id2
+			connectNodes $id1 $id2
         }
     }
 }
@@ -240,7 +238,7 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 ###################
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2}  {
-	$mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
+		$mll($id1) addentry [$ipif($id2) addr] [$mac($id2) addr]
     }
 }
 
@@ -266,10 +264,10 @@ for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
 # e.g., 
 for {set id1 0} {$id1 < $opt(nn)} {incr id1}  {
     for {set id2 0} {$id2 < $opt(nn)} {incr id2} {
-	if {$id1 != $id2} {
-	    $ns at $opt(starttime)    "$cbr($id1,$id2) start"
-	    $ns at $opt(stoptime)     "$cbr($id1,$id2) stop"
-	}
+		if {$id1 != $id2} {
+		    $ns at $opt(starttime)    "$cbr($id1,$id2) start"
+		    $ns at $opt(stoptime)     "$cbr($id1,$id2) stop"
+		}
     }
 }
 
@@ -278,69 +276,22 @@ for {set ii 0} {$ii < $opt(nn)} {incr ii} {
     $ns at $opt(stoptime)     "$mac($ii) stop"
 }
 
+
 ###################
 # Final Procedure #
 ###################
 # Define here the procedure to call at the end of the simulation
 proc finish {} {
-    global ns opt outfile
-    global mac propagation cbr_sink mac_sink phy_data phy_data_sink channel db_manager propagation
-    global node_coordinates
-    global ipr_sink ipr ipif udp cbr phy phy_data_sink
-    global node_stats tmp_node_stats sink_stats tmp_sink_stats
-    if ($opt(verbose)) {
-       puts "-----------------------------------------------------------------"
-       puts "Simulation summary"
-       puts "-----------------------------------------------------------------"
-       puts "Total simulation time    : [expr $opt(stoptime)-$opt(starttime)] s"
-       puts "Number of nodes          : $opt(nn)"
-       puts "-----------------------------------------------------------------"
-    }
+    global ns opt output_config_filename
+    global cbr udp ipr ipf mac phy channel propagation
 
-    set sum_cbr_throughput    0
-    set sum_mac_sent_pkts     0
-    set sum_mac_recv_pkts     0    
-    set sum_sent_pkts     0.0
-    set sum_recv_pkts     0.0    
-    set sum_pcks_in_buffer    0
-    set sum_upper_pcks_rx     0
-    set sum_mac_pcks_tx       0
-    set cbr_throughput        0
-    set sent_pkts 0
-    set recv_pkts 0
+	# Create dictionary containing simulation modules
+	set input_modules [dict create]
+	write-input-node-based-modules input_modules phy mac
+	write-input-link-based-modules input_modules cbr
 
-    for {set i 0} {$i < $opt(nn)} {incr i}  {
-
-    	set mac_sent_pkts        [$mac($i) get_sent_pkts]
-    	set mac_recv_pkts        [$mac($i) get_recv_pkts]
-
-    	for {set j 0} {$j < $opt(nn)} {incr j} {
-    	    if {$i != $j} {
-                set cbr_throughput   [$cbr($i,$j) getthr]
-                set sent_pkts        [$cbr($i,$j) getsentpkts]
-                set recv_pkts        [$cbr($i,$j) getrecvpkts]
-                set sum_cbr_throughput [expr $sum_cbr_throughput + $cbr_throughput]
-                set sum_sent_pkts  [expr $sum_sent_pkts + $sent_pkts]
-                set sum_recv_pkts  [expr $sum_recv_pkts + $recv_pkts]
-            }
-    	}
-        set sum_upper_pcks_rx  [expr $sum_upper_pcks_rx + [$mac($i) get_upper_data_pkts_rx]]
-        set sum_mac_pcks_tx    [expr $sum_mac_pcks_tx + [$mac($i) getDataPktsTx]]
-        set sum_mac_sent_pkts  [expr $sum_mac_sent_pkts + $mac_sent_pkts]
-        set sum_mac_recv_pkts  [expr $sum_mac_recv_pkts + $mac_recv_pkts]
-       	set sum_pcks_in_buffer [expr $sum_pcks_in_buffer + [$mac($i) get_buffer_size]]
-    }
-
-    if ($opt(verbose)) {
-        puts "Mean Throughput          : [expr ($sum_cbr_throughput/(($opt(nn))*($opt(nn)-1)))]"
-        puts "MAC sent Packets         : $sum_mac_sent_pkts"
-        puts "MAC received Packets     : $sum_mac_recv_pkts"
-        puts "MAC upper_pcks_rx        : $sum_upper_pcks_rx"
-        puts "CBR sent Packets         : $sum_sent_pkts"
-        puts "CBR received Packets     : $sum_recv_pkts"
-        puts "Packets in buffer        : $sum_pcks_in_buffer"
-        puts "Packet Delivery Ratio    : [format %.4f [expr $sum_recv_pkts / $sum_sent_pkts * 100]]"
-    }
+	# Print metrics to csv according to yaml output config
+	print-metrics-csv $opt(rngstream) $input_modules $output_config_filename
     
     $ns flush-trace
     close $opt(tracefile)
@@ -350,10 +301,6 @@ proc finish {} {
 ###################
 # start simulation
 ###################
-if ($opt(verbose)) {
-    puts "\nStarting Simulation\n"
-}
-
+puts "\nStarting Simulation\n"
 $ns at [expr $opt(stoptime) + 50.0]  "finish; $ns halt" 
-
 $ns run
