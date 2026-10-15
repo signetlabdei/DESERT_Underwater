@@ -411,6 +411,7 @@ UwCoolPhy::command(int argc, const char *const *argv) {
 - UWIPModule
 - UwStaticRoutingModule
 - CsmaAloha
+- UwTDMA
 - UnderwaterPhysical
 
 All the other modules use the ns-way of logging: 

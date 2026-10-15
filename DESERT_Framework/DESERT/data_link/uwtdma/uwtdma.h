@@ -41,17 +41,12 @@
 #define UWTDMA_H
 
 #include <assert.h>
+#include <chrono>
 #include <deque>
 #include <fstream>
-#include <iostream>
 #include <mmac.h>
-#include <queue>
-#include <sstream>
 #include <sys/time.h>
 #include <timer-handler.h>
-
-#define UW_TDMA_STATUS_MY_SLOT 1 /**< Status slot active>*/
-#define UW_TDMA_STATUS_NOT_MY_SLOT 2 /**< Status slot not active >*/
 
 class UwTDMA;
 
@@ -101,7 +96,7 @@ public:
 	/**
 	 * Destructor of the TDMA class
 	 */
-	virtual ~UwTDMA();
+	virtual ~UwTDMA() = default;
 
 	/**
 	 * Cross-Layer messages synchronous interpreter.
@@ -110,7 +105,7 @@ public:
 	 * received
 	 * @return <i>0</i> if successful.
 	 */
-	virtual int recvSyncClMsg(ClMessage *m);
+	virtual int recvSyncClMsg(ClMessage *m) override;
 
 protected:
 	/**
@@ -140,19 +135,19 @@ protected:
 	 * @param Packet* pointer to the packet received
 	 *
 	 */
-	virtual void recvFromUpperLayers(Packet *p);
+	virtual void recvFromUpperLayers(Packet *p) override;
 	/**
 	 * Method called when the Phy Layer finish to receive a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in reception
 	 */
-	virtual void Phy2MacEndRx(Packet *p);
+	virtual void Phy2MacEndRx(Packet *p) override;
 	/**
 	 * Method called when the Phy Layer start to receive a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in reception
 	 */
-	virtual void Phy2MacStartRx(const Packet *p);
+	virtual void Phy2MacStartRx(const Packet *p) override;
 	/**
 	 * Method called when the Mac Layer start to transmit a Packet
 	 * @param const Packet* Pointer to an Packet object that rapresent the
@@ -164,7 +159,7 @@ protected:
 	 * @param const Packet* Pointer to an Packet object that rapresent the
 	 * Packet in transmission
 	 */
-	virtual void Phy2MacEndTx(const Packet *p);
+	virtual void Phy2MacEndTx(const Packet *p) override;
 	/**
 	 * Method called when the Packet received is determined to be not for me
 	 * @param const Packet* Pointer to an Packet object that rapresent the
@@ -177,14 +172,45 @@ protected:
 	 * Packet in transmission
 	 */
 	virtual void initPkt(Packet *p);
+
 	/**
-	 * Calculate the epoch of the event. Used in sea-trial mode
-	 * @return the epoch of the system
+	 * Calculate the epoch of the event. Used in sea-trial mode.
+	 * @return the epoch of the system.
 	 */
-	inline unsigned long int
-	getEpoch()
+	std::string
+	getEpoch() const
 	{
-		return time(NULL);
+		unsigned long int timestamp =
+				(unsigned long int) (std::chrono::duration_cast<
+						std::chrono::milliseconds>(
+						std::chrono::system_clock::now().time_since_epoch())
+								.count());
+
+		return to_string(timestamp);
+	}
+
+	/**
+	 * Method to send the log message to the logger.
+	 * If sea_trial enabled add epoch of the event to the message and
+	 * use node_id passed via tcl.
+	 *
+	 * @param log_level LogLevel representing the amout of logs.
+	 * @param module String name of the plugin/module.
+	 * @param message String log message.
+	 *
+	 */
+	virtual void
+	printOnLog(Logger::LogLevel log_level, const std::string &module,
+			const std::string &message) const override
+	{
+		if (enable_log) {
+			if (sea_trial_)
+				logger.printOnLog(log_level,
+						"[" + getEpoch() + "]::" + module + "(" +
+								to_string(node_id) + ")::" + message);
+			else
+				PlugIn::printOnLog(log_level, module, message);
+		}
 	}
 
 	/**
@@ -198,17 +224,17 @@ protected:
 															  successfully or
 	 not.
 	 */
-	virtual int command(int argc, const char *const *argv);
+	virtual int command(int argc, const char *const *argv) override;
+
 	/**
 	 * Enumeration class of UWTDMA status.
 	 */
 	enum UWTDMA_STATUS { IDLE, TRANSMITTING, RECEIVING };
 
 	UWTDMA_STATUS
-	transceiver_status; /**<Variable holding the status enum type*/
-	int slot_status; /**<Is it my turn to transmit data?*/
-	int debug_; /**<Debug variable: 0 for no info,
-				>-5 for small info, <-5 for complete info*/
+			transceiver_status; /**<Variable holding the status enum type*/
+	enum class SlotStatus { MY_SLOT = 1, NOT_MY_SLOT = 2 };
+	SlotStatus slot_status; /**<Is it my turn to transmit data?*/
 	int sea_trial_; /**<Written log variable*/
 	int fair_mode; /**<Fair modality on if 1: then only set
 					   tot_slots and common guard_time*/
