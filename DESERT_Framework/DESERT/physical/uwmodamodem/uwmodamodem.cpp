@@ -35,7 +35,6 @@
 #include <functional>
 #include <string>
 
-#include <iostream>
 
 const int UwMODAModem::SIGNALING_ADDRESS = 55006;
 
