@@ -1,0 +1,40 @@
+opt:
+  nn: 3
+  starttime: 1
+  stoptime: 1001
+  bandwidth: 5000.0
+  frequency: 25000.0
+  propagation_speed: 1500
+  maxinterval_: 200
+  rngstream: 1
+APPLICATION:
+  tag: Module/UW/CBR
+  packetSize_: 128
+  PoissonTraffic_: 1
+  period_: 10
+MAC:
+  tag: Module/UW/TDMA
+  frame_duration: "expr: ${opt.nn} * (${APPLICATION.packetSize_} * 8) / ${PHYSICAL.BitRate_}"
+  sea_trial_: 0
+  fair_mode: 1
+  guard_time: 1e-4
+  tot_slots: "expr: ${opt.nn}"
+PHYSICAL:
+  tag: Module/UW/PHYSICAL
+  BitRate_: 4000.0
+  AcquisitionThreshold_dB_: 15.0
+  BandwidthOptimization_: 0
+  CentralFreqOptimization_: 0
+  MaxTxRange_: 200
+  MaxTxSPL_dB_: 150
+  MinTxSPL_dB_: 10
+  PER_target_: 0
+  RxSnrPenalty_dB_: 0
+  SPLOptimization_: 0
+  TxSPLMargin_dB_: 0
+PROPAGATION:
+  tag: MPropagation/Underwater
+  debug_: 0
+  practicalSpreading_: 2
+  shipping_: 1
+  windspeed_: 10
