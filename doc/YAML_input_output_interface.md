@@ -66,7 +66,11 @@ The example also provide a [marimo notebook](../DESERT_Framework/DESERT/samples/
 2. Enter the initial `rngstream` value, the step and the number of runs, then submit the form.
 3. Before each run, the notebook updates `opt.rngstream` in `input_config.yaml`, keeping the order of sections and keys intact. After the last run, the final value stays in the file.
 
-You'll need marimo, PyYAML, Polars and Matplotlib installed.
+You'll need marimo, which can be installed as follows:
+
+```
+pip install marimo
+```
 
 ## Developer guide
 
