@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cstddef>
+#include <exception>
 #include <linux/limits.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -86,7 +87,7 @@ UwSocket::openConnection(const std::string &path)
 
 	address = host_section;
 	port = std::stoi(port_section);
-	
+
 	if (proto == Transport::TCP) {
 
 		if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -412,7 +413,7 @@ UwSocket::readFromDevice(void *wpos, int maxlen)
 	return -1;
 }
 
-const bool
+bool
 UwSocket::resolveStringAddress(
 		const std::string &address, std::string &host, std::string &port)
 {
@@ -436,7 +437,7 @@ UwSocket::resolveStringAddress(
 				std::count(host_section.begin(), host_section.end(), '.') !=
 						3) {
 			std::cerr
-					<< "[ERROR]::UWSOCKET::openConnection()::Invalid address: "
+					<< "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid address: "
 					<< address << std::endl;
 			return false;
 		} else {
@@ -456,25 +457,25 @@ UwSocket::resolveStringAddress(
 		sockaddr_in sock_address;
 		if (inet_pton(AF_INET, host.c_str(), &(sock_address.sin_addr)) != 1) {
 			std::cerr
-					<< "[ERROR]::UWSOCKET::openConnection()::Invalid address: "
+					<< "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid address: "
 					<< address << std::endl;
 		}
 
 	} catch (const std::invalid_argument &e) {
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Port must be a "
+		std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Port must be a "
 					 "number. "
 					 "Invalid address: "
 				  << address << std::endl;
 		return false;
 	} catch (const std::out_of_range &e) {
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Invalid port "
+		std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid port "
 					 "number. Invalid address: "
 				  << address << std::endl;
 		return false;
-	} catch (...) {
-		std::cerr << "[ERROR]::UWSOCKET::openConnection()::Error parsing "
+	} catch (const std::exception &e) {
+		std::cerr << "[ERROR]::USOCKET::resolveStringAddress()::Error parsing "
 					 "address: '"
-				  << address << "'. Error code: " << local_errno << std::endl;
+				  << address << "'. " << e.what() << std::endl;
 	}
 
 	return true;

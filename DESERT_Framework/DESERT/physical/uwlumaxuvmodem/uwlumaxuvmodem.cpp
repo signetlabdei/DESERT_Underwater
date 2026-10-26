@@ -26,8 +26,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "uwlumaxuvmodem.h"
+#include "generic/tcl.h"
 #include "phymac-clmsg.h"
+#include "uwlumaxuvmodem.h"
 #include "uwmodem.h"
 #include "uwsocket.h"
 
@@ -143,14 +144,17 @@ int
 UwLumaXUVModem::command(int argc, const char *const *argv)
 {
 	if (argc == 3) {
-		// TODO add the check valid address method to the uwsocket class
 		if (!strcmp(argv[1], "setModemAddress")) {
+			if (!UwSocket::isValidAddress(modem_address))
+				return TCL_ERROR;
 			modem_address = argv[2];
 			return TCL_OK;
 		}
 		// local network interface address that the modem will send multicast
 		// messages to
 		if (!strcmp(argv[1], "setLocalAddress")) {
+			if (!UwSocket::isValidAddress(modem_address))
+				return TCL_ERROR;
 			data_address = argv[2];
 			return TCL_OK;
 		}
@@ -159,6 +163,7 @@ UwLumaXUVModem::command(int argc, const char *const *argv)
 					recv_conn->setMulticastAddress(argv[2])) {
 				return TCL_OK;
 			}
+			return TCL_ERROR;
 		}
 		// modem settings
 		if (!strcmp(argv[1], "start_state")) {
