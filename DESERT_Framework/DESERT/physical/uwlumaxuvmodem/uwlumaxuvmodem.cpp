@@ -26,7 +26,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "generic/tcl.h"
 #include "phymac-clmsg.h"
 #include "uwlumaxuvmodem.h"
 #include "uwmodem.h"
