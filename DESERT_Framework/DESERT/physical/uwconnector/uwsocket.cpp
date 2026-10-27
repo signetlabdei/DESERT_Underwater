@@ -184,6 +184,8 @@ UwSocket::openConnection(const std::string &path)
 							 "code: " +
 								std::to_string(local_errno)
 						  << std::endl;
+				close(sockfd);
+				return false;
 			}
 
 			close(sockfd);
@@ -436,36 +438,37 @@ UwSocket::resolveStringAddress(
 		} else if (host_section.find(".") == std::string::npos ||
 				std::count(host_section.begin(), host_section.end(), '.') !=
 						3) {
-			std::cerr
-					<< "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid address: "
-					<< address << std::endl;
+			std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid "
+						 "address: "
+					  << address << std::endl;
 			return false;
 		} else {
 			host = host_section;
 		}
-
-		if (std::stoi(port) < 1 || std::stoi(port) > 65535)
-			throw std::out_of_range("");
 
 		// port section validation
 		if (port_section.empty()) {
 			port = DEFAULT_PORT;
 		} else {
 			port = port_section;
+			if (std::stoi(port_section) < 1 || std::stoi(port_section) > 65535)
+				throw std::out_of_range("");
 		}
 
 		sockaddr_in sock_address;
 		if (inet_pton(AF_INET, host.c_str(), &(sock_address.sin_addr)) != 1) {
-			std::cerr
-					<< "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid address: "
-					<< address << std::endl;
+			std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid "
+						 "address: "
+					  << address << std::endl;
+			return false;
 		}
 
 	} catch (const std::invalid_argument &e) {
-		std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Port must be a "
-					 "number. "
-					 "Invalid address: "
-				  << address << std::endl;
+		std::cerr
+				<< "[ERROR]::UWSOCKET::resolveStringAddress()::Port must be a "
+				   "number. "
+				   "Invalid address: "
+				<< address << std::endl;
 		return false;
 	} catch (const std::out_of_range &e) {
 		std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Invalid port "

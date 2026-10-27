@@ -41,6 +41,6 @@ extern EmbeddedTcl UwLumaXUVModemTclCode;
 extern "C" int
 Uwlumaxuvmodem_Init()
 {
-    UwLumaXUVModemTclCode.load();
+	UwLumaXUVModemTclCode.load();
 	return 0;
 }

@@ -35,7 +35,6 @@
 #include <functional>
 #include <string>
 
-
 const int UwMODAModem::SIGNALING_ADDRESS = 55006;
 
 const int UwMODAModem::DATA_ADDRESS = 55555;

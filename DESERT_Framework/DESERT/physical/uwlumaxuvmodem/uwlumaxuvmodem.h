@@ -55,9 +55,7 @@ class UwLumaXUVModem : public UwModem
 {
 
 public:
-	enum class ModemState { AVAILABLE = 0,
-		TRANSMITTING,
-		RECEIVING };
+	enum class ModemState { AVAILABLE = 0, TRANSMITTING, RECEIVING };
 
 	/**
 	 * Constructor of the UwLumaXUVModem class
