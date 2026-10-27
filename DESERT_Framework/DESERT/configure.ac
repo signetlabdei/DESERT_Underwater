@@ -10,20 +10,20 @@
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-# 3. Neither the name of the University of Padova (SIGNET lab) nor the 
-#    names of its contributors may be used to endorse or promote products 
+# 3. Neither the name of the University of Padova (SIGNET lab) nor the
+#    names of its contributors may be used to endorse or promote products
 #    derived from this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED 
-# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
-# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -33,26 +33,33 @@ AM_PROG_AR
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_MSG_NOTICE([DESERT AC_PACKAGE_VERSION]) 
+AC_MSG_NOTICE([DESERT AC_PACKAGE_VERSION])
+
+PKG_PROG_PKG_CONFIG
+
+# Check for libcurl
+PKG_CHECK_MODULES([LIBCURL], [libcurl], [], [
+    AC_MSG_ERROR([libcurl is required for UwLumaXUVModem but was not found.])
+])
 
 AC_PROG_CXX
-AC_PROG_MAKE_SET 
+AC_PROG_MAKE_SET
 
 AC_DISABLE_STATIC
 
 AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL 
+AC_PROG_LIBTOOL
 
 AC_PATH_NS_UWS
 
-AC_ARG_WITH_NSMIRACLE 
+AC_ARG_WITH_NSMIRACLE
 
 AC_CHECK_NSMIRACLE([have_nsmiracle=yes],[have_nsmiracle=no])
 if test x$have_nsmiracle != xyes ; then
     AC_MSG_ERROR([Could not find nsmiracle, is --with-nsmiracle set correctly?])
-fi 
+fi
 
-#AC_ARG_WITH_WOSS 
+#AC_ARG_WITH_WOSS
 #AC_CHECK_WOSS([have_woss=yes],[have_woss=no])
 
 
@@ -88,6 +95,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/interference/uwinterferenceo
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoimodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodamodem'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwlumaxuvmodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_phy'
@@ -140,9 +148,9 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'$(GCC6_FLAG)'
 #fi
 
 
-AC_SUBST(DESERT_CPPFLAGS) 
+AC_SUBST(DESERT_CPPFLAGS)
 
-AC_SUBST(DESERT_LDFLAGS) 
+AC_SUBST(DESERT_LDFLAGS)
 
 AC_SUBST(DESERT_LIBADD)
 
@@ -192,9 +200,9 @@ AC_SUBST(DESERT_UWCSBURST_LIBADD)
 AC_SUBST(DESERT_UWTAP_LIBADD)
 
 
-AC_DEFINE(CPP_NAMESPACE,std) 
+AC_DEFINE(CPP_NAMESPACE,std)
 
-AC_CHECK_LIB(pthread, pthread_create, [LIBS="$LIBS -lpthread"]) 
+AC_CHECK_LIB(pthread, pthread_create, [LIBS="$LIBS -lpthread"])
 
 AC_CONFIG_FILES([
     Makefile
@@ -210,7 +218,7 @@ AC_CONFIG_FILES([
     mobility/uwsmposition/Makefile
     physical/uw-al/Makefile
     physical/uw-al/packer_common/Makefile
-    physical/uw-al/packer_mac/Makefile    
+    physical/uw-al/packer_mac/Makefile
     physical/uwmodem/Makefile
     physical/uwconnector/Makefile
     physical/uwmodemcsa/Makefile
@@ -230,6 +238,7 @@ AC_CONFIG_FILES([
     physical/uwahoi_phy/Makefile
     physical/uwahoimodem/Makefile
     physical/uwmodamodem/Makefile
+    physical/uwlumaxuvmodem/Makefile
     physical/uwoptical_phy/Makefile
     physical/uwopticalbeampattern/Makefile
     physical/uwem_phy/Makefile
