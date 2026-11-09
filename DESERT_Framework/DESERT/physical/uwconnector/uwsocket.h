@@ -75,7 +75,7 @@ public:
 	virtual ~UwSocket();
 
 	/**
-	 * Method that opens a TCP or UDP connection, accordinto to UwSocket::proto
+	 * Method that opens a TCP or UDP connection, according to UwSocket::proto
 	 * variable: the behavior depends both on the transport protocol selected
 	 * and the path specified in the constructor parameter.
 	 * If TCP is set:

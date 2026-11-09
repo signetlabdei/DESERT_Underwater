@@ -144,7 +144,7 @@ UwLumaXUVModem::command(int argc, const char *const *argv)
 {
 	if (argc == 3) {
 		if (!strcmp(argv[1], "setModemAddress")) {
-			if (!UwSocket::isValidAddress(modem_address))
+			if (!UwSocket::isValidAddress(argv[2]))
 				return TCL_ERROR;
 			modem_address = argv[2];
 			return TCL_OK;
@@ -152,7 +152,7 @@ UwLumaXUVModem::command(int argc, const char *const *argv)
 		// local network interface address that the modem will send multicast
 		// messages to
 		if (!strcmp(argv[1], "setLocalAddress")) {
-			if (!UwSocket::isValidAddress(modem_address))
+			if (!UwSocket::isValidAddress(argv[2]))
 				return TCL_ERROR;
 			data_address = argv[2];
 			return TCL_OK;

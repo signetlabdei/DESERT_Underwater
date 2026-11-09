@@ -110,6 +110,7 @@ UwSocket::openConnection(const std::string &path)
 						 "failed. Error code: " +
 							std::to_string(local_errno)
 					  << std::endl;
+			close(sockfd);
 			return false;
 		}
 
@@ -126,6 +127,7 @@ UwSocket::openConnection(const std::string &path)
 							 "Error code: " +
 								std::to_string(local_errno)
 						  << std::endl;
+				close(sockfd);
 				return false;
 			}
 
@@ -138,6 +140,7 @@ UwSocket::openConnection(const std::string &path)
 							 "Error code: " +
 								std::to_string(local_errno)
 						  << std::endl;
+				close(sockfd);
 				return false;
 			}
 
@@ -161,6 +164,7 @@ UwSocket::openConnection(const std::string &path)
 							 "failed. Error code: " +
 								std::to_string(local_errno)
 						  << std::endl;
+				close(sockfd);
 				return false;
 			}
 
@@ -171,6 +175,7 @@ UwSocket::openConnection(const std::string &path)
 							 "code: " +
 								std::to_string(local_errno)
 						  << std::endl;
+				close(sockfd);
 				return false;
 			}
 
@@ -213,6 +218,7 @@ UwSocket::openConnection(const std::string &path)
 						 "...) failed. Error code: " +
 							std::to_string(local_errno)
 					  << std::endl;
+			close(sockfd);
 			return false;
 		}
 
@@ -245,6 +251,7 @@ UwSocket::openConnection(const std::string &path)
 								 "enable multicast. Error code: "
 							  << std::strerror(local_errno)
 							  << ", local_interface: " << ip << std::endl;
+					close(sockfd);
 					return false;
 				}
 
@@ -259,6 +266,7 @@ UwSocket::openConnection(const std::string &path)
 								 "failed to set TTL. "
 								 "Error code: "
 							  << std::to_string(local_errno) << std::endl;
+					close(sockfd);
 					return false;
 				}
 
@@ -297,6 +305,7 @@ UwSocket::openConnection(const std::string &path)
 								std::to_string(local_errno)
 						  << ", local_interface: " << address << ":" << port
 						  << std::endl;
+				close(sockfd);
 				return false;
 			}
 
@@ -430,6 +439,13 @@ UwSocket::resolveStringAddress(
 	std::string port_section =
 			(sep_pos != std::string::npos) ? address.substr(sep_pos + 1) : "";
 
+	// A bare port (e.g. "9200") is accepted as localhost:port.
+	if (sep_pos == std::string::npos && !address.empty() &&
+			address.find_first_not_of("0123456789") == std::string::npos) {
+		host_section = LOCAL_ADDRESS;
+		port_section = address;
+	}
+
 	try {
 		// host_section validation
 		if (host_section.find(".") == std::string::npos &&
@@ -476,9 +492,10 @@ UwSocket::resolveStringAddress(
 				  << address << std::endl;
 		return false;
 	} catch (const std::exception &e) {
-		std::cerr << "[ERROR]::USOCKET::resolveStringAddress()::Error parsing "
+		std::cerr << "[ERROR]::UWSOCKET::resolveStringAddress()::Error parsing "
 					 "address: '"
 				  << address << "'. " << e.what() << std::endl;
+		return false;
 	}
 
 	return true;
