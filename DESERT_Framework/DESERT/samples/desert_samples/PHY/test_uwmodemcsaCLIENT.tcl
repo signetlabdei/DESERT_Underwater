@@ -176,7 +176,7 @@ for {set k 0} {$k < $opt(node)} {incr k} {
 # variables for the AL module
 Module/UW/AL set Dbit 0
 Module/UW/AL set PSDU 1400
-Module/UW/AL set debug_ 0
+Module/UW/AL set debug_ 1
 Module/UW/AL set interframe_period 0.e1
 Module/UW/AL set frame_set_validity 0
 
@@ -186,7 +186,7 @@ UW/AL/Packer set PKT_ID_Bits 8
 UW/AL/Packer set FRAME_OFFSET_Bits 15
 UW/AL/Packer set M_BIT_Bits 1
 UW/AL/Packer set DUMMY_CONTENT_Bits 0
-UW/AL/Packer set debug_ 0
+UW/AL/Packer set debug_ 1
 
 NS2/COMMON/Packer set PTYPE_Bits 8
 NS2/COMMON/Packer set SIZE_Bits 8
@@ -198,11 +198,11 @@ NS2/COMMON/Packer set NEXT_HOP_Bits 8
 NS2/COMMON/Packer set ADDR_TYPE_Bits 0
 NS2/COMMON/Packer set LAST_HOP_Bits 0
 NS2/COMMON/Packer set TXTIME_Bits 0
-NS2/COMMON/Packer set debug_ 0
+NS2/COMMON/Packer set debug_ 1
 
 UW/IP/Packer set SAddr_Bits 8
 UW/IP/Packer set DAddr_Bits 8
-UW/IP/Packer set debug_ 0
+UW/IP/Packer set debug_ 1
 
 NS2/MAC/Packer set Ftype_Bits 0
 NS2/MAC/Packer set SRC_Bits 8
@@ -211,18 +211,18 @@ NS2/MAC/Packer set Htype_Bits 0
 NS2/MAC/Packer set TXtime_Bits 0
 NS2/MAC/Packer set SStime_Bits 0
 NS2/MAC/Packer set Padding_Bits 0
-NS2/MAC/Packer set debug_ 0
+NS2/MAC/Packer set debug_ 1
 
 UW/UDP/Packer set SPort_Bits 2
 UW/UDP/Packer set DPort_Bits 2
-UW/UDP/Packer set debug_ 0
+UW/UDP/Packer set debug_ 1
 
 UW/APP/uwApplication/Packer set SN_FIELD_ 16
 UW/APP/uwApplication/Packer set RFFT_FIELD_ 5
 UW/APP/uwApplication/Packer set RFFTVALID_FIELD_ 2
 UW/APP/uwApplication/Packer set PRIORITY_FIELD_ 8
 UW/APP/uwApplication/Packer set PAYLOADMSG_FIELD_SIZE_ 8
-UW/APP/uwApplication/Packer set debug_ 0
+UW/APP/uwApplication/Packer set debug_ 1
 
 Module/UW/APPLICATION set period_ $opt(traffic)
 if {$opt(AppSocket) == 1} {
@@ -236,13 +236,13 @@ Module/UW/APPLICATION set drop_out_of_order_ 1
 Module/UW/APPLICATION set sea_trial_ 1
 
 # variables for the CSA modem's interface
-Module/UW/UwModem/ModemCSA set debug_		 0
+Module/UW/UwModem/ModemCSA set debug_		 1
 Module/UW/UwModem/ModemCSA set buffer_size   4096
 Module/UW/UwModem/ModemCSA set max_read_size 4096
 
 Module/UW/CSMA_ALOHA set max_tx_tries_      0
 Module/UW/CSMA_ALOHA set wait_costant_      0.0001
-Module/UW/CSMA_ALOHA set debug_         0
+Module/UW/CSMA_ALOHA set debug_         1
 Module/UW/CSMA_ALOHA set backoff_tuner_         0
 Module/UW/CSMA_ALOHA set max_payload_           1250
 Module/UW/CSMA_ALOHA set ACK_timeout_           1.0

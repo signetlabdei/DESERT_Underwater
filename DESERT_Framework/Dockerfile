@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim AS builder
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 ENV TZ=UTC
 ARG DESERT_TAG=master
 
@@ -12,9 +12,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
                 bison \
                 build-essential \
                 ca-certificates \
+                curl \
                 flex \
                 gfortran \
                 git \
+                libcurl4-gnutls-dev \
                 libtool \
                 libx11-dev \
                 libxml2-dev \
@@ -32,7 +34,7 @@ RUN git clone --depth 1 --single-branch --branch "${DESERT_TAG}" https://github.
 
 FROM debian:bookworm-slim
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 ENV TZ=UTC
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \

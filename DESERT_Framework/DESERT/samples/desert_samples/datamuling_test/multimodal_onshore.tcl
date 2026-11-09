@@ -314,7 +314,7 @@ proc createNode { } {
     $mac_ setMacAddr 67
 	# configure CSA/TCP modem
     $modem_ set ID_ 67
-	puts "DIOCANN::::address::$remote_address"
+	puts "REMOTE_ADDRESS::::address::$remote_address"
 	$modem_ setModemAddress $remote_address
 	$modem_ setTCP
     $modem_ setLogLevel "DBG"

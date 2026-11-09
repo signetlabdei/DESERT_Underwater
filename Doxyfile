@@ -939,6 +939,7 @@ INPUT                  = doc/README.md \
                          DESERT_Framework/Installer/INSTALL_Raspberry_Pi_zero.md \
                          doc/ROS_integration.md \
                          doc/Developer_guide.md \
+                         doc/LumaX-UV_guide.md \
                          coding_rules.md \
                          CONTRIBUTING.md \
                          doc/Giovanni_Toso.md \
