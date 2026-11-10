@@ -1,0 +1,2 @@
+# Transport Layer Security for underwater networks
+Transport Layer Security (TLS) for underwater networks focuses on adapting standard TLS concepts to harsh acoustic environments characterized by low bandwidth, high latency, and high error rates. This repository explores how to design and evaluate secure, energy‑aware TLS‑like mechanisms that can run on underwater nodes, considering cross‑layer optimizations, constrained hardware, and the unique propagation characteristics of the underwater channels.
