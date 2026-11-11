@@ -167,6 +167,19 @@ int pkts_lost; /**< Total number of lost packets, including packets received
                     out of sequence. */
 ```
 
+
+## C++ standard
+
+DESERT enforces the use of **C++11**, specifically the core (`DESERT_Framework`) is built using this standard (which is explicitly specified in the [installation script](https://github.com/signetlabdei/DESERT_Underwater/blob/3c91bc682c4d91520eb69367794b1cb4e88f0599/DESERT_Framework/Installer/installDESERT_LOCAL.sh#L540)). 
+
+Addons (`DESERT_Addons`) may use a different C++ standard. An addon that needs one must declare it in its own `Makefile.am` (See the [mobility_udpposition addon](https://github.com/signetlabdei/DESERT_Underwater/blob/3c91bc682c4d91520eb69367794b1cb4e88f0599/DESERT_Addons/mobility_udpposition/Makefile.am#L30) as an example) adding the following directive:
+
+```makefile
+AM_CXXFLAGS += -std=c++17
+```
+
+This setting applies exclusively to the addon and does not affect the core's build as each addon is built separately.
+
 ## Clang-format
 
 Inside the tools directory there is a script to auto-format a module using clang-format.
