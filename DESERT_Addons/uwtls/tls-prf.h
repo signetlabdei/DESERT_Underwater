@@ -47,6 +47,8 @@
 
 namespace key_derivation {
 
+enum DerivationResult { OK = 0, PRF_ERROR = -1, PREMASTER_ERROR = -2, RANDOMS_ERROR = -3 };
+
 /**
  * Derives the TLS 1.2 key block.
  *
@@ -70,14 +72,14 @@ namespace key_derivation {
  * @param server_random Pointer to the 32-byte server random.
  * @param out_len Number of bytes to derive for the key block.
  *
- * @throws std::runtime_error If an input is invalid or OpenSSL derivation fails.
+ * @returns Result of the OpenSSL key block derivation.
  */
-void derive_tls12_key_block(std::vector<uint8_t>& key_block,
-                                const uint8_t premaster[48],
-                                std::size_t premaster_len,
-                                const uint8_t client_random[32],
-                                const uint8_t server_random[32],
-                                std::size_t out_len);
+DerivationResult derive_tls12_key_block(std::vector<uint8_t>& key_block,
+                                        const uint8_t premaster[48],
+                                        std::size_t premaster_len,
+                                        const uint8_t client_random[32],
+                                        const uint8_t server_random[32],
+                                        std::size_t out_len);
 
 } // namespace key_derivation
 

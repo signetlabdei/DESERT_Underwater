@@ -449,9 +449,9 @@ UwTls::applyChangeCipherSpec(Packet *p)
 
 	std::vector<uint8_t> key_block;
 
-	try {
-		key_derivation::derive_tls12_key_block(key_block, ecdh_premaster.data(), ecdh_premaster.size(), client_random, server_random, 40);
-	} catch (...) {
+	key_derivation::DerivationResult key_result = key_derivation::derive_tls12_key_block(key_block, ecdh_premaster.data(), ecdh_premaster.size(), client_random, server_random, 40);
+
+	if (key_result != key_derivation::DerivationResult::OK) {
 		printOnLog(Logger::LogLevel::ERROR,
 				"UWTLS",
 				"applyChangeCipherSpec::Key block derivation failed");
