@@ -52,69 +52,72 @@ static DerivationResult derive_tls12_prf(std::vector<uint8_t>& out,
 		return DerivationResult::PRF_ERROR;
 	}
 
-	try {
-		if (EVP_PKEY_derive_init(pctx) <= 0) {
-			// EVP_PKEY_derive_init failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_derive_init(pctx) <= 0) {
+		// EVP_PKEY_derive_init failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (EVP_PKEY_CTX_set_tls1_prf_md(pctx, EVP_sha256()) <= 0) {
-			// EVP_PKEY_CTX_set_tls1_prf_md failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_CTX_set_tls1_prf_md(pctx, EVP_sha256()) <= 0) {
+		// EVP_PKEY_CTX_set_tls1_prf_md failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (EVP_PKEY_CTX_set1_tls1_prf_secret(
-				pctx,
-				secret,
-				static_cast<int>(secret_len)) <= 0) {
-			// EVP_PKEY_CTX_set1_tls1_prf_secret failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_CTX_set1_tls1_prf_secret(
+			pctx,
+			secret,
+			static_cast<int>(secret_len)) <= 0) {
+		// EVP_PKEY_CTX_set1_tls1_prf_secret failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (EVP_PKEY_CTX_add1_tls1_prf_seed(
-				pctx,
-				label,
-				static_cast<int>(label_len)) <= 0) {
-			// EVP_PKEY_CTX_add1_tls1_prf_seed label failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_CTX_add1_tls1_prf_seed(
+			pctx,
+			label,
+			static_cast<int>(label_len)) <= 0) {
+		// EVP_PKEY_CTX_add1_tls1_prf_seed label failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (EVP_PKEY_CTX_add1_tls1_prf_seed(
-				pctx,
-				seed1,
-				static_cast<int>(seed1_len)) <= 0) {
-			// EVP_PKEY_CTX_add1_tls1_prf_seed seed1 failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_CTX_add1_tls1_prf_seed(
+			pctx,
+			seed1,
+			static_cast<int>(seed1_len)) <= 0) {
+		// EVP_PKEY_CTX_add1_tls1_prf_seed seed1 failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (EVP_PKEY_CTX_add1_tls1_prf_seed(
-				pctx,
-				seed2,
-				static_cast<int>(seed2_len)) <= 0) {
-			// EVP_PKEY_CTX_add1_tls1_prf_seed seed2 failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_CTX_add1_tls1_prf_seed(
+			pctx,
+			seed2,
+			static_cast<int>(seed2_len)) <= 0) {
+		// EVP_PKEY_CTX_add1_tls1_prf_seed seed2 failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		out.resize(out_len);
-		std::size_t derived_len = out_len;
+	out.resize(out_len);
+	std::size_t derived_len = out_len;
 
-		if (EVP_PKEY_derive(pctx, out.data(), &derived_len) <= 0) {
-			// EVP_PKEY_derive failed
-			return DerivationResult::PRF_ERROR;
-		}
+	if (EVP_PKEY_derive(pctx, out.data(), &derived_len) <= 0) {
+		// EVP_PKEY_derive failed
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
+	}
 
-		if (derived_len != out_len) {
-			// Unexpected derived length
-			return DerivationResult::PRF_ERROR;
-		}
-	} catch (...) {
-        EVP_PKEY_CTX_free(pctx);
-        return DerivationResult::PRF_ERROR;
+	if (derived_len != out_len) {
+		// Unexpected derived length
+		EVP_PKEY_CTX_free(pctx);
+		return DerivationResult::PRF_ERROR;
 	}
 
 	EVP_PKEY_CTX_free(pctx);
 
-    return DerivationResult::OK;
+	return DerivationResult::OK;
 }
 
 DerivationResult derive_tls12_key_block(std::vector<uint8_t>& key_block,
