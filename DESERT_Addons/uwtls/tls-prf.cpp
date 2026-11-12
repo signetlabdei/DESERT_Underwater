@@ -108,8 +108,8 @@ static DerivationResult derive_tls12_prf(std::vector<uint8_t>& out,
 			return DerivationResult::PRF_ERROR;
 		}
 	} catch (...) {
-		EVP_PKEY_CTX_free(pctx);
-		throw;
+        EVP_PKEY_CTX_free(pctx);
+        return DerivationResult::PRF_ERROR;
 	}
 
 	EVP_PKEY_CTX_free(pctx);
