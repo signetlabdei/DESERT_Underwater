@@ -36,7 +36,8 @@
  *
  */
 
-#pragma once
+#ifndef UWTLS_RECORD_H
+#define UWTLS_RECORD_H
 
 #include <packet.h>
 
@@ -59,3 +60,5 @@ typedef struct hdr_tls_record {
 		return (hdr_tls_record*) p->access(offset_);
 	}
 } hdr_tls_record;
+
+#endif // UWTLS_RECORD_H

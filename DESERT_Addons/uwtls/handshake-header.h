@@ -36,7 +36,8 @@
  *
  */
 
-#pragma once
+#ifndef UWTLS_HANDSHAKE_H
+#define UWTLS_HANDSHAKE_H
 
 #include <packet.h>
 
@@ -58,3 +59,5 @@ typedef struct hdr_handshake {
 		return (hdr_handshake*) p->access(offset_);
 	}
 } hdr_handshake;
+
+#endif // UWTLS_HANDSHAKE_H

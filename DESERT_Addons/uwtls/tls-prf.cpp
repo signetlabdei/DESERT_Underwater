@@ -1,24 +1,8 @@
 #include "tls-prf.h"
 
-namespace {
+namespace key_derivation {
 
-/**
- * Derives TLS 1.2 PRF output using OpenSSL EVP_PKEY_TLS1_PRF.
- *
- * @param out Output vector that will contain the derived bytes.
- * @param secret Pointer to the secret input.
- * @param secret_len Secret length in bytes.
- * @param label Pointer to the ASCII label bytes.
- * @param label_len Label length in bytes, without terminating null.
- * @param seed1 Pointer to the first seed fragment.
- * @param seed1_len Length of the first seed fragment.
- * @param seed2 Pointer to the second seed fragment.
- * @param seed2_len Length of the second seed fragment.
- * @param out_len Number of bytes to derive.
- *
- * @throws std::runtime_error If OpenSSL derivation fails or an input is invalid.
- */
-void derive_tls12_prf(std::vector<uint8_t>& out,
+static void derive_tls12_prf(std::vector<uint8_t>& out,
                       const uint8_t* secret,
                       std::size_t secret_len,
                       const uint8_t* label,
@@ -102,8 +86,6 @@ void derive_tls12_prf(std::vector<uint8_t>& out,
     EVP_PKEY_CTX_free(pctx);
 }
 
-} // namespace
-
 void derive_tls12_key_block(std::vector<uint8_t>& key_block,
                                 const uint8_t premaster[48],
                                 std::size_t premaster_len,
@@ -145,3 +127,5 @@ void derive_tls12_key_block(std::vector<uint8_t>& key_block,
                      32,
                      out_len);
 }
+
+} // namespace key_derivation

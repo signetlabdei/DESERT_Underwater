@@ -36,7 +36,8 @@
  *
  */
 
-#pragma once
+#ifndef UWTLS_CKE_H
+#define UWTLS_CKE_H
 
 #include <packet.h>
 
@@ -58,3 +59,5 @@ typedef struct hdr_clientkeyexchange {
         return (hdr_clientkeyexchange*) p->access(offset_);
     }
 } hdr_clientkeyexchange;
+
+#endif // UWTLS_CKE_H

@@ -450,7 +450,7 @@ UwTls::applyChangeCipherSpec(Packet *p)
 	std::vector<uint8_t> key_block;
 
 	try {
-		derive_tls12_key_block(key_block, ecdh_premaster.data(), ecdh_premaster.size(), client_random, server_random, 40);
+		key_derivation::derive_tls12_key_block(key_block, ecdh_premaster.data(), ecdh_premaster.size(), client_random, server_random, 40);
 	} catch (...) {
 		printOnLog(Logger::LogLevel::ERROR,
 				"UWTLS",

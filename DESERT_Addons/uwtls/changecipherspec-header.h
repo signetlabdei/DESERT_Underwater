@@ -36,7 +36,8 @@
  *
  */
 
-#pragma once
+#ifndef UWTLS_CCS_H
+#define UWTLS_CCS_H
 
 #include <packet.h>
 
@@ -57,3 +58,5 @@ typedef struct hdr_changecipherspec {
         return (hdr_changecipherspec*) p->access(offset_);
     }
 } hdr_changecipherspec;
+
+#endif // UWTLS_CCS_H

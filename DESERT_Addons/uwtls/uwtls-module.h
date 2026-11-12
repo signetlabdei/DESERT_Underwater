@@ -33,7 +33,8 @@
  * \brief  Header of the class responsible for the Transport Layer Security.
  */
 
-#pragma once
+#ifndef UWTLS_MODULE_H
+#define UWTLS_MODULE_H
 
 #include "packer.h"
 #include "uwip-module.h"
@@ -113,7 +114,7 @@ public:
 	/**
 	 * Destructor of UwTls class.
 	 */
-	~UwTls();
+	virtual ~UwTls();
 
 	/**
 	 * TCL command interpreter. It implements the following OTCL methods:
@@ -141,6 +142,12 @@ public:
 	 */
 	virtual void recv(Packet *, int) override;
 
+	/**
+	 * Sends the current flight loaded in the module instance
+	 */
+	void sendCurrentFlight();
+
+protected:
 	/**
 	 * Loads a private key
 	 *
@@ -225,11 +232,6 @@ public:
 	 * @param uint8_t Address of the destination.
 	 */
 	void sendRepeatedMessage(void (UwTls::*func)(int, uint8_t), int portnum, uint8_t ipaddr);
-
-	/**
-	 * Sends the current flight loaded in the module instance
-	 */
-	void sendCurrentFlight();
 
 	/**
 	 * Stops the current flight loaded in the module instance
@@ -323,7 +325,6 @@ public:
 		out[7] = v & 0xFF;
 	}
 
-protected:
 	HandshakeState state;
 	uint8_t tls_status;
 	
@@ -364,3 +365,5 @@ protected:
 	// Unused variable - here to prevent a warning
 	int debug_;
 };
+
+#endif // UWTLS_MODULE_H

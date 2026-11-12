@@ -36,7 +36,8 @@
  *
  */
 
-#pragma once
+#ifndef UWTLS_CH_H
+#define UWTLS_CH_H
 
 #include <packet.h>
 
@@ -66,3 +67,5 @@ typedef struct hdr_clienthello {
 		return (hdr_clienthello*) p->access(offset_);
 	}
 } hdr_clienthello;
+
+#endif // UWTLS_CH_H
