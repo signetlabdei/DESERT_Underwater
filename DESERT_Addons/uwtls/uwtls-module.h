@@ -331,7 +331,7 @@ protected:
 	std::queue<Packet *> waitingQueue;
 	std::optional<Packet *> bufferedChangeCipherSpec;
 	
-	// Asymmetric material for TLS_RSA_WITH_AES_128_GCM_SHA256
+	// Asymmetric material
 	uint8_t client_random[32];
 	uint8_t server_random[32];
 	
@@ -340,7 +340,7 @@ protected:
 	EVP_PKEY *local_ec_privkey;
 	EVP_PKEY *remote_ec_pubkey;
 	
-	// Symmetric material for TLS_RSA_WITH_AES_128_GCM_SHA256
+	// Symmetric material
 	uint8_t client_write_key[16];
 	uint8_t server_write_key[16];
 	uint8_t client_write_iv[4];
