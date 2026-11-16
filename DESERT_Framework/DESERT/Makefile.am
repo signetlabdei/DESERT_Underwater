@@ -100,6 +100,7 @@ SUBDIRS = m4 \
     data_link/uwtokenbus \
     data_link/uwjammer \
     data_link/uw-cs-burst \
+    data_link/uwslotted-aloha \
     channel/uwem_channel \
     channel/uwoptical_channel \
     ranging/uwranging_tokenbus \
