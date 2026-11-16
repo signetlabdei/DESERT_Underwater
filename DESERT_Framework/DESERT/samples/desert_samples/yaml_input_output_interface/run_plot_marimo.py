@@ -1,0 +1,178 @@
+# /// script
+# dependencies = [
+#     "marimo",
+#     "matplotlib==3.10.9",
+#     "numpy==2.4.6",
+#     "polars==1.41.1",
+#     "pyyaml",
+# ]
+# requires-python = ">=3.14"
+# ///
+
+import marimo
+
+__generated_with = "0.23.9"
+app = marimo.App(width="medium")
+
+
+@app.cell(hide_code=True)
+def _():
+    import marimo as mo
+    import os
+    import yaml
+    import subprocess
+    import polars as pl
+    import matplotlib.pyplot as plt
+
+    return mo, os, pl, plt, subprocess, yaml
+
+
+@app.cell(hide_code=True)
+def _(os):
+    input_config = "input_config.yaml"
+    if not os.access(input_config, os.F_OK):
+        raise ValueError("Input config file doesn't exists")
+
+    tcl_file = "test_io_yaml.tcl"
+    if not os.access(tcl_file, os.F_OK):
+        raise ValueError("Simulation file doesn't exists")
+    return input_config, tcl_file
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    simulation_form = (
+        mo.md(
+            """
+            ### ⚙️ Simulation Setup
+            Configure `rngstream` values and number of runs:
+
+            * {start}
+            * {step}
+            * {count}
+            """
+        )
+        .batch(
+            start=mo.ui.number(start=1, stop=10000, value=1, label="Initial Value"),
+            step=mo.ui.number(start=1, stop=1000, value=2, label="Step Size"),
+            count=mo.ui.number(start=1, stop=100, value=5, label="Number of runs"),
+        )
+        .form(submit_button_label="Run simulations")
+    )
+
+    simulation_form
+    return (simulation_form,)
+
+
+@app.cell(hide_code=True)
+def _(input_config, simulation_form, subprocess, tcl_file, yaml):
+    if simulation_form.value is not None:
+        inputs = simulation_form.value
+        start_val = inputs["start"]
+        step_val = inputs["step"]
+        count_val = inputs["count"]
+
+        rng_values = [start_val + (i * step_val) for i in range(count_val)]
+
+        for current_rng in rng_values:
+            # Update yaml file with current rng
+            with open(input_config, "r") as file:
+                data = yaml.safe_load(file) or {}
+
+            data["opt"]["rngstream"] = current_rng
+
+            with open(input_config, "w") as file:
+                yaml.safe_dump(data, file, default_flow_style=False, sort_keys=False)
+
+            # Run simulation
+            print(f"Running simulation with rngstream = {current_rng}...")
+            result = subprocess.run(["ns", tcl_file], capture_output=True, text=True)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo, pl, plt, simulation_form):
+    if simulation_form.value is not None:
+        df = pl.read_csv("Module_UW_CBR.csv")
+        fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+
+        # pdr
+        ax[0].boxplot(df["PDR"])
+        ax[0].set_ylabel("PDR")
+        ax[0].set_xticks([1])
+
+        # throughput
+        ax[1].boxplot(df["throughput"])
+        ax[1].set_ylabel("Throughput [bps]")
+        ax[1].set_xticks([1])
+
+        # title and layout
+        plt.suptitle("application layer performance")
+        plt.tight_layout()
+
+        # Embed the plot inside a markdown component using mo.as_html()
+        plot_markdown = mo.md(
+            f"""
+            ### 📊 Simulation Results
+
+            {mo.as_html(fig)}
+            """
+        )
+    else:
+        plot_markdown = None
+
+    plot_markdown
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo, pl, plt, simulation_form):
+    if simulation_form.value is not None:
+        df_link = pl.read_csv("Module_UW_CBR.csv")
+        fig_link, ax_link = plt.subplots(1, 2, figsize=(12, 5))
+
+        # 1. Create a link identifier string combining tx_id and rx_id
+        df_link = df_link.with_columns(
+            (pl.col("tx_id").cast(pl.Utf8) + " -> " + pl.col("rx_id").cast(pl.Utf8)).alias("link")
+        )
+
+        # 2. Extract a unique, sorted list of all directional links
+        unique_links = sorted(df_link["link"].unique().to_list())
+
+        # 3. Separate PDR and throughput values into distinct lists for each link
+        pdr_data = [df_link.filter(pl.col("link") == l)["PDR"].to_list() for l in unique_links]
+        throughput_data = [df_link.filter(pl.col("link") == l)["throughput"].to_list() for l in unique_links]
+
+        # 4. PDR boxplot per link
+        ax_link[0].boxplot(pdr_data, tick_labels=unique_links)
+        ax_link[0].set_ylabel("PDR")
+        ax_link[0].set_xlabel("Link (tx -> rx)")
+        ax_link[0].tick_params(axis='x', rotation=45)
+
+        # 5. Throughput boxplot per link
+        ax_link[1].boxplot(throughput_data, tick_labels=unique_links)
+        ax_link[1].set_ylabel("Throughput [bps]")
+        ax_link[1].set_xlabel("Link (tx -> rx)")
+        ax_link[1].tick_params(axis='x', rotation=45)
+
+        # title and layout
+        plt.suptitle("application layer performance")
+        plt.tight_layout()
+
+        # Embed the plot inside a markdown component using mo.as_html()
+        plot_markdown_link = mo.md(
+            f"""
+            ### 📊 Simulation Results
+
+            {mo.as_html(fig_link)}
+            """
+        )
+    else:
+        plot_markdown_link = None
+
+    plot_markdown_link
+    return
+
+
+if __name__ == "__main__":
+    app.run()
