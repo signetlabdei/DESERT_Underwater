@@ -110,6 +110,9 @@ uwApplicationModule::acceptTCP()
 		if ((clnSockDescr = accept(servSockDescr,
 					 (struct sockaddr *) &(clnAddr),
 					 (socklen_t *) &clnLen)) < 0) {
+			if (!receiving.load())
+				break;
+
 			printOnLog(Logger::LogLevel::ERROR,
 					"UWAPPLICATION",
 					"acceptTCP()::Socket connection not accepted");

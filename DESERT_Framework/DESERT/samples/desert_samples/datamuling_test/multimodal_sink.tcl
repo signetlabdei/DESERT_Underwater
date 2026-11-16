@@ -396,7 +396,7 @@ proc createNode { } {
 
 	# configure the CSA/TCP modem
 	$modem_t set ID_ 66
-	puts "DIOCANN::::address::$opt(address)"
+	puts "ADDRESS::::address::$opt(address)"
 	$modem_t setModemAddress $opt(address)
     $modem_t setLogLevel "DBG"
 	$modem_t setServer
