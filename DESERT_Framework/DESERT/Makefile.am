@@ -69,6 +69,7 @@ SUBDIRS = m4 \
     physical/uwem_phy \
     physical/uwem_antenna \
     physical/uwoptical_phy \
+    physical/uwopticalstats_phy \
     physical/uwopticalbeampattern \
     network/uwip \
     transport/uwudp \

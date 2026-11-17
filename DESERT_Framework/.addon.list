@@ -13,6 +13,8 @@ uwswarm_control (requires uwrov and uwtracker)
 uwmulti_stack_controller
 uwmulti_traffic_control
 uwmulti_destination
+uwmultimodal_rl
+uw_csma_aloha_for_multimodal_rl
 uwmphy_modem
 ms2c_evologics_lowlev (requires uwmphy_modem)
 wossgmmob3D    (requires WOSS)

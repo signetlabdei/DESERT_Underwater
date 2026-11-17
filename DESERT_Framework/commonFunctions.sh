@@ -765,6 +765,43 @@ handle_package() {
     done
 }
 
+ensure_libtorch_for_uwmultimodal_rl() {
+    # If $libtorch_url is not available, please check the official PyTorch website for the
+    # latest version and update the URL accordingly:
+    #
+    # https://pytorch.org/get-started/locally/
+    
+    addon_source_dir="${ROOT_DESERT}/../DESERT_Addons/uwmultimodal_rl"
+    libtorch_dir="${addon_source_dir}/libtorch"
+    libtorch_url="https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-2.12.0%2Bcpu.zip"
+    libtorch_zip="${addon_source_dir}/libtorch-shared-with-deps-2.12.0+cpu.zip"
+
+    if [ -d "${libtorch_dir}" ]; then
+        return 0
+    fi
+
+    info_L1 "libtorch is missing for uwmultimodal_rl, downloading it ..."
+    mkdir -p "${addon_source_dir}"
+
+    if command -v curl >/dev/null 2>&1; then
+        curl -L "${libtorch_url}" -o "${libtorch_zip}" >> /dev/null 2>&1 || return 1
+    elif command -v wget >/dev/null 2>&1; then
+        wget -O "${libtorch_zip}" "${libtorch_url}" >> /dev/null 2>&1 || return 1
+    else
+        err_L1 "Neither curl nor wget is available to download libtorch"
+        return 1
+    fi
+
+    if ! command -v unzip >/dev/null 2>&1; then
+        err_L1 "unzip is required to extract libtorch"
+        return 1
+    fi
+
+    unzip -q "${libtorch_zip}" -d "${addon_source_dir}" || return 1
+    rm -f "${libtorch_zip}"
+    return 0
+}
+
 handle_desert_ADDON() {
     log_L1 "[handle_desert_ADDON]: -->" ${INSTALL_LOG}
     log_L2 "[handle_desert_ADDON]: $*" ${INSTALL_LOG}
@@ -784,6 +821,13 @@ handle_desert_ADDON() {
                 fi
 
                 cd ${BUILD_HOST}/DESERT_ADDON/${2}
+                if [ "${2}" = "uwmultimodal_rl" ]; then
+                    ensure_libtorch_for_uwmultimodal_rl
+                    if [ "$?" -ne 0 ]; then
+                        err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
+                        exit 1
+                    fi
+                fi
                 check_pktInstallation ${2}
                 # exec the following commands in a subshell
                 if [ "$?" -ne "1" ]; then
@@ -810,6 +854,13 @@ handle_desert_ADDON() {
                 fi
 
                 cd ${BUILD_TARGET}/DESERT_ADDON/${2}
+                if [ "${2}" = "uwmultimodal_rl" ]; then
+                    ensure_libtorch_for_uwmultimodal_rl
+                    if [ "$?" -ne 0 ]; then
+                        err_L1 "EXIT FROM THE INSTALLATION PROCEDURE!"
+                        exit 1
+                    fi
+                fi
                 check_pktInstallation ${2}
                 # exec the following commands in a subshell
                 if [ "$?" -ne "1" ]; then

@@ -112,6 +112,16 @@ protected:
 	 */
 	virtual void initializeLUT();
 
+	virtual double getTemperature() const {
+		return T;
+	}
+
+	virtual double setTemperature(double temp) {
+		T = temp;
+	}
+
+	double& accessTemperature() { return T; }
+	
 	double getVarTemperature(Packet *p);
 	bool use_woss_; /**< Flag to set whether woss is employed*/
 

@@ -89,6 +89,7 @@ DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoi_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwahoimodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwmodamodem'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwoptical_phy'
+DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalstats_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwopticalbeampattern'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_phy'
 DESERT_CPPFLAGS="$DESERT_CPPFLAGS "'-I$(top_srcdir)/physical/uwem_antenna'
@@ -159,6 +160,7 @@ DESERT_UWPHY_CLMSGS_LIBADD='$(top_builddir)/physical/uwphy_clmsgs/libuwphy_clmsg
 DESERT_UWPHYSICAL_LIBADD='$(top_builddir)/physical/uwphysical/libuwphysical.la'
 DESERT_UWOFDMPHY_LIBADD='$(top_builddir)/physical/uwofdmphy/libuwofdmphy.la'
 DESERT_UWOPTICAL_PHY_LIBADD='$(top_builddir)/physical/uwoptical_phy/libuwoptical_phy.la'
+DESERT_UWOPTICALSTATS_PHY_LIBADD='$(top_builddir)/physical/uwopticalstats_phy/libuwopticalstats_phy.la'
 DESERT_UWIP_LIBADD='$(top_builddir)/network/uwip/libuwip.la'
 DESERT_UWUDP_LIBADD='$(top_builddir)/transport/uwudp/libuwudp.la'
 DESERT_UWCBR_LIBADD='$(top_builddir)/application/uwcbr/libuwcbr.la'
@@ -231,6 +233,7 @@ AC_CONFIG_FILES([
     physical/uwahoimodem/Makefile
     physical/uwmodamodem/Makefile
     physical/uwoptical_phy/Makefile
+    physical/uwopticalstats_phy/Makefile
     physical/uwopticalbeampattern/Makefile
     physical/uwem_phy/Makefile
     physical/uwem_antenna/Makefile
