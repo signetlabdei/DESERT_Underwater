@@ -295,7 +295,7 @@ proc createSink { } {
         }    
     }
     
-    $ipif_sink addr 6
+    $ipif_sink addr 32
 
     set position_sink [new "Position/BM"]
     $node_sink addPosition $position_sink
@@ -311,7 +311,7 @@ proc createSink { } {
         set prt_ [expr ($cnt) + 5000]
         $app_sink($cnt) set Socket_Port_  $prt_
         $app_sink($cnt) setSocketProtocol "TCP"
-        $app_sink($cnt) set node_ID_ 254
+        $app_sink($cnt) set node_ID_ 32
     }
     $mac_sink $opt(ack_mode)
     $mac_sink initialize
