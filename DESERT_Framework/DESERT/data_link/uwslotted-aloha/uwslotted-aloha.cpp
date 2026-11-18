@@ -112,23 +112,23 @@ void
 UwSlottedAloha::txData()
 {
 	if (buffer_.empty()) {
-		status_ = UWSA_STATUS::IDLE;
+		if (status_ != UWSA_STATUS::IDLE) {
+			status_ = UWSA_STATUS::IDLE;
 
-		printOnLog(Logger::LogLevel::DEBUG,
-				"UWSA",
-				"txData()::no data to transmit. Change status to IDLE");
-	} else {
-
-		if (status_ == UWSA_STATUS::IDLE) {
-			status_ = UWSA_STATUS::TRANSMITTING;
-
-			Packet *p = buffer_.front();
-			buffer_.pop_front();
-
-			Mac2PhyStartTx(p);
-
-			incrDataPktsTx();
+			printOnLog(Logger::LogLevel::DEBUG,
+					"UWSA",
+					"txData()::no data to transmit. Change status to IDLE");
 		}
+	} else if (status_ == UWSA_STATUS::IDLE) {
+
+		status_ = UWSA_STATUS::TRANSMITTING;
+
+		Packet *p = buffer_.front();
+		buffer_.pop_front();
+
+		Mac2PhyStartTx(p);
+
+		incrDataPktsTx();
 	}
 
 	timer_.resched(slot_time_);
