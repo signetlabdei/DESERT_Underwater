@@ -50,7 +50,6 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
                 for dir in                       \
                     network/uwip                 \
                     transport/uwudp              \
-                    physical/uw-al               \
                     application/uwApplication
                 do
                     echo "considering dir \"$dir\""
@@ -61,7 +60,6 @@ AC_DEFUN([AC_ARG_WITH_DESERT],[
                 for lib in       \
                     uwip         \
                     uwudp        \
-                    uwal         \
                     uwapplication
                 do
                     DESERT_LIBADD="$DESERT_LIBADD -l${lib}"
@@ -100,7 +98,6 @@ AC_DEFUN([AC_ARG_WITH_DESERT_BUILD],[
                     for dir in                       \
                         network/uwip                 \
                         transport/uwudp              \
-                        physical/uw-al               \
                         application/uwApplication
                     do
                         echo "considering dir \"$dir\""

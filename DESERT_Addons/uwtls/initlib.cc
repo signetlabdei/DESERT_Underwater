@@ -1,6 +1,20 @@
 #include <module.h>
 #include <tclcl.h>
 
+#include "tls-record-header.h"
+#include "handshake-header.h"
+#include "clienthello-header.h"
+#include "serverhello-header.h"
+#include "clientkeyexchange-header.h"
+#include "changecipherspec-header.h"
+
+int hdr_tls_record::offset_;
+int hdr_handshake::offset_;
+int hdr_changecipherspec::offset_;
+int hdr_clienthello::offset_;
+int hdr_serverhello::offset_;
+int hdr_clientkeyexchange::offset_;
+
 packet_t PT_TLS_RECORD;
 packet_t PT_HANDSHAKE;
 packet_t PT_CLIENTHELLO;

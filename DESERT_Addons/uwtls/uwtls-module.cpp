@@ -36,12 +36,6 @@
 #include "uwtls-module.h"
 
 // Declaration of headers
-int hdr_tls_record::offset_;
-int hdr_handshake::offset_;
-int hdr_changecipherspec::offset_;
-int hdr_clienthello::offset_;
-int hdr_serverhello::offset_;
-int hdr_clientkeyexchange::offset_;
 
 static class UwTlsRecordHdrClass : public PacketHeaderClass
 {
@@ -145,7 +139,6 @@ UwTls::UwTls()
 	, flight_active(false)
 	, retransmission_timer_(this)
 {
-	bind("debug_", (int *) &debug_);
 	bind("retransmit_timeout_", (double *) &retransmit_timeout);
 	bind("max_retransmissions_", (int *) &max_retransmissions);
 }

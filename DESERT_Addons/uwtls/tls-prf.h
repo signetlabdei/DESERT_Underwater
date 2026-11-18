@@ -40,8 +40,6 @@
 #include <cstdint>
 #include <vector>
 
-#include <stdexcept>
-
 #include <openssl/evp.h>
 #include <openssl/kdf.h>
 

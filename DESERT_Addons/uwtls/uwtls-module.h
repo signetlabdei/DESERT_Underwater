@@ -36,7 +36,6 @@
 #ifndef UWTLS_MODULE_H
 #define UWTLS_MODULE_H
 
-#include "packer.h"
 #include "uwip-module.h"
 #include "uwudp-module.h"
 #include "uwApplication_module.h"
@@ -304,7 +303,7 @@ protected:
 	/**
 	 * Helper function to send Flight C2
 	 */
-	inline void sendFlightC2(int portnum, uint8_t ipaddr)
+	void sendFlightC2(int portnum, uint8_t ipaddr)
 	{
 		sendClientKeyExchange(portnum, ipaddr);
 		sendChangeCipherSpec(portnum, ipaddr);
@@ -313,7 +312,7 @@ protected:
 	/**
 	 * Helper function to prevend endian mismatches
 	 */
-	inline void writeUint64BE(unsigned char out[8], uint64_t v)
+	void writeUint64BE(unsigned char out[8], uint64_t v)
 	{
 		out[0] = (v >> 56) & 0xFF;
 		out[1] = (v >> 48) & 0xFF;
@@ -325,45 +324,41 @@ protected:
 		out[7] = v & 0xFF;
 	}
 
-	HandshakeState state;
-	uint8_t tls_status;
+	HandshakeState state; /**< Current progression of the TLS handshake */
 	
-	std::queue<Packet *> waitingQueue;
-	std::optional<Packet *> bufferedChangeCipherSpec;
+	std::queue<Packet *> waitingQueue;                  /**< Queue with the packets waiting to be sent during the handshake */
+	std::optional<Packet *> bufferedChangeCipherSpec;   /**< Variable containing an eventual out of order CCS */
 	
 	// Asymmetric material
-	uint8_t client_random[32];
-	uint8_t server_random[32];
+	uint8_t client_random[32]; /**< Client-generated random bytes sequence for TLS */
+	uint8_t server_random[32]; /**< Server-generated random bytes sequence for TLS */
 	
-	std::vector<uint8_t> ecdh_premaster;
+	std::vector<uint8_t> ecdh_premaster; /**< Derived premaster secret */
 	
-	EVP_PKEY *local_ec_privkey;
-	EVP_PKEY *remote_ec_pubkey;
+	EVP_PKEY *local_ec_privkey; /**< Pointer to the ECDH private key of the local host */
+	EVP_PKEY *remote_ec_pubkey; /**< Pointer to the ECDH public key of the remote host */
 	
 	// Symmetric material
-	uint8_t client_write_key[16];
-	uint8_t server_write_key[16];
-	uint8_t client_write_iv[4];
-	uint8_t server_write_iv[4];
+	uint8_t client_write_key[16]; /**< Client-derived symmetric key */
+	uint8_t server_write_key[16]; /**< Server-derived symmetric key */
+	uint8_t client_write_iv[4];   /**< Client-derived IV */
+	uint8_t server_write_iv[4];   /**< Server-derived IV */
 	
-	Role role;
+	Role role; /**< Role of the  current node (client or server) */
 	
-	double retransmit_timeout;     // In seconds
-	int max_retransmissions;
-	int retransmissions_done;
+	double retransmit_timeout; /**< Flight retransmit timeout in seconds */
+	int max_retransmissions;   /**< Maximum number of retransmissions before failing */
+	int retransmissions_done;  /**< Current number of retransmissions done */
 	
 	// Info to resend the current flight
-	int flight_port;
-	uint8_t flight_ip;
-	void (UwTls::*flight_func)(int, uint8_t);
+	int flight_port;                            /**< UDP destination port of the current flight */
+	uint8_t flight_ip;                          /**< IP destination address of the current flight */
+	void (UwTls::*flight_func)(int, uint8_t);   /**< Function to send the current flight */
 
-	double current_timeout;
-	bool flight_active;
+	double current_timeout; /**< Current flight retransmission timeout to set on the Timer */
+	bool flight_active;     /**< Boolean that stores the flight status */
 	
-	UwTlsRetransmissionTimer retransmission_timer_;
-	
-	// Unused variable - here to prevent a warning
-	int debug_;
+	UwTlsRetransmissionTimer retransmission_timer_; /**< Timer used to resend the flights */
 };
 
 #endif // UWTLS_MODULE_H
