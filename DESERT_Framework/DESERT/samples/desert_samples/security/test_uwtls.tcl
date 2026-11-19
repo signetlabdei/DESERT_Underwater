@@ -93,7 +93,7 @@ if {$opt(bash_parameters)} {
         puts "---> Period to generate DATA packets (s)"
         puts "---> socket_comm"
         puts "---> Random generator substream"
-        puts "For example: ns test_uwApplicationTLS.tcl 125 60 0 13"
+        puts "For example: ns test_uwtls.tcl 125 60 0 13"
         puts "Please try again."
         return
     } else {
@@ -118,9 +118,9 @@ for {set k 0} {$k < $opt(rngstream)} {incr k} {
 
 
 if {$opt(trace_files)} {
-    set opt(tracefilename) "./test_uwApplicationTLS.tr"
+    set opt(tracefilename) "./test_uwtls.tr"
     set opt(tracefile) [open $opt(tracefilename) w]
-    set opt(cltracefilename) "./test_uwApplicationTCP.cltr"
+    set opt(cltracefilename) "./test_uwtls.cltr"
     set opt(cltracefile) [open $opt(tracefilename) w]
 } else {
     set opt(tracefilename) "/dev/null"
