@@ -27,27 +27,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file data_link/uw-csma-aloha/initlib.cc
- * @author Federico Guerra, Saiful Azad, Federico Favaro and Filippo Donegà
+ * @file data_link/uw-csma-aloha-rl/initlib.cc
+ * @author Filippo Donegà
  * @version 1.0.0
  *
- * \brief Provides the initialization of the uw-csma-aloha-for-multimodal-rl library
+ * \brief Provides the initialization of the uw-csma-aloha-rl library
  *
  */
 
 #include <tclcl.h>
 
-extern EmbeddedTcl CsmaAlohaForMultimodalRlTclCode;
+extern EmbeddedTcl CsmaAlohaRlTclCode;
 
 extern "C" int
-Uwcsmaalohaformultimodalrl_Init()
+Uwcsmaaloharl_Init()
 {
-	CsmaAlohaForMultimodalRlTclCode.load();
+	CsmaAlohaRlTclCode.load();
 	return 0;
 }
 
 extern "C" int
-Cygcsmaalohaformultimodalrl_Init()
+Cygcsmaaloharl_Init()
 {
-	return Uwcsmaalohaformultimodalrl_Init();
+	return Uwcsmaaloharl_Init();
 }

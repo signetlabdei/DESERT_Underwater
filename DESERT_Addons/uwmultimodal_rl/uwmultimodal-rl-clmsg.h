@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,18 +27,18 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file uwmulti-traffic-rl-clmsg.h
+ * @file uwmultimodal-rl-clmsg.h
  * @author Filippo Donegà and Filippo Bragato
  * @version 1.0.0
  */
 
-#ifndef UWMULTI_TRAFFIC_RL_CLMSG_H
-#define UWMULTI_TRAFFIC_RL_CLMSG_H
+#ifndef UWMULTIMODAL_RL_CLMSG_H
+#define UWMULTIMODAL_RL_CLMSG_H
 
 #include <timer-handler.h>
 #include <clmessage.h>
 #include <packet.h>
-#include <uwmulti-traffic-rl.h>
+#include <uwmultimodal-rl.h>
 
 extern ClMessage_t CLMSG_INFO_VEC_POINTER;
 extern ClMessage_t CLMSG_QUEUE_POINTER;

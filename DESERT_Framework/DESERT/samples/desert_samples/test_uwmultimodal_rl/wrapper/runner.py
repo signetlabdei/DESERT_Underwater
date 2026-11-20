@@ -116,7 +116,7 @@ def run(rng_seed=None, resume=False):
     with open(campaign_folder.joinpath("config.json"), "w") as f:
         json.dump(config, f, indent=4)
 
-    shutil.copy(sim.base_folder.joinpath("DESERT_Addons/uwmultimodal_rl/uwmulti-traffic-rl.cpp"), campaign_folder.joinpath("uwmulti-traffic-rl.cpp"))
+    shutil.copy(sim.base_folder.joinpath("DESERT_Addons/uwmultimodal_rl/uwmultimodal-rl.cpp"), campaign_folder.joinpath("uwmultimodal-rl.cpp"))
 
     epsilon_func = lambda ep: 0.05 + (0.95 * np.exp(- ep / config["decaying_rate"]))
 

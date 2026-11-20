@@ -25,20 +25,35 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# Author: Federico Guerra, Saiful Azad, Federico Favaro and Filippo Donegà
-# Version: 1.0.0
 
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set HDR_size_                0
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set ACK_size_  			    10
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set max_tx_tries_		    5
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set wait_costant_		    0.1
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set debug_			        0
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set backoff_tuner_   	    1
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set max_payload_			    125
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set ACK_timeout_			    5.0
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set alpha_			        0.8
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set buffer_pkts_			    -1
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set max_backoff_counter_     4
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set listen_time_ 		    0.5
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set MAC_addr_ 		        0
+# 1. Define the path where you extracted libtorch. 
+# You can hardcode it here, or pass it when running make: `make LIBTORCH_DIR=/path/to/libtorch`
+LIBTORCH_DIR ?= $(srcdir)/../uwmultimodal_rl/libtorch
+
+# 2. Define LibTorch compilation and linking flags
+TORCH_CPPFLAGS = -I$(LIBTORCH_DIR)/include -I$(LIBTORCH_DIR)/include/torch/csrc/api/include
+# The -Wl,-rpath is crucial so the simulation finds the .so files at runtime
+TORCH_LDFLAGS = -L$(LIBTORCH_DIR)/lib -Wl,-rpath,$(LIBTORCH_DIR)/lib
+TORCH_LIBS = -ltorch -ltorch_cpu -lc10
+
+# LibTorch requires a modern C++ standard.
+AM_CXXFLAGS = -Wall -ggdb3 -std=c++17
+
+lib_LTLIBRARIES = libuwcsmaaloharl.la
+
+libuwcsmaaloharl_la_SOURCES = initlib.cpp uw-csma-aloha-rl.cpp
+
+libuwcsmaaloharl_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@ @DESERT_CPPFLAGS@ $(TORCH_CPPFLAGS)
+libuwcsmaaloharl_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_ADDON_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ @DESERT_ADDON_LDFLAGS_BUILD@ $(TORCH_LDFLAGS)
+libuwcsmaaloharl_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_ADDON_LIBADD@ @DESERT_LIBADD@ $(TORCH_LIBS)
+
+nodist_libuwcsmaaloharl_la_SOURCES = embeddedtcl.cc
+BUILT_SOURCES = embeddedtcl.cc
+CLEANFILES = embeddedtcl.cc
+
+TCL_FILES =  uw-csma-aloha-rl-init.tcl
+
+embeddedtcl.cc: Makefile $(TCL_FILES)
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ CsmaAlohaRlTclCode > embeddedtcl.cc
+
+EXTRA_DIST = $(TCL_FILES)

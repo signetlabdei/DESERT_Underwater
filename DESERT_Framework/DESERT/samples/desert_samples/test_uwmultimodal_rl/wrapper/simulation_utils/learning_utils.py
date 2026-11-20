@@ -77,7 +77,7 @@ def evaluate_epoch(config:dict, campaign_folder:Path, epoch, seeds=[0]):
         config["windspeed_mean"] = comb[0]
         config["c_mean"] = comb[1]
 
-        command = init_simulation(config, "../test_uwmulti_traffic_rl.tcl")
+        command = init_simulation(config, "../test_uwmultimodal_rl.tcl")
         results_rl = run_simulation(command, config)
 
         results_rl["seed"] = seed
@@ -100,7 +100,7 @@ def train_epoch(config, campaign_folder:Path, epoch):
     config["out_model_filename_2"] = campaign_folder.joinpath(f"{epoch}_2.pth")
     config["in_model_filename_3"] = campaign_folder.joinpath(f"{epoch-1}_3.pth")
     config["out_model_filename_3"] = campaign_folder.joinpath(f"{epoch}_3.pth")
-    command = init_simulation(config, "../test_uwmulti_traffic_rl.tcl")
+    command = init_simulation(config, "../test_uwmultimodal_rl.tcl")
     results = run_simulation(command, config)
     results["epoch"] = epoch
     results["seed"] = config["rng_stream"]

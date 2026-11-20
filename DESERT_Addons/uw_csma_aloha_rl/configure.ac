@@ -25,35 +25,47 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-# 1. Define the path where you extracted libtorch. 
-# You can hardcode it here, or pass it when running make: `make LIBTORCH_DIR=/path/to/libtorch`
-LIBTORCH_DIR ?= $(srcdir)/../uwmultimodal_rl/libtorch
+AC_INIT(uwcsmaaloharl, 1.0.0)
+AM_INIT_AUTOMAKE
+AM_PROG_AR
 
-# 2. Define LibTorch compilation and linking flags
-TORCH_CPPFLAGS = -I$(LIBTORCH_DIR)/include -I$(LIBTORCH_DIR)/include/torch/csrc/api/include
-# The -Wl,-rpath is crucial so the simulation finds the .so files at runtime
-TORCH_LDFLAGS = -L$(LIBTORCH_DIR)/lib -Wl,-rpath,$(LIBTORCH_DIR)/lib
-TORCH_LIBS = -ltorch -ltorch_cpu -lc10
+AC_CONFIG_MACRO_DIR([m4])
 
-# LibTorch requires a modern C++ standard.
-AM_CXXFLAGS = -Wall -ggdb3 -std=c++17
+AC_PROG_CXX
+AC_PROG_MAKE_SET
 
-lib_LTLIBRARIES = libuwcsmaalohaformultimodalrl.la
+AC_DISABLE_STATIC
+ 
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
 
-libuwcsmaalohaformultimodalrl_la_SOURCES = initlib.cpp uw-csma-aloha-for-multimodal-rl.cpp
+AC_PATH_NS_UWS
 
-libuwcsmaalohaformultimodalrl_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@ @DESERT_CPPFLAGS@ $(TORCH_CPPFLAGS)
-libuwcsmaalohaformultimodalrl_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_ADDON_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ @DESERT_ADDON_LDFLAGS_BUILD@ $(TORCH_LDFLAGS)
-libuwcsmaalohaformultimodalrl_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_ADDON_LIBADD@ @DESERT_LIBADD@ $(TORCH_LIBS)
+AC_ARG_WITH_NSMIRACLE
 
-nodist_libuwcsmaalohaformultimodalrl_la_SOURCES = embeddedtcl.cc
-BUILT_SOURCES = embeddedtcl.cc
-CLEANFILES = embeddedtcl.cc
+AC_CHECK_NSMIRACLE([have_nsmiracle=yes],[have_nsmiracle=no])
+if test x$have_nsmiracle != xyes ; then
+  AC_MSG_ERROR([Could not find nsmiracle, is --with-nsmiracle set correctly?])
+fi  
 
-TCL_FILES =  uw-csma-aloha-for-multimodal-rl-init.tcl
+AC_ARG_WITH_DESERT
+AC_ARG_WITH_DESERT_BUILD
 
-embeddedtcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ CsmaAlohaForMultimodalRlTclCode > embeddedtcl.cc
+AC_CHECK_DESERT([have_desert=yes],[have_desert=no])
+if test x$have_desert != xyes ; then
+  AC_MSG_ERROR([Could not find desert, is --with-desert set correctly?])
+fi  
 
-EXTRA_DIST = $(TCL_FILES)
+AC_ARG_WITH_DESERT_ADDON
+AC_ARG_WITH_DESERT_ADDON_BUILD
+
+AC_DEFINE(CPP_NAMESPACE,std)
+
+AC_CONFIG_FILES([
+		m4/Makefile
+		Makefile
+      ])
+
+AC_OUTPUT

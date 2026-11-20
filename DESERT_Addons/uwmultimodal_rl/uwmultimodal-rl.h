@@ -28,13 +28,13 @@
 //
 
 /**
- * @file uwmulti-traffic-rl.h
+ * @file uwmultimodal-rl.h
  * @author Filippo Donegà and Filippo Bragato
  * @version 1.0.0
  */
 
-#ifndef UWMULTI_TRAFFIC_RL_H
-#define UWMULTI_TRAFFIC_RL_H
+#ifndef UWMULTIMODAL_RL_H
+#define UWMULTIMODAL_RL_H
 
 #include <timer-handler.h>
 #include "rl/Agent.h"
@@ -45,7 +45,7 @@
 #include <string>
 #include <torch/torch.h>
 
-class UwMultiTrafficRl; // Forward declaration of the UwMultiTrafficRl class
+class UwMultiModalRl; // Forward declaration of the UwMultiModalRl class
 
 /**
  * Class used to schedule periodic processing of the wait queue
@@ -53,7 +53,7 @@ class UwMultiTrafficRl; // Forward declaration of the UwMultiTrafficRl class
 class UwFinalProcedureTimer : public TimerHandler
 {
 public:
-	UwFinalProcedureTimer(UwMultiTrafficRl *m)
+	UwFinalProcedureTimer(UwMultiModalRl *m)
 		: TimerHandler()
 	{
 		module = m;
@@ -61,7 +61,7 @@ public:
 
 protected:
 	virtual void expire(Event *e);
-	UwMultiTrafficRl *module;
+	UwMultiModalRl *module;
 };
 
 /**
@@ -71,7 +71,7 @@ protected:
 class UwOpticalProbeRxTimer : public TimerHandler
 {
 public:
-	UwOpticalProbeRxTimer(UwMultiTrafficRl *m)
+	UwOpticalProbeRxTimer(UwMultiModalRl *m)
 		: TimerHandler()
 	{
 		module = m;
@@ -79,7 +79,7 @@ public:
 
 protected:
 	virtual void expire(Event *e);
-	UwMultiTrafficRl *module;
+	UwMultiModalRl *module;
 };
 
 /**
@@ -129,7 +129,7 @@ struct Info {
 	torch::Tensor value_; /**< Value of the state chosen by the RL algorithm */
 };
 
-class UwMultiTrafficRl : public UwMultiTrafficControl
+class UwMultiModalRl : public UwMultiTrafficControl
 {
 
 	friend class UwFinalProcedureTimer;
@@ -137,13 +137,13 @@ class UwMultiTrafficRl : public UwMultiTrafficControl
 
 public:
 	/**
-	 * Constructor of the UwMultiTrafficRl class
+	 * Constructor of the UwMultiModalRl class
 	 */
-	UwMultiTrafficRl();
+	UwMultiModalRl();
 	/**
-	 * Destructor of the UwMultiTrafficRl class
+	 * Destructor of the UwMultiModalRl class
 	 */
-	virtual ~UwMultiTrafficRl() = default;
+	virtual ~UwMultiModalRl() = default;
 	/**
 	 * TCL command interpreter
 	 *

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -42,11 +42,11 @@ AM_CXXFLAGS = -Wall -ggdb3 -std=c++17
 
 lib_LTLIBRARIES = libuwmultimodal_rl.la
 
-libuwmultimodal_rl_la_SOURCES = initlib.cc uwmulti-traffic-control.cc uwmulti-multiphy-controller.cpp uwmulti-traffic-range-crt.cc uwmulti-traffic-rl.cpp uwmulti-traffic-rl-clmsg.cpp rl/Agent.cpp rl/DDQNAgent.cpp rl/PPOAgent.cpp rl/DSGSARSAAgent.cpp rl/DSGQlearningAgent.cpp rl/State.cpp 
+libuwmultimodal_rl_la_SOURCES = initlib.cc uwmultimodal-rl.cpp uwmultimodal-rl-clmsg.cpp rl/Agent.cpp rl/DDQNAgent.cpp rl/PPOAgent.cpp rl/DSGSARSAAgent.cpp rl/DSGQlearningAgent.cpp rl/State.cpp 
 
-libuwmultimodal_rl_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_CPPFLAGS@ $(TORCH_CPPFLAGS)
-libuwmultimodal_rl_la_LDFLAGS =  @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ $(TORCH_LDFLAGS)
-libuwmultimodal_rl_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_LIBADD@ $(TORCH_LIBS)
+libuwmultimodal_rl_la_CPPFLAGS = @NS_CPPFLAGS@ @NSMIRACLE_CPPFLAGS@ @DESERT_ADDON_CPPFLAGS@ @DESERT_CPPFLAGS@ $(TORCH_CPPFLAGS)
+libuwmultimodal_rl_la_LDFLAGS = @NS_LDFLAGS@ @NSMIRACLE_LDFLAGS@ @DESERT_ADDON_LDFLAGS@ @DESERT_ADDON_LDFLAGS_BUILD@ @DESERT_LDFLAGS@ @DESERT_LDFLAGS_BUILD@ $(TORCH_LDFLAGS)
+libuwmultimodal_rl_la_LIBADD = @NS_LIBADD@ @NSMIRACLE_LIBADD@ @DESERT_ADDON_LIBADD@ @DESERT_LIBADD@ $(TORCH_LIBS)
 
 nodist_libuwmultimodal_rl_la_SOURCES = InitTcl.cc
 
@@ -54,9 +54,9 @@ BUILT_SOURCES = InitTcl.cc
 
 CLEANFILES = InitTcl.cc
 
-TCL_FILES =  uwmulti-traffic-control-default.tcl
+TCL_FILES =  uwmultimodal-rl-default.tcl
 
 InitTcl.cc: Makefile $(TCL_FILES)
-		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwMultiTrafficControlInitTclCode > InitTcl.cc
+		cat $(VPATH)/$(TCL_FILES) | @TCL2CPP@ UwMultiModalRlInitTclCode > InitTcl.cc
 
 EXTRA_DIST = $(TCL_FILES)

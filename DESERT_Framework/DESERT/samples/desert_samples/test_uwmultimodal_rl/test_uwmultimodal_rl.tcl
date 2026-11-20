@@ -72,7 +72,7 @@
 #   | 3.UW/MLL                                    | 3.UW/MLL                                    |
 #   | (Acoustic)                                  | (Optical)                                   |
 #   +---------------------------------------------+---------------------------------------------+
-#   | 2.UW/CSMA_ALOHA_FOR_MULTIMODAL_RL           | 2.UW/CSMA_ALOHA_FOR_MULTIMODAL_RL           |
+#   | 2.UW/CSMA_ALOHA_RL                          | 2.UW/CSMA_ALOHA_RL                          |
 #   | (Acoustic)                                  | (Optical)                                   |
 #   +---------------------------------------------+---------------------------------------------+
 #   | 1.UW/PHYSICAL                               | 1.UW/OPTICALSTATSPHY                        |
@@ -120,7 +120,8 @@ load libuwoptical_channel.so
 load libuwoptical_phy.so
 load libuwmultimodal_rl.so
 load libuwopticalstatsphy.so
-load libuwcsmaalohaformultimodalrl.so
+load libuwcsmaaloha.so
+load libuwcsmaaloharl.so
 
 #############################
 # NS-Miracle initialization #
@@ -217,7 +218,7 @@ set opt(per_tgt)                        0.1
 set opt(freq)                           26000.0
 set opt(bw)                             16000.0
 
-# UW/CSMA_ALOHA_FOR_MULTIMODAL_RL
+# UW/CSMA_ALOHA_RL
 set opt(ack_mode)                       "setNoAckMode"
 
 # UW/CBR
@@ -276,8 +277,8 @@ set opt(threshold)                 10
 Module/UW/CBR set debug_                                 $opt(debug)
 
 # CSMA ALOHA
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set buffer_pkts_  $opt(queues_max_size)      ;# Set this to cap the CSMA buffers
-Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL set debug_        $opt(debug)
+Module/UW/CSMA_ALOHA_RL set buffer_pkts_  $opt(queues_max_size)      ;# Set this to cap the CSMA buffers
+Module/UW/CSMA_ALOHA_RL set debug_        $opt(debug)
 
 # ACOUSTIC PHY
 Module/UW/PHYSICAL  set BitRate_                         $opt(bitrate)
@@ -421,8 +422,8 @@ proc createNode { id } {
     set ipif($id)                       [new Module/UW/IP]
     set acoustic_mll($id)               [new Module/UW/MLL]
     set optical_mll($id)                [new Module/UW/MLL]
-    set acoustic_mac($id)               [new Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL]
-    set optical_mac($id)                [new Module/UW/CSMA_ALOHA_FOR_MULTIMODAL_RL]
+    set acoustic_mac($id)               [new Module/UW/CSMA_ALOHA_RL]
+    set optical_mac($id)                [new Module/UW/CSMA_ALOHA_RL]
     set acoustic_phy($id)               [new Module/UW/PHYSICAL]
     set optical_phy($id)                [new Module/UW/OPTICAL/STATSPHY]
 

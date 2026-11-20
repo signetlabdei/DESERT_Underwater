@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
                 fi
 
                 for dir in        \
-                    uwmultimodal_rl
+                    uwmulti_traffic_control
                 do
                     echo "considering dir \"$dir\""
                     DESERT_ADDON_CPPFLAGS="$DESERT_ADDON_CPPFLAGS -I${DESERT_ADDON_PATH}/${dir}"
@@ -57,7 +57,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT_ADDON],[
                 done
 
                 for lib in        \
-                    uwmultimodal_rl
+                    uwmulti_traffic_control
                 do
                     DESERT_ADDON_LIBADD="$DESERT_ADDON_LIBADD -l${lib}"
                 done
@@ -94,7 +94,7 @@ AC_DEFUN([AC_ARG_WITH_DESERT_ADDON_BUILD],[
                     fi
 
                     for dir in        \
-                        uwmultimodal_rl
+                        uwmulti_traffic_control
                     do
                         echo "considering dir \"$dir\""
                         DESERT_ADDON_LDFLAGS_BUILD="$DESERT_ADDON_LDFLAGS_BUILD -L${DESERT_ADDON_PATH_BUILD}/${dir}"

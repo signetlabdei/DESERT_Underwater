@@ -159,7 +159,7 @@ UwMultiTrafficControl::addLowLayerFromTag(
 	if (debug_)
 		std::cout << NOW << "UwMultiTrafficControl::addLowLayerFromTag("
 				  << traffic_id << "," << tag << ") disc size "
-				  << low_layer_storage.getSize() << endl;
+				  << low_layer_storage.getSize() << std::endl;
 	if (low_layer_storage.getSize() == 1) {
 		DiscoveryData low_layer = (*low_layer_storage.begin()).second;
 		if (debug_)

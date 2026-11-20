@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2024 Regents of the SIGNET lab, University of Padova.
+// Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,12 +27,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * @file uwmulti-traffic-rl-clmsg.cpp
+ * @file uwmultimodal-rl-clmsg.cpp
  * @author Filippo Donegà and Filippo Bragato
  * @version 1.0.0
  */
 
-#include "uwmulti-traffic-rl-clmsg.h"
+#include "uwmultimodal-rl-clmsg.h"
 #include <iostream>
 
 ClMsgInfoVecPointer::ClMsgInfoVecPointer()

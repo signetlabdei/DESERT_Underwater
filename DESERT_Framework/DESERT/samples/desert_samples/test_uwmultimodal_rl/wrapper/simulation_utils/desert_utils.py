@@ -44,7 +44,6 @@ def run_simulation(command:str, config) -> str:
     """Executes the simulation. Returning the log"""
     # Run the simulation
     actual_command = f'source {base_folder.joinpath("DESERT_buildCopy_LOCAL/environment").absolute()}; ' + command
-    print(actual_command)
     p = subprocess.Popen(actual_command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, shell=True, executable='/bin/bash') # Security hazard
     out, err = p.communicate("")

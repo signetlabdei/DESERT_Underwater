@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Regents of the SIGNET lab, University of Padova.
+# Copyright (c) 2026 Regents of the SIGNET lab, University of Padova.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# @file   uwmultiphy-default.tcl
-# @author Filippo Campagnaro
+# @file   uwmultimodal-rl-default.tcl
+# @author Filippo Donegà
 # @version 1.0.0
-
-PacketHeaderManager set tab_(PacketHeader/MULTI_TR) 1
-PacketHeaderManager set tab_(PacketHeader/UWMULTIPHY_PING) 1
-PacketHeaderManager set tab_(PacketHeader/UWMULTIPHY_PONG) 1
-PacketHeaderManager set tab_(PacketHeader/UWMULTIPHY_DATA) 1
-
-Module/UW/MULTI_TRAFFIC_CONTROL set debug_  0
-Module/UW/MULTI_TRAFFIC_RANGE_CTR set check_to_period_  2.5
-Module/UW/MULTI_TRAFFIC_RANGE_CTR set signaling_pktSize_  2

@@ -28,18 +28,18 @@
 //
 
 /**
- * @file uwmulti-traffic-rl.cpp
+ * @file uwmultimodal-rl.cpp
  * @author Filippo Donegà and Filippo Bragato
  * @version 1.0.0
  */
 
-#include "uwmulti-traffic-rl.h"
+#include "uwmultimodal-rl.h"
 #include "rl/Agent.h"
 #include "rl/DDQNAgent.h"
 #include "rl/DSGQlearningAgent.h"
 #include "rl/DSGSARSAAgent.h"
 #include "rl/PPOAgent.h"
-#include "uwmulti-traffic-rl-clmsg.h"
+#include "uwmultimodal-rl-clmsg.h"
 #include <torch/torch.h>
 
 #include <algorithm>
@@ -64,13 +64,13 @@
 /**
  * Class that represents the binding with the Tcl configuration script
  */
-static class UwMultiTrafficRlClass : public TclClass
+static class UwMultiModalRlClass : public TclClass
 {
 public:
 	/**
 	 * Constructor of the class
 	 */
-	UwMultiTrafficRlClass()
+	UwMultiModalRlClass()
 		: TclClass("Module/UW/MULTIMODAL_RL")
 	{
 	}
@@ -81,11 +81,11 @@ public:
 	virtual TclObject *
 	create(int, const char *const *)
 	{
-		return (new UwMultiTrafficRl);
+		return (new UwMultiModalRl);
 	}
 } class_multitraffic_rl;
 
-UwMultiTrafficRl::UwMultiTrafficRl()
+UwMultiModalRl::UwMultiModalRl()
 	: UwMultiTrafficControl()
 	, debug_(0)
 	, phy_ids()
@@ -178,7 +178,7 @@ createAgent(const std::string &agent_type, int64_t state_dim,
 }
 
 void
-UwMultiTrafficRl::recv(Packet *p)
+UwMultiModalRl::recv(Packet *p)
 {
 	hdr_cmn *ch = HDR_CMN(p);
 	hdr_uwcbr *cbrh = HDR_UWCBR(p);
@@ -201,7 +201,7 @@ UwMultiTrafficRl::recv(Packet *p)
 		} else if (ch->direction() == hdr_cmn::UP) {
 			// Packet incoming from the lower layer
 			if (debug_) {
-				std::cout << "UwMultiTrafficRl (" << mac_addr
+				std::cout << "UwMultiModalRl (" << mac_addr
 						  << ")::Received packet " << ch->uid() << " from "
 						  << (int) mach->macSA()
 						  << ", other node: " << other_addr_ << std::endl;
@@ -246,7 +246,7 @@ UwMultiTrafficRl::recv(Packet *p)
 }
 
 void
-UwMultiTrafficRl::processWaitQueue()
+UwMultiModalRl::processWaitQueue()
 {
 	// Iterate over wait_queue until it is empty or a packet is re-queued
 	// (action 2 = wait is chosen)
@@ -259,7 +259,7 @@ UwMultiTrafficRl::processWaitQueue()
 		hdr_mac *mach = HDR_MAC(front_packet);
 		int daddr = cmnh->next_hop();
 		if (debug_) {
-			std::cout << "UwMultiTrafficRl (" << mac_addr << ")::Packet "
+			std::cout << "UwMultiModalRl (" << mac_addr << ")::Packet "
 					  << cmnh->uid()
 					  << " incoming from the upper layer directed to " << daddr
 					  << std::endl;
@@ -271,12 +271,12 @@ UwMultiTrafficRl::processWaitQueue()
 			if (debug_) {
 				switch (i) {
 					case 0:
-						std::cout << "UwMultiTrafficRl (" << mac_addr
+						std::cout << "UwMultiModalRl (" << mac_addr
 								  << ")::Asked UwPhysical for stats"
 								  << std::endl;
 						break;
 					case 1:
-						std::cout << "UwMultiTrafficRl (" << mac_addr
+						std::cout << "UwMultiModalRl (" << mac_addr
 								  << ")::Asked UwOpticalStats for stats"
 								  << std::endl;
 						break;
@@ -289,7 +289,7 @@ UwMultiTrafficRl::processWaitQueue()
 							dynamic_cast<const UwPhysicalStats *>(
 									m.getStats())) {
 				if (debug_) {
-					std::cout << "UwMultiTrafficRl (" << mac_addr
+					std::cout << "UwMultiModalRl (" << mac_addr
 							  << ")::Received UwPhysicalStats" << std::endl;
 				}
 				if (*state_ptr_other != nullptr) {
@@ -307,7 +307,7 @@ UwMultiTrafficRl::processWaitQueue()
 							dynamic_cast<const UwOpticalStats *>(
 									m.getStats())) {
 				if (debug_) {
-					std::cout << "UwMultiTrafficRl (" << mac_addr
+					std::cout << "UwMultiModalRl (" << mac_addr
 							  << ")::Received UwOpticalStats" << std::endl;
 				}
 				if (*state_ptr_other != nullptr) {
@@ -380,7 +380,7 @@ UwMultiTrafficRl::processWaitQueue()
 			}
 		}
 		if (debug_) {
-			std::cout << "UwMultiTrafficRl (" << mac_addr
+			std::cout << "UwMultiModalRl (" << mac_addr
 					  << ")::Chosen action: " << action << std::endl;
 		}
 		// Set reward of the packet to 0 if wait action is chosen for it
@@ -403,7 +403,7 @@ UwMultiTrafficRl::processWaitQueue()
 			info_vec.back().delay_ = 0.0;
 
 			if (debug_) {
-				printf("[%f] UwMultiTrafficRl: Packet %d marked as completed "
+				printf("[%f] UwMultiModalRl: Packet %d marked as completed "
 					   "(%s)\n",
 						NOW,
 						info_vec.back().packet_id_,
@@ -460,7 +460,7 @@ buildTransition(
 }
 
 float
-UwMultiTrafficRl::getReward(const Info *current, const Info *next_info,
+UwMultiModalRl::getReward(const Info *current, const Info *next_info,
 		const Info *prev_info, int traffic_type) const
 {
 	switch (traffic_type) {
@@ -546,7 +546,7 @@ Info::Info(int mask_type)
 }
 
 int
-UwMultiTrafficRl::command(int argc, const char *const *argv)
+UwMultiModalRl::command(int argc, const char *const *argv)
 {
 	Tcl &tcl = Tcl::instance();
 	if (argc == 2) {
@@ -674,14 +674,14 @@ UwMultiTrafficRl::command(int argc, const char *const *argv)
 }
 
 void
-UwMultiTrafficRl::finalProcedure()
+UwMultiModalRl::finalProcedure()
 {
 	processWaitQueue();
 	tmr.resched(finalProcedureTimerPeriod);
 }
 
 void
-UwMultiTrafficRl::discoverPhyLayers()
+UwMultiModalRl::discoverPhyLayers()
 {
 	// Discover all PHY layers in the stack and save their IDs
 	ClMsgDiscovery m;
@@ -704,7 +704,7 @@ UwMultiTrafficRl::discoverPhyLayers()
 			phy_layers.push_back((*phy_layer_storage.begin()).second);
 			phy_ids.push_back(phy_layers[i].getId());
 			if (debug_) {
-				std::cout << "UwMultiTrafficRl::initialize::PHY Id("
+				std::cout << "UwMultiModalRl::initialize::PHY Id("
 						  << phy_layers[i].getId()
 						  << ")::Tcl Name = " << phy_layers[i].getTclName()
 						  << "::Layer Id = " << phy_layers[i].getLayer()
@@ -718,7 +718,7 @@ UwMultiTrafficRl::discoverPhyLayers()
 }
 
 void
-UwMultiTrafficRl::discoverMllLayers()
+UwMultiModalRl::discoverMllLayers()
 {
 	// Discover all MLL layers in the stack and save their IDs
 	ClMsgDiscovery m;
@@ -741,7 +741,7 @@ UwMultiTrafficRl::discoverMllLayers()
 			mll_layers.push_back((*mll_layer_storage.begin()).second);
 			mll_ids.push_back(mll_layers[i].getId());
 			if (debug_)
-				std::cout << "UwMultiTrafficRl::initialize::MLL Id("
+				std::cout << "UwMultiModalRl::initialize::MLL Id("
 						  << mll_layers[i].getId()
 						  << ")::Tcl Name = " << mll_layers[i].getTclName()
 						  << "::Layer Id = " << mll_layers[i].getLayer()
@@ -754,7 +754,7 @@ UwMultiTrafficRl::discoverMllLayers()
 }
 
 void
-UwMultiTrafficRl::initialize(std::string output_path, double probing_period,
+UwMultiModalRl::initialize(std::string output_path, double probing_period,
 		int mask_type, int eval_flag)
 {
 	ClMsgPhy2MacAddr msg;
@@ -788,7 +788,7 @@ UwMultiTrafficRl::initialize(std::string output_path, double probing_period,
 
 // TODO[AGENT]: Va tutto su un file a parte
 void
-UwMultiTrafficRl::sendInfoVecPtrClmsg()
+UwMultiModalRl::sendInfoVecPtrClmsg()
 {
 	ClMsgInfoVecPointer m = ClMsgInfoVecPointer();
 	m.setInfoVecPointer(info_vec_src);
@@ -796,7 +796,7 @@ UwMultiTrafficRl::sendInfoVecPtrClmsg()
 }
 
 int
-UwMultiTrafficRl::recvSyncClMsg(ClMessage *m)
+UwMultiModalRl::recvSyncClMsg(ClMessage *m)
 {
 	if (m->type() == CLMSG_QUEUE_POINTER) {
 		// Received a pointer to a MAC layer queue
@@ -812,13 +812,13 @@ UwMultiTrafficRl::recvSyncClMsg(ClMessage *m)
 }
 
 void
-UwMultiTrafficRl::setBestMediumToAcoustic()
+UwMultiModalRl::setBestMediumToAcoustic()
 {
 	probing_best_medium_ = 0;
 }
 
 void
-UwMultiTrafficRl::updateInfoCompletion()
+UwMultiModalRl::updateInfoCompletion()
 {
 	double now = NOW;
 
@@ -855,7 +855,7 @@ UwMultiTrafficRl::updateInfoCompletion()
 				info.delay_ = -1.0;
 
 				if (debug_) {
-					printf("[%f] UwMultiTrafficRl: Packet %d marked as lost "
+					printf("[%f] UwMultiModalRl: Packet %d marked as lost "
 						   "(timeout)\n",
 							now,
 							info.packet_id_);
@@ -866,7 +866,7 @@ UwMultiTrafficRl::updateInfoCompletion()
 }
 
 void
-UwMultiTrafficRl::checkAndLearnFromInfo()
+UwMultiModalRl::checkAndLearnFromInfo()
 {
 	if (!agent) {
 		return; // No agent initialized yet
@@ -929,7 +929,7 @@ UwMultiTrafficRl::checkAndLearnFromInfo()
 				current_info.delay_);
 
 		if (debug_) {
-			printf("[%f] UwMultiTrafficRl: Learning from packet %d -> %d "
+			printf("[%f] UwMultiModalRl: Learning from packet %d -> %d "
 				   "(action %ld -> %ld, reward %.2f)\n",
 					now,
 					current_info.packet_id_,
@@ -947,11 +947,11 @@ UwMultiTrafficRl::checkAndLearnFromInfo()
 void
 UwFinalProcedureTimer::expire(Event *e)
 {
-	((UwMultiTrafficRl *) module)->finalProcedure();
+	((UwMultiModalRl *) module)->finalProcedure();
 }
 
 void
 UwOpticalProbeRxTimer::expire(Event *e)
 {
-	((UwMultiTrafficRl *) module)->setBestMediumToAcoustic();
+	((UwMultiModalRl *) module)->setBestMediumToAcoustic();
 }

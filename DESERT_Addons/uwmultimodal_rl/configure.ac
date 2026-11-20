@@ -58,6 +58,9 @@ if test x$have_desert != xyes ; then
   AC_MSG_ERROR([Could not find desert, is --with-desert set correctly?])
 fi  
 
+AC_ARG_WITH_DESERT_ADDON
+AC_ARG_WITH_DESERT_ADDON_BUILD
+
 AC_DEFINE(CPP_NAMESPACE,std)
 
 AC_CONFIG_FILES([
