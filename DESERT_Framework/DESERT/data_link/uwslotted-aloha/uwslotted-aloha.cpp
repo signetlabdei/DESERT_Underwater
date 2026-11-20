@@ -37,15 +37,21 @@
  */
 
 #include "uwslotted-aloha.h"
+#include "uwslotted-aloha-cmn-hdr.h"
 #include <iostream>
 #include <mac.h>
 #include <rng.h>
-#include <timer-handler.h>
 
 void
-UwSlotTimer::expire(Event *e)
+UwSASlotTimer::expire(Event *e)
 {
 	((UwSlottedAloha *) module_)->txData();
+}
+
+void
+UwSAAckTimer::expire(Event *e)
+{
+	((UwSlottedAloha *) module_)->retxData();
 }
 
 /**
@@ -76,10 +82,15 @@ public:
 
 UwSlottedAloha::UwSlottedAloha()
 	: MMac()
-	, slot_time_()
+	, enable_ack(true)
+	, retx_(false)
 	, max_queue_size_()
+	, slot_time_()
+	, retry_prob_()
 	, status_(UWSA_STATUS::IDLE)
-	, timer_(this)
+	, slot_timer_(this)
+	, ack_timer_(this)
+	, backoff_timer_(this)
 	, buffer_()
 {
 	bind("slot_time", (double *) &slot_time_);
@@ -123,15 +134,49 @@ UwSlottedAloha::txData()
 
 		status_ = UWSA_STATUS::TRANSMITTING;
 
-		Packet *p = buffer_.front();
-		buffer_.pop_front();
+		if (!retx_) {
+			last_data_pkt = buffer_.front();
+			buffer_.pop_front();
+		}
 
-		Mac2PhyStartTx(p);
+		Mac2PhyStartTx(last_data_pkt);
 
 		incrDataPktsTx();
 	}
 
-	timer_.resched(slot_time_);
+	slot_timer_.resched(slot_time_);
+}
+
+void
+UwSlottedAloha::retxData()
+{
+	if (status_ != UWSA_STATUS::WAITING) {
+		printOnLog(Logger::LogLevel::DEBUG,
+				"UWSA",
+				"retxData()::error");
+
+		return;
+	}
+
+	// after 2*t_slot try to retx in the next slot with retry_prob.
+	// If not wait another slot and try to transmit in the slot after
+	if (retx_count_ < max_retx_) {
+		if (RNG::defaultrng()->uniform_double() < retry_prob_) {
+			ack_timer_.force_cancel();
+			retx_ = true;
+			retx_count_++;
+		} else {
+			ack_timer_.resched(slot_time_);
+			return;
+		}
+	} else {
+		ack_timer_.force_cancel();
+		retx_count_ = 0;
+		retx_ = false;
+		Packet::free(last_data_pkt);
+	}
+
+	status_ = UWSA_STATUS::IDLE;
 }
 
 void
@@ -151,7 +196,12 @@ UwSlottedAloha::Phy2MacEndTx(const Packet *p)
 			"UWSA",
 			"Mac2PhyEndTx()::End transmitting");
 
-	status_ = UWSA_STATUS::IDLE;
+	if (enable_ack && (hdr_cmn::access(p))->ptype() != PT_SA_ACK) {
+		status_ = UWSA_STATUS::WAITING;
+		retx_ = false;
+		ack_timer_.resched(2 * slot_time_);
+	} else
+		status_ = UWSA_STATUS::IDLE;
 }
 
 void
@@ -201,13 +251,36 @@ UwSlottedAloha::Phy2MacEndRx(Packet *p)
 					"Phy2MacEndRx()::dropping packet, it was for node " +
 							to_string(dest_mac));
 		} else {
-			sendUp(p);
-			incrDataPktsRx();
+			if (ch->ptype() == PT_SA_ACK) {
+				ack_timer_.force_cancel();
 
-			printOnLog(Logger::LogLevel::DEBUG,
-					"UWSA",
-					"Phy2MacEndRx()::Received packet from node " +
-							to_string(src_mac));
+				Packet::free(p);
+
+				printOnLog(Logger::LogLevel::DEBUG,
+						"UWSA",
+						"Phy2MacEndRx()::Received ACK from node " +
+								to_string(src_mac));
+			} else {
+				sendUp(p);
+				incrDataPktsRx();
+
+				printOnLog(Logger::LogLevel::DEBUG,
+						"UWSA",
+						"Phy2MacEndRx()::Received packet from node " +
+								to_string(src_mac));
+
+				// Send back ack
+				if (enable_ack) {
+					status_ = UWSA_STATUS::TRANSMITTING;
+					initAckPkt(src_mac);
+
+					Mac2PhyStartTx(p);
+
+					// TODO: incr ack packets sent
+
+					return;
+				}
+			}
 		}
 	}
 
@@ -219,6 +292,20 @@ UwSlottedAloha::initPkt(Packet *p)
 {
 	hdr_mac *mach = HDR_MAC(p);
 	mach->macSA() = addr;
+}
+
+void
+UwSlottedAloha::initAckPkt(int dst_addr)
+{
+	Packet *p_ack = Packet::alloc();
+
+	hdr_cmn *ch = hdr_cmn::access(p_ack);
+	hdr_mac *mach = HDR_MAC(p_ack);
+	hdr_SAAck *saach = HDR_SA_ACK(p_ack);
+
+	ch->ptype() = PT_SA_ACK;
+	mach->macSA() = addr;
+	saach->dst_addr() = dst_addr;
 }
 
 void
@@ -235,7 +322,7 @@ UwSlottedAloha::start()
 			"UWSA",
 			"start()::Addr " + std::to_string(addr));
 
-	timer_.sched(slot_time_);
+	slot_timer_.sched(slot_time_);
 }
 
 void
@@ -245,7 +332,7 @@ UwSlottedAloha::stop()
 			"UWSA",
 			"stop()::Addr " + std::to_string(addr));
 
-	timer_.cancel();
+	slot_timer_.cancel();
 }
 
 int

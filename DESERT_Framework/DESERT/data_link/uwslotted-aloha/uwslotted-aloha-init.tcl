@@ -29,5 +29,7 @@
 # Author: Vincenzo Cimino
 # Version: 1.0.0
 
+PacketHeaderManager set tab_(PacketHeader/UW/SAAck) 1
+
 Module/UW/SLOTTEDALOHA set slot_time    	10
 Module/UW/SLOTTEDALOHA set max_queue_size	10

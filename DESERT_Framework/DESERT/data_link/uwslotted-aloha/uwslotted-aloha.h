@@ -41,8 +41,9 @@ wait for the beginning of the next time slot.
  * Acknowledgment: If the frame is received correctly, the receiver sends an
 acknowledgment (ACK). If multiple nodes transmit in the same slot, a collision
 may occur and the frames are destroyed.
- * After a collision, nodes wait for a random back-off period before
-retransmitting to avoid repeated collisions.
+ * After a transmission, each node waits an ACK for 2 slot. After this time
+ * if the ack wasn't received, the node tries to retransmit with a given
+ * probability  on the next slot.
  *
  */
 
@@ -56,26 +57,56 @@ retransmitting to avoid repeated collisions.
 class UwSlottedAloha;
 
 /**
- * UwSlotTimer class is used to handle the scheduling period of
+ * UwSASlotTimer class is used to handle the scheduling period of
  * <i>UwSlottedAloha</i> slots.
  */
-
-class UwSlotTimer : public TimerHandler
+class UwSASlotTimer : public TimerHandler
 {
 
 public:
 	/**
-	 * Costructor of the class UwSlotTimer
+	 * Costructor of the class UwSASlotTimer
 	 * @param Pointer to a UwSlottedAloha object
 	 */
-	UwSlotTimer(UwSlottedAloha *m)
+	UwSASlotTimer(UwSlottedAloha *m)
 		: TimerHandler()
 	{
 		assert(m != NULL);
 		module_ = m;
 	}
 
-	~UwSlotTimer() = default;
+	~UwSASlotTimer() = default;
+
+protected:
+	/**
+	 * Method call when the timer expire
+	 * @param Event*  pointer to an object of type Event
+	 */
+	virtual void expire(Event *e);
+
+	UwSlottedAloha *module_;
+};
+
+/**
+ * UwSAAckTimer class is used to handle the scheduling period of
+ * <i>UwSlottedAloha</i> slots.
+ */
+class UwSAAckTimer : public TimerHandler
+{
+
+public:
+	/**
+	 * Costructor of the class UwSAAckTimer
+	 * @param Pointer to a UwSlottedAloha object
+	 */
+	UwSAAckTimer(UwSlottedAloha *m)
+		: TimerHandler()
+	{
+		assert(m != NULL);
+		module_ = m;
+	}
+
+	~UwSAAckTimer() = default;
 
 protected:
 	/**
@@ -93,7 +124,8 @@ protected:
 class UwSlottedAloha : public MMac
 {
 
-	friend class UwSlotTimer;
+	friend class UwSASlotTimer;
+	friend class UwSAAckTimer;
 
 public:
 	/**
@@ -111,6 +143,8 @@ protected:
 	 * Transmit a data packet at the beginning of a slot
 	 */
 	virtual void txData();
+
+	virtual void retxData();
 
 	/**
 	 * Receive the packet from the upper layer (e.g. IP)
@@ -162,6 +196,13 @@ protected:
 	virtual void initPkt(Packet *p);
 
 	/**
+	 * Method called to add the MAC header size
+	 * @param const Packet* Pointer to an Packet object that rapresent the
+	 * Packet in transmission
+	 */
+	virtual void initAckPkt(int dst_addr);
+
+	/**
 	 * Schedule the beginning of each TDMA cycle, each one after \p delay
 	 * @param delay to await before starting the TDMA
 	 */
@@ -185,12 +226,25 @@ protected:
 	/**
 	 * Enumeration class of UwSlottedAloha status.
 	 */
-	enum class UWSA_STATUS { IDLE, RECEIVING, TRANSMITTING };
+	enum class UWSA_STATUS {
+		IDLE,
+		RECEIVING,
+		TRANSMITTING,
+		WAITING,
+	};
 
-	double slot_time_;
+	bool enable_ack;
+	bool retx_;
 	uint max_queue_size_; /**< Maximum dimension of queue. */
+	uint retx_count_;
+	int max_retx_;
+	double slot_time_; /**< Duration of a transmission slot in seconds. */
+	double retry_prob_; /**< probability of retransmitting after backoff expire.
+						 */
 	UWSA_STATUS status_; /**< Variable holding the status enum type. */
-	UwSlotTimer timer_; /**< Aloha slot timer handler. */
+	UwSASlotTimer slot_timer_; /**< Aloha slot timer handler. */
+	UwSAAckTimer ack_timer_; /**< Aloha ack timer handler. */
+	Packet *last_data_pkt;
 	std::deque<Packet *> buffer_; /**< Buffer of the MAC node. */
 };
 

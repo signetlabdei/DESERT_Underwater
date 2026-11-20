@@ -31,17 +31,41 @@
  * @author Vincenzo Cimino
  * @version 1.0.0
  *
- * \brief Provides the initialization of uw-cs-burst library
+ * \brief Provides the initialization of uw-slotted-aloha library
  *
  */
 
+#include "uwslotted-aloha-cmn-hdr.h"
+#include <packet.h>
 #include <tclcl.h>
 
 extern EmbeddedTcl slottedAlohaTclCode;
 
+int hdr_SAAck::offset_ = 0;
+
+packet_t PT_SA_ACK;
+
+/**
+ * Class that describe the Header of JAMMER Packet
+ */
+static class SAAckHeaderClass : public PacketHeaderClass
+{
+public:
+	/**
+	 * Constructor of the class
+	 */
+	SAAckHeaderClass()
+		: PacketHeaderClass("PacketHeader/UW/SAAck", sizeof(hdr_SAAck))
+	{
+		this->bind();
+		bind_offset(&hdr_SAAck::offset_);
+	}
+} class_hdr_SAAck;
+
 extern "C" int
 Uwslottedaloha_Init()
 {
+	PT_SA_ACK = p_info::addPacket("UW/SAAck");
 	slottedAlohaTclCode.load();
 	return 0;
 }
